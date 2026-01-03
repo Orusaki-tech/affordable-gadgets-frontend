@@ -139,13 +139,16 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     // Add positioned promotions to their slots
     positionedPromotions.forEach(promo => {
       const pos = promo.carousel_position;
-      items.push({ 
-        type: 'promotion', 
-        data: promo, 
-        uniqueKey: `promo-${promo.id}`,
-        position: pos
-      });
-      usedPromotionIds.add(promo.id);
+      // Type guard: pos is guaranteed to be a number due to filter above, but TypeScript doesn't know that
+      if (pos && pos >= 2 && pos <= 5) {
+        items.push({ 
+          type: 'promotion', 
+          data: promo, 
+          uniqueKey: `promo-${promo.id}`,
+          position: pos
+        });
+        usedPromotionIds.add(promo.id);
+      }
     });
     
     // Fill remaining slots with promotions without positions

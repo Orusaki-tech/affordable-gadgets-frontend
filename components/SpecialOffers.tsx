@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getPlaceholderBannerImage } from '@/lib/utils/placeholders';
+import { Promotion } from '@/lib/api/promotions';
 
 interface SpecialOffersProps {
   filter?: 'special_offers' | 'flash_sales';
@@ -88,7 +89,7 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {specialOffersPromotions.map((promotion) => {
+          {specialOffersPromotions.map((promotion: Promotion) => {
             // Get first product ID from promotion
             const firstProductId = promotion.products && promotion.products.length > 0 
               ? promotion.products[0] 

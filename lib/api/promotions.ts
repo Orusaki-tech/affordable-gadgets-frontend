@@ -4,6 +4,9 @@
 import apiClient from './client';
 import { PaginatedResponse } from './products';
 
+// Re-export PaginatedResponse for convenience
+export type { PaginatedResponse } from './products';
+
 export interface Promotion {
   id: number;
   title: string;
@@ -19,6 +22,7 @@ export interface Promotion {
   product_types: string | null;
   display_locations: string[]; // Array of display location strings: 'stories_carousel', 'special_offers', 'flash_sales'
   products: number[]; // Array of product IDs associated with this promotion
+  carousel_position?: number | null; // Optional position in carousel (1-5)
 }
 
 export const promotionsApi = {

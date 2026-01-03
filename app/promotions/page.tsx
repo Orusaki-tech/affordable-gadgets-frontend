@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { StoriesCarousel } from '@/components/StoriesCarousel';
@@ -8,7 +9,7 @@ import { SpecialOffers } from '@/components/SpecialOffers';
 import { ReviewsShowcase } from '@/components/ReviewsShowcase';
 import { useSearchParams } from 'next/navigation';
 
-export default function PromotionsPage() {
+function PromotionsContent() {
   const searchParams = useSearchParams();
   const filterParam = searchParams.get('filter');
   
@@ -19,32 +20,51 @@ export default function PromotionsPage() {
       : undefined;
 
   return (
+    <main className="flex-1">
+      {/* Stories Carousel */}
+      <section className="container mx-auto px-4 py-6">
+        <StoriesCarousel autoAdvanceDuration={5} />
+      </section>
+
+      {/* Special Offers / Flash Sales (filtered if filter param exists) */}
+      <section className="container mx-auto px-4 py-8">
+        <SpecialOffers filter={filter} />
+      </section>
+
+      {/* Featured Products */}
+      <section className="container mx-auto px-4 py-8">
+        <h2 className="text-3xl font-bold mb-6">Featured Products</h2>
+        <ProductGrid />
+      </section>
+
+      {/* Reviews Showcase */}
+      <section className="container mx-auto px-4 py-8">
+        <ReviewsShowcase />
+      </section>
+    </main>
+  );
+}
+
+export default function PromotionsPage() {
+  return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      
-      <main className="flex-1">
-        {/* Stories Carousel */}
-        <section className="container mx-auto px-4 py-6">
-          <StoriesCarousel autoAdvanceDuration={5} />
-        </section>
-
-        {/* Special Offers / Flash Sales (filtered if filter param exists) */}
-        <section className="container mx-auto px-4 py-8">
-          <SpecialOffers filter={filter} />
-        </section>
-
-        {/* Featured Products */}
-        <section className="container mx-auto px-4 py-8">
-          <h2 className="text-3xl font-bold mb-6">Featured Products</h2>
-          <ProductGrid />
-        </section>
-
-        {/* Reviews Showcase */}
-        <section className="container mx-auto px-4 py-8">
-          <ReviewsShowcase />
-        </section>
-      </main>
-
+      <Suspense fallback={
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-8">
+            <div className="animate-pulse space-y-8">
+              <div className="h-64 bg-gray-200 rounded-lg"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="h-48 bg-gray-200 rounded-lg" />
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      }>
+        <PromotionsContent />
+      </Suspense>
       <Footer />
     </div>
   );

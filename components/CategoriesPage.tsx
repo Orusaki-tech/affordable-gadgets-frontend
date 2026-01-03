@@ -65,7 +65,15 @@ export function CategoriesPage() {
   );
 }
 
-function CategoryProducts({ category }: { category: typeof categories[0] }) {
+type Category = {
+  name: string;
+  code: string;
+  description: string;
+  icon: string;
+  href: string;
+};
+
+function CategoryProducts({ category }: { category: Category }) {
   const { data, isLoading } = useProducts({ type: category.code, page_size: 4 });
 
   if (isLoading) {

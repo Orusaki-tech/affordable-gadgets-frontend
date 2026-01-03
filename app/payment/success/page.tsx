@@ -1,12 +1,13 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import Link from 'next/link';
 import { brandConfig } from '@/lib/config/brand';
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order_id');
   const paymentReference = searchParams.get('payment_reference');
@@ -23,9 +24,7 @@ export default function PaymentSuccessPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
+    <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
         <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
           <div className="mb-6">
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
@@ -87,6 +86,26 @@ export default function PaymentSuccessPage() {
           </div>
         </div>
       </main>
+  );
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <Suspense fallback={
+        <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
+            <div className="animate-pulse">
+              <div className="h-16 w-16 bg-gray-200 rounded-full mx-auto mb-4"></div>
+              <div className="h-8 bg-gray-200 rounded w-48 mx-auto mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-64 mx-auto"></div>
+            </div>
+          </div>
+        </main>
+      }>
+        <PaymentSuccessContent />
+      </Suspense>
       <Footer />
     </div>
   );

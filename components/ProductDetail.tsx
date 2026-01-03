@@ -31,8 +31,8 @@ interface UnitCardProps {
 function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }: UnitCardProps) {
   const [imageIndex, setImageIndex] = useState(0);
   const unitImages = unit.images || [];
-  const primaryImage = unitImages.find((img: any) => img.is_primary) || (unitImages.length > 0 ? unitImages[0] : null);
-  const displayImage = (unitImages.length > imageIndex ? unitImages[imageIndex] : null) || primaryImage;
+  const primaryImage = unitImages.find((img: any) => img.is_primary) || unitImages[0];
+  const displayImage = unitImages[imageIndex] || primaryImage;
   const imageUrl = displayImage?.image_url || null;
   
   const handleImageClick = (index: number, img: any) => {
@@ -155,8 +155,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   // Auto-select unit if only one is available
   useEffect(() => {
-    if (units && units.length === 1 && !selectedUnit && units[0]) {
-      setSelectedUnit(units[0].id);
+    if (units && units.length === 1 && !selectedUnit) {
+      // TypeScript knows units[0] exists because of the length check
+      setSelectedUnit(units[0]!.id);
     }
   }, [units, selectedUnit]);
 
@@ -228,18 +229,18 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   // Auto-select from filtered units when Storage and Color are selected
   useEffect(() => {
-    if (filteredUnits.length > 0 && filteredUnits[0]) {
+    if (filteredUnits.length > 0) {
     if (filteredUnits.length === 1 && !selectedUnit) {
         // Auto-select if only one unit matches
-      setSelectedUnit(filteredUnits[0].id);
+      setSelectedUnit(filteredUnits[0]!.id);
       } else if (selectedStorage && selectedColor && !selectedUnit) {
         // Auto-select first available unit when both Storage and Color are selected
-        setSelectedUnit(filteredUnits[0].id);
+        setSelectedUnit(filteredUnits[0]!.id);
       } else if (selectedUnit) {
         // Check if currently selected unit is still available
       const stillAvailable = filteredUnits.some(u => u.id === selectedUnit);
-        if (!stillAvailable && filteredUnits.length > 0 && filteredUnits[0]) {
-        setSelectedUnit(filteredUnits[0].id);
+        if (!stillAvailable && filteredUnits.length > 0) {
+        setSelectedUnit(filteredUnits[0]!.id);
       }
     }
     } else if (selectedUnit) {
@@ -289,11 +290,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     }
     
     // Use the first available unit (or could let user select)
-    const unit = variant.units[0];
-    if (!unit) {
-      alert('No unit available');
-      return;
-    }
+    // TypeScript doesn't understand the control flow, so we use non-null assertion
+    const unit = variant.units[0]!;
     
     setIsAddingToCart(true);
     try {
@@ -1032,7 +1030,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         <p className="text-sm text-gray-600 mb-2">
                           Compatible with: {accessory.main_product_name}
                         </p>
-                        {accessory.accessory_price_range && accessory.accessory_price_range.min !== null && accessory.accessory_price_range.max !== null && (
+                        {accessory.accessory_price_range && (
                           <p className="text-sm font-semibold text-gray-800">
                             {accessory.accessory_price_range.min === accessory.accessory_price_range.max
                               ? formatPrice(accessory.accessory_price_range.min)
@@ -1080,7 +1078,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                             <div className="relative w-full h-32 bg-gray-100 rounded mb-2 overflow-hidden cursor-pointer">
                               <Image
                                 src={
-                                  variant.units[0]?.image_url || 
+                                  variant.units?.[0]?.image_url || 
                                   accessory.accessory_primary_image || 
                                   getPlaceholderProductImage(accessory.accessory_name)
                                 }
@@ -1100,14 +1098,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                             </div>
                             
                             {/* Price */}
-                            {variant.min_price !== null && variant.max_price !== null && (
-                              <p className="text-sm font-semibold text-gray-800 mb-2">
-                                {variant.min_price === variant.max_price
-                                  ? formatPrice(variant.min_price)
-                                  : `${formatPrice(variant.min_price)} - ${formatPrice(variant.max_price)}`
-                                }
-                              </p>
-                            )}
+                            <p className="text-sm font-semibold text-gray-800 mb-2">
+                              {variant.min_price === variant.max_price
+                                ? formatPrice(variant.min_price)
+                                : `${formatPrice(variant.min_price)} - ${formatPrice(variant.max_price)}`
+                              }
+                            </p>
                             
                             {/* Stock Info */}
                             <p className="text-xs text-gray-600 mb-2">

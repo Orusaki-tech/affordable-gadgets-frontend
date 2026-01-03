@@ -2,11 +2,11 @@
 
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProduct } from '@/lib/hooks/useProducts';
+import { Promotion } from '@/lib/api/promotions';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getPlaceholderBannerImage } from '@/lib/utils/placeholders';
-import { Promotion } from '@/lib/api/promotions';
 
 interface SpecialOffersProps {
   filter?: 'special_offers' | 'flash_sales';
@@ -59,7 +59,7 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
   }
 
   // Filter promotions based on filter prop or default behavior
-  const specialOffersPromotions = (data?.results || []).filter((promo: any) => {
+  const specialOffersPromotions = (data?.results || []).filter((promo: Promotion) => {
     const locations = promo.display_locations || [];
     if (filter === 'special_offers') {
       return Array.isArray(locations) && locations.includes('special_offers');

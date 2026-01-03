@@ -10,7 +10,13 @@ import { useSearchParams } from 'next/navigation';
 
 export default function PromotionsPage() {
   const searchParams = useSearchParams();
-  const filter = searchParams.get('filter');
+  const filterParam = searchParams.get('filter');
+  
+  // Type guard: ensure filter is one of the valid values
+  const filter: 'special_offers' | 'flash_sales' | undefined = 
+    filterParam === 'special_offers' || filterParam === 'flash_sales' 
+      ? filterParam 
+      : undefined;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -24,7 +30,7 @@ export default function PromotionsPage() {
 
         {/* Special Offers / Flash Sales (filtered if filter param exists) */}
         <section className="container mx-auto px-4 py-8">
-          <SpecialOffers filter={filter || undefined} />
+          <SpecialOffers filter={filter} />
         </section>
 
         {/* Featured Products */}

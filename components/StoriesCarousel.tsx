@@ -380,7 +380,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                 );
                 } else {
                   // Product Video
-                  const product = item.data;
+                  const product = item.data as Product;
                   return (
                     <div
                       key={item.uniqueKey}
@@ -580,7 +580,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               );
                 } else {
                   // Product Video
-                  const product = item.data;
+                  const product = item.data as Product;
                   return (
                     <div
                       key={item.uniqueKey}

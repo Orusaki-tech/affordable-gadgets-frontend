@@ -12,6 +12,7 @@ export interface CreateOrderRequest {
   customer_phone?: string;
   customer_email?: string;
   delivery_address?: string;
+  order_source?: string;
   brand?: number;
 }
 

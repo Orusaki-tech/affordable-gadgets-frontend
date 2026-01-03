@@ -280,8 +280,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   };
 
   const handleAddAccessoryVariantToCart = async (
-    accessory: typeof accessories[0],
-    variant: typeof accessories[0]['accessory_color_variants'][0]
+    accessory: NonNullable<typeof accessories>[0],
+    variant: NonNullable<typeof accessories>[0]['accessory_color_variants'][0]
   ) => {
     if (!variant.units || variant.units.length === 0) {
       alert('No units available for this color variant');

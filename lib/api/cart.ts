@@ -57,6 +57,21 @@ export interface CheckoutResponse {
   };
 }
 
+export interface Customer {
+  id: number;
+  name: string;
+  phone: string;
+  email?: string | null;
+  address?: string | null;
+}
+
+export interface AddItemPayload {
+  inventory_unit_id: number;
+  quantity: number;
+  promotion_id?: number;
+  unit_price?: number;
+}
+
 export const cartApi = {
   /**
    * Create or get existing cart
@@ -87,7 +102,7 @@ export const cartApi = {
     promotionId?: number,
     unitPrice?: number
   ): Promise<CartItem> => {
-    const payload: any = {
+    const payload: AddItemPayload = {
       inventory_unit_id: inventoryUnitId,
       quantity,
     };
@@ -123,7 +138,7 @@ export const cartApi = {
    * Recognize customer by phone
    */
   recognizeCustomer: async (phone: string): Promise<{
-    customer: any | null;
+    customer: Customer | null;
     is_returning: boolean;
     message: string | null;
   }> => {

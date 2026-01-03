@@ -5,6 +5,7 @@ import { usePromotion } from '@/lib/hooks/usePromotions';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
 import { useCompare } from '@/lib/hooks/useCompare';
+import { InventoryUnit, InventoryUnitImage } from '@/lib/api/products';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo } from 'react';
@@ -21,7 +22,7 @@ interface ProductDetailProps {
 type TabType = 'overview' | 'specs' | 'reviews' | 'videos';
 
 interface UnitCardProps {
-  unit: any;
+  unit: InventoryUnit;
   isSelected: boolean;
   onSelect: (unitId: number) => void;
   promotionPrice: number | null;
@@ -31,11 +32,11 @@ interface UnitCardProps {
 function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }: UnitCardProps) {
   const [imageIndex, setImageIndex] = useState(0);
   const unitImages = unit.images || [];
-  const primaryImage = unitImages.find((img: any) => img.is_primary) || unitImages[0];
-  const displayImage = unitImages[imageIndex] || primaryImage;
+  const primaryImage = unitImages.find((img: InventoryUnitImage) => img.is_primary) || (unitImages.length > 0 ? unitImages[0] : null);
+  const displayImage = (unitImages.length > imageIndex ? unitImages[imageIndex] : null) || primaryImage;
   const imageUrl = displayImage?.image_url || null;
   
-  const handleImageClick = (index: number, img: any) => {
+  const handleImageClick = (index: number, img: InventoryUnitImage) => {
     setImageIndex(index);
     // Auto-select color if image has associated color
     if (img.color_name) {
@@ -113,9 +114,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     // Add all unique unit images (for color selection)
     if (units && units.length > 0) {
       const unitImageUrls = new Set<string>();
-      units.forEach((unit: any) => {
+      units.forEach((unit: InventoryUnit) => {
         if (unit.images && unit.images.length > 0) {
-          unit.images.forEach((img: any) => {
+          unit.images.forEach((img: InventoryUnitImage) => {
             if (img.image_url && !unitImageUrls.has(img.image_url)) {
               unitImageUrls.add(img.image_url);
               images.push(img.image_url);
@@ -155,9 +156,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   // Auto-select unit if only one is available
   useEffect(() => {
-    if (units && units.length === 1 && !selectedUnit) {
-      // TypeScript knows units[0] exists because of the length check
-      setSelectedUnit(units[0]!.id);
+    if (units && units.length === 1 && !selectedUnit && units[0]) {
+      setSelectedUnit(units[0].id);
     }
   }, [units, selectedUnit]);
 
@@ -229,18 +229,18 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   // Auto-select from filtered units when Storage and Color are selected
   useEffect(() => {
-    if (filteredUnits.length > 0) {
+    if (filteredUnits.length > 0 && filteredUnits[0]) {
     if (filteredUnits.length === 1 && !selectedUnit) {
         // Auto-select if only one unit matches
-      setSelectedUnit(filteredUnits[0]!.id);
+      setSelectedUnit(filteredUnits[0].id);
       } else if (selectedStorage && selectedColor && !selectedUnit) {
         // Auto-select first available unit when both Storage and Color are selected
-        setSelectedUnit(filteredUnits[0]!.id);
+        setSelectedUnit(filteredUnits[0].id);
       } else if (selectedUnit) {
         // Check if currently selected unit is still available
       const stillAvailable = filteredUnits.some(u => u.id === selectedUnit);
-        if (!stillAvailable && filteredUnits.length > 0) {
-        setSelectedUnit(filteredUnits[0]!.id);
+        if (!stillAvailable && filteredUnits.length > 0 && filteredUnits[0]) {
+        setSelectedUnit(filteredUnits[0].id);
       }
     }
     } else if (selectedUnit) {
@@ -290,8 +290,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     }
     
     // Use the first available unit (or could let user select)
-    // TypeScript doesn't understand the control flow, so we use non-null assertion
-    const unit = variant.units[0]!;
+    const unit = variant.units[0];
+    if (!unit) {
+      alert('No unit available');
+      return;
+    }
     
     setIsAddingToCart(true);
     try {
@@ -349,7 +352,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   // Get main display image - show selected unit's image if available, otherwise product image
   const mainDisplayImage = useMemo(() => {
     if (selectedUnitData?.images && selectedUnitData.images.length > 0) {
-      const primaryImg = selectedUnitData.images.find((img: any) => img.is_primary);
+      const primaryImg = selectedUnitData.images.find((img: InventoryUnitImage) => img.is_primary);
       return primaryImg?.image_url || selectedUnitData.images[0]?.image_url || productImages[selectedImageIndex] || product?.primary_image || (product ? getPlaceholderProductImage(product.product_name) : '');
     }
     return productImages[selectedImageIndex] || product?.primary_image || (product ? getPlaceholderProductImage(product.product_name) : '');
@@ -469,8 +472,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
               {productImages.map((img, index) => {
                 // Try to find a unit with this image to get color info
-                const unitWithImage = units?.find((u: any) => 
-                  u.images?.some((imgObj: any) => imgObj.image_url === img)
+                const unitWithImage = units?.find((u: InventoryUnit) => 
+                  u.images?.some((imgObj: InventoryUnitImage) => imgObj.image_url === img)
                 );
                 const imageColor = unitWithImage?.color_name || null;
                 
@@ -651,7 +654,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   <div className="flex flex-wrap gap-1.5">
                     {uniqueColors.map((color) => {
                       // Check if this color has units available with current storage filter
-                      const availableForColor = units?.filter((u: any) => {
+                      const availableForColor = units?.filter((u: InventoryUnit) => {
                         if (selectedStorage && u.storage_gb !== selectedStorage) return false;
                         return u.color_name === color;
                       }) || [];
@@ -1030,7 +1033,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         <p className="text-sm text-gray-600 mb-2">
                           Compatible with: {accessory.main_product_name}
                         </p>
-                        {accessory.accessory_price_range && (
+                        {accessory.accessory_price_range && accessory.accessory_price_range.min !== null && accessory.accessory_price_range.max !== null && (
                           <p className="text-sm font-semibold text-gray-800">
                             {accessory.accessory_price_range.min === accessory.accessory_price_range.max
                               ? formatPrice(accessory.accessory_price_range.min)
@@ -1078,7 +1081,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                             <div className="relative w-full h-32 bg-gray-100 rounded mb-2 overflow-hidden cursor-pointer">
                               <Image
                                 src={
-                                  variant.units?.[0]?.image_url || 
+                                  variant.units[0]?.image_url || 
                                   accessory.accessory_primary_image || 
                                   getPlaceholderProductImage(accessory.accessory_name)
                                 }
@@ -1098,12 +1101,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                             </div>
                             
                             {/* Price */}
-                            <p className="text-sm font-semibold text-gray-800 mb-2">
-                              {variant.min_price === variant.max_price
-                                ? formatPrice(variant.min_price)
-                                : `${formatPrice(variant.min_price)} - ${formatPrice(variant.max_price)}`
-                              }
-                            </p>
+                            {variant.min_price !== null && variant.max_price !== null && (
+                              <p className="text-sm font-semibold text-gray-800 mb-2">
+                                {variant.min_price === variant.max_price
+                                  ? formatPrice(variant.min_price)
+                                  : `${formatPrice(variant.min_price)} - ${formatPrice(variant.max_price)}`
+                                }
+                              </p>
+                            )}
                             
                             {/* Stock Info */}
                             <p className="text-xs text-gray-600 mb-2">

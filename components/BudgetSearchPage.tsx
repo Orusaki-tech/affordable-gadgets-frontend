@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useBudgetSearch } from '@/lib/hooks/useBudget';
+import { Product } from '@/lib/api/products';
 import { formatPrice, formatPriceRange } from '@/lib/utils/format';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 import Link from 'next/link';
@@ -159,7 +160,7 @@ export function BudgetSearchPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {data.results.map((product: any) => {
+              {data.results.map((product: Product) => {
                 const hasStock = product.available_units_count > 0;
                 const interestText = product.interest_count > 0 
                   ? `${product.interest_count} ${product.interest_count === 1 ? 'person' : 'people'} interested`

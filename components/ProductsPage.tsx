@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { usePromotion } from '@/lib/hooks/usePromotions';
+import { Promotion } from '@/lib/api/promotions';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, FilterState } from './ProductFilters';
 import { useState, useMemo } from 'react';
@@ -56,13 +57,14 @@ export function ProductsPage() {
     <div>
       {promotionData ? (
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h1 className="text-4xl font-bold mb-2">{(promotionData as any).title}</h1>
-          {(promotionData as any).description && (
-            <p className="text-gray-600 mb-2">{(promotionData as any).description}</p>
+          <h1 className="text-4xl font-bold mb-2">{promotionData.title}</h1>
+          {promotionData.description && (
+            <p className="text-gray-600 mb-2">{promotionData.description}</p>
           )}
-          {(promotionData as any).promotion_code && (
+          {/* Note: promotion_code is not in the Promotion interface, but keeping for backward compatibility */}
+          {(promotionData as Promotion & { promotion_code?: string }).promotion_code && (
             <p className="text-sm text-gray-500">
-              Promotion Code: <code className="bg-white px-2 py-1 rounded">{(promotionData as any).promotion_code}</code>
+              Promotion Code: <code className="bg-white px-2 py-1 rounded">{(promotionData as Promotion & { promotion_code?: string }).promotion_code}</code>
             </p>
           )}
         </div>
@@ -117,7 +119,7 @@ export function ProductsPage() {
             Showing {data.results.length} of {data.count} product{data.count !== 1 ? 's' : ''}
             {promotionId && promotionData && (
               <span className="ml-2 text-sm text-blue-600">
-                (filtered by promotion: {(promotionData as any).title})
+                (filtered by promotion: {promotionData.title})
               </span>
             )}
           </p>

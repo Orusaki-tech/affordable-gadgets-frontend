@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { Promotion } from '@/lib/api/promotions';
+import { Product } from '@/lib/api/products';
 import { getPlaceholderBannerImage, getPlaceholderVideoThumbnail } from '@/lib/utils/placeholders';
 import { useRouter } from 'next/navigation';
 
@@ -86,8 +87,8 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
       );
     }).sort((a, b) => {
       // Sort by carousel_position if set, otherwise by start_date
-      const aPos = (a as any).carousel_position;
-      const bPos = (b as any).carousel_position;
+      const aPos = a.carousel_position;
+      const bPos = b.carousel_position;
       
       if (aPos && bPos) {
         return aPos - bPos; // Sort by position number (1-5)
@@ -112,14 +113,14 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   // Get items for display: use carousel_position if set, otherwise use order
   const bannerItem = useMemo(() => {
     // Find promotion with position 1, or first promotion if no position set
-    const position1Promo = allPromotions.find(p => (p as any).carousel_position === 1);
+    const position1Promo = allPromotions.find(p => p.carousel_position === 1);
     if (position1Promo) return position1Promo;
     // Fallback to first promotion if no position 1 is set
     return allPromotions.length > 0 ? allPromotions[0] : null;
   }, [allPromotions]);
 
   const gridItems = useMemo(() => {
-    const items: Array<{ type: 'promotion' | 'video'; data: any; uniqueKey: string; position: number }> = [];
+    const items: Array<{ type: 'promotion' | 'video'; data: Promotion | Product; uniqueKey: string; position: number }> = [];
     const usedPromotionIds = new Set<number>();
     
     // Add banner item to used set
@@ -130,14 +131,14 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     // Get promotions with positions 2-5
     const positionedPromotions = allPromotions
       .filter(promo => {
-        const pos = (promo as any).carousel_position;
+        const pos = promo.carousel_position;
         return pos && pos >= 2 && pos <= 5 && !usedPromotionIds.has(promo.id);
       })
-      .sort((a, b) => (a as any).carousel_position - (b as any).carousel_position);
+      .sort((a, b) => (a.carousel_position || 0) - (b.carousel_position || 0));
     
     // Add positioned promotions to their slots
     positionedPromotions.forEach(promo => {
-      const pos = (promo as any).carousel_position;
+      const pos = promo.carousel_position;
       items.push({ 
         type: 'promotion', 
         data: promo, 
@@ -150,7 +151,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     // Fill remaining slots with promotions without positions
     const unpositionedPromotions = allPromotions.filter(promo => 
       !usedPromotionIds.has(promo.id) && 
-      (!(promo as any).carousel_position || (promo as any).carousel_position > 5)
+      (!promo.carousel_position || promo.carousel_position > 5)
     );
     
     // Fill positions 2-5 in order
@@ -197,7 +198,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     }
   };
 
-  const handleVideoClick = (product: any) => {
+  const handleVideoClick = (product: Product) => {
     if (product.product_video_url) {
       setSelectedVideo({
         url: product.product_video_url,

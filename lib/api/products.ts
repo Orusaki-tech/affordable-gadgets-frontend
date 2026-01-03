@@ -42,6 +42,7 @@ export interface InventoryUnit {
   storage_gb: number | null;
   ram_gb: number | null;
   battery_mah: number | null;
+  processor_details?: string | null;
   product_color: number | null;
   color_name: string | null;
   interest_count: number;

@@ -2,6 +2,7 @@
  * Order API functions
  */
 import apiClient from './client';
+import { getIdempotencyKey } from '@/lib/utils/idempotency';
 
 export interface CreateOrderRequest {
   order_items: Array<{
@@ -43,10 +44,14 @@ export const orderApi = {
     const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     
+    // Generate or get idempotency key for this order
+    const idempotencyKey = getIdempotencyKey(data);
+    
     const response = await fetch(`${baseURL}/api/inventory/orders/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Idempotency-Key': idempotencyKey,  // Send idempotency key in header
         ...(token && { 'Authorization': `Token ${token}` }),
       },
       credentials: 'include',

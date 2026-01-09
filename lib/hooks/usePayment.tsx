@@ -10,6 +10,7 @@ interface UsePaymentOptions {
   onPaymentFailed?: (error: string) => void;
   pollInterval?: number; // milliseconds
   maxPollAttempts?: number;
+  autoStartPolling?: boolean; // New option to control polling
 }
 
 export function usePayment({
@@ -18,6 +19,7 @@ export function usePayment({
   onPaymentFailed,
   pollInterval = 3000, // 3 seconds
   maxPollAttempts = 100, // 5 minutes total
+  autoStartPolling = false, // Default to false - don't auto-poll
 }: UsePaymentOptions) {
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatusResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,9 +43,11 @@ export function usePayment({
       const response = await paymentApi.initiatePayment(orderId, data);
       
       if (response.success && response.redirect_url) {
-        // Start polling for payment status
-        setIsPolling(true);
-        setPollAttempts(0);
+        // ✅ FIXED: Don't start polling immediately
+        // Only return the response - let the component handle redirect
+        // Polling should only start when user returns from Pesapal
+        console.log('[PESAPAL] Payment initiated successfully - redirect_url received');
+        console.log('[PESAPAL] NOT starting polling - user will be redirected to Pesapal');
         return response;
       } else {
         setError(response.error || 'Failed to initiate payment');
@@ -108,6 +112,15 @@ export function usePayment({
   }, [orderId, onPaymentComplete, onPaymentFailed]);
 
   /**
+   * Start polling payment status
+   */
+  const startPolling = useCallback(() => {
+    console.log('[PESAPAL] Starting payment status polling...');
+    setIsPolling(true);
+    setPollAttempts(0);
+  }, []);
+
+  /**
    * Poll payment status
    */
   useEffect(() => {
@@ -169,6 +182,7 @@ export function usePayment({
     pollAttempts,
     initiatePayment,
     checkPaymentStatus,
+    startPolling, // ✅ NEW: Expose startPolling method
     stopPolling,
   };
 }

@@ -25,8 +25,10 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
     isPolling,
     initiatePayment,
     checkPaymentStatus,
+    startPolling, // ✅ NEW: Use startPolling method
   } = usePayment({
     orderId,
+    autoStartPolling: false, // ✅ FIXED: Don't auto-start polling
     onPaymentComplete: () => {
       // Redirect to success page
       const successUrl = callbackUrl || `/payment/success?order_id=${orderId}`;
@@ -38,8 +40,17 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
     },
   });
 
-  // Initialize payment on mount
+  // Initialize payment on mount (only if not returning from Pesapal)
   useEffect(() => {
+    const orderTrackingId = searchParams.get('OrderTrackingId');
+    
+    // ✅ FIXED: If user is returning from Pesapal, don't initiate payment again
+    if (orderTrackingId) {
+      console.log('[PESAPAL] User returned from Pesapal - OrderTrackingId:', orderTrackingId);
+      console.log('[PESAPAL] Skipping payment initiation - will check status instead');
+      return;
+    }
+
     const initPayment = async () => {
       console.log('\n[PESAPAL] ========== COMPONENT: INITIALIZE PAYMENT START ==========');
       console.log('[PESAPAL] Order ID:', orderId);
@@ -80,31 +91,46 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
     }
   }, [orderId, callbackUrl, searchParams, redirectUrl, paymentStatus, initiatePayment]);
 
-  // Auto-redirect to Pesapal when redirect URL is available
+  // ✅ FIXED: Redirect immediately (or with minimal delay) to Pesapal
   useEffect(() => {
     if (redirectUrl && !hasRedirected) {
       setHasRedirected(true);
-      // Small delay to show loading state
+      console.log('[PESAPAL] Redirecting to Pesapal payment page...');
+      // ✅ FIXED: Remove 1-second delay - redirect immediately
+      // Small delay (100ms) only to ensure state is set
       setTimeout(() => {
         window.location.href = redirectUrl;
-      }, 1000);
+      }, 100);
     }
   }, [redirectUrl, hasRedirected]);
 
-  // Check payment status if returning from Pesapal
+  // ✅ FIXED: Check payment status and start polling ONLY when user returns from Pesapal
   useEffect(() => {
     const orderTrackingId = searchParams.get('OrderTrackingId');
     console.log('[PESAPAL] Checking for OrderTrackingId in URL params:', orderTrackingId);
     
-    if (orderTrackingId && orderId) {
-      console.log('[PESAPAL] OrderTrackingId found - checking payment status');
+    // ✅ FIXED: Only check status if user returned from Pesapal (has OrderTrackingId)
+    // AND we haven't redirected yet (to avoid checking before redirect)
+    if (orderTrackingId && orderId && !redirectUrl) {
+      console.log('[PESAPAL] OrderTrackingId found - user returned from Pesapal');
       console.log('[PESAPAL] Order ID:', orderId);
       console.log('[PESAPAL] Order Tracking ID:', orderTrackingId);
+      
+      // Start polling for payment status
+      console.log('[PESAPAL] Starting payment status polling...');
+      startPolling();
+      
+      // Also do an immediate check
       checkPaymentStatus();
     } else {
-      console.log('[PESAPAL] No OrderTrackingId found or missing orderId - skipping status check');
+      console.log('[PESAPAL] No OrderTrackingId found or conditions not met - skipping status check');
+      console.log('[PESAPAL] Conditions:', {
+        hasOrderTrackingId: !!orderTrackingId,
+        hasOrderId: !!orderId,
+        hasRedirectUrl: !!redirectUrl,
+      });
     }
-  }, [searchParams, orderId, checkPaymentStatus]);
+  }, [searchParams, orderId, checkPaymentStatus, startPolling, redirectUrl]);
 
   // Payment status display
   if (paymentStatus) {
@@ -226,6 +252,46 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
             <p className="text-gray-600 mb-4">
               {redirectUrl ? 'Please wait while we redirect you to Pesapal...' : 'Initializing payment...'}
             </p>
+            <div className="text-sm text-gray-500">
+              <p>Order: {orderId}</p>
+              <p>Amount: {formatPrice(totalAmount)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Processing payment state (when polling)
+  if (isPolling && !paymentStatus) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
+          <div className="mb-6">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
+              <svg
+                className="animate-spin h-8 w-8 text-blue-600"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold mb-2">Processing Payment</h2>
+            <p className="text-gray-600 mb-4">Payment is being processed...</p>
             <div className="text-sm text-gray-500">
               <p>Order: {orderId}</p>
               <p>Amount: {formatPrice(totalAmount)}</p>

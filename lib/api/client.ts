@@ -9,11 +9,6 @@ import { brandConfig } from '@/lib/config/brand';
 // Normalize base URL: remove trailing slash to avoid double slashes
 const normalizedBaseUrl = brandConfig.apiBaseUrl.replace(/\/+$/, '');
 const apiBaseUrl = `${normalizedBaseUrl}/api/v1/public`;
-// #region agent log
-if (typeof window !== 'undefined') {
-  fetch('http://127.0.0.1:7242/ingest/b929b5de-6cb5-433f-9de2-1e9133201c78',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'client.ts:10',message:'API client initialized',data:{originalApiBaseUrl:brandConfig.apiBaseUrl,normalizedBaseUrl:normalizedBaseUrl,fullBaseURL:apiBaseUrl,brandCode:brandConfig.code,envVar:process.env.NEXT_PUBLIC_API_BASE_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'api-404-debug',hypothesisId:'A'})}).catch(()=>{});
-}
-// #endregion
 const apiClient: AxiosInstance = axios.create({
   baseURL: apiBaseUrl,
   headers: {
@@ -30,10 +25,6 @@ apiClient.interceptors.request.use(
     if (config.headers) {
       config.headers['X-Brand-Code'] = brandConfig.code;
     }
-    // #region agent log
-    const fullUrl = config.baseURL ? `${config.baseURL}${config.url || ''}` : (config.url || '');
-    fetch('http://127.0.0.1:7242/ingest/b929b5de-6cb5-433f-9de2-1e9133201c78',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'client.ts:20',message:'API request initiated',data:{method:config.method,url:config.url,baseURL:config.baseURL,fullURL:fullUrl,params:config.params,brandCode:brandConfig.code},timestamp:Date.now(),sessionId:'debug-session',runId:'api-404-debug',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     return config;
   },
   (error) => {
@@ -72,15 +63,9 @@ apiClient.interceptors.response.use(
     // Log error if we have any information
     if (Object.keys(errorInfo).length > 0) {
       console.error('API Error:', errorInfo);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/b929b5de-6cb5-433f-9de2-1e9133201c78',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'client.ts:62',message:'API error caught',data:errorInfo,timestamp:Date.now(),sessionId:'debug-session',runId:'api-404-debug',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
     } else {
       // Fallback: log the raw error
       console.error('API Error (raw):', error);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/b929b5de-6cb5-433f-9de2-1e9133201c78',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'client.ts:65',message:'API error (raw)',data:{errorMessage:error?.message,errorName:error?.name,errorCode:error?.code},timestamp:Date.now(),sessionId:'debug-session',runId:'api-404-debug',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
     }
     
     // Handle common errors with specific messages

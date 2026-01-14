@@ -71,17 +71,7 @@ export const productsApi = {
     ordering?: string;
     promotion?: number; // Promotion ID to filter products
   }): Promise<PaginatedResponse<Product>> => {
-    // #region agent log
-    if (typeof window !== 'undefined') {
-      fetch('http://127.0.0.1:7242/ingest/b929b5de-6cb5-433f-9de2-1e9133201c78',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'products.ts:74',message:'Fetching products',data:{params},timestamp:Date.now(),sessionId:'debug-session',runId:'products-debug',hypothesisId:'A'})}).catch(()=>{});
-    }
-    // #endregion
     const response = await apiClient.get('/products/', { params });
-    // #region agent log
-    if (typeof window !== 'undefined') {
-      fetch('http://127.0.0.1:7242/ingest/b929b5de-6cb5-433f-9de2-1e9133201c78',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'products.ts:76',message:'Products API response',data:{count:response.data?.count,resultsCount:response.data?.results?.length,hasNext:!!response.data?.next,hasPrevious:!!response.data?.previous},timestamp:Date.now(),sessionId:'debug-session',runId:'products-debug',hypothesisId:'A'})}).catch(()=>{});
-    }
-    // #endregion
     return response.data;
   },
 

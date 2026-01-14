@@ -19,6 +19,14 @@ function PaymentSuccessContent() {
     const apiBaseUrl = brandConfig.apiBaseUrl || 'http://localhost:8000';
     const receiptUrl = `${apiBaseUrl}/api/inventory/orders/${orderId}/receipt/?format=pdf`;
     
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/b3aea4aa-ba5b-4cfc-9488-9a1aecd960da',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/payment/success/page.tsx:20',message:'Receipt URL constructed',data:{orderId,apiBaseUrl,receiptUrl,fullUrl:receiptUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/b3aea4aa-ba5b-4cfc-9488-9a1aecd960da',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/payment/success/page.tsx:23',message:'About to open receipt URL',data:{receiptUrl,hasReceipt:receiptUrl.includes('/receipt/')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    
     // Open in new tab to download
     window.open(receiptUrl, '_blank');
   };

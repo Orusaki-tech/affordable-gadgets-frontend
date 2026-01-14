@@ -41,3 +41,4 @@ export function getIdempotencyKey(orderData: any): string {
   sessionStorage.setItem(storageKey, newKey);
   return newKey;
 }
+

@@ -1,6 +1,7 @@
 'use client';
 
 import { Suspense } from 'react';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -27,6 +28,16 @@ function PaymentSuccessContent() {
     <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
         <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
           <div className="mb-6">
+            <div className="flex justify-center mb-4">
+              <Image 
+                src="/affordablelogo.png" 
+                alt={`${brandConfig.name} logo`}
+                width={100}
+                height={100}
+                className="object-contain h-16 w-auto"
+                priority
+              />
+            </div>
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
               <svg
                 className="h-8 w-8 text-green-600"

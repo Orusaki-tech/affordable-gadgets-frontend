@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePayment } from '@/lib/hooks/usePayment';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
+import { brandConfig } from '@/lib/config/brand';
 
 interface PaymentPageProps {
   orderId: string;
@@ -180,6 +182,16 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
             <div className="mb-6">
+              <div className="flex justify-center mb-4">
+                <Image 
+                  src="/affordablelogo.png" 
+                  alt={`${brandConfig.name} logo`}
+                  width={100}
+                  height={100}
+                  className="object-contain h-16 w-auto"
+                  priority
+                />
+              </div>
               <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
                 <svg
                   className="h-8 w-8 text-red-600"
@@ -226,6 +238,16 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
           <div className="mb-6">
+            <div className="flex justify-center mb-4">
+              <Image 
+                src="/affordablelogo.png" 
+                alt={`${brandConfig.name} logo`}
+                width={100}
+                height={100}
+                className="object-contain h-16 w-auto"
+                priority
+              />
+            </div>
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
               <svg
                 className="animate-spin h-8 w-8 text-blue-600"
@@ -268,6 +290,16 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
           <div className="mb-6">
+            <div className="flex justify-center mb-4">
+              <Image 
+                src="/affordablelogo.png" 
+                alt={`${brandConfig.name} logo`}
+                width={100}
+                height={100}
+                className="object-contain h-16 w-auto"
+                priority
+              />
+            </div>
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
               <svg
                 className="animate-spin h-8 w-8 text-blue-600"
@@ -308,6 +340,16 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
           <div className="mb-6">
+            <div className="flex justify-center mb-4">
+              <Image 
+                src="/affordablelogo.png" 
+                alt={`${brandConfig.name} logo`}
+                width={100}
+                height={100}
+                className="object-contain h-16 w-auto"
+                priority
+              />
+            </div>
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
               <svg
                 className="h-8 w-8 text-red-600"

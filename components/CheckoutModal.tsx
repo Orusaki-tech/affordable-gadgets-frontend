@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useCart } from '@/lib/hooks/useCart';
 import { formatPrice } from '@/lib/utils/format';
 import { useRouter } from 'next/navigation';
@@ -285,6 +286,16 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg max-w-md w-full p-6 text-center max-h-[90vh] overflow-y-auto">
           <div className="mb-6">
+            <div className="flex justify-center mb-4">
+              <Image 
+                src="/affordablelogo.png" 
+                alt={`${brandConfig.name} logo`}
+                width={100}
+                height={100}
+                className="object-contain h-16 w-auto"
+                priority
+              />
+            </div>
             <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
               <svg
                 className="h-8 w-8 text-green-600"
@@ -353,7 +364,17 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">Checkout</h2>
+        <div className="flex items-center justify-center mb-6">
+          <Image 
+            src="/affordablegadgetslogo.png" 
+            alt={`${brandConfig.name} logo`}
+            width={100}
+            height={100}
+            className="object-contain h-12 w-auto"
+            priority
+          />
+        </div>
+        <h2 className="text-2xl font-bold mb-4 text-center">Checkout</h2>
         
         {/* Payment Mode Selection */}
         <div className="mb-6">

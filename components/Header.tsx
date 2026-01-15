@@ -28,46 +28,19 @@ export function Header() {
             href="/" 
             className="flex items-center gap-3 shrink-0 hover:opacity-80 transition-opacity group"
           >
-            {/* Logo Image Placeholder */}
-            {/* 
-              TO REPLACE WITH ACTUAL LOGO:
-              1. Add your logo image to /public/logo.png (or logo.svg)
-              2. Uncomment the Image component below
-              3. Remove or comment out the SVG placeholder
-              4. Adjust width/height as needed
-            */}
-            <div className="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg shadow-md group-hover:shadow-lg transition-shadow overflow-hidden">
-              {/* Placeholder SVG - This will be replaced with actual logo */}
-              <svg 
-                className="w-6 h-6 md:w-7 md:h-7 text-white" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2.5} 
-                  d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" 
-                />
-              </svg>
-              
-              {/* Uncomment this when you have the logo image ready */}
-              {/* 
+            <div className="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-lg shadow-md group-hover:shadow-lg transition-shadow overflow-hidden">
               <Image 
-                src="/logo.png" 
+                src="/affordablelogo.png" 
                 alt={`${brandConfig.name} logo`}
                 width={48}
                 height={48}
-                className="object-contain p-1"
+                className="object-contain w-full h-full"
                 priority
               /> 
-              */}
             </div>
             
             {/* Logo Text - Hidden on mobile/tablet, visible on desktop */}
-            <span className="hidden lg:block text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <span className="hidden lg:block text-2xl font-bold text-black">
               {brandConfig.name}
             </span>
           </Link>

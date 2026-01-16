@@ -41,7 +41,9 @@ export const orderApi = {
    */
   createOrder: async (data: CreateOrderRequest): Promise<OrderResponse> => {
     // Use inventory API endpoint (requires authentication)
-    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+    // Normalize base URL: remove trailing slash to avoid double slashes
+    const rawBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+    const baseURL = rawBaseURL.trim().replace(/\/+$/, '') || 'http://localhost:8000';
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     
     // Generate or get idempotency key for this order
@@ -113,7 +115,9 @@ export const orderApi = {
    */
   getOrder: async (orderId: string): Promise<OrderResponse> => {
     // Use inventory API endpoint (requires authentication)
-    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+    // Normalize base URL: remove trailing slash to avoid double slashes
+    const rawBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+    const baseURL = rawBaseURL.trim().replace(/\/+$/, '') || 'http://localhost:8000';
     const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
     
     const response = await fetch(`${baseURL}/api/inventory/orders/${orderId}/`, {

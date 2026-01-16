@@ -14,6 +14,10 @@ export interface Review {
   comment: string;
   video_url?: string | null;
   video_file_url?: string | null;
+  review_image?: string | null;
+  review_image_url?: string | null;
+  product_condition?: string | null;
+  purchase_date?: string | null;
   customer_username?: string | null;
   is_admin_review: boolean;
   date_posted: string;

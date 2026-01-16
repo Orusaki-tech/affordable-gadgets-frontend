@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAllReviews } from '@/lib/hooks/useReviews';
+import type { Review } from '@/lib/api/reviews';
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -26,7 +27,7 @@ function formatPurchaseDate(dateString?: string | null): string | null {
 
 export function ReviewsShowcase() {
   const { data, isLoading } = useAllReviews({ page_size: 10 });
-  const [selectedReview, setSelectedReview] = useState<typeof data?.results[number] | null>(null);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
 
   if (isLoading) {
     return <div className="text-center py-8 text-gray-500">Loading reviews...</div>;

@@ -16,60 +16,24 @@ function PaymentSuccessContent() {
   const downloadReceipt = () => {
     if (!orderId) return;
     
-    // #region agent log
-    fetch('http://127.0.0.1:7248/ingest/65d9ad06-b70b-4149-bf19-de4e9e0d0599',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment/success/page.tsx:16',message:'downloadReceipt called',data:{orderId,brandConfigApiBaseUrl:brandConfig.apiBaseUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
-    
-    // Get API base URL from brand config
+    // Get API base URL from brand config (already normalized)
     let apiBaseUrl = brandConfig.apiBaseUrl || 'http://localhost:8000';
     
-    // #region agent log
-    fetch('http://127.0.0.1:7248/ingest/65d9ad06-b70b-4149-bf19-de4e9e0d0599',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment/success/page.tsx:20',message:'Base URL from brandConfig',data:{apiBaseUrl,hasTrailingSlash:apiBaseUrl.endsWith('/'),isEmpty:!apiBaseUrl || apiBaseUrl.trim() === '',isRelative:apiBaseUrl.startsWith('/') && !apiBaseUrl.startsWith('http')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
-    
     // Fix: Handle empty, relative, or malformed base URLs
-    // If base URL is empty, relative (starts with /), or doesn't start with http/https, use window.location.origin
     if (!apiBaseUrl || apiBaseUrl.trim() === '' || (apiBaseUrl.startsWith('/') && !apiBaseUrl.startsWith('http'))) {
-      // #region agent log
-      fetch('http://127.0.0.1:7248/ingest/65d9ad06-b70b-4149-bf19-de4e9e0d0599',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment/success/page.tsx:25',message:'Fixing malformed base URL',data:{originalApiBaseUrl:apiBaseUrl,windowOrigin:typeof window !== 'undefined' ? window.location.origin : 'N/A'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
-      // Try to infer from current page origin, or use default
-      if (typeof window !== 'undefined' && window.location.origin) {
-        // Extract backend URL from current origin (assuming same domain or known pattern)
-        // For Vercel deployments, backend is typically on a different domain
-        // Fall back to a sensible default or use environment detection
-        apiBaseUrl = 'http://localhost:8000'; // Will be overridden by env var in production
-      }
+      apiBaseUrl = 'http://localhost:8000';
     }
     
     // Remove trailing slash if present
-    const apiBaseUrlBefore = apiBaseUrl;
     apiBaseUrl = apiBaseUrl.replace(/\/+$/, '');
-    
-    // #region agent log
-    fetch('http://127.0.0.1:7248/ingest/65d9ad06-b70b-4149-bf19-de4e9e0d0599',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment/success/page.tsx:35',message:'After trailing slash removal',data:{apiBaseUrlBefore,apiBaseUrlAfter:apiBaseUrl,startsWithDoubleSlash:apiBaseUrl.startsWith('//')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
     
     // CRITICAL FIX: If URL still starts with // (protocol-relative), prepend https:
     if (apiBaseUrl.startsWith('//')) {
       apiBaseUrl = 'https:' + apiBaseUrl;
-      // #region agent log
-      fetch('http://127.0.0.1:7248/ingest/65d9ad06-b70b-4149-bf19-de4e9e0d0599',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment/success/page.tsx:41',message:'Fixed protocol-relative URL',data:{apiBaseUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
     }
     
     // Construct the receipt URL properly, ensuring no double slashes
     const receiptUrl = `${apiBaseUrl}/api/inventory/orders/${orderId}/receipt/?format=pdf`;
-    
-    // #region agent log
-    fetch('http://127.0.0.1:7248/ingest/65d9ad06-b70b-4149-bf19-de4e9e0d0599',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment/success/page.tsx:47',message:'Final receipt URL constructed',data:{apiBaseUrl,receiptUrl,receiptUrlLength:receiptUrl.length,hasDoubleSlash:receiptUrl.includes('//'),startsWithDoubleSlash:receiptUrl.startsWith('//')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
-    
-    console.log('Downloading receipt from URL:', receiptUrl);
-    
-    // #region agent log
-    fetch('http://127.0.0.1:7248/ingest/65d9ad06-b70b-4149-bf19-de4e9e0d0599',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'payment/success/page.tsx:54',message:'Calling window.open',data:{receiptUrl},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
     
     // Open in new tab to download
     window.open(receiptUrl, '_blank');

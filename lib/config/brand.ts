@@ -34,12 +34,6 @@ export const brandConfig = {
   apiBaseUrl: normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL),
 } as const;
 
-// #region agent log
-if (typeof window !== 'undefined') {
-  fetch('http://127.0.0.1:7248/ingest/65d9ad06-b70b-4149-bf19-de4e9e0d0599',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'brand.ts:35',message:'brandConfig initialized',data:{apiBaseUrl:brandConfig.apiBaseUrl,envVar:process.env.NEXT_PUBLIC_API_BASE_URL,hasTrailingSlash:brandConfig.apiBaseUrl.endsWith('/'),startsWithDoubleSlash:brandConfig.apiBaseUrl.startsWith('//')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-}
-// #endregion
-
 
 
 

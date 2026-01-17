@@ -90,9 +90,9 @@ export function ReviewsShowcase() {
         <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory">
           {reviews.map((review) => {
             const imageUrl = review.review_image_url || review.review_image || null;
-            const productData = productById[review.product] || null;
-            const productImage = productData?.primary_image || getPlaceholderProductImage(review.product_name);
-            const productSlug = productData?.slug || review.product;
+            const taggedProductIds = review.tagged_products || review.tagged_product_ids || [];
+            const productIds = Array.from(new Set([review.product, ...taggedProductIds]));
+            const productsForCard = productIds.map((productId) => productById[productId]).filter(Boolean);
 
             return (
               <button
@@ -135,21 +135,36 @@ export function ReviewsShowcase() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3">
-                  <div className="relative h-11 w-11 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-                    <Image
-                      src={productImage}
-                      alt={review.product_name}
-                      fill
-                      className="object-contain"
-                      sizes="44px"
-                    />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-gray-900 line-clamp-1">{review.product_name}</p>
-                    {review.product_condition && (
-                      <p className="text-[11px] text-gray-500">{review.product_condition}</p>
-                    )}
+                <div className="border-t border-gray-100 bg-white p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">
+                    Tagged products
+                  </p>
+                  <div className="flex gap-2 overflow-x-auto pb-1">
+                    {(productsForCard.length > 0 ? productsForCard : [null]).map((product, index) => {
+                      const productId = product?.id ?? review.product;
+                      const productImage = product?.primary_image || getPlaceholderProductImage(review.product_name);
+                      const productName = product?.product_name || review.product_name;
+
+                      return (
+                        <div
+                          key={`${productId}-${index}`}
+                          className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-2 py-1.5 shadow-sm"
+                        >
+                          <div className="relative h-7 w-7 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+                            <Image
+                              src={productImage}
+                              alt={productName}
+                              fill
+                              className="object-contain"
+                              sizes="28px"
+                            />
+                          </div>
+                          <span className="text-[11px] font-medium text-gray-700 whitespace-nowrap">
+                            {productName}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </button>
@@ -178,22 +193,19 @@ export function ReviewsShowcase() {
 
             return (
           <div
-            className="w-full max-w-5xl max-h-[80vh] overflow-hidden rounded-2xl bg-white shadow-2xl"
+            className="relative w-full max-w-5xl max-h-[80vh] overflow-hidden rounded-2xl bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <p className="text-sm font-semibold text-gray-700">{selectedReview.product_name}</p>
-              <button
-                type="button"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50"
-                onClick={() => setSelectedReview(null)}
-                aria-label="Close review modal"
-              >
-                ✕
-              </button>
-            </div>
+            <button
+              type="button"
+              className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-600 shadow-sm hover:bg-blue-50"
+              onClick={() => setSelectedReview(null)}
+              aria-label="Close review modal"
+            >
+              ✕
+            </button>
 
-            <div className="grid max-h-[calc(80vh-64px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
+            <div className="grid max-h-[80vh] grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
               <div className="flex items-center justify-center bg-gray-50 p-6">
                 <div className="relative w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-sm">
                   <div className="relative aspect-[4/5] bg-gray-100">
@@ -218,9 +230,7 @@ export function ReviewsShowcase() {
                     <p className="text-lg font-semibold text-gray-900">
                       {selectedReview.customer_username || (selectedReview.is_admin_review ? 'Admin' : 'Customer')}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      Reviewed {formatDate(selectedReview.date_posted)}
-                    </p>
+                    <p className="text-xs text-gray-500">Reviewed {formatDate(selectedReview.date_posted)}</p>
                     <div className="mt-2 flex gap-1 text-yellow-400">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span key={star} className={star <= selectedReview.rating ? 'text-yellow-400' : 'text-gray-300'}>
@@ -241,10 +251,8 @@ export function ReviewsShowcase() {
                 )}
 
                 <div className="mt-auto space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Tagged products
-                  </p>
-                  <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Tagged products</p>
+                  <div className="max-h-[180px] space-y-3 overflow-y-auto pr-1">
                     {productsToDisplay.map((product) => {
                       const isPrimary = product?.id === selectedReview.product;
                       const productSlug = product?.slug || product?.id;

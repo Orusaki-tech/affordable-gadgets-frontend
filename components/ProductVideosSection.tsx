@@ -99,7 +99,7 @@ export function ProductVideosSection() {
                 src={product.primary_image || getPlaceholderVideoThumbnail(product.product_name)}
                 alt={product.product_name}
                 fill
-                className="object-cover"
+                className="object-contain"
                 unoptimized={!product.primary_image || product.primary_image.includes('placehold.co')}
               />
               

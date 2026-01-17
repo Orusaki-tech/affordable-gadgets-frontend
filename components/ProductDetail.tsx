@@ -461,7 +461,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               src={mainDisplayImage || getPlaceholderProductImage(product.product_name)}
                 alt={product.product_name}
                 fill
-                className="object-cover"
+                className="object-contain bg-gray-50"
                 priority
               unoptimized={!mainDisplayImage || mainDisplayImage.includes('localhost') || mainDisplayImage.includes('placehold.co')}
             />
@@ -498,7 +498,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     src={img}
                       alt={`${product.product_name} view ${index + 1}${imageColor ? ` - ${imageColor}` : ''}`}
                     fill
-                    className="object-cover"
+                    className="object-contain bg-gray-50"
                     unoptimized={img.includes('localhost') || img.includes('placehold.co')}
                   />
                     {imageColor && (
@@ -1013,7 +1013,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                           src={accessory.accessory_primary_image || getPlaceholderProductImage(accessory.accessory_name)}
                           alt={accessory.accessory_name}
                           fill
-                          className="object-cover"
+                          className="object-contain bg-gray-50"
                           sizes="96px"
                           unoptimized={process.env.NODE_ENV === 'development'}
                           onError={(e) => {
@@ -1087,7 +1087,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                                 }
                                 alt={`${accessory.accessory_name} - ${variant.color_name}`}
                                 fill
-                                className="object-cover"
+                                className="object-contain bg-gray-50"
                                 sizes="(max-width: 640px) 50vw, 25vw"
                                 unoptimized={process.env.NODE_ENV === 'development'}
                                 onError={(e) => {

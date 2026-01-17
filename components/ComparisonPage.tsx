@@ -71,7 +71,7 @@ function ProductImageCell({ product }: { product: Product }) {
           src={product.primary_image || getPlaceholderProductImage(product.product_name)}
           alt={product.product_name}
           fill
-          className="object-cover"
+          className="object-contain bg-gray-50"
           unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('placehold.co')}
         />
       </div>
@@ -430,7 +430,7 @@ export function ComparisonPage() {
                     src={product.primary_image || getPlaceholderProductImage(product.product_name)}
                     alt={product.product_name}
                     fill
-                    className="object-cover"
+                    className="object-contain bg-gray-50"
                     unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('placehold.co')}
                   />
                 </div>

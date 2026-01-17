@@ -122,7 +122,7 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
                       src={promotion.banner_image || getPlaceholderBannerImage(promotion.title)}
                       alt={promotion.title}
                       fill
-                      className="object-cover"
+                      className="object-contain bg-gray-50"
                       unoptimized={!promotion.banner_image || promotion.banner_image.includes('placehold.co')}
                     />
                   </div>

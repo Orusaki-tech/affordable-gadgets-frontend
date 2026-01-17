@@ -57,7 +57,7 @@ export function ReviewsShowcase() {
                   <img
                     src={imageUrl}
                     alt={review.product_name}
-                    className="h-[360px] w-full object-cover"
+                    className="h-[360px] w-full object-contain bg-gray-50"
                     loading="lazy"
                   />
                 ) : (
@@ -114,7 +114,7 @@ export function ReviewsShowcase() {
                   <img
                     src={selectedReview.review_image_url}
                     alt={selectedReview.product_name}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain bg-black"
                   />
                 ) : (
                   <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">

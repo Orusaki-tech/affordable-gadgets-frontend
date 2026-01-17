@@ -28,7 +28,7 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
           src={product.primary_image || getPlaceholderProductImage(product.product_name)}
           alt={product.product_name}
           fill
-          className="object-cover group-hover:scale-110 transition-transform duration-500"
+          className="object-contain transition-transform duration-300"
           unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
         />
         

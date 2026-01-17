@@ -10,6 +10,8 @@ export interface Review {
   id: number;
   product: number;
   product_name: string;
+  tagged_products?: number[] | null;
+  tagged_product_ids?: number[] | null;
   rating: number;
   comment: string;
   video_url?: string | null;

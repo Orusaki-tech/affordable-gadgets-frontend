@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAllReviews } from '@/lib/hooks/useReviews';
 import type { Review } from '@/lib/api/reviews';
+import type { Product } from '@/lib/api/products';
+import { productsApi } from '@/lib/api/products';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 
 function formatDate(dateString: string): string {
@@ -31,12 +33,52 @@ function formatPurchaseDate(dateString?: string | null): string | null {
 export function ReviewsShowcase() {
   const { data, isLoading } = useAllReviews({ page_size: 10 });
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const [productById, setProductById] = useState<Record<number, Product | null>>({});
 
   if (isLoading) {
     return <div className="text-center py-8 text-gray-500">Loading reviews...</div>;
   }
 
   const reviews = data?.results ?? [];
+
+  useEffect(() => {
+    let isActive = true;
+    const loadProducts = async () => {
+      const productIds = Array.from(
+        new Set(
+          reviews.flatMap((review) => [
+            review.product,
+            ...(review.tagged_products || review.tagged_product_ids || []),
+          ])
+        )
+      );
+      if (productIds.length === 0) return;
+
+      const entries = await Promise.all(
+        productIds.map(async (productId) => {
+          try {
+            const product = await productsApi.getProduct(productId);
+            return [productId, product] as const;
+          } catch (error) {
+            console.warn(`Failed to load product ${productId}`, error);
+            return [productId, null] as const;
+          }
+        })
+      );
+
+      if (!isActive) return;
+      const nextMap: Record<number, Product | null> = {};
+      entries.forEach(([productId, product]) => {
+        nextMap[productId] = product;
+      });
+      setProductById(nextMap);
+    };
+
+    loadProducts();
+    return () => {
+      isActive = false;
+    };
+  }, [reviews]);
 
   if (reviews.length === 0) {
     return <div className="text-center py-8 text-gray-500">No reviews yet.</div>;
@@ -48,6 +90,9 @@ export function ReviewsShowcase() {
         <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory">
           {reviews.map((review) => {
             const imageUrl = review.review_image_url || review.review_image || null;
+            const productData = productById[review.product] || null;
+            const productImage = productData?.primary_image || getPlaceholderProductImage(review.product_name);
+            const productSlug = productData?.slug || review.product;
 
             return (
               <button
@@ -93,7 +138,7 @@ export function ReviewsShowcase() {
                 <div className="flex items-center gap-3 p-3">
                   <div className="relative h-11 w-11 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
                     <Image
-                      src={getPlaceholderProductImage(review.product_name)}
+                      src={productImage}
                       alt={review.product_name}
                       fill
                       className="object-contain"
@@ -120,6 +165,18 @@ export function ReviewsShowcase() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
           onClick={() => setSelectedReview(null)}
         >
+          {(() => {
+            const selectedProduct = productById[selectedReview.product] || null;
+            const selectedProductImage = selectedProduct?.primary_image || getPlaceholderProductImage(selectedReview.product_name);
+            const selectedProductSlug = selectedProduct?.slug || selectedReview.product;
+            const taggedProductIds = selectedReview.tagged_products || selectedReview.tagged_product_ids || [];
+            const taggedProducts = taggedProductIds
+              .map((productId) => productById[productId])
+              .filter((product): product is Product => Boolean(product));
+            const fallbackProducts = selectedProduct ? [selectedProduct] : [];
+            const productsToDisplay = taggedProducts.length > 0 ? taggedProducts : fallbackProducts;
+
+            return (
           <div
             className="w-full max-w-5xl max-h-[80vh] overflow-hidden rounded-2xl bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
@@ -183,39 +240,58 @@ export function ReviewsShowcase() {
                   <p className="text-sm leading-relaxed text-gray-700">"{selectedReview.comment}"</p>
                 )}
 
-                <Link
-                  href={`/products/${selectedReview.product}`}
-                  className="mt-auto rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-                      <Image
-                        src={getPlaceholderProductImage(selectedReview.product_name)}
-                        alt={selectedReview.product_name}
-                        fill
-                        className="object-contain"
-                        sizes="48px"
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-gray-900 line-clamp-1">
-                        {selectedReview.product_name}
-                      </p>
-                      {selectedReview.product_condition && (
-                        <p className="text-xs text-gray-500">Condition {selectedReview.product_condition}</p>
-                      )}
-                      {formatPurchaseDate(selectedReview.purchase_date) && (
-                        <p className="text-xs text-gray-500">Purchased {formatPurchaseDate(selectedReview.purchase_date)}</p>
-                      )}
-                    </div>
-                    <div className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-gray-500">
-                      →
-                    </div>
+                <div className="mt-auto space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Tagged products
+                  </p>
+                  <div className="space-y-3">
+                    {productsToDisplay.map((product) => {
+                      const isPrimary = product?.id === selectedReview.product;
+                      const productSlug = product?.slug || product?.id;
+                      const productImage = product?.primary_image || selectedProductImage;
+                      const productName = product?.product_name || selectedReview.product_name;
+
+                      return (
+                        <Link
+                          key={product?.id ?? selectedReview.product}
+                          href={`/products/${productSlug}`}
+                          className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                              <Image
+                                src={productImage}
+                                alt={productName}
+                                fill
+                                className="object-contain"
+                                sizes="48px"
+                              />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-gray-900 line-clamp-1">
+                                {productName}
+                              </p>
+                              {isPrimary && selectedReview.product_condition && (
+                                <p className="text-xs text-gray-500">Condition {selectedReview.product_condition}</p>
+                              )}
+                              {isPrimary && formatPurchaseDate(selectedReview.purchase_date) && (
+                                <p className="text-xs text-gray-500">Purchased {formatPurchaseDate(selectedReview.purchase_date)}</p>
+                              )}
+                            </div>
+                            <div className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-gray-500">
+                              →
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
                   </div>
-                </Link>
+                </div>
               </div>
             </div>
           </div>
+            );
+          })()}
         </div>
       )}
     </div>

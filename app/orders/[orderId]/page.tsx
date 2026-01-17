@@ -149,6 +149,16 @@ function OrderDetailContent() {
     }
   };
 
+  const getItemProductName = (item: (typeof order.order_items)[number]) => {
+    const inventoryUnit = (item as { inventory_unit?: { product_name?: string } }).inventory_unit;
+    if (inventoryUnit?.product_name) {
+      return inventoryUnit.product_name;
+    }
+
+    const fallbackName = (item as { inventory_unit_name?: string }).inventory_unit_name;
+    return fallbackName || 'Product';
+  };
+
   return (
     <main className="flex-1 bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -162,6 +172,10 @@ function OrderDetailContent() {
           </div>
 
           {/* Order Status */}
+          {(() => {
+            const createdAt = order.created_at ?? '';
+            return (
+              <>
           <div className="mb-6">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700">Status:</span>
@@ -170,15 +184,21 @@ function OrderDetailContent() {
               </span>
             </div>
             <p className="text-sm text-gray-500 mt-2">
-              Ordered on: {new Date(order.created_at).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
+              Ordered on:{' '}
+              {createdAt
+                ? new Date(createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                : 'N/A'}
             </p>
           </div>
+              </>
+            );
+          })()}
 
           {/* Order Items */}
           <div className="mb-8">
@@ -192,15 +212,15 @@ function OrderDetailContent() {
                   >
                     <div>
                       <h3 className="font-semibold text-lg">
-                        {item.inventory_unit?.product_name || 'Product'}
+                        {getItemProductName(item)}
                       </h3>
                       <p className="text-sm text-gray-600">
-                        Quantity: {item.quantity} × {formatPrice(parseFloat(item.unit_price_at_purchase))}
+                        Quantity: {item.quantity ?? 0} × {formatPrice(Number(item.unit_price_at_purchase ?? 0))}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-lg">
-                        {formatPrice(parseFloat(item.unit_price_at_purchase) * item.quantity)}
+                        {formatPrice(Number(item.unit_price_at_purchase ?? 0) * Number(item.quantity ?? 0))}
                       </p>
                     </div>
                   </div>
@@ -216,7 +236,7 @@ function OrderDetailContent() {
             <div className="flex justify-between items-center mb-2">
               <span className="text-lg font-semibold">Total Amount:</span>
               <span className="text-2xl font-bold text-blue-600">
-                {formatPrice(parseFloat(order.total_amount))}
+                {formatPrice(Number(order.total_amount ?? 0))}
               </span>
             </div>
             {order.customer_username && (

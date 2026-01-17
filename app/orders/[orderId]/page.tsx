@@ -134,8 +134,8 @@ function OrderDetailContent() {
     return null;
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
+  const getStatusColor = (status?: string) => {
+    switch ((status ?? '').toLowerCase()) {
       case 'paid':
         return 'bg-green-100 text-green-800';
       case 'pending':
@@ -166,7 +166,7 @@ function OrderDetailContent() {
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700">Status:</span>
               <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
-                {order.status}
+                {order.status ?? 'Unknown'}
               </span>
             </div>
             <p className="text-sm text-gray-500 mt-2">

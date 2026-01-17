@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useAllReviews } from '@/lib/hooks/useReviews';
 import type { Review } from '@/lib/api/reviews';
+import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -51,46 +54,59 @@ export function ReviewsShowcase() {
                 key={review.id}
                 type="button"
                 onClick={() => setSelectedReview(review)}
-                className="group relative w-[260px] sm:w-[280px] lg:w-[300px] shrink-0 snap-start rounded-2xl overflow-hidden shadow-lg text-left focus:outline-none"
+                className="group relative w-[260px] sm:w-[280px] lg:w-[300px] shrink-0 snap-start rounded-2xl overflow-hidden bg-white shadow-md ring-1 ring-black/5 text-left transition-all hover:-translate-y-0.5 hover:shadow-xl focus:outline-none"
               >
-                {imageUrl ? (
-                  <img
-                    src={imageUrl}
-                    alt={review.product_name}
-                    className="h-[360px] w-full object-contain bg-gray-50"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="h-[360px] w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                    <span className="text-sm text-gray-600">{review.product_name}</span>
+                <div className="relative aspect-[3/4] bg-gray-100">
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt={review.product_name}
+                      className="h-full w-full object-contain bg-gray-50"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                      <span className="text-sm text-gray-600">{review.product_name}</span>
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                  <div className="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-gray-900 shadow-sm">
+                    {review.customer_username || (review.is_admin_review ? 'Admin' : 'Customer')}
                   </div>
-                )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-
-                <div className="absolute top-3 left-3 bg-white/90 text-xs font-semibold px-2 py-1 rounded">
-                  {review.customer_username || (review.is_admin_review ? 'Admin' : 'Customer')}
+                  <div className="absolute bottom-14 left-3 right-3 text-white">
+                    <div className="flex gap-1 text-yellow-300 mb-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span key={star} className={star <= review.rating ? 'text-yellow-300' : 'text-white/40'}>
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                    {review.comment && (
+                      <p className="text-sm line-clamp-3">"{review.comment}"</p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="absolute bottom-16 left-3 right-3 text-white">
-                  <div className="flex gap-1 text-yellow-300 mb-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                      <span key={star} className={star <= review.rating ? 'text-yellow-300' : 'text-white/40'}>
-                    ★
-                  </span>
-                ))}
-              </div>
-                  {review.comment && (
-                    <p className="text-sm line-clamp-3">"{review.comment}"</p>
-                  )}
+                <div className="flex items-center gap-3 p-3">
+                  <div className="relative h-11 w-11 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                    <Image
+                      src={getPlaceholderProductImage(review.product_name)}
+                      alt={review.product_name}
+                      fill
+                      className="object-contain"
+                      sizes="44px"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-gray-900 line-clamp-1">{review.product_name}</p>
+                    {review.product_condition && (
+                      <p className="text-[11px] text-gray-500">{review.product_condition}</p>
+                    )}
+                  </div>
                 </div>
-
-                <div className="absolute bottom-0 left-0 right-0 bg-white p-3">
-                  <p className="text-xs font-medium">{review.product_name}</p>
-                  {review.product_condition && (
-                    <p className="text-xs text-gray-500">{review.product_condition}</p>
-                  )}
-              </div>
               </button>
             );
           })}
@@ -105,71 +121,102 @@ export function ReviewsShowcase() {
           onClick={() => setSelectedReview(null)}
         >
           <div
-            className="w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+            className="w-full max-w-5xl max-h-[80vh] overflow-hidden rounded-2xl bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              <div className="bg-black">
-                {selectedReview.review_image_url ? (
-                  <img
-                    src={selectedReview.review_image_url}
-                    alt={selectedReview.product_name}
-                    className="h-full w-full object-contain bg-black"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                    <span className="text-sm text-gray-600">{selectedReview.product_name}</span>
+            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+              <p className="text-sm font-semibold text-gray-700">{selectedReview.product_name}</p>
+              <button
+                type="button"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 text-gray-600 hover:bg-gray-50"
+                onClick={() => setSelectedReview(null)}
+                aria-label="Close review modal"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="grid max-h-[calc(80vh-64px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
+              <div className="flex items-center justify-center bg-gray-50 p-6">
+                <div className="relative w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-sm">
+                  <div className="relative aspect-[4/5] bg-gray-100">
+                    {selectedReview.review_image_url ? (
+                      <img
+                        src={selectedReview.review_image_url}
+                        alt={selectedReview.product_name}
+                        className="h-full w-full object-contain bg-black"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                        <span className="text-sm text-gray-600">{selectedReview.product_name}</span>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
 
-              <div className="p-6 md:p-8">
-                <div className="flex items-start justify-between">
-    <div>
-                    <p className="text-lg font-semibold">
+              <div className="flex flex-col gap-5 p-6 md:p-8">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-lg font-semibold text-gray-900">
                       {selectedReview.customer_username || (selectedReview.is_admin_review ? 'Admin' : 'Customer')}
                     </p>
-                    <div className="flex gap-1 text-yellow-400 mt-1">
-              {[1, 2, 3, 4, 5].map((star) => (
+                    <p className="text-xs text-gray-500">
+                      Reviewed {formatDate(selectedReview.date_posted)}
+                    </p>
+                    <div className="mt-2 flex gap-1 text-yellow-400">
+                      {[1, 2, 3, 4, 5].map((star) => (
                         <span key={star} className={star <= selectedReview.rating ? 'text-yellow-400' : 'text-gray-300'}>
-                  ★
-                </span>
-              ))}
-            </div>
+                          ★
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    className="text-gray-400 hover:text-gray-600"
-                    onClick={() => setSelectedReview(null)}
-                  >
-                    ✕
-                  </button>
-              </div>
-
-                {selectedReview.is_admin_review && (
-                  <span className="mt-3 inline-flex text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
-                  Verified
-                </span>
-              )}
+                  {selectedReview.is_admin_review && (
+                    <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                      Verified
+                    </span>
+                  )}
+                </div>
 
                 {selectedReview.comment && (
-                  <p className="mt-4 text-gray-700 leading-relaxed">"{selectedReview.comment}"</p>
+                  <p className="text-sm leading-relaxed text-gray-700">"{selectedReview.comment}"</p>
                 )}
 
-                <div className="mt-6 space-y-1 text-sm text-gray-600">
-                  <p><span className="font-medium text-gray-900">Product:</span> {selectedReview.product_name}</p>
-                  {selectedReview.product_condition && (
-                    <p><span className="font-medium text-gray-900">Condition:</span> {selectedReview.product_condition}</p>
-                  )}
-                  {formatPurchaseDate(selectedReview.purchase_date) && (
-                    <p><span className="font-medium text-gray-900">Purchased:</span> {formatPurchaseDate(selectedReview.purchase_date)}</p>
-                  )}
-                  <p><span className="font-medium text-gray-900">Reviewed:</span> {formatDate(selectedReview.date_posted)}</p>
-                </div>
+                <Link
+                  href={`/products/${selectedReview.product}`}
+                  className="mt-auto rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                      <Image
+                        src={getPlaceholderProductImage(selectedReview.product_name)}
+                        alt={selectedReview.product_name}
+                        fill
+                        className="object-contain"
+                        sizes="48px"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 line-clamp-1">
+                        {selectedReview.product_name}
+                      </p>
+                      {selectedReview.product_condition && (
+                        <p className="text-xs text-gray-500">Condition {selectedReview.product_condition}</p>
+                      )}
+                      {formatPurchaseDate(selectedReview.purchase_date) && (
+                        <p className="text-xs text-gray-500">Purchased {formatPurchaseDate(selectedReview.purchase_date)}</p>
+                      )}
+                    </div>
+                    <div className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-gray-500">
+                      →
+                    </div>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>
-      </div>
+        </div>
       )}
     </div>
   );

@@ -35,10 +35,6 @@ export function ReviewsShowcase() {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [productById, setProductById] = useState<Record<number, Product | null>>({});
 
-  if (isLoading) {
-    return <div className="text-center py-8 text-gray-500">Loading reviews...</div>;
-  }
-
   const reviews = data?.results ?? [];
 
   useEffect(() => {
@@ -79,6 +75,10 @@ export function ReviewsShowcase() {
       isActive = false;
     };
   }, [reviews]);
+
+  if (isLoading) {
+    return <div className="text-center py-8 text-gray-500">Loading reviews...</div>;
+  }
 
   if (reviews.length === 0) {
     return <div className="text-center py-8 text-gray-500">No reviews yet.</div>;

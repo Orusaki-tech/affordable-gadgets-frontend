@@ -2,7 +2,8 @@
  * React hook for payment operations
  */
 import { useState, useEffect, useCallback } from 'react';
-import { paymentApi, InitiatePaymentRequest, PaymentStatusResponse } from '@/lib/api/payment';
+import { OpenAPI, OrdersService, OrderRequest, Order } from '@/lib/api/generated';
+import { inventoryBaseUrl } from '@/lib/api/openapi';
 
 interface UsePaymentOptions {
   orderId: string | null;
@@ -21,7 +22,7 @@ export function usePayment({
   maxPollAttempts = 100, // 5 minutes total
   autoStartPolling = false, // Default to false - don't auto-poll
 }: UsePaymentOptions) {
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatusResponse | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(false);
@@ -30,7 +31,7 @@ export function usePayment({
   /**
    * Initiate payment
    */
-  const initiatePayment = useCallback(async (data: InitiatePaymentRequest) => {
+  const initiatePayment = useCallback(async (data: OrderRequest) => {
     if (!orderId) {
       setError('Order ID is required');
       return null;
@@ -40,9 +41,12 @@ export function usePayment({
     setError(null);
 
     try {
-      const response = await paymentApi.initiatePayment(orderId, data);
+      const previousBase = OpenAPI.BASE;
+      OpenAPI.BASE = inventoryBaseUrl;
+      const response = await OrdersService.ordersInitiatePaymentCreate(orderId, data);
+      OpenAPI.BASE = previousBase;
       
-      if (response.success && response.redirect_url) {
+      if ((response as any)?.redirect_url) {
         // ✅ FIXED: Don't start polling immediately
         // Only return the response - let the component handle redirect
         // Polling should only start when user returns from Pesapal
@@ -50,8 +54,9 @@ export function usePayment({
         console.log('[PESAPAL] NOT starting polling - user will be redirected to Pesapal');
         return response;
       } else {
-        setError(response.error || 'Failed to initiate payment');
-        onPaymentFailed?.(response.error || 'Failed to initiate payment');
+        const message = (response as any)?.error || 'Failed to initiate payment';
+        setError(message);
+        onPaymentFailed?.(message);
         return null;
       }
     } catch (err: any) {
@@ -77,8 +82,11 @@ export function usePayment({
     }
 
     try {
-      console.log('[PESAPAL] Calling paymentApi.getPaymentStatus...');
-      const status = await paymentApi.getPaymentStatus(orderId);
+      console.log('[PESAPAL] Calling OrdersService.ordersPaymentStatusRetrieve...');
+      const previousBase = OpenAPI.BASE;
+      OpenAPI.BASE = inventoryBaseUrl;
+      const status = await OrdersService.ordersPaymentStatusRetrieve(orderId);
+      OpenAPI.BASE = previousBase;
       console.log('[PESAPAL] Payment Status received:', JSON.stringify(status, null, 2));
       setPaymentStatus(status);
 
@@ -95,7 +103,7 @@ export function usePayment({
       if (status.status === 'FAILED' || status.status === 'CANCELLED' || status.status === 'EXPIRED') {
         console.log('[PESAPAL] Payment is', status.status, '- stopping polling');
         setIsPolling(false);
-        onPaymentFailed?.(status.message || 'Payment failed');
+        onPaymentFailed?.((status as any)?.message || 'Payment failed');
         console.log('[PESAPAL] ========== HOOK: CHECK PAYMENT STATUS - FAILED ==========\n');
         return false;
       }

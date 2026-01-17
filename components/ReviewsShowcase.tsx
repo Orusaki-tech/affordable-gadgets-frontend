@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAllReviews } from '@/lib/hooks/useReviews';
-import type { Review } from '@/lib/api/reviews';
-import type { Product } from '@/lib/api/products';
-import { productsApi } from '@/lib/api/products';
+import type { Review, PublicProduct } from '@/lib/api/generated';
+import { ApiService } from '@/lib/api/generated';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 
 function formatDate(dateString: string): string {
@@ -33,7 +32,7 @@ function formatPurchaseDate(dateString?: string | null): string | null {
 export function ReviewsShowcase() {
   const { data, isLoading } = useAllReviews({ page_size: 10 });
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
-  const [productById, setProductById] = useState<Record<number, Product | null>>({});
+  const [productById, setProductById] = useState<Record<number, PublicProduct | null>>({});
 
   const reviews = data?.results ?? [];
 
@@ -53,7 +52,7 @@ export function ReviewsShowcase() {
       const entries = await Promise.all(
         productIds.map(async (productId) => {
           try {
-            const product = await productsApi.getProduct(productId);
+            const product = await ApiService.apiV1PublicProductsRetrieve(productId);
             return [productId, product] as const;
           } catch (error) {
             console.warn(`Failed to load product ${productId}`, error);
@@ -63,7 +62,7 @@ export function ReviewsShowcase() {
       );
 
       if (!isActive) return;
-      const nextMap: Record<number, Product | null> = {};
+      const nextMap: Record<number, PublicProduct | null> = {};
       entries.forEach(([productId, product]) => {
         nextMap[productId] = product;
       });
@@ -196,16 +195,21 @@ export function ReviewsShowcase() {
             className="relative w-full max-w-5xl max-h-[80vh] overflow-hidden rounded-2xl bg-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <button
-              type="button"
-              className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-600 shadow-sm hover:bg-blue-50"
-              onClick={() => setSelectedReview(null)}
-              aria-label="Close review modal"
-            >
-              ✕
-            </button>
+            <div className="relative flex items-center justify-center border-b border-gray-100 px-6 py-4">
+              <p className="text-sm font-semibold text-gray-700">
+                {selectedReview.product_name}
+              </p>
+              <button
+                type="button"
+                className="absolute right-4 top-3.5 flex h-9 w-9 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-600 shadow-sm hover:bg-blue-50"
+                onClick={() => setSelectedReview(null)}
+                aria-label="Close review modal"
+              >
+                ✕
+              </button>
+            </div>
 
-            <div className="grid max-h-[80vh] grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
+            <div className="grid max-h-[calc(80vh-56px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
               <div className="flex items-center justify-center bg-gray-50 p-6">
                 <div className="relative w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-sm">
                   <div className="relative aspect-[4/5] bg-gray-100">
@@ -231,12 +235,15 @@ export function ReviewsShowcase() {
                       {selectedReview.customer_username || (selectedReview.is_admin_review ? 'Admin' : 'Customer')}
                     </p>
                     <p className="text-xs text-gray-500">Reviewed {formatDate(selectedReview.date_posted)}</p>
-                    <div className="mt-2 flex gap-1 text-yellow-400">
+                    <div className="mt-2 flex items-center gap-1 text-yellow-400">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span key={star} className={star <= selectedReview.rating ? 'text-yellow-400' : 'text-gray-300'}>
                           ★
                         </span>
                       ))}
+                      <span className="ml-2 text-sm font-semibold text-gray-900">
+                        {selectedReview.rating}/5
+                      </span>
                     </div>
                   </div>
                   {selectedReview.is_admin_review && (

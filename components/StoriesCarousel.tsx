@@ -4,8 +4,7 @@ import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProducts } from '@/lib/hooks/useProducts';
-import { Promotion } from '@/lib/api/promotions';
-import { Product } from '@/lib/api/products';
+import { PublicPromotion, PublicProduct } from '@/lib/api/generated';
 import { getPlaceholderBannerImage, getPlaceholderVideoThumbnail } from '@/lib/utils/placeholders';
 import { useRouter } from 'next/navigation';
 
@@ -77,7 +76,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
 
   // Process promotions - combine special_offers and flash_sales
   const allPromotions = useMemo(() => {
-    const promotions = (promotionsData?.results || []) as Promotion[];
+    const promotions = (promotionsData?.results || []) as PublicPromotion[];
     return promotions.filter((promo) => {
       const locations = promo.display_locations || [];
       return Array.isArray(locations) && (
@@ -120,7 +119,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   }, [allPromotions]);
 
   const gridItems = useMemo(() => {
-    const items: Array<{ type: 'promotion' | 'video'; data: Promotion | Product; uniqueKey: string; position: number }> = [];
+    const items: Array<{ type: 'promotion' | 'video'; data: PublicPromotion | PublicProduct; uniqueKey: string; position: number }> = [];
     const usedPromotionIds = new Set<number>();
     
     // Add banner item to used set
@@ -189,7 +188,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     return items.sort((a, b) => a.position - b.position).slice(0, 4);
   }, [allPromotions, productsWithVideos, bannerItem]);
 
-  const handlePromotionClick = (promotion: Promotion) => {
+  const handlePromotionClick = (promotion: PublicPromotion) => {
     const firstProductId = promotion.products && promotion.products.length > 0 
       ? promotion.products[0] 
       : null;
@@ -201,7 +200,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     }
   };
 
-  const handleVideoClick = (product: Product) => {
+  const handleVideoClick = (product: PublicProduct) => {
     if (product.product_video_url) {
       setSelectedVideo({
         url: product.product_video_url,
@@ -333,7 +332,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
             {gridItems.length > 0 ? (
               gridItems.map((item) => {
                 if (item.type === 'promotion') {
-                  const promotion = item.data as Promotion;
+                  const promotion = item.data as PublicPromotion;
               return (
                 <div
                       key={item.uniqueKey}
@@ -380,7 +379,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                 );
                 } else {
                   // Product Video
-                  const product = item.data as Product;
+                  const product = item.data as PublicProduct;
                   return (
                     <div
                       key={item.uniqueKey}
@@ -534,7 +533,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
             {gridItems.length > 0 ? (
               gridItems.map((item) => {
                 if (item.type === 'promotion') {
-                  const promotion = item.data as Promotion;
+                  const promotion = item.data as PublicPromotion;
                   return (
                     <div
                       key={item.uniqueKey}
@@ -580,7 +579,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               );
                 } else {
                   // Product Video
-                  const product = item.data as Product;
+                  const product = item.data as PublicProduct;
                   return (
                     <div
                       key={item.uniqueKey}

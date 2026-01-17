@@ -5,7 +5,7 @@ import { usePromotion } from '@/lib/hooks/usePromotions';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
 import { useCompare } from '@/lib/hooks/useCompare';
-import { InventoryUnit, InventoryUnitImage } from '@/lib/api/products';
+import { PublicInventoryUnit, InventoryUnitImage } from '@/lib/api/generated';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo } from 'react';
@@ -22,7 +22,7 @@ interface ProductDetailProps {
 type TabType = 'overview' | 'specs' | 'reviews' | 'videos';
 
 interface UnitCardProps {
-  unit: InventoryUnit;
+  unit: PublicInventoryUnit;
   isSelected: boolean;
   onSelect: (unitId: number) => void;
   promotionPrice: number | null;
@@ -114,7 +114,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     // Add all unique unit images (for color selection)
     if (units && units.length > 0) {
       const unitImageUrls = new Set<string>();
-      units.forEach((unit: InventoryUnit) => {
+      units.forEach((unit: PublicInventoryUnit) => {
         if (unit.images && unit.images.length > 0) {
           unit.images.forEach((img: InventoryUnitImage) => {
             if (img.image_url && !unitImageUrls.has(img.image_url)) {
@@ -472,7 +472,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
               {productImages.map((img, index) => {
                 // Try to find a unit with this image to get color info
-                const unitWithImage = units?.find((u: InventoryUnit) => 
+                const unitWithImage = units?.find((u: PublicInventoryUnit) => 
                   u.images?.some((imgObj: InventoryUnitImage) => imgObj.image_url === img)
                 );
                 const imageColor = unitWithImage?.color_name || null;
@@ -654,7 +654,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   <div className="flex flex-wrap gap-1.5">
                     {uniqueColors.map((color) => {
                       // Check if this color has units available with current storage filter
-                      const availableForColor = units?.filter((u: InventoryUnit) => {
+                      const availableForColor = units?.filter((u: PublicInventoryUnit) => {
                         if (selectedStorage && u.storage_gb !== selectedStorage) return false;
                         return u.color_name === color;
                       }) || [];

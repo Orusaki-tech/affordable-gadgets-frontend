@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { usePromotion } from '@/lib/hooks/usePromotions';
-import { Promotion } from '@/lib/api/promotions';
+import { PublicPromotion } from '@/lib/api/generated';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, FilterState } from './ProductFilters';
 import { useState, useMemo } from 'react';
@@ -62,9 +62,9 @@ export function ProductsPage() {
             <p className="text-gray-600 mb-2">{promotionData.description}</p>
           )}
           {/* Note: promotion_code is not in the Promotion interface, but keeping for backward compatibility */}
-          {(promotionData as Promotion & { promotion_code?: string }).promotion_code && (
+          {(promotionData as PublicPromotion & { promotion_code?: string }).promotion_code && (
             <p className="text-sm text-gray-500">
-              Promotion Code: <code className="bg-white px-2 py-1 rounded">{(promotionData as Promotion & { promotion_code?: string }).promotion_code}</code>
+              Promotion Code: <code className="bg-white px-2 py-1 rounded">{(promotionData as PublicPromotion & { promotion_code?: string }).promotion_code}</code>
             </p>
           )}
         </div>

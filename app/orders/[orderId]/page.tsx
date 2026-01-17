@@ -4,7 +4,8 @@ import { Suspense, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { orderApi, OrderResponse } from '@/lib/api/order';
+import { OpenAPI, OrdersService, Order } from '@/lib/api/generated';
+import { inventoryBaseUrl } from '@/lib/api/openapi';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
 import { brandConfig } from '@/lib/config/brand';
@@ -12,7 +13,7 @@ import { brandConfig } from '@/lib/config/brand';
 function OrderDetailContent() {
   const params = useParams();
   const orderId = params.orderId as string;
-  const [order, setOrder] = useState<OrderResponse | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +21,10 @@ function OrderDetailContent() {
     const fetchOrder = async () => {
       try {
         setLoading(true);
-        const orderData = await orderApi.getOrder(orderId);
+        const previousBase = OpenAPI.BASE;
+        OpenAPI.BASE = inventoryBaseUrl;
+        const orderData = await OrdersService.ordersRetrieve(orderId);
+        OpenAPI.BASE = previousBase;
         setOrder(orderData);
         setError(null);
       } catch (err: any) {

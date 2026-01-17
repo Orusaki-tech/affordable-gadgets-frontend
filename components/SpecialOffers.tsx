@@ -2,7 +2,7 @@
 
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProduct } from '@/lib/hooks/useProducts';
-import { Promotion } from '@/lib/api/promotions';
+import { PublicPromotion } from '@/lib/api/generated';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -59,7 +59,7 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
   }
 
   // Filter promotions based on filter prop or default behavior
-  const specialOffersPromotions = (data?.results || []).filter((promo: Promotion) => {
+  const specialOffersPromotions = (data?.results || []).filter((promo: PublicPromotion) => {
     const locations = promo.display_locations || [];
     if (filter === 'special_offers') {
       return Array.isArray(locations) && locations.includes('special_offers');
@@ -89,7 +89,7 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {specialOffersPromotions.map((promotion: Promotion) => {
+          {specialOffersPromotions.map((promotion: PublicPromotion) => {
             // Get first product ID from promotion
             const firstProductId = promotion.products && promotion.products.length > 0 
               ? promotion.products[0] 

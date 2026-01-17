@@ -39,8 +39,8 @@ export function ReviewsShowcase() {
     return <div className="text-center py-8 text-gray-500">No reviews yet.</div>;
   }
 
-  return (
-    <div>
+    return (
+      <div>
       <div className="relative">
         <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory">
           {reviews.map((review) => {
@@ -74,12 +74,12 @@ export function ReviewsShowcase() {
 
                 <div className="absolute bottom-16 left-3 right-3 text-white">
                   <div className="flex gap-1 text-yellow-300 mb-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
+                {[1, 2, 3, 4, 5].map((star) => (
                       <span key={star} className={star <= review.rating ? 'text-yellow-300' : 'text-white/40'}>
-                        ★
-                      </span>
-                    ))}
-                  </div>
+                    ★
+                  </span>
+                ))}
+              </div>
                   {review.comment && (
                     <p className="text-sm line-clamp-3">"{review.comment}"</p>
                   )}
@@ -90,7 +90,7 @@ export function ReviewsShowcase() {
                   {review.product_condition && (
                     <p className="text-xs text-gray-500">{review.product_condition}</p>
                   )}
-                </div>
+              </div>
               </button>
             );
           })}
@@ -125,17 +125,17 @@ export function ReviewsShowcase() {
 
               <div className="p-6 md:p-8">
                 <div className="flex items-start justify-between">
-                  <div>
+    <div>
                     <p className="text-lg font-semibold">
                       {selectedReview.customer_username || (selectedReview.is_admin_review ? 'Admin' : 'Customer')}
                     </p>
                     <div className="flex gap-1 text-yellow-400 mt-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
+              {[1, 2, 3, 4, 5].map((star) => (
                         <span key={star} className={star <= selectedReview.rating ? 'text-yellow-400' : 'text-gray-300'}>
-                          ★
-                        </span>
-                      ))}
-                    </div>
+                  ★
+                </span>
+              ))}
+            </div>
                   </div>
                   <button
                     type="button"
@@ -144,13 +144,13 @@ export function ReviewsShowcase() {
                   >
                     ✕
                   </button>
-                </div>
+              </div>
 
                 {selectedReview.is_admin_review && (
                   <span className="mt-3 inline-flex text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
-                    Verified
-                  </span>
-                )}
+                  Verified
+                </span>
+              )}
 
                 {selectedReview.comment && (
                   <p className="mt-4 text-gray-700 leading-relaxed">"{selectedReview.comment}"</p>
@@ -169,7 +169,7 @@ export function ReviewsShowcase() {
               </div>
             </div>
           </div>
-        </div>
+      </div>
       )}
     </div>
   );

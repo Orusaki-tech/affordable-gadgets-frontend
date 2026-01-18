@@ -287,7 +287,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                       <img
                         src={selectedReview.review_image_url || selectedReview.review_image || ''}
                         alt={selectedReview.product_name ?? 'Product review'}
-                        className="w-full max-h-[52vh] object-contain bg-black"
+                        className="w-full max-h-[52vh] object-contain bg-white"
                       />
                     ) : (
                       <div className="h-[52vh] w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center rounded-2xl">

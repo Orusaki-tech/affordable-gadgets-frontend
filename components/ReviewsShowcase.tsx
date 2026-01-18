@@ -134,7 +134,7 @@ export function ReviewsShowcase() {
             );
             const productsForCard = productIds.map((productId) => productById[productId]).filter(Boolean);
 
-            const reviewImageSrc = selectedReview.review_image_url || selectedReview.review_image || '';
+            const reviewImageSrc = review.review_image_url || review.review_image || '';
 
             return (
               <button

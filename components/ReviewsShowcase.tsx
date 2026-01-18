@@ -44,7 +44,14 @@ export function ReviewsShowcase() {
       const productIds = Array.from(
         new Set(
           reviews
-            .flatMap((review) => [review.product])
+            .flatMap((review) => {
+              const reviewAny = review as Review & { products?: number[]; tagged_products?: number[] };
+              const extraProducts = [
+                ...(Array.isArray(reviewAny.products) ? reviewAny.products : []),
+                ...(Array.isArray(reviewAny.tagged_products) ? reviewAny.tagged_products : []),
+              ];
+              return [review.product, ...extraProducts];
+            })
             .filter((id): id is number => typeof id === 'number')
         )
       );
@@ -215,10 +222,24 @@ export function ReviewsShowcase() {
           onClick={() => setSelectedReview(null)}
         >
           {(() => {
-            const selectedProduct = productById[selectedReview.product] || null;
+            const selectedReviewAny = selectedReview as Review & {
+              products?: number[];
+              tagged_products?: number[];
+            };
+            const selectedProductIds = Array.from(
+              new Set([
+                selectedReview.product,
+                ...(Array.isArray(selectedReviewAny.products) ? selectedReviewAny.products : []),
+                ...(Array.isArray(selectedReviewAny.tagged_products) ? selectedReviewAny.tagged_products : []),
+              ].filter((id): id is number => typeof id === 'number'))
+            );
             const selectedProductImage =
-              selectedProduct?.primary_image || getPlaceholderProductImage(selectedReview.product_name ?? 'Product');
-            const productsToDisplay = selectedProduct ? [selectedProduct] : [];
+              productById[selectedReview.product]?.primary_image ||
+              getPlaceholderProductImage(selectedReview.product_name ?? 'Product');
+            const productsToDisplay = selectedProductIds
+              .map((productId) => productById[productId] || null)
+              .filter(Boolean);
+            const productsForModal = productsToDisplay.length > 0 ? productsToDisplay : [null];
 
             return (
           <div
@@ -290,16 +311,17 @@ export function ReviewsShowcase() {
                 <div className="mt-6 space-y-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Product</p>
                   <div className="max-h-[200px] space-y-3 overflow-y-auto pr-1">
-                    {productsToDisplay.map((product) => {
-                      const isPrimary = product?.id === selectedReview.product;
-                      const productSlug = product?.slug ?? product?.id ?? selectedReview.product;
+                    {productsForModal.map((product, index) => {
+                      const productId = product?.id ?? selectedReview.product;
+                      const isPrimary = productId === selectedReview.product;
+                      const productSlug = product?.slug ?? productId;
                       const productHref = `/products/${String(productSlug)}`;
                       const productImage = product?.primary_image || selectedProductImage;
                       const productName = product?.product_name || selectedReview.product_name || 'Product';
 
                       return (
                         <Link
-                          key={product?.id ?? selectedReview.product}
+                          key={`${productId}-${index}`}
                           href={productHref}
                           className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md"
                         >
@@ -313,7 +335,7 @@ export function ReviewsShowcase() {
                                 sizes="48px"
                               />
                             </div>
-                            <div className="min-w-0">
+                            <div className="min-w-0 flex-1">
                               <p className="text-sm font-semibold text-gray-900 line-clamp-1">
                                 {productName}
                               </p>
@@ -324,9 +346,9 @@ export function ReviewsShowcase() {
                                 <p className="text-xs text-gray-500">Purchased {formatPurchaseDate(selectedReview.purchase_date)}</p>
                               )}
                             </div>
-                            <div className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-gray-500">
-                              →
-                            </div>
+                            <span className="ml-auto inline-flex items-center rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-600">
+                              View
+                            </span>
                           </div>
                         </Link>
                       );

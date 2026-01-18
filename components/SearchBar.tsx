@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useProducts } from '@/lib/hooks/useProducts';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { getProductHref } from '@/lib/utils/productRoutes';
 
 export function SearchBar() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,7 +71,7 @@ export function SearchBar() {
           {suggestions.map((product) => (
             <Link
               key={product.id}
-              href={`/products/${product.slug}`}
+              href={getProductHref(product)}
               onClick={() => {
                 setIsOpen(false);
                 setSearchQuery('');

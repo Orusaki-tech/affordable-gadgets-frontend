@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PublicProduct } from '@/lib/api/generated';
 import { formatPrice, formatPriceRange } from '@/lib/utils/format';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
+import { getProductHref } from '@/lib/utils/productRoutes';
 
 interface ProductCardProps {
   product: PublicProduct;
@@ -21,7 +22,7 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
 
   return (
     <Link 
-      href={`/products/${product.slug || product.id}`}
+      href={getProductHref(product)}
       className="group block bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200 animate-fade-in"
     >
       {/* Product Image */}

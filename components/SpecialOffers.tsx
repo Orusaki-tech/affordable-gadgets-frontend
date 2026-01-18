@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { getPlaceholderBannerImage } from '@/lib/utils/placeholders';
+import { getProductHref } from '@/lib/utils/productRoutes';
 
 interface SpecialOffersProps {
   filter?: 'special_offers' | 'flash_sales';
@@ -101,15 +102,16 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
               
               const handleClick = (e: React.MouseEvent) => {
                 e.preventDefault();
-                if (product?.slug) {
-                  router.push(`/products/${product.slug}?promotion=${promotion.id}`);
-                } else if (firstProductId) {
-                  // Fallback: try to navigate with product ID if slug not available
-                  router.push(`/products/${firstProductId}?promotion=${promotion.id}`);
-                } else {
-                  // No products in promotion, go to products list
-                  router.push(`/products?promotion=${promotion.id}`);
+                const promotionId = typeof promotion.id === 'number' ? promotion.id : null;
+                if (product || firstProductId) {
+                  router.push(getProductHref(product ?? undefined, { fallbackId: firstProductId, promotionId }));
+                  return;
                 }
+                if (promotionId) {
+                  router.push(`/products?promotion=${promotionId}`);
+                  return;
+                }
+                router.push('/products');
               };
               
               return (

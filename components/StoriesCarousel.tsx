@@ -7,6 +7,7 @@ import { useProducts } from '@/lib/hooks/useProducts';
 import { PublicPromotion, PublicProduct } from '@/lib/api/generated';
 import { getPlaceholderBannerImage, getPlaceholderVideoThumbnail } from '@/lib/utils/placeholders';
 import { useRouter } from 'next/navigation';
+import { getProductHref } from '@/lib/utils/productRoutes';
 
 interface VideoModalProps {
   videoUrl: string;
@@ -71,8 +72,8 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   const router = useRouter();
 
   // Fetch promotions and products with videos
-  const { data: promotionsData, isLoading: promotionsLoading } = usePromotions({ page_size: 100 });
-  const { data: productsData, isLoading: productsLoading } = useProducts({ page_size: 100 });
+  const { data: promotionsData, isLoading: promotionsLoading } = usePromotions({ page_size: 30 });
+  const { data: productsData, isLoading: productsLoading } = useProducts({ page_size: 40 });
 
   // Process promotions - combine special_offers and flash_sales
   const allPromotions = useMemo(() => {
@@ -230,8 +231,8 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
         url: product.product_video_url,
         title: product.product_name
       });
-    } else if (product.slug) {
-      router.push(`/products/${product.slug}`);
+    } else {
+      router.push(getProductHref(product));
     }
   };
 

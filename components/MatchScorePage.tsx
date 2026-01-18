@@ -7,6 +7,7 @@ import { calculateMatchScores, MatchCriteria, ProductForMatching } from '@/lib/u
 import { PublicProduct } from '@/lib/api/generated';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
+import { getProductHref } from '@/lib/utils/productRoutes';
 
 export function MatchScorePage() {
   const [criteria, setCriteria] = useState<MatchCriteria>({
@@ -18,7 +19,7 @@ export function MatchScorePage() {
     mustBeInStock: false,
   });
   const [results, setResults] = useState<any[]>([]);
-  const { data: productsData } = useProducts({ page_size: 100 });
+  const { data: productsData } = useProducts({ page_size: 40 });
 
   const handleCalculate = () => {
     if (!productsData) return;
@@ -187,7 +188,7 @@ export function MatchScorePage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <Link
-                      href={`/products/${result.product.slug || result.product.id}`}
+                      href={getProductHref(result.product)}
                       className="text-xl font-semibold hover:text-blue-600"
                     >
                       {result.product.product_name}

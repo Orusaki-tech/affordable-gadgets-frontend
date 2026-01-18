@@ -21,6 +21,7 @@ export function useProducts(params?: {
   max_price?: number;
   ordering?: string;
   promotion?: number; // Promotion ID to filter products
+  enabled?: boolean;
 }) {
   return useQuery<PaginatedPublicProductList>({
     queryKey: ['products', params],
@@ -49,6 +50,7 @@ export function useProducts(params?: {
         type
       );
     },
+    enabled: params?.enabled ?? true,
     staleTime: 30000, // 30 seconds
   });
 }

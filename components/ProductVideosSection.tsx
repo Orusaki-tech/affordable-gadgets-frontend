@@ -1,7 +1,7 @@
 'use client';
 
 import { useProducts } from '@/lib/hooks/useProducts';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -10,7 +10,27 @@ import { getPlaceholderVideoThumbnail, getPlaceholderVideoUrl, getPlaceholderVid
 export function ProductVideosSection() {
   const searchParams = useSearchParams();
   const [selectedVideo, setSelectedVideo] = useState<number | null>(null);
-  const { data, isLoading } = useProducts({ page_size: 50 });
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+  const { data, isLoading } = useProducts({ page_size: 24, enabled: isVisible });
+
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   // Check if there's a video ID in the URL hash or query params
   useEffect(() => {
@@ -87,7 +107,7 @@ export function ProductVideosSection() {
   }
 
   return (
-    <div>
+    <div ref={sectionRef}>
       <h2 className="text-3xl font-bold mb-6">Product Videos</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {productsToShowWithId.map((product) => (

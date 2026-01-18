@@ -7,6 +7,7 @@ import { useAllReviews } from '@/lib/hooks/useReviews';
 import type { Review, PublicProduct } from '@/lib/api/generated';
 import { ApiService } from '@/lib/api/generated';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
+import { getProductHref } from '@/lib/utils/productRoutes';
 
 function formatDate(dateString?: string | null): string {
   if (!dateString) return '—';
@@ -314,8 +315,7 @@ export function ReviewsShowcase() {
                     {productsForModal.map((product, index) => {
                       const productId = product?.id ?? selectedReview.product;
                       const isPrimary = productId === selectedReview.product;
-                      const productSlug = product?.slug ?? productId;
-                      const productHref = `/products/${String(productSlug)}`;
+                      const productHref = getProductHref(product ?? undefined, { fallbackId: productId });
                       const productImage = product?.primary_image || selectedProductImage;
                       const productName = product?.product_name || selectedReview.product_name || 'Product';
 

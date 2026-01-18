@@ -1,6 +1,6 @@
 'use client';
 
-import { useProductBySlug, useProductUnits } from '@/lib/hooks/useProducts';
+import { useProduct, useProductBySlug, useProductUnits } from '@/lib/hooks/useProducts';
 import { usePromotion } from '@/lib/hooks/usePromotions';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
@@ -91,14 +91,21 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
 export function ProductDetail({ slug }: ProductDetailProps) {
   const searchParams = useSearchParams();
   const promotionId = searchParams.get('promotion');
-  
+
   const isNumericSlug = /^\d+$/.test(slug);
-  const productIdFromSlug = isNumericSlug ? Number(slug) : 0;
+  const fallbackProductIdParam = searchParams.get('pid');
+  const fallbackProductId = fallbackProductIdParam && /^\d+$/.test(fallbackProductIdParam)
+    ? Number(fallbackProductIdParam)
+    : 0;
+  const productIdFromSlug = isNumericSlug ? Number(slug) : fallbackProductId;
+  const hasFallbackId = !isNumericSlug && fallbackProductId > 0;
   const { data: productBySlug, isLoading: productBySlugLoading, error: productBySlugError } = useProductBySlug(isNumericSlug ? '' : slug);
   const { data: productById, isLoading: productByIdLoading, error: productByIdError } = useProduct(productIdFromSlug);
-  const product = isNumericSlug ? productById : productBySlug;
-  const productLoading = isNumericSlug ? productByIdLoading : productBySlugLoading;
-  const productError = isNumericSlug ? productByIdError : productBySlugError;
+  const product = productBySlug ?? productById;
+  const productLoading = isNumericSlug
+    ? productByIdLoading
+    : productBySlugLoading || (hasFallbackId && productByIdLoading && !productBySlug);
+  const productError = product ? undefined : (productBySlugError || productByIdError);
   const { data: units, isLoading: unitsLoading } = useProductUnits(product?.id || 0);
   const { data: accessories } = useProductAccessories(product?.id || 0);
   const { data: promotion } = usePromotion(promotionId ? parseInt(promotionId) : 0);

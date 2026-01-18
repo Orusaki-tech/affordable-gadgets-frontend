@@ -307,7 +307,7 @@ export function ComparisonPage() {
   const [brandFilter, setBrandFilter] = useState('');
   const [priceRange, setPriceRange] = useState<{ min: number | ''; max: number | '' }>({ min: '', max: '' });
   const { data: productsData, isLoading: isLoadingProducts } = useProducts({ 
-    page_size: 100, 
+    page_size: 40, 
     search: searchQuery 
   });
 

@@ -92,7 +92,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const searchParams = useSearchParams();
   const promotionId = searchParams.get('promotion');
   
-  const { data: product, isLoading: productLoading, error: productError } = useProductBySlug(slug);
+  const isNumericSlug = /^\d+$/.test(slug);
+  const productIdFromSlug = isNumericSlug ? Number(slug) : 0;
+  const { data: productBySlug, isLoading: productBySlugLoading, error: productBySlugError } = useProductBySlug(isNumericSlug ? '' : slug);
+  const { data: productById, isLoading: productByIdLoading, error: productByIdError } = useProduct(productIdFromSlug);
+  const product = isNumericSlug ? productById : productBySlug;
+  const productLoading = isNumericSlug ? productByIdLoading : productBySlugLoading;
+  const productError = isNumericSlug ? productByIdError : productBySlugError;
   const { data: units, isLoading: unitsLoading } = useProductUnits(product?.id || 0);
   const { data: accessories } = useProductAccessories(product?.id || 0);
   const { data: promotion } = usePromotion(promotionId ? parseInt(promotionId) : 0);

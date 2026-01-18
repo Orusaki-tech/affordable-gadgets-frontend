@@ -63,18 +63,18 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
 
   return (
     <div className="mt-12">
-      <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Customer Reviews</h2>
       
       {/* Rating Summary */}
-      <div className="bg-gray-50 rounded-lg p-6 mb-8">
+      <div className="bg-gray-50 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
         <div className="flex items-center gap-4 mb-4">
-          <div className="text-5xl font-bold">{averageRating.toFixed(1)}</div>
+          <div className="text-4xl sm:text-5xl font-bold">{averageRating.toFixed(1)}</div>
           <div>
             <div className="flex items-center gap-1 mb-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <span
                   key={star}
-                  className={`text-2xl ${
+                  className={`text-[18px] sm:text-2xl ${
                     star <= Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-300'
                   }`}
                 >
@@ -82,7 +82,9 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
                 </span>
               ))}
             </div>
-            <p className="text-gray-600">Based on {data.count} review{data.count !== 1 ? 's' : ''}</p>
+            <p className="text-[13px] sm:text-[14px] text-gray-600">
+              Based on {data.count} review{data.count !== 1 ? 's' : ''}
+            </p>
           </div>
         </div>
         
@@ -92,14 +94,18 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
             const percentage = data.count > 0 ? (count / data.count) * 100 : 0;
             return (
               <div key={rating} className="flex items-center gap-2">
-                <span className="text-sm w-12">{rating} star{rating !== 1 ? 's' : ''}</span>
+                <span className="text-[12px] sm:text-[13px] w-12">
+                  {rating} star{rating !== 1 ? 's' : ''}
+                </span>
                 <div className="flex-1 bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-yellow-400 h-2 rounded-full"
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
-                <span className="text-sm text-gray-600 w-12 text-right">{count}</span>
+                <span className="text-[12px] sm:text-[13px] text-gray-600 w-12 text-right">
+                  {count}
+                </span>
               </div>
             );
           })}
@@ -107,13 +113,13 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
       </div>
 
       {/* Reviews List */}
-      <div className="space-y-6">
+      <div className="space-y-5 sm:space-y-6">
         {data.results.map((review) => (
-          <div key={review.id} className="border-b border-gray-200 pb-6 last:border-0">
+          <div key={review.id} className="border-b border-gray-200 pb-5 sm:pb-6 last:border-0">
             <div className="flex items-start justify-between mb-2">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 text-[13px] sm:text-[14px]">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span
                         key={star}
@@ -123,21 +129,25 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
                       </span>
                     ))}
                   </div>
-                  <span className="font-semibold">
+                  <span className="font-semibold text-[14px] sm:text-[15px]">
                     {review.customer_username || (review.is_admin_review ? 'Admin' : 'Anonymous')}
                   </span>
                   {review.is_admin_review && (
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                    <span className="text-[10px] sm:text-[11px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
                       Verified
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-500">{formatDate(review.date_posted)}</p>
+                <p className="text-[12px] sm:text-[13px] text-gray-500">
+                  {formatDate(review.date_posted)}
+                </p>
               </div>
             </div>
             
             {review.comment && (
-              <p className="text-gray-700 mt-3 mb-3">{review.comment}</p>
+              <p className="text-[14px] sm:text-[15px] leading-[20px] sm:leading-[22px] text-gray-700 mt-3 mb-3">
+                {review.comment}
+              </p>
             )}
             
             {/* Review Video */}
@@ -183,13 +193,13 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
         <div className="flex justify-center gap-4 mt-8">
           <button
             disabled={!data.previous}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 sm:px-4 text-[13px] sm:text-[14px] bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
           <button
             disabled={!data.next}
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 sm:px-4 text-[13px] sm:text-[14px] bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>

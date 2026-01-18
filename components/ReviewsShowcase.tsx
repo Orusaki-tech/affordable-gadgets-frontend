@@ -104,7 +104,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
         {[...Array(3)].map((_, index) => (
           <div
             key={`review-skeleton-${index}`}
-            className="h-[420px] rounded-2xl bg-gray-100 animate-pulse"
+            className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl bg-gray-100 animate-pulse"
           />
         ))}
       </div>
@@ -125,7 +125,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
         {[...Array(3)].map((_, index) => (
           <div
             key={`review-empty-${index}`}
-            className="rounded-2xl border border-dashed border-gray-300 bg-white p-6 text-center text-gray-500"
+            className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl border border-dashed border-gray-300 bg-white p-4 sm:p-6 text-center text-gray-500"
           >
             <div className="text-4xl mb-4">💬</div>
             <p className="font-semibold">Be the first to review</p>
@@ -154,9 +154,9 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                 key={review.id}
                 type="button"
                 onClick={() => setSelectedReview(review)}
-                className="group relative w-[260px] sm:w-[280px] lg:w-[300px] shrink-0 snap-start rounded-2xl overflow-hidden bg-white shadow-md ring-1 ring-black/5 text-left transition-all hover:-translate-y-0.5 hover:shadow-xl focus:outline-none"
+                className="group relative w-[260px] sm:w-[280px] lg:w-[300px] h-[320px] sm:h-[340px] lg:h-[360px] shrink-0 snap-start rounded-2xl overflow-hidden bg-white shadow-md ring-1 ring-black/5 text-left transition-all hover:-translate-y-0.5 hover:shadow-xl focus:outline-none flex flex-col"
               >
-                <div className="relative aspect-[3/4] bg-gray-100">
+                <div className="relative flex-[60] sm:flex-[65] bg-gray-100">
                   {imageUrl ? (
                     <img
                       src={imageUrl}
@@ -172,12 +172,12 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-                  <div className="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-gray-900 shadow-sm">
+                  <div className="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[10px] sm:text-[11px] font-semibold text-gray-900 shadow-sm">
                     {review.customer_username || (review.is_admin_review ? 'Admin' : 'Customer')}
                   </div>
 
-                  <div className="absolute bottom-14 left-3 right-3 text-white">
-                    <div className="flex gap-1 text-yellow-300 mb-1">
+                  <div className="absolute bottom-12 sm:bottom-14 left-3 right-3 text-white">
+                    <div className="flex gap-1 text-yellow-300 mb-1 text-[12px] sm:text-[13px]">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span key={star} className={star <= review.rating ? 'text-yellow-300' : 'text-white/40'}>
                           ★
@@ -185,13 +185,13 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                       ))}
                     </div>
                     {review.comment && (
-                      <p className="text-sm line-clamp-3">"{review.comment}"</p>
+                      <p className="text-[12px] sm:text-[13px] leading-[18px] sm:leading-[20px] line-clamp-3">"{review.comment}"</p>
                     )}
                   </div>
                 </div>
 
-                <div className="border-t border-gray-100 bg-white p-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">
+                <div className="flex-[40] sm:flex-[35] border-t border-gray-100 bg-white p-3 sm:p-4">
+                  <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">
                     Tagged products
                   </p>
                   <div className="flex gap-2 overflow-x-auto pb-1">
@@ -215,7 +215,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                               sizes="28px"
                             />
                           </div>
-                          <span className="text-[11px] font-medium text-gray-700 whitespace-nowrap">
+                          <span className="text-[10px] sm:text-[11px] font-medium text-gray-700 whitespace-nowrap">
                             {productName}
                           </span>
                         </div>

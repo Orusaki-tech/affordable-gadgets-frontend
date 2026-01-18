@@ -32,7 +32,7 @@ function formatPurchaseDate(dateString?: string | null): string | null {
 }
 
 export function ReviewsShowcase() {
-  const { data, isLoading } = useAllReviews({ page_size: 10 });
+  const { data, isLoading, error } = useAllReviews({ page_size: 10 });
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [productById, setProductById] = useState<Record<number, PublicProduct | null>>({});
 
@@ -77,11 +77,41 @@ export function ReviewsShowcase() {
   }, [reviews]);
 
   if (isLoading) {
-    return <div className="text-center py-8 text-gray-500">Loading reviews...</div>;
+    return (
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(3)].map((_, index) => (
+          <div
+            key={`review-skeleton-${index}`}
+            className="h-[420px] rounded-2xl bg-gray-100 animate-pulse"
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8 text-red-500">
+        Unable to load reviews right now. Please try again later.
+      </div>
+    );
   }
 
   if (reviews.length === 0) {
-    return <div className="text-center py-8 text-gray-500">No reviews yet.</div>;
+    return (
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(3)].map((_, index) => (
+          <div
+            key={`review-empty-${index}`}
+            className="rounded-2xl border border-dashed border-gray-300 bg-white p-6 text-center text-gray-500"
+          >
+            <div className="text-4xl mb-4">💬</div>
+            <p className="font-semibold">Be the first to review</p>
+            <p className="text-sm mt-2">Share your experience to help others.</p>
+          </div>
+        ))}
+      </div>
+    );
   }
 
     return (

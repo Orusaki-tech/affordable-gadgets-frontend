@@ -154,9 +154,9 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                 key={review.id}
                 type="button"
                 onClick={() => setSelectedReview(review)}
-                className="group relative w-[260px] sm:w-[280px] lg:w-[300px] h-[320px] sm:h-[340px] lg:h-[360px] shrink-0 snap-start rounded-2xl overflow-hidden bg-white shadow-md ring-1 ring-black/5 text-left transition-all hover:-translate-y-0.5 hover:shadow-xl focus:outline-none flex flex-col"
+                className="group relative w-[260px] sm:w-[280px] lg:w-[300px] h-[320px] sm:h-[340px] lg:h-[360px] shrink-0 snap-start rounded-2xl overflow-hidden bg-white shadow-md ring-1 ring-black/5 text-left transition-all hover:-translate-y-0.5 hover:shadow-xl focus:outline-none grid grid-rows-[60%_40%] sm:grid-rows-[65%_35%]"
               >
-                <div className="relative flex-[60] sm:flex-[65] bg-gray-100">
+                <div className="relative bg-gray-100">
                   {imageUrl ? (
                     <img
                       src={imageUrl}
@@ -190,7 +190,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                   </div>
                 </div>
 
-                <div className="flex-[40] sm:flex-[35] border-t border-gray-100 bg-white p-3 sm:p-4">
+                <div className="border-t border-gray-100 bg-white p-3 sm:p-4">
                   <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">
                     Tagged products
                   </p>

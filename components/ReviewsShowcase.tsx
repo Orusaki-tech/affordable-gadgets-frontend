@@ -238,6 +238,7 @@ export function ReviewsShowcase() {
             const selectedProductImage =
               productById[selectedReview.product]?.primary_image ||
               getPlaceholderProductImage(selectedReview.product_name ?? 'Product');
+            const reviewImageSrc = selectedReview.review_image_url || selectedReview.review_image || '';
             const productsToDisplay = selectedProductIds
               .map((productId) => productById[productId] || null)
               .filter(Boolean);

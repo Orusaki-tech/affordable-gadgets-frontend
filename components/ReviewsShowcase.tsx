@@ -243,7 +243,7 @@ export function ReviewsShowcase() {
 
             return (
           <div
-            className="relative w-full max-w-6xl overflow-hidden rounded-3xl border border-gray-200 bg-slate-50 shadow-2xl"
+            className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-gray-200 bg-slate-50 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="relative flex items-center justify-center border-b border-gray-200 px-6 py-4">
@@ -260,18 +260,18 @@ export function ReviewsShowcase() {
               </button>
             </div>
 
-            <div className="grid max-h-[calc(82vh-56px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr] gap-0">
-              <div className="flex items-center justify-center bg-slate-50 p-6 md:p-8">
-                <div className="w-full max-w-[520px] rounded-2xl bg-white p-4 shadow-sm">
+            <div className="grid max-h-[calc(78vh-56px)] grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-0">
+              <div className="flex items-center justify-center bg-slate-50 p-5 md:p-6">
+                <div className="w-full max-w-[420px] rounded-2xl bg-white p-3 shadow-sm">
                   <div className="flex items-center justify-center rounded-2xl bg-gray-100 p-2">
                     {selectedReview.review_image_url || selectedReview.review_image ? (
                       <img
                         src={selectedReview.review_image_url || selectedReview.review_image || ''}
                         alt={selectedReview.product_name ?? 'Product review'}
-                        className="w-full max-h-[60vh] object-contain bg-black"
+                        className="w-full max-h-[52vh] object-contain bg-black"
                       />
                     ) : (
-                      <div className="h-[60vh] w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center rounded-2xl">
+                      <div className="h-[52vh] w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center rounded-2xl">
                         <span className="text-sm text-gray-600">{selectedReview.product_name ?? 'Product'}</span>
                       </div>
                     )}
@@ -279,7 +279,7 @@ export function ReviewsShowcase() {
                 </div>
               </div>
 
-              <div className="bg-white p-6 md:p-8">
+              <div className="bg-white p-6 md:p-7">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-lg font-semibold text-gray-900">

@@ -89,7 +89,7 @@ export function ProductVideosSection() {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-64" />
+          <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-[320px] sm:h-[340px] lg:h-[360px]" />
         ))}
       </div>
     );
@@ -108,17 +108,17 @@ export function ProductVideosSection() {
 
   return (
     <div ref={sectionRef}>
-      <h2 className="text-3xl font-bold mb-6">Product Videos</h2>
+      <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Product Videos</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {productsToShowWithId.map((product) => (
           <div
             key={product.id}
             id={`video-card-${product.id}`}
-            className="relative rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer group"
+            className="relative rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer group h-[320px] sm:h-[340px] lg:h-[360px] grid grid-rows-[60%_40%] sm:grid-rows-[65%_35%]"
             onClick={() => setSelectedVideo(selectedVideo === product.id ? null : product.id)}
           >
             {/* Product Image/Thumbnail */}
-            <div className="relative aspect-video bg-gray-100">
+            <div className="relative bg-gray-100">
               <Image
                 src={product.primary_image || getPlaceholderVideoThumbnail(product.product_name)}
                 alt={product.product_name}
@@ -138,13 +138,17 @@ export function ProductVideosSection() {
             </div>
 
             {/* Product Info */}
-            <div className="p-4 bg-white">
-              <h3 className="font-semibold text-lg mb-2">{product.product_name}</h3>
+            <div className="p-3 sm:p-4 lg:p-5 bg-white">
+              <h3 className="font-semibold text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] mb-2 line-clamp-2">
+                {product.product_name}
+              </h3>
               {product.brand && (
-                <p className="text-sm text-gray-600 mb-2">{product.brand}</p>
+                <p className="text-[13px] leading-[18px] sm:text-[14px] sm:leading-[20px] text-gray-600 mb-2">
+                  {product.brand}
+                </p>
               )}
               {product.min_price && product.max_price && (
-                <p className="text-lg font-bold text-blue-600">
+                <p className="text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px] font-bold text-blue-600">
                   KES {product.min_price.toLocaleString()} - {product.max_price.toLocaleString()}
                 </p>
               )}

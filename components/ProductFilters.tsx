@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface ProductFiltersProps {
   onFiltersChange: (filters: FilterState) => void;
   onSortChange: (sort: string) => void;
+  initialFilters?: FilterState;
+  autoOpen?: boolean;
 }
 
 export interface FilterState {
@@ -23,15 +25,39 @@ const SORT_OPTIONS = [
   { value: '-available_units_count', label: 'Most Available' },
 ];
 
-export function ProductFilters({ onFiltersChange, onSortChange }: ProductFiltersProps) {
-  const [filters, setFilters] = useState<FilterState>({
-    type: '',
-    minPrice: '',
-    maxPrice: '',
-    brand: '',
-  });
+export function ProductFilters({
+  onFiltersChange,
+  onSortChange,
+  initialFilters,
+  autoOpen,
+}: ProductFiltersProps) {
+  const [filters, setFilters] = useState<FilterState>(
+    initialFilters ?? {
+      type: '',
+      minPrice: '',
+      maxPrice: '',
+      brand: '',
+    }
+  );
+  const [budgetMin, setBudgetMin] = useState(initialFilters?.minPrice ?? '');
+  const [budgetMax, setBudgetMax] = useState(initialFilters?.maxPrice ?? '');
   const [sort, setSort] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(Boolean(autoOpen));
+
+  useEffect(() => {
+    if (!initialFilters) {
+      return;
+    }
+    setFilters(initialFilters);
+    setBudgetMin(initialFilters.minPrice);
+    setBudgetMax(initialFilters.maxPrice);
+  }, [initialFilters]);
+
+  useEffect(() => {
+    if (autoOpen) {
+      setIsOpen(true);
+    }
+  }, [autoOpen]);
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     const newFilters = { ...filters, [key]: value };
@@ -52,13 +78,62 @@ export function ProductFilters({ onFiltersChange, onSortChange }: ProductFilters
       brand: '',
     };
     setFilters(emptyFilters);
+    setBudgetMin('');
+    setBudgetMax('');
     setSort('');
     onFiltersChange(emptyFilters);
     onSortChange('');
   };
 
+  const handleBudgetApply = () => {
+    const minValue = budgetMin.trim();
+    const maxValue = budgetMax.trim();
+    const min = minValue ? parseFloat(minValue) : null;
+    const max = maxValue ? parseFloat(maxValue) : null;
+
+    if (min !== null && Number.isNaN(min)) {
+      alert('Please enter a valid minimum price');
+      return;
+    }
+
+    if (max !== null && Number.isNaN(max)) {
+      alert('Please enter a valid maximum price');
+      return;
+    }
+
+    if ((min ?? 0) < 0 || (max ?? 0) < 0) {
+      alert('Prices cannot be negative');
+      return;
+    }
+
+    if (min !== null && max !== null && max < min) {
+      alert('Maximum price must be greater than or equal to minimum price');
+      return;
+    }
+
+    const newFilters = {
+      ...filters,
+      minPrice: minValue,
+      maxPrice: maxValue,
+    };
+    setFilters(newFilters);
+    onFiltersChange(newFilters);
+  };
+
+  const handleBudgetReset = () => {
+    const newFilters = {
+      ...filters,
+      minPrice: '',
+      maxPrice: '',
+    };
+    setBudgetMin('');
+    setBudgetMax('');
+    setFilters(newFilters);
+    onFiltersChange(newFilters);
+  };
+
   return (
-    <div className="mb-6">
+    <div id="product-filters" className="mb-6">
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -125,29 +200,50 @@ export function ProductFilters({ onFiltersChange, onSortChange }: ProductFilters
 
             {/* Min Price */}
             <div>
-              <label className="block text-sm font-medium mb-2">Min Price (KES)</label>
+              <label className="block text-sm font-medium mb-2">Budget Min (KES)</label>
               <input
                 type="number"
-                value={filters.minPrice}
-                onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+                value={budgetMin}
+                onChange={(e) => setBudgetMin(e.target.value)}
                 placeholder="0"
                 min="0"
+                step="100"
                 className="w-full px-3 py-2 border rounded-lg"
               />
             </div>
 
             {/* Max Price */}
             <div>
-              <label className="block text-sm font-medium mb-2">Max Price (KES)</label>
+              <label className="block text-sm font-medium mb-2">Budget Max (KES)</label>
               <input
                 type="number"
-                value={filters.maxPrice}
-                onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
-                placeholder="1000000"
+                value={budgetMax}
+                onChange={(e) => setBudgetMax(e.target.value)}
+                placeholder="100000"
                 min="0"
+                step="100"
                 className="w-full px-3 py-2 border rounded-lg"
               />
             </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={handleBudgetApply}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Apply Budget
+            </button>
+            {(filters.minPrice || filters.maxPrice || budgetMin || budgetMax) && (
+              <button
+                type="button"
+                onClick={handleBudgetReset}
+                className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Reset Budget
+              </button>
+            )}
           </div>
         </div>
       )}

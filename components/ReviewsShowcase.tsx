@@ -222,16 +222,16 @@ export function ReviewsShowcase() {
 
             return (
           <div
-            className="relative w-full max-w-5xl max-h-[80vh] overflow-hidden rounded-2xl bg-white shadow-2xl"
+            className="relative w-full max-w-6xl overflow-hidden rounded-3xl border border-gray-200 bg-slate-50 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="relative flex items-center justify-center border-b border-gray-100 px-6 py-4">
+            <div className="relative flex items-center justify-center border-b border-gray-200 px-6 py-4">
               <p className="text-sm font-semibold text-gray-700">
                 {selectedReview.product_name ?? 'Product'}
               </p>
               <button
                 type="button"
-                className="absolute right-4 top-3.5 flex h-9 w-9 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-600 shadow-sm hover:bg-blue-50"
+                className="absolute right-4 top-3.5 flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm hover:bg-gray-50"
                 onClick={() => setSelectedReview(null)}
                 aria-label="Close review modal"
               >
@@ -239,13 +239,13 @@ export function ReviewsShowcase() {
               </button>
             </div>
 
-            <div className="grid max-h-[calc(80vh-56px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr]">
-              <div className="flex items-center justify-center bg-gray-50 p-6">
-                <div className="relative w-full max-w-[520px] overflow-hidden rounded-2xl bg-white shadow-sm">
-                  <div className="relative aspect-[4/5] bg-gray-100">
-                    {selectedReview.review_image_url ? (
+            <div className="grid max-h-[calc(82vh-56px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr] gap-0">
+              <div className="flex items-center justify-center bg-slate-50 p-6 md:p-8">
+                <div className="w-full max-w-[520px] rounded-2xl bg-white p-4 shadow-sm">
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-gray-100">
+                    {selectedReview.review_image_url || selectedReview.review_image ? (
                       <img
-                        src={selectedReview.review_image_url}
+                        src={selectedReview.review_image_url || selectedReview.review_image}
                         alt={selectedReview.product_name ?? 'Product review'}
                         className="h-full w-full object-contain bg-black"
                       />
@@ -258,7 +258,7 @@ export function ReviewsShowcase() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-5 p-6 md:p-8">
+              <div className="bg-white p-6 md:p-8">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-lg font-semibold text-gray-900">
@@ -284,12 +284,12 @@ export function ReviewsShowcase() {
                 </div>
 
                 {selectedReview.comment && (
-                  <p className="text-sm leading-relaxed text-gray-700">"{selectedReview.comment}"</p>
+                  <p className="mt-4 text-sm leading-relaxed text-gray-700">"{selectedReview.comment}"</p>
                 )}
 
-                <div className="mt-auto space-y-3">
+                <div className="mt-6 space-y-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Product</p>
-                  <div className="max-h-[180px] space-y-3 overflow-y-auto pr-1">
+                  <div className="max-h-[200px] space-y-3 overflow-y-auto pr-1">
                     {productsToDisplay.map((product) => {
                       const isPrimary = product?.id === selectedReview.product;
                       const productSlug = product?.slug ?? product?.id ?? selectedReview.product;

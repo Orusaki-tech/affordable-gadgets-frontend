@@ -134,8 +134,6 @@ export function ReviewsShowcase() {
             );
             const productsForCard = productIds.map((productId) => productById[productId]).filter(Boolean);
 
-            const reviewImageSrc = review.review_image_url || review.review_image || '';
-
             return (
               <button
                 key={review.id}
@@ -238,7 +236,6 @@ export function ReviewsShowcase() {
             const selectedProductImage =
               productById[selectedReview.product]?.primary_image ||
               getPlaceholderProductImage(selectedReview.product_name ?? 'Product');
-            const reviewImageSrc = selectedReview.review_image_url || selectedReview.review_image || '';
             const productsToDisplay = selectedProductIds
               .map((productId) => productById[productId] || null)
               .filter(Boolean);
@@ -267,9 +264,9 @@ export function ReviewsShowcase() {
               <div className="flex items-center justify-center bg-slate-50 p-6 md:p-8">
                 <div className="w-full max-w-[520px] rounded-2xl bg-white p-4 shadow-sm">
                   <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-gray-100">
-                    {reviewImageSrc ? (
+                    {selectedReview.review_image_url || selectedReview.review_image ? (
                       <img
-                        src={reviewImageSrc}
+                        src={selectedReview.review_image_url || selectedReview.review_image || ''}
                         alt={selectedReview.product_name ?? 'Product review'}
                         className="h-full w-full object-contain bg-black"
                       />

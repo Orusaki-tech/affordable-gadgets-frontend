@@ -95,6 +95,9 @@ export function useProductUnits(productId: number) {
     queryKey: ['product', productId, 'units'],
     queryFn: async () => {
       const response = await ApiService.apiV1PublicProductsUnitsList(productId);
+      if (Array.isArray(response)) {
+        return response;
+      }
       return response?.results ?? [];
     },
     enabled: productId > 0,

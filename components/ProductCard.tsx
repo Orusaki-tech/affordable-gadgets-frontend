@@ -23,10 +23,10 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
   return (
     <Link 
       href={getProductHref(product)}
-      className="group block bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200 animate-fade-in"
+      className="group block bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200 animate-fade-in h-[320px] sm:h-[340px] lg:h-[360px] flex flex-col"
     >
       {/* Product Image */}
-      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+      <div className="relative flex-[60] sm:flex-[65] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
         <Image
           src={product.primary_image || getPlaceholderProductImage(product.product_name)}
           alt={product.product_name}
@@ -47,12 +47,12 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
       </div>
 
       {/* Product Info */}
-      <div className="p-5">
-        <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors text-gray-900">
+      <div className="flex-[40] sm:flex-[35] p-3 sm:p-4 lg:p-5 flex flex-col">
+        <h3 className="font-semibold text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors text-gray-900">
           {product.product_name}
         </h3>
         
-        <p className="text-sm text-gray-500 mb-3 font-medium">
+        <p className="text-[13px] leading-[18px] sm:text-[14px] sm:leading-[20px] text-gray-500 mb-3 font-medium">
           {product.brand} {product.model_series && `• ${product.model_series}`}
         </p>
 
@@ -68,19 +68,19 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
         )}
 
         {/* Price */}
-        <div className="mb-4">
+        <div className="mb-4 mt-auto">
         {product.min_price !== null && product.min_price !== undefined &&
         product.max_price !== null && product.max_price !== undefined ? (
-            <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <p className="text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px] font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
             {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
             </p>
           ) : (
-            <p className="text-xl font-bold text-gray-700">Price on request</p>
+            <p className="text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] font-semibold text-gray-700">Price on request</p>
           )}
         </div>
 
         {/* Stock & Interest Info */}
-        <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100">
+        <div className="flex items-center justify-between text-[13px] leading-[18px] sm:text-[14px] sm:leading-[20px] pt-3 border-t border-gray-100">
           <span className={`font-semibold ${hasStock ? 'text-green-600' : 'text-red-600'}`}>
             {hasStock ? (
               <span className="flex items-center gap-1">

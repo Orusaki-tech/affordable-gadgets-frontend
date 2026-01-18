@@ -1036,21 +1036,31 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           {activeTab === 'videos' && product && (
             <div>
               <h3 className="text-2xl font-bold mb-6">Product Videos</h3>
-              <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                <iframe
-                  src={convertToYouTubeEmbed(product.product_video_url || getPlaceholderVideoUrl(product.product_name))}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-              {!product.product_video_url && (
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    <span className="font-semibold">Note:</span> This is a placeholder video. The actual product video will be available soon.
-                  </p>
+              <div className="max-w-sm w-full">
+                <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                  <div className="relative aspect-video bg-gray-100">
+                    <iframe
+                      src={convertToYouTubeEmbed(product.product_video_url || getPlaceholderVideoUrl(product.product_name))}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-gray-900">
+                      {product.product_name}
+                    </p>
+                    {product.brand && (
+                      <p className="text-xs text-gray-600 mt-1">{product.brand}</p>
+                    )}
+                    {!product.product_video_url && (
+                      <p className="mt-2 text-[11px] text-blue-700 bg-blue-50 border border-blue-200 rounded-md px-2.5 py-1.5">
+                        This is a placeholder video. The actual product video will be available soon.
+                      </p>
+                    )}
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           )}
         </div>

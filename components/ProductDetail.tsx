@@ -5,7 +5,7 @@ import { usePromotion } from '@/lib/hooks/usePromotions';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
 import { useCompare } from '@/lib/hooks/useCompare';
-import { PublicInventoryUnit, InventoryUnitImage } from '@/lib/api/generated';
+import { PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo } from 'react';
@@ -22,7 +22,7 @@ interface ProductDetailProps {
 type TabType = 'overview' | 'specs' | 'reviews' | 'videos';
 
 interface UnitCardProps {
-  unit: PublicInventoryUnit;
+  unit: PublicInventoryUnitPublic;
   isSelected: boolean;
   onSelect: (unitId: number) => void;
   promotionPrice: number | null;
@@ -46,7 +46,12 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
 
   return (
     <div
-      onClick={() => onSelect(unit.id)}
+      onClick={() => {
+        if (unit.id === undefined) {
+          return;
+        }
+        onSelect(unit.id);
+      }}
       className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
         isSelected
           ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-200'
@@ -59,10 +64,10 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
           {promotionPrice ? (
             <div>
               <p className="text-lg font-bold text-red-600">{formatPrice(promotionPrice)}</p>
-              <p className="text-xs text-gray-400 line-through">{formatPrice(unit.selling_price)}</p>
+              <p className="text-xs text-gray-400 line-through">{formatPrice(Number(unit.selling_price))}</p>
             </div>
           ) : (
-            <p className="text-lg font-bold text-gray-900">{formatPrice(unit.selling_price)}</p>
+            <p className="text-lg font-bold text-gray-900">{formatPrice(Number(unit.selling_price))}</p>
           )}
           {isSelected && (
             <span className="text-blue-600 font-semibold text-xs bg-blue-100 px-2 py-0.5 rounded">
@@ -74,7 +79,9 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
         {/* Specs Badges - Only Condition and Grade (differentiating factors) */}
         <div className="flex flex-wrap gap-1.5 text-xs">
           <span className="bg-gray-100 px-2 py-0.5 rounded">{unit.condition === 'N' ? 'New' : unit.condition === 'R' ? 'Refurbished' : unit.condition === 'P' ? 'Pre-owned' : unit.condition}</span>
-          {unit.grade && <span className="bg-gray-100 px-2 py-0.5 rounded">Grade {unit.grade}</span>}
+          {typeof unit.grade === 'string' && unit.grade && (
+            <span className="bg-gray-100 px-2 py-0.5 rounded">Grade {unit.grade}</span>
+          )}
         </div>
       </div>
     </div>
@@ -94,6 +101,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const router = useRouter();
   
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
+  const productId = product?.id;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -114,7 +122,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     // Add all unique unit images (for color selection)
     if (units && units.length > 0) {
       const unitImageUrls = new Set<string>();
-      units.forEach((unit: PublicInventoryUnit) => {
+      units.forEach((unit: PublicInventoryUnitPublic) => {
         if (unit.images && unit.images.length > 0) {
           unit.images.forEach((img: InventoryUnitImage) => {
             if (img.image_url && !unitImageUrls.has(img.image_url)) {
@@ -156,7 +164,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   // Auto-select unit if only one is available
   useEffect(() => {
-    if (units && units.length === 1 && !selectedUnit && units[0]) {
+    if (units && units.length === 1 && !selectedUnit && units[0]?.id !== undefined) {
       setSelectedUnit(units[0].id);
     }
   }, [units, selectedUnit]);
@@ -176,19 +184,37 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   }, [units]);
 
   // Get unique variants
-  const uniqueStorage = useMemo(() => {
+  const uniqueStorage = useMemo<number[]>(() => {
     if (!units) return [];
-    return Array.from(new Set(units.map(u => u.storage_gb).filter(Boolean))).sort((a, b) => (a || 0) - (b || 0));
+    return Array.from(
+      new Set(
+        units
+          .map((u) => u.storage_gb)
+          .filter((value): value is number => typeof value === 'number')
+      )
+    ).sort((a, b) => a - b);
   }, [units]);
 
-  const uniqueRAM = useMemo(() => {
+  const uniqueRAM = useMemo<number[]>(() => {
     if (!units) return [];
-    return Array.from(new Set(units.map(u => u.ram_gb).filter(Boolean))).sort((a, b) => (a || 0) - (b || 0));
+    return Array.from(
+      new Set(
+        units
+          .map((u) => u.ram_gb)
+          .filter((value): value is number => typeof value === 'number')
+      )
+    ).sort((a, b) => a - b);
   }, [units]);
 
-  const uniqueColors = useMemo(() => {
+  const uniqueColors = useMemo<string[]>(() => {
     if (!units) return [];
-    return Array.from(new Set(units.map(u => u.color_name).filter(Boolean)));
+    return Array.from(
+      new Set(
+        units
+          .map((u) => u.color_name)
+          .filter((value): value is string => typeof value === 'string' && value.trim() !== '')
+      )
+    );
   }, [units]);
 
   const uniqueConditions = useMemo(() => {
@@ -196,14 +222,26 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     return Array.from(new Set(units.map(u => u.condition)));
   }, [units]);
 
-  const uniqueGrades = useMemo(() => {
+  const uniqueGrades = useMemo<string[]>(() => {
     if (!units) return [];
-    return Array.from(new Set(units.map(u => u.grade).filter(Boolean)));
+    return Array.from(
+      new Set(
+        units
+          .map((u) => u.grade)
+          .filter((value): value is string => typeof value === 'string' && value.trim() !== '')
+      )
+    );
   }, [units]);
 
-  const uniqueBattery = useMemo(() => {
+  const uniqueBattery = useMemo<number[]>(() => {
     if (!units) return [];
-    return Array.from(new Set(units.map(u => u.battery_mah).filter(Boolean))).sort((a, b) => (a || 0) - (b || 0));
+    return Array.from(
+      new Set(
+        units
+          .map((u) => u.battery_mah)
+          .filter((value): value is number => typeof value === 'number')
+      )
+    ).sort((a, b) => a - b);
   }, [units]);
 
   // Filter units based on selected variants
@@ -216,36 +254,41 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   const filteredUnits = useMemo(() => {
     if (!units) return [];
-    return units.filter(unit => {
-      if (selectedStorage && unit.storage_gb !== selectedStorage) return false;
-      if (selectedRAM && unit.ram_gb !== selectedRAM) return false;
-      if (selectedColor && unit.color_name !== selectedColor) return false;
-      if (selectedCondition && unit.condition !== selectedCondition) return false;
-      if (selectedGrade && unit.grade !== selectedGrade) return false;
-      if (selectedBattery && unit.battery_mah !== selectedBattery) return false;
+    return units.filter((unit) => {
+      if (selectedStorage !== null && unit.storage_gb !== selectedStorage) return false;
+      if (selectedRAM !== null && unit.ram_gb !== selectedRAM) return false;
+      if (selectedColor !== null && unit.color_name !== selectedColor) return false;
+      if (selectedCondition !== null && unit.condition !== selectedCondition) return false;
+      if (selectedGrade !== null && unit.grade !== selectedGrade) return false;
+      if (selectedBattery !== null && unit.battery_mah !== selectedBattery) return false;
       return true;
     });
   }, [units, selectedStorage, selectedRAM, selectedColor, selectedCondition, selectedGrade, selectedBattery]);
 
   // Auto-select from filtered units when Storage and Color are selected
   useEffect(() => {
-    if (filteredUnits.length > 0 && filteredUnits[0]) {
-    if (filteredUnits.length === 1 && !selectedUnit) {
-        // Auto-select if only one unit matches
-      setSelectedUnit(filteredUnits[0].id);
-      } else if (selectedStorage && selectedColor && !selectedUnit) {
-        // Auto-select first available unit when both Storage and Color are selected
-        setSelectedUnit(filteredUnits[0].id);
-      } else if (selectedUnit) {
-        // Check if currently selected unit is still available
-      const stillAvailable = filteredUnits.some(u => u.id === selectedUnit);
-        if (!stillAvailable && filteredUnits.length > 0 && filteredUnits[0]) {
-        setSelectedUnit(filteredUnits[0].id);
+    if (filteredUnits.length === 0) {
+      if (selectedUnit) {
+        setSelectedUnit(null);
       }
+      return;
     }
-    } else if (selectedUnit) {
-      // Clear selection if no units match
-      setSelectedUnit(null);
+
+    const firstUnitId = filteredUnits[0]?.id;
+    if (firstUnitId === undefined) {
+      return;
+    }
+
+    if (!selectedUnit) {
+      if (filteredUnits.length === 1 || (selectedStorage && selectedColor)) {
+        setSelectedUnit(firstUnitId);
+      }
+      return;
+    }
+
+    const stillAvailable = filteredUnits.some((u) => u.id === selectedUnit);
+    if (!stillAvailable) {
+      setSelectedUnit(firstUnitId);
     }
   }, [filteredUnits, selectedUnit, selectedStorage, selectedColor]);
 
@@ -262,12 +305,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       const promoPrice = isEligibleForPromotion && promotionUnitPrice !== null 
         ? promotionUnitPrice 
         : selectedUnitData?.selling_price;
+      const normalizedPromoPrice =
+        promoPrice !== undefined && promoPrice !== null ? Number(promoPrice) : undefined;
       
       await addToCart(
         selectedUnit, 
         quantity,
         promoId,
-        promoPrice
+        normalizedPromoPrice
       );
       setShowSuccessMessage(true);
       setTimeout(() => setShowSuccessMessage(false), 3000);
@@ -348,6 +393,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   };
 
   const selectedUnitData = units?.find(u => u.id === selectedUnit);
+  const processorDetails = (selectedUnitData as { processor_details?: string } | undefined)?.processor_details;
 
   // Get main display image - show selected unit's image if available, otherwise product image
   const mainDisplayImage = useMemo(() => {
@@ -389,6 +435,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     
     // Check if product is in promotion's products list
     if (promotion.products && promotion.products.length > 0) {
+      if (product.id === undefined) {
+        return false;
+      }
       return promotion.products.includes(product.id);
     }
     
@@ -413,7 +462,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   const promotionUnitPrice = useMemo(() => {
     if (!isEligibleForPromotion || !selectedUnitData) return null;
-    return calculatePromotionPrice(selectedUnitData.selling_price);
+    return calculatePromotionPrice(Number(selectedUnitData.selling_price));
   }, [isEligibleForPromotion, selectedUnitData, calculatePromotionPrice]);
 
   if (productLoading) {
@@ -472,7 +521,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
               {productImages.map((img, index) => {
                 // Try to find a unit with this image to get color info
-                const unitWithImage = units?.find((u: PublicInventoryUnit) => 
+                const unitWithImage = units?.find((u: PublicInventoryUnitPublic) => 
                   u.images?.some((imgObj: InventoryUnitImage) => imgObj.image_url === img)
                 );
                 const imageColor = unitWithImage?.color_name || null;
@@ -556,12 +605,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       {formatPrice(promotionUnitPrice)}
                     </p>
                     <p className="text-sm text-gray-400 line-through">
-                      {formatPrice(selectedUnitData.selling_price)}
+                      {formatPrice(Number(selectedUnitData.selling_price))}
                     </p>
                   </div>
                 ) : (
                   <p className="text-2xl font-bold text-gray-900">
-                    {formatPrice(selectedUnitData.selling_price)}
+                    {formatPrice(Number(selectedUnitData.selling_price))}
                   </p>
                 )}
               </div>
@@ -631,7 +680,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       <button
                         key={storage}
                         onClick={() => {
-                          setSelectedStorage(selectedStorage === storage ? null : storage);
+                          setSelectedStorage(selectedStorage === storage ? null : (storage ?? null));
                           setSelectedUnit(null);
                         }}
                         className={`px-3 py-1.5 rounded font-semibold text-xs transition-all ${
@@ -654,7 +703,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   <div className="flex flex-wrap gap-1.5">
                     {uniqueColors.map((color) => {
                       // Check if this color has units available with current storage filter
-                      const availableForColor = units?.filter((u: PublicInventoryUnit) => {
+                      const availableForColor = units?.filter((u: PublicInventoryUnitPublic) => {
                         if (selectedStorage && u.storage_gb !== selectedStorage) return false;
                         return u.color_name === color;
                       }) || [];
@@ -663,7 +712,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       <button
                         key={color}
                         onClick={() => {
-                          setSelectedColor(selectedColor === color ? null : color);
+                          setSelectedColor(selectedColor === color ? null : (color ?? null));
                           setSelectedUnit(null);
                         }}
                           disabled={!hasAvailableUnits}
@@ -703,7 +752,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                             </div>
 
           {/* Add to Cart Button - Prominent */}
-          {product.available_units_count > 0 && (
+          {Number(product.available_units_count ?? 0) > 0 && (
             <div className="space-y-1.5">
               {showSuccessMessage && (
                 <div className="bg-green-50 border border-green-200 text-green-700 px-2 py-1 rounded flex items-center gap-1.5 text-xs">
@@ -749,7 +798,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 <div className="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[200px] overflow-y-auto pr-1">
                   {filteredUnits.map((unit) => {
                     const unitPromotionPrice = isEligibleForPromotion && promotion && unit.selling_price
-                      ? calculatePromotionPrice(unit.selling_price)
+                      ? calculatePromotionPrice(Number(unit.selling_price))
                       : null;
                     
                     return <UnitCard
@@ -885,7 +934,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       <p className="text-[10px] text-gray-600 mb-0.5">Condition</p>
                       <p className="text-xs font-bold">{selectedUnitData.condition}</p>
                     </div>
-                    {selectedUnitData.grade && (
+                    {typeof selectedUnitData.grade === 'string' && selectedUnitData.grade && (
                       <div className="p-2 bg-gray-50 rounded">
                         <p className="text-[10px] text-gray-600 mb-0.5">Grade</p>
                         <p className="text-xs font-bold">{selectedUnitData.grade}</p>
@@ -893,7 +942,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     )}
                     <div className="p-2 bg-gray-50 rounded">
                       <p className="text-[10px] text-gray-600 mb-0.5">Price</p>
-                      <p className="text-xs font-bold">{formatPrice(selectedUnitData.selling_price)}</p>
+                      <p className="text-xs font-bold">{formatPrice(Number(selectedUnitData.selling_price))}</p>
                     </div>
                   </div>
                 </div>
@@ -926,19 +975,19 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                           <td className="px-6 py-4 text-gray-700">{selectedUnitData.battery_mah}mAh</td>
                         </tr>
                       )}
-                      {selectedUnitData.processor_details && (
+                      {processorDetails && (
                         <tr>
                           <td className="px-6 py-4 font-semibold text-gray-900">Processor</td>
-                          <td className="px-6 py-4 text-gray-700">{selectedUnitData.processor_details}</td>
+                          <td className="px-6 py-4 text-gray-700">{processorDetails}</td>
                         </tr>
                       )}
                       {selectedUnitData.color_name && (
-                        <tr className={selectedUnitData.processor_details ? 'bg-gray-50' : ''}>
+                        <tr className={processorDetails ? 'bg-gray-50' : ''}>
                           <td className="px-6 py-4 font-semibold text-gray-900">Color</td>
                           <td className="px-6 py-4 text-gray-700">{selectedUnitData.color_name}</td>
                         </tr>
                       )}
-                      <tr className={selectedUnitData.color_name && !selectedUnitData.processor_details ? '' : selectedUnitData.color_name ? '' : 'bg-gray-50'}>
+                      <tr className={selectedUnitData.color_name && !processorDetails ? '' : selectedUnitData.color_name ? '' : 'bg-gray-50'}>
                         <td className="px-6 py-4 font-semibold text-gray-900">Condition</td>
                         <td className="px-6 py-4 text-gray-700">
                           {selectedUnitData.condition === 'N' ? 'New' : 
@@ -947,8 +996,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                            selectedUnitData.condition}
                         </td>
                       </tr>
-                      {selectedUnitData.grade && (
-                        <tr className={selectedUnitData.color_name && selectedUnitData.processor_details ? 'bg-gray-50' : !selectedUnitData.color_name ? 'bg-gray-50' : ''}>
+                      {typeof selectedUnitData.grade === 'string' && selectedUnitData.grade && (
+                        <tr className={selectedUnitData.color_name && processorDetails ? 'bg-gray-50' : !selectedUnitData.color_name ? 'bg-gray-50' : ''}>
                           <td className="px-6 py-4 font-semibold text-gray-900">Grade</td>
                           <td className="px-6 py-4 text-gray-700">Grade {selectedUnitData.grade}</td>
                         </tr>
@@ -964,23 +1013,23 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             </div>
           )}
 
-          {activeTab === 'reviews' && (
+          {activeTab === 'reviews' && typeof productId === 'number' && (
             <div>
-              <ReviewsSection productId={product.id} />
+              <ReviewsSection productId={productId} />
             </div>
           )}
 
-          {activeTab === 'videos' && (
+          {activeTab === 'videos' && product && (
             <div>
               <h3 className="text-2xl font-bold mb-6">Product Videos</h3>
-                <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
-                  <iframe
-                    src={convertToYouTubeEmbed(product.product_video_url || getPlaceholderVideoUrl(product.product_name))}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
+              <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
+                <iframe
+                  src={convertToYouTubeEmbed(product.product_video_url || getPlaceholderVideoUrl(product.product_name))}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
               {!product.product_video_url && (
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-sm text-blue-800">
@@ -1011,7 +1060,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       <div className="relative w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                         <Image
                           src={accessory.accessory_primary_image || getPlaceholderProductImage(accessory.accessory_name)}
-                          alt={accessory.accessory_name}
+                          alt={accessory.accessory_name ?? 'Accessory'}
                           fill
                           className="object-contain bg-gray-50"
                           sizes="96px"
@@ -1139,9 +1188,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       )}
 
       {/* Product Recommendations */}
-      <div className="mt-16">
-        <ProductRecommendations productId={product.id} />
-      </div>
+      {typeof productId === 'number' && (
+        <div className="mt-16">
+          <ProductRecommendations productId={productId} />
+        </div>
+      )}
     </div>
   );
 }

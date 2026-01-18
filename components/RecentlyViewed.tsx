@@ -17,9 +17,10 @@ export function RecentlyViewed() {
     setProductIds(recentlyViewed);
   }, []);
 
-  const recentlyViewedProducts = data?.results.filter((p) =>
-    productIds.includes(p.id)
-  ) || [];
+  const recentlyViewedProducts = (data?.results || []).filter(
+    (p): p is typeof p & { id: number } =>
+      typeof p.id === 'number' && productIds.includes(p.id)
+  );
 
   // Sort by recently viewed order
   const sortedProducts = recentlyViewedProducts.sort((a, b) => {

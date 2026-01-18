@@ -8,8 +8,10 @@ import type { Review, PublicProduct } from '@/lib/api/generated';
 import { ApiService } from '@/lib/api/generated';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 
-function formatDate(dateString: string): string {
+function formatDate(dateString?: string | null): string {
+  if (!dateString) return '—';
   const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '—';
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
   
@@ -41,10 +43,9 @@ export function ReviewsShowcase() {
     const loadProducts = async () => {
       const productIds = Array.from(
         new Set(
-          reviews.flatMap((review) => [
-            review.product,
-            ...(review.tagged_products || review.tagged_product_ids || []),
-          ])
+          reviews
+            .flatMap((review) => [review.product])
+            .filter((id): id is number => typeof id === 'number')
         )
       );
       if (productIds.length === 0) return;
@@ -89,8 +90,11 @@ export function ReviewsShowcase() {
         <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory">
           {reviews.map((review) => {
             const imageUrl = review.review_image_url || review.review_image || null;
-            const taggedProductIds = review.tagged_products || review.tagged_product_ids || [];
-            const productIds = Array.from(new Set([review.product, ...taggedProductIds]));
+            const productIds = Array.from(
+              new Set(
+                [review.product].filter((id): id is number => typeof id === 'number')
+              )
+            );
             const productsForCard = productIds.map((productId) => productById[productId]).filter(Boolean);
 
             return (
@@ -104,7 +108,7 @@ export function ReviewsShowcase() {
                   {imageUrl ? (
                     <img
                       src={imageUrl}
-                      alt={review.product_name}
+                      alt={review.product_name ?? 'Product review'}
                       className="h-full w-full object-contain bg-gray-50"
                       loading="lazy"
                     />
@@ -141,8 +145,9 @@ export function ReviewsShowcase() {
                   <div className="flex gap-2 overflow-x-auto pb-1">
                     {(productsForCard.length > 0 ? productsForCard : [null]).map((product, index) => {
                       const productId = product?.id ?? review.product;
-                      const productImage = product?.primary_image || getPlaceholderProductImage(review.product_name);
-                      const productName = product?.product_name || review.product_name;
+                      const productImage =
+                        product?.primary_image || getPlaceholderProductImage(review.product_name ?? 'Product');
+                      const productName = product?.product_name || review.product_name || 'Product';
 
                       return (
                         <div
@@ -181,14 +186,9 @@ export function ReviewsShowcase() {
         >
           {(() => {
             const selectedProduct = productById[selectedReview.product] || null;
-            const selectedProductImage = selectedProduct?.primary_image || getPlaceholderProductImage(selectedReview.product_name);
-            const selectedProductSlug = selectedProduct?.slug || selectedReview.product;
-            const taggedProductIds = selectedReview.tagged_products || selectedReview.tagged_product_ids || [];
-            const taggedProducts = taggedProductIds
-              .map((productId) => productById[productId])
-              .filter((product): product is Product => Boolean(product));
-            const fallbackProducts = selectedProduct ? [selectedProduct] : [];
-            const productsToDisplay = taggedProducts.length > 0 ? taggedProducts : fallbackProducts;
+            const selectedProductImage =
+              selectedProduct?.primary_image || getPlaceholderProductImage(selectedReview.product_name ?? 'Product');
+            const productsToDisplay = selectedProduct ? [selectedProduct] : [];
 
             return (
           <div
@@ -197,7 +197,7 @@ export function ReviewsShowcase() {
           >
             <div className="relative flex items-center justify-center border-b border-gray-100 px-6 py-4">
               <p className="text-sm font-semibold text-gray-700">
-                {selectedReview.product_name}
+                {selectedReview.product_name ?? 'Product'}
               </p>
               <button
                 type="button"
@@ -216,12 +216,12 @@ export function ReviewsShowcase() {
                     {selectedReview.review_image_url ? (
                       <img
                         src={selectedReview.review_image_url}
-                        alt={selectedReview.product_name}
+                        alt={selectedReview.product_name ?? 'Product review'}
                         className="h-full w-full object-contain bg-black"
                       />
                     ) : (
                       <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                        <span className="text-sm text-gray-600">{selectedReview.product_name}</span>
+                        <span className="text-sm text-gray-600">{selectedReview.product_name ?? 'Product'}</span>
                       </div>
                     )}
                   </div>
@@ -258,18 +258,19 @@ export function ReviewsShowcase() {
                 )}
 
                 <div className="mt-auto space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Tagged products</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Product</p>
                   <div className="max-h-[180px] space-y-3 overflow-y-auto pr-1">
                     {productsToDisplay.map((product) => {
                       const isPrimary = product?.id === selectedReview.product;
-                      const productSlug = product?.slug || product?.id;
+                      const productSlug = product?.slug ?? product?.id ?? selectedReview.product;
+                      const productHref = `/products/${String(productSlug)}`;
                       const productImage = product?.primary_image || selectedProductImage;
-                      const productName = product?.product_name || selectedReview.product_name;
+                      const productName = product?.product_name || selectedReview.product_name || 'Product';
 
                       return (
                         <Link
                           key={product?.id ?? selectedReview.product}
-                          href={`/products/${productSlug}`}
+                          href={productHref}
                           className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md"
                         >
                           <div className="flex items-center gap-3">

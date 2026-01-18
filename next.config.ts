@@ -80,6 +80,12 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BRAND_CODE: process.env.NEXT_PUBLIC_BRAND_CODE,
     NEXT_PUBLIC_BRAND_NAME: process.env.NEXT_PUBLIC_BRAND_NAME,
   },
+
+  // Ensure workspace package is transpiled for App Router client boundaries
+  experimental: {
+    externalDir: true,
+  },
+  transpilePackages: ['@shwari/api-client'],
 };
 
 export default nextConfig;

@@ -61,6 +61,10 @@ export function ProductVideosSection() {
         product_video_url: getPlaceholderVideoUrl(product.product_name),
       }));
 
+  const productsToShowWithId = productsToShow.filter(
+    (product): product is typeof product & { id: number } => typeof product.id === 'number'
+  );
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -71,7 +75,7 @@ export function ProductVideosSection() {
     );
   }
 
-  if (productsToShow.length === 0) {
+  if (productsToShowWithId.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-600 mb-4">No product videos available at the moment.</p>
@@ -86,7 +90,7 @@ export function ProductVideosSection() {
     <div>
       <h2 className="text-3xl font-bold mb-6">Product Videos</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {productsToShow.map((product) => (
+        {productsToShowWithId.map((product) => (
           <div
             key={product.id}
             id={`video-card-${product.id}`}

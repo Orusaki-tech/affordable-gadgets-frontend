@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { useProductUnits } from '@/lib/hooks/useProducts';
-import { calculateMatchScores, MatchCriteria } from '@/lib/utils/matchScore';
+import { calculateMatchScores, MatchCriteria, ProductForMatching } from '@/lib/utils/matchScore';
 import { PublicProduct } from '@/lib/api/generated';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
@@ -28,11 +28,17 @@ export function MatchScorePage() {
     // This is a simplified version - in production, you'd need to fetch units for each product
     // For now, we'll use empty arrays as placeholders
 
-    const matchResults = calculateMatchScores(
-      productsData.results,
-      criteria,
-      unitsMap
-    );
+    const productsForMatching: ProductForMatching[] = productsData.results
+      .filter((p): p is PublicProduct & { id: number } => p.id !== undefined)
+      .map((p) => ({
+        id: p.id,
+        product_name: p.product_name,
+        min_price: p.min_price ?? null,
+        max_price: p.max_price ?? null,
+        available_units_count: p.available_units_count ?? 0,
+      }));
+
+    const matchResults = calculateMatchScores(productsForMatching, criteria, unitsMap);
 
     setResults(matchResults.slice(0, 10)); // Top 10 matches
   };

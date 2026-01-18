@@ -88,12 +88,14 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
       // Sort by carousel_position if set, otherwise by start_date
       const aPos = a.carousel_position;
       const bPos = b.carousel_position;
+      const aHasPos = typeof aPos === 'number';
+      const bHasPos = typeof bPos === 'number';
       
-      if (aPos && bPos) {
+      if (aHasPos && bHasPos) {
         return aPos - bPos; // Sort by position number (1-5)
-      } else if (aPos) {
+      } else if (aHasPos) {
         return -1; // Promotions with position come first
-      } else if (bPos) {
+      } else if (bHasPos) {
         return 1;
       } else {
         // Both have no position, sort by date
@@ -123,60 +125,79 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     const usedPromotionIds = new Set<number>();
     
     // Add banner item to used set
-    if (bannerItem) {
+    if (bannerItem && typeof bannerItem.id === 'number') {
       usedPromotionIds.add(bannerItem.id);
     }
     
     // Get promotions with positions 2-5
     const positionedPromotions = allPromotions
-      .filter(promo => {
+      .filter((promo) => {
         const pos = promo.carousel_position;
-        return pos && pos >= 2 && pos <= 5 && !usedPromotionIds.has(promo.id);
+        const promoId = promo.id;
+        return (
+          typeof promoId === 'number' &&
+          typeof pos === 'number' &&
+          pos >= 2 &&
+          pos <= 5 &&
+          !usedPromotionIds.has(promoId)
+        );
       })
-      .sort((a, b) => (a.carousel_position || 0) - (b.carousel_position || 0));
+      .sort((a, b) => (a.carousel_position ?? 0) - (b.carousel_position ?? 0));
     
     // Add positioned promotions to their slots
-    positionedPromotions.forEach(promo => {
+    positionedPromotions.forEach((promo) => {
       const pos = promo.carousel_position;
-      // Type guard: pos is guaranteed to be a number due to filter above, but TypeScript doesn't know that
-      if (pos && pos >= 2 && pos <= 5) {
+      const promoId = promo.id;
+      if (typeof pos === 'number' && pos >= 2 && pos <= 5 && typeof promoId === 'number') {
         items.push({ 
           type: 'promotion', 
           data: promo, 
-          uniqueKey: `promo-${promo.id}`,
+          uniqueKey: `promo-${promoId}`,
           position: pos
         });
-        usedPromotionIds.add(promo.id);
+        usedPromotionIds.add(promoId);
       }
     });
     
     // Fill remaining slots with promotions without positions
-    const unpositionedPromotions = allPromotions.filter(promo => 
-      !usedPromotionIds.has(promo.id) && 
-      (!promo.carousel_position || promo.carousel_position > 5)
-    );
+    const unpositionedPromotions = allPromotions.filter((promo) => {
+      const promoId = promo.id;
+      if (typeof promoId === 'number' && usedPromotionIds.has(promoId)) {
+        return false;
+      }
+      const pos = promo.carousel_position;
+      return typeof pos !== 'number' || pos > 5;
+    });
     
     // Fill positions 2-5 in order
     for (let pos = 2; pos <= 5 && items.length < 4; pos++) {
       const existingAtPos = items.find(item => item.position === pos);
       if (!existingAtPos) {
         // Try to find an unpositioned promotion
-        const nextPromo = unpositionedPromotions.find(p => !usedPromotionIds.has(p.id));
+        const nextPromo = unpositionedPromotions.find((p) => {
+          const promoId = p.id;
+          return typeof promoId !== 'number' || !usedPromotionIds.has(promoId);
+        });
         if (nextPromo) {
+          const promoId = nextPromo.id;
+          const promoKey = typeof promoId === 'number' ? promoId : nextPromo.title;
           items.push({ 
             type: 'promotion', 
             data: nextPromo, 
-            uniqueKey: `promo-${nextPromo.id}`,
+            uniqueKey: `promo-${promoKey}`,
             position: pos
           });
-          usedPromotionIds.add(nextPromo.id);
+          if (typeof promoId === 'number') {
+            usedPromotionIds.add(promoId);
+          }
         } else if (productsWithVideos.length > 0 && items.length < 4) {
           // Add product video if no promotion available
           const featuredVideo = productsWithVideos[0];
+          const videoKey = featuredVideo.id ?? featuredVideo.product_name;
           items.push({ 
             type: 'video', 
             data: featuredVideo, 
-            uniqueKey: `video-${featuredVideo.id}`,
+            uniqueKey: `video-${videoKey}`,
             position: pos
           });
           break; // Only add one video
@@ -193,10 +214,13 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
       ? promotion.products[0] 
       : null;
 
-    if (firstProductId) {
-      router.push(`/products/${firstProductId}?promotion=${promotion.id}`);
+    const promotionId = promotion.id;
+    const promotionQuery = typeof promotionId === 'number' ? `?promotion=${promotionId}` : '';
+
+    if (typeof firstProductId === 'number') {
+      router.push(`/products/${firstProductId}${promotionQuery}`);
     } else {
-      router.push(`/products?promotion=${promotion.id}`);
+      router.push(promotionQuery ? `/products${promotionQuery}` : '/products');
     }
   };
 

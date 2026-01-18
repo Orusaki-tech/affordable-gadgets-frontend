@@ -3,8 +3,10 @@
 import { useProductReviews } from '@/lib/hooks/useReviews';
 import { getPlaceholderVideoThumbnail, getPlaceholderVideoUrl, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
 
-function formatDate(dateString: string): string {
+function formatDate(dateString?: string | null): string {
+  if (!dateString) return '—';
   const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '—';
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
   
@@ -130,9 +132,7 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-500">
-                  {formatDate(review.date_posted)}
-                </p>
+                <p className="text-sm text-gray-500">{formatDate(review.date_posted)}</p>
               </div>
             </div>
             

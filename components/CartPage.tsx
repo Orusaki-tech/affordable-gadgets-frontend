@@ -26,7 +26,9 @@ export function CartPage() {
     return <div className="text-center py-12">Loading cart...</div>;
   }
 
-  if (!cart || cart.items.length === 0) {
+  const items = cart?.items ?? [];
+
+  if (!cart || items.length === 0) {
     return (
       <div className="text-center py-12">
         <h1 className="text-3xl font-bold mb-4">Your Cart is Empty</h1>
@@ -48,10 +50,13 @@ export function CartPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-4">
-          {cart.items.map((item) => {
-            const unitPrice = item.unit_price || item.inventory_unit.selling_price;
-            const originalPrice = item.inventory_unit.selling_price;
-            const hasPromotion = item.unit_price && item.unit_price < originalPrice;
+          {items.map((item) => {
+            const inventoryUnit = item.inventory_unit;
+            const basePrice = Number(inventoryUnit?.selling_price ?? 0);
+            const unitPrice = Number(item.unit_price ?? basePrice);
+            const originalPrice = basePrice;
+            const hasPromotion = item.unit_price !== undefined && item.unit_price !== null && unitPrice < originalPrice;
+            const quantity = Number(item.quantity ?? 0);
             
             return (
               <div
@@ -59,26 +64,26 @@ export function CartPage() {
                 className="flex gap-4 bg-white p-4 rounded-lg shadow-sm border-2 border-gray-100"
               >
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{item.inventory_unit.product_name}</h3>
+                  <h3 className="font-semibold text-lg">{inventoryUnit?.product_name ?? 'Product'}</h3>
                   <p className="text-gray-600 text-sm">
-                    {item.inventory_unit.condition}
-                    {item.inventory_unit.grade && ` • Grade ${item.inventory_unit.grade}`}
-                    {item.inventory_unit.storage_gb && ` • ${item.inventory_unit.storage_gb}GB`}
-                    {item.inventory_unit.ram_gb && ` • ${item.inventory_unit.ram_gb}GB RAM`}
-                    {item.inventory_unit.color_name && ` • ${item.inventory_unit.color_name}`}
+                    {inventoryUnit?.condition ?? 'Condition N/A'}
+                    {inventoryUnit?.grade && ` • Grade ${inventoryUnit.grade}`}
+                    {inventoryUnit?.storage_gb && ` • ${inventoryUnit.storage_gb}GB`}
+                    {inventoryUnit?.ram_gb && ` • ${inventoryUnit.ram_gb}GB RAM`}
+                    {inventoryUnit?.color_name && ` • ${inventoryUnit.color_name}`}
                   </p>
                   {hasPromotion ? (
                     <div className="mt-2">
                       <p className="text-lg font-semibold text-red-600">
-                        {formatPrice(unitPrice)} × {item.quantity}
+                        {formatPrice(unitPrice)} × {quantity}
                       </p>
                       <p className="text-sm text-gray-400 line-through">
-                        {formatPrice(originalPrice)} × {item.quantity}
+                        {formatPrice(originalPrice)} × {quantity}
                       </p>
                     </div>
                   ) : (
                     <p className="text-lg font-semibold mt-2">
-                      {formatPrice(unitPrice)} × {item.quantity}
+                      {formatPrice(unitPrice)} × {quantity}
                     </p>
                   )}
                 </div>
@@ -86,19 +91,23 @@ export function CartPage() {
                   {hasPromotion ? (
                     <div className="text-right">
                       <p className="text-xl font-bold text-red-600">
-                        {formatPrice(unitPrice * item.quantity)}
+                        {formatPrice(unitPrice * quantity)}
                       </p>
                       <p className="text-sm text-gray-400 line-through">
-                        {formatPrice(originalPrice * item.quantity)}
+                        {formatPrice(originalPrice * quantity)}
                       </p>
                     </div>
                   ) : (
                     <p className="text-xl font-bold">
-                      {formatPrice(unitPrice * item.quantity)}
+                      {formatPrice(unitPrice * quantity)}
                     </p>
                   )}
                   <button
                     onClick={async () => {
+                      if (item.id === undefined || item.id === null) {
+                        console.warn('Cannot remove cart item without id');
+                        return;
+                      }
                       try {
                         await removeFromCart(item.id);
                       } catch (err) {

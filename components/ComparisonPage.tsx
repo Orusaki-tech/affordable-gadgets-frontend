@@ -3,14 +3,14 @@
 import { useState, useMemo } from 'react';
 import { useProducts, useProductUnits } from '@/lib/hooks/useProducts';
 import { useCompare } from '@/lib/hooks/useCompare';
-import { PublicProduct, PublicInventoryUnit } from '@/lib/api/generated';
+import { PublicProduct, PublicInventoryUnitPublic, ConditionEnum, GradeEnum } from '@/lib/api/generated';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 
 interface ProductWithSpecs extends PublicProduct {
-  units?: PublicInventoryUnit[];
+  units?: PublicInventoryUnitPublic[];
   storageRange?: string;
   ramRange?: string;
   batteryRange?: string;
@@ -81,17 +81,19 @@ function ProductImageCell({ product }: { product: PublicProduct }) {
 
 // Component for rendering price cell with highlighting
 function PriceCell({ product, allProducts }: { product: PublicProduct; allProducts: PublicProduct[] }) {
-  const price = product.min_price !== null && product.max_price !== null
-    ? product.min_price === product.max_price
-      ? product.min_price
-      : (product.min_price + product.max_price) / 2 // Average for comparison
+  const minPrice = product.min_price ?? null;
+  const maxPrice = product.max_price ?? null;
+  const price = minPrice !== null && maxPrice !== null
+    ? minPrice === maxPrice
+      ? minPrice
+      : (minPrice + maxPrice) / 2 // Average for comparison
     : null;
 
   const allPrices = allProducts.map(p => 
-    p.min_price !== null && p.max_price !== null
-      ? p.min_price === p.max_price
-        ? p.min_price
-        : (p.min_price + p.max_price) / 2
+    (p.min_price ?? null) !== null && (p.max_price ?? null) !== null
+      ? (p.min_price ?? null) === (p.max_price ?? null)
+        ? (p.min_price ?? null)
+        : ((p.min_price ?? 0) + (p.max_price ?? 0)) / 2
       : null
   );
 
@@ -99,10 +101,10 @@ function PriceCell({ product, allProducts }: { product: PublicProduct; allProduc
 
   return (
     <td className={`border-b border-gray-100 p-4 ${highlightClass}`}>
-      {product.min_price !== null && product.max_price !== null
-        ? product.min_price === product.max_price
-          ? formatPrice(product.min_price)
-          : `${formatPrice(product.min_price)} - ${formatPrice(product.max_price)}`
+      {minPrice !== null && maxPrice !== null
+        ? minPrice === maxPrice
+          ? formatPrice(minPrice)
+          : `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`
         : 'N/A'}
     </td>
   );
@@ -206,8 +208,10 @@ function UnitAttributeCell({
   }
 
   if (attributeType === 'condition') {
-    const conditions = Array.from(new Set(units.map(u => u.condition).filter(Boolean)));
-    const conditionLabels: Record<string, string> = {
+    const conditions = Array.from(
+      new Set(units.map(u => u.condition).filter((cond): cond is ConditionEnum => cond !== undefined))
+    );
+    const conditionLabels: Record<'N' | 'R' | 'P' | 'D', string> = {
       'N': 'New',
       'R': 'Refurbished',
       'P': 'Pre-owned',
@@ -218,7 +222,7 @@ function UnitAttributeCell({
         <div className="flex flex-wrap gap-1">
           {conditions.map((cond, idx) => (
             <span key={idx} className="px-2 py-1 text-xs bg-gray-100 rounded">
-              {conditionLabels[cond] || cond}
+              {conditionLabels[cond as keyof typeof conditionLabels] || cond}
             </span>
           ))}
         </div>
@@ -227,7 +231,9 @@ function UnitAttributeCell({
   }
 
   if (attributeType === 'grade') {
-    const grades = Array.from(new Set(units.map(u => u.grade).filter(Boolean)));
+    const grades = Array.from(
+      new Set(units.map(u => u.grade).filter((grade): grade is GradeEnum => grade !== undefined))
+    );
     return (
       <td className="border-b border-gray-100 p-4">
         <div className="flex flex-wrap gap-1">
@@ -308,18 +314,20 @@ export function ComparisonPage() {
   // Get selected products
   const selectedProductsData = useMemo(() => {
     if (!productsData?.results) return [];
-    return productsData.results.filter((p) => compareList.includes(p.id));
+    return productsData.results.filter((p) => p.id !== undefined && compareList.includes(p.id));
   }, [productsData?.results, compareList]);
 
   // Filter available products
   const filteredProducts = useMemo(() => {
     if (!productsData?.results) return [];
     return productsData.results
-      .filter((p) => !compareList.includes(p.id))
+      .filter((p) => p.id === undefined || !compareList.includes(p.id))
       .filter((p) => {
+        const minPrice = p.min_price ?? null;
+        const maxPrice = p.max_price ?? null;
         if (brandFilter && p.brand?.toLowerCase() !== brandFilter.toLowerCase()) return false;
-        if (priceRange.min !== '' && p.min_price !== null && p.min_price < Number(priceRange.min)) return false;
-        if (priceRange.max !== '' && p.max_price !== null && p.max_price > Number(priceRange.max)) return false;
+        if (priceRange.min !== '' && minPrice !== null && minPrice < Number(priceRange.min)) return false;
+        if (priceRange.max !== '' && maxPrice !== null && maxPrice > Number(priceRange.max)) return false;
         return true;
       });
   }, [productsData?.results, compareList, brandFilter, priceRange]);
@@ -446,7 +454,12 @@ export function ComparisonPage() {
                   </p>
                 )}
                 <button
-                  onClick={() => addProduct(product.id)}
+                  onClick={() => {
+                    if (product.id === undefined) {
+                      return;
+                    }
+                    addProduct(product.id);
+                  }}
                   disabled={count >= 4}
                   className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium text-sm"
                 >
@@ -495,7 +508,12 @@ export function ComparisonPage() {
                             <span className="text-xs sm:text-sm text-gray-600 truncate block">{product.brand}</span>
                           </div>
                           <button
-                            onClick={() => removeProduct(product.id)}
+                            onClick={() => {
+                              if (product.id === undefined) {
+                                return;
+                              }
+                              removeProduct(product.id);
+                            }}
                             className="ml-2 flex-shrink-0 text-red-600 hover:text-red-700 hover:bg-red-50 rounded p-1 transition-colors"
                             title="Remove from comparison"
                           >
@@ -522,16 +540,24 @@ export function ComparisonPage() {
                           return <PriceCell key={product.id} product={product} allProducts={selectedProductsData} />;
                         }
                         if (field.type === 'spec' && field.specType) {
+                          if (product.id === undefined) {
+                            return <td key={String(product.id)} className="border-b border-gray-100 p-4 text-gray-500">N/A</td>;
+                          }
                           return (
                             <SpecCell 
                               key={product.id} 
                               productId={product.id} 
                               specType={field.specType}
-                              allProductIds={selectedProductsData.map(p => p.id)}
+                              allProductIds={selectedProductsData
+                                .map(p => p.id)
+                                .filter((id): id is number => id !== undefined)}
                             />
                           );
                         }
                         if (field.type === 'unitAttribute' && field.attributeType) {
+                          if (product.id === undefined) {
+                            return <td key={String(product.id)} className="border-b border-gray-100 p-4 text-gray-500">N/A</td>;
+                          }
                           return (
                             <UnitAttributeCell 
                               key={product.id} 

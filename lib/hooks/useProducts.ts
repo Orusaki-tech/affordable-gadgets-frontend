@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   ApiService,
   PublicProduct,
-  PublicInventoryUnit,
+  PublicInventoryUnitPublic,
   PaginatedPublicProductList,
 } from '@/lib/api/generated';
 
@@ -37,15 +37,16 @@ export function useProducts(params?: {
         promotion,
       } = params || {};
       return ApiService.apiV1PublicProductsList(
+        brand_filter,
+        max_price,
+        min_price,
+        ordering,
         page,
         page_size,
-        type,
+        promotion,
         search,
-        brand_filter,
-        min_price,
-        max_price,
-        ordering,
-        promotion
+        undefined,
+        type
       );
     },
     staleTime: 30000, // 30 seconds
@@ -73,8 +74,8 @@ export function useProductBySlug(slug: string) {
         undefined,
         undefined,
         undefined,
-        undefined,
-        slug
+        slug,
+        undefined
       ).then((response) => {
         if (response.results.length > 0) {
           return response.results[0];
@@ -88,10 +89,13 @@ export function useProductBySlug(slug: string) {
 }
 
 export function useProductUnits(productId: number) {
-  return useQuery<PublicInventoryUnit[]>({
+  return useQuery<PublicInventoryUnitPublic[]>({
     queryKey: ['product', productId, 'units'],
-    queryFn: () => ApiService.apiV1PublicProductsUnitsRetrieve(productId),
-    enabled: !!productId,
+    queryFn: async () => {
+      const response = await ApiService.apiV1PublicProductsUnitsList(productId);
+      return response?.results ?? [];
+    },
+    enabled: productId > 0,
     staleTime: 10000, // 10 seconds (more frequent updates for stock)
   });
 }

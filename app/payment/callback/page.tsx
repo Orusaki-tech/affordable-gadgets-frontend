@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { OpenAPI, OrdersService } from '@/lib/api/generated';
+import { OpenAPI, OrdersService, OrderStatusEnum } from '@/lib/api/generated';
 import { inventoryBaseUrl } from '@/lib/api/openapi';
 import Link from 'next/link';
 
@@ -45,7 +45,10 @@ function PaymentCallbackContent() {
         OpenAPI.BASE = previousBase;
         console.log('[PESAPAL] Payment Status:', JSON.stringify(paymentStatus, null, 2));
         
-        if (paymentStatus.status === 'COMPLETED') {
+        if (
+          paymentStatus.status === OrderStatusEnum.PAID ||
+          paymentStatus.status === OrderStatusEnum.DELIVERED
+        ) {
           console.log('[PESAPAL] Payment is COMPLETED - showing success');
           setStatus('success');
           setMessage('Payment completed successfully!');
@@ -56,10 +59,10 @@ function PaymentCallbackContent() {
             console.log('[PESAPAL] Redirecting to success page...');
             router.push(`/payment/success?order_id=${orderId}`);
           }, 2000);
-        } else if (paymentStatus.status === 'FAILED' || paymentStatus.status === 'CANCELLED') {
+        } else if (paymentStatus.status === OrderStatusEnum.CANCELED) {
           console.log('[PESAPAL] Payment is', paymentStatus.status, '- showing failure');
           setStatus('failed');
-          setMessage(paymentStatus.message || 'Payment failed');
+          setMessage('Payment failed or was cancelled.');
         } else {
           // Still processing
           console.log('[PESAPAL] Payment status:', paymentStatus.status, '- will poll again in 3 seconds');

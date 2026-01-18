@@ -12,9 +12,11 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, showInterestCount = true }: ProductCardProps) {
-  const hasStock = product.available_units_count > 0;
-  const interestText = product.interest_count > 0 
-    ? `${product.interest_count} ${product.interest_count === 1 ? 'person' : 'people'} interested`
+  const availableCount = Number(product.available_units_count ?? 0);
+  const interestCount = Number(product.interest_count ?? 0);
+  const hasStock = availableCount > 0;
+  const interestText = interestCount > 0 
+    ? `${interestCount} ${interestCount === 1 ? 'person' : 'people'} interested`
     : null;
 
   return (
@@ -66,9 +68,10 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
 
         {/* Price */}
         <div className="mb-4">
-          {product.min_price !== null && product.max_price !== null ? (
+        {product.min_price !== null && product.min_price !== undefined &&
+        product.max_price !== null && product.max_price !== undefined ? (
             <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-              {formatPriceRange(product.min_price, product.max_price)}
+            {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
             </p>
           ) : (
             <p className="text-xl font-bold text-gray-700">Price on request</p>

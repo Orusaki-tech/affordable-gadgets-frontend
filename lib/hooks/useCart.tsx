@@ -4,7 +4,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { ApiService, Cart, CartItem, CheckoutResponse, Checkout } from '@/lib/api/generated';
+import { ApiService, Cart, CartItemRequest, CartRequest } from '@/lib/api/generated';
 
 interface CartContextType {
   cart: Cart | null;
@@ -13,13 +13,23 @@ interface CartContextType {
   addToCart: (inventoryUnitId: number, quantity?: number, promotionId?: number, unitPrice?: number) => Promise<void>;
   removeFromCart: (itemId: number) => Promise<void>;
   updateCart: () => Promise<void>;
-  checkout: (checkoutData: Checkout) => Promise<CheckoutResponse>;
+  checkout: (checkoutData: CartRequest) => Promise<Cart>;
   clearCart: () => void;
   itemCount: number;
   totalValue: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+const getCartId = (currentCart: Cart): number => {
+  if (currentCart.id === undefined) {
+    throw new Error('Cart ID is missing');
+  }
+  return currentCart.id;
+};
+type CartItemCreateRequest = CartItemRequest & {
+  promotion_id?: number;
+  unit_price?: number;
+};
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null);
@@ -91,6 +101,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const updateCart = useCallback(async () => {
     if (!cart) return;
     try {
+      if (cart.id === undefined) return;
       const updatedCart = await ApiService.apiV1PublicCartRetrieve(cart.id);
       // If cart has no items, clear it
       if (!updatedCart.items || updatedCart.items.length === 0) {
@@ -141,19 +152,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       
       // Add item to cart with promotion info
+      const cartId = getCartId(currentCart);
       console.log('Adding item to cart:', { 
-        cartId: currentCart.id, 
+        cartId, 
         inventoryUnitId, 
         quantity,
         promotionId,
         unitPrice
       });
-      await ApiService.apiV1PublicCartItemsCreate(currentCart.id, {
+      const cartItemRequest: CartItemCreateRequest = {
         inventory_unit_id: inventoryUnitId,
         quantity,
         promotion_id: promotionId,
         unit_price: unitPrice,
-      });
+      };
+      await ApiService.apiV1PublicCartItemsCreate(cartId, cartItemRequest as unknown as CartRequest);
       await updateCart();
       console.log('Item added successfully');
     } catch (err: any) {
@@ -175,6 +188,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       console.error('Cannot remove item: No cart available');
       return;
     }
+    if (cart.id === undefined) {
+      console.error('Cannot remove item: Cart ID is missing');
+      return;
+    }
     try {
       console.log(`Removing item ${itemId} from cart ${cart.id}`);
       await ApiService.apiV1PublicCartItemsDestroy(cart.id, String(itemId));
@@ -189,10 +206,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [cart, updateCart]);
 
-  const checkout = useCallback(async (checkoutData: Checkout): Promise<CheckoutResponse> => {
+  const checkout = useCallback(async (checkoutData: CartRequest): Promise<Cart> => {
     if (!cart) throw new Error('No cart available');
+    const cartId = getCartId(cart);
     try {
-      const response = await ApiService.apiV1PublicCartCheckoutCreate(cart.id, checkoutData);
+      const response = await ApiService.apiV1PublicCartCheckoutCreate(cartId, checkoutData);
       // Don't clear cart - keep it for reference until lead is converted to order
       // The cart is now linked to the lead via cart.lead
       // Just refresh the cart to show it's submitted
@@ -208,7 +226,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart(null);
   }, []);
 
-  const itemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
+  const itemCount = (cart?.items ?? []).reduce((sum, item) => sum + (item.quantity ?? 0), 0);
   const totalValue = cart?.total_value || 0;
 
   const value: CartContextType = {

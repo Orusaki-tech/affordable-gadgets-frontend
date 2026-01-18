@@ -5,9 +5,10 @@ import Image from 'next/image';
 import { useCart } from '@/lib/hooks/useCart';
 import { formatPrice } from '@/lib/utils/format';
 import { useRouter } from 'next/navigation';
-import { ApiService, OpenAPI, OrdersService, OrderRequest, Order } from '@/lib/api/generated';
+import { ApiService, OpenAPI, OrdersService, OrderRequest, Order, InitiatePaymentRequestRequest } from '@/lib/api/generated';
 import { inventoryBaseUrl } from '@/lib/api/openapi';
 import { PaymentMethodModal } from './PaymentMethodModal';
+import { brandConfig } from '@/lib/config/brand';
 
 interface CheckoutModalProps {
   onClose: () => void;
@@ -89,13 +90,13 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
           // Prepare order items from cart
           // Note: inventory_unit_id is write_only in the API, so we need to use inventory_unit.id
           const orderItems = cart.items.map(item => {
-            const unitId = item.inventory_unit?.id || item.inventory_unit_id;
+            const unitId = item.inventory_unit?.id;
             if (!unitId) {
-              throw new Error(`Missing inventory_unit_id for cart item ${item.id}`);
+              throw new Error(`Missing inventory_unit.id for cart item ${item.id ?? 'unknown'}`);
             }
             return {
               inventory_unit_id: unitId,
-              quantity: item.quantity,
+              quantity: item.quantity ?? 1,
             };
           });
 
@@ -115,7 +116,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
           console.log('Order created:', order);
 
           // Store order ID and show payment method modal
-          setCreatedOrderId(order.order_id);
+          setCreatedOrderId(order.order_id ?? null);
           setIsSubmitting(false);
           // Close checkout modal and show payment method modal
           setShowPaymentMethodModal(true);
@@ -142,25 +143,31 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
           delivery_address: formData.delivery_address || undefined,
         });
 
+        const expiresAt = cart?.expires_at ?? new Date(Date.now() + 60 * 60 * 1000).toISOString();
         const response = await checkout({
           customer_name: formData.customer_name,
           customer_phone: formData.customer_phone,
           customer_email: formData.customer_email || undefined,
           delivery_address: formData.delivery_address || undefined,
+          expires_at: expiresAt,
         });
 
         console.log('Checkout response:', response);
 
         // Show success message instead of redirecting
         // Ensure we have lead_reference from response
-        if (response && response.lead_reference) {
-          setLeadReference(response.lead_reference);
+        const leadReferenceValue =
+          (response as { lead_reference?: string; lead?: { lead_reference?: string } })?.lead_reference ??
+          (response as { lead?: { lead_reference?: string } })?.lead?.lead_reference ??
+          null;
+        if (response && leadReferenceValue) {
+          setLeadReference(leadReferenceValue);
           setIsSuccess(true);
           setIsSubmitting(false);
         } else {
           // If no lead_reference, still show success but log warning
           console.warn('Checkout successful but no lead_reference in response:', response);
-          setLeadReference(response?.lead?.lead_reference || null);
+          setLeadReference(leadReferenceValue);
           setIsSuccess(true);
           setIsSubmitting(false);
         }
@@ -242,7 +249,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
           first_name: formData.customer_name.split(' ')[0] || formData.customer_name,
           last_name: formData.customer_name.split(' ').slice(1).join(' ') || '',
         },
-      } as OrderRequest);
+      } as InitiatePaymentRequestRequest);
       OpenAPI.BASE = previousBase;
 
       console.log('[PESAPAL] Payment initiation result:', JSON.stringify(paymentResult, null, 2));

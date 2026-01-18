@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
-    "build": "next build",
+    "build": "node node_modules/next/dist/bin/next build --webpack",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
-    "@shwari/api-client": "file:./packages/api-client",
+    "@shwari/api-client": "file:../affordable-gadgets-api-client/packages/api-client",
     "@tanstack/react-query": "^5.90.7",
     "axios": "^1.13.2",
     "date-fns": "^4.1.0",

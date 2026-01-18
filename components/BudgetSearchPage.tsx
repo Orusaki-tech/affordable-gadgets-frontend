@@ -161,9 +161,11 @@ export function BudgetSearchPage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {data.results.map((product: PublicProduct) => {
-                const hasStock = product.available_units_count > 0;
-                const interestText = product.interest_count > 0 
-                  ? `${product.interest_count} ${product.interest_count === 1 ? 'person' : 'people'} interested`
+                const availableCount = Number(product.available_units_count ?? 0);
+                const interestCount = Number(product.interest_count ?? 0);
+                const hasStock = availableCount > 0;
+                const interestText = interestCount > 0 
+                  ? `${interestCount} ${interestCount === 1 ? 'person' : 'people'} interested`
                   : null;
 
                 return (
@@ -216,9 +218,10 @@ export function BudgetSearchPage() {
 
                       {/* Price */}
                       <div className="mb-4">
-                        {product.min_price !== null && product.max_price !== null ? (
+                        {product.min_price !== null && product.min_price !== undefined &&
+                        product.max_price !== null && product.max_price !== undefined ? (
                           <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-                            {formatPriceRange(product.min_price, product.max_price)}
+                            {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
                           </p>
                         ) : (
                           <p className="text-xl font-bold text-gray-700">Price on request</p>
@@ -228,12 +231,12 @@ export function BudgetSearchPage() {
                       {/* Stock & Interest Info */}
                       <div className="flex items-center justify-between text-sm pt-3 border-t border-gray-100">
                         <span className={`font-semibold ${hasStock ? 'text-green-600' : 'text-red-600'}`}>
-                          {hasStock ? (
+                            {hasStock ? (
                             <span className="flex items-center gap-1">
                               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                               </svg>
-                              {product.available_units_count} {product.available_units_count === 1 ? 'unit' : 'units'}
+                                {availableCount} {availableCount === 1 ? 'unit' : 'units'}
                             </span>
                           ) : (
                             'Out of stock'

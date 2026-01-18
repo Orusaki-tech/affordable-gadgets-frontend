@@ -7,6 +7,7 @@ import { usePayment } from '@/lib/hooks/usePayment';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
 import { brandConfig } from '@/lib/config/brand';
+import { OrderStatusEnum } from '@/lib/api/generated';
 
 interface PaymentPageProps {
   orderId: string;
@@ -136,7 +137,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
 
   // Payment status display
   if (paymentStatus) {
-    if (paymentStatus.status === 'COMPLETED') {
+    if (paymentStatus.status === OrderStatusEnum.PAID || paymentStatus.status === OrderStatusEnum.DELIVERED) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
@@ -160,9 +161,12 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
               <p className="text-gray-600 mb-4">
                 Your payment has been confirmed. Your order is being processed.
               </p>
-              {paymentStatus.payment_reference && (
+              {(paymentStatus as { payment_reference?: string }).payment_reference && (
                 <p className="text-sm text-gray-500 mb-4">
-                  Reference: <span className="font-mono font-semibold">{paymentStatus.payment_reference}</span>
+                  Reference:{' '}
+                  <span className="font-mono font-semibold">
+                    {(paymentStatus as { payment_reference?: string }).payment_reference}
+                  </span>
                 </p>
               )}
             </div>
@@ -177,7 +181,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
       );
     }
 
-    if (paymentStatus.status === 'FAILED' || paymentStatus.status === 'CANCELLED') {
+    if (paymentStatus.status === OrderStatusEnum.CANCELED) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
@@ -209,7 +213,8 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
               </div>
               <h2 className="text-2xl font-bold mb-2 text-red-600">Payment Failed</h2>
               <p className="text-gray-600 mb-4">
-                {paymentStatus.message || 'Your payment could not be processed. Please try again.'}
+                {(paymentStatus as { message?: string }).message ||
+                  'Your payment could not be processed. Please try again.'}
               </p>
             </div>
             <div className="space-y-2">

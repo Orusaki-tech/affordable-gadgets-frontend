@@ -134,6 +134,8 @@ export function ReviewsShowcase() {
             );
             const productsForCard = productIds.map((productId) => productById[productId]).filter(Boolean);
 
+            const reviewImageSrc = selectedReview.review_image_url || selectedReview.review_image || '';
+
             return (
               <button
                 key={review.id}
@@ -264,9 +266,9 @@ export function ReviewsShowcase() {
               <div className="flex items-center justify-center bg-slate-50 p-6 md:p-8">
                 <div className="w-full max-w-[520px] rounded-2xl bg-white p-4 shadow-sm">
                   <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-gray-100">
-                    {selectedReview.review_image_url || selectedReview.review_image ? (
+                    {reviewImageSrc ? (
                       <img
-                        src={selectedReview.review_image_url || selectedReview.review_image}
+                        src={reviewImageSrc}
                         alt={selectedReview.product_name ?? 'Product review'}
                         className="h-full w-full object-contain bg-black"
                       />

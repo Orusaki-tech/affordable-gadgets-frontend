@@ -263,15 +263,15 @@ export function ReviewsShowcase() {
             <div className="grid max-h-[calc(82vh-56px)] grid-cols-1 md:grid-cols-[1.1fr_0.9fr] gap-0">
               <div className="flex items-center justify-center bg-slate-50 p-6 md:p-8">
                 <div className="w-full max-w-[520px] rounded-2xl bg-white p-4 shadow-sm">
-                  <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-gray-100">
+                  <div className="flex items-center justify-center rounded-2xl bg-gray-100 p-2">
                     {selectedReview.review_image_url || selectedReview.review_image ? (
                       <img
                         src={selectedReview.review_image_url || selectedReview.review_image || ''}
                         alt={selectedReview.product_name ?? 'Product review'}
-                        className="h-full w-full object-contain bg-black"
+                        className="w-full max-h-[60vh] object-contain bg-black"
                       />
                     ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                      <div className="h-[60vh] w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center rounded-2xl">
                         <span className="text-sm text-gray-600">{selectedReview.product_name ?? 'Product'}</span>
                       </div>
                     )}

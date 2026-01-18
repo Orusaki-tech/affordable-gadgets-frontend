@@ -57,39 +57,67 @@ export function ProductsPage() {
     <div>
       {promotionData ? (
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h1 className="text-4xl font-bold mb-2">{promotionData.title}</h1>
-          {promotionData.description && (
-            <p className="text-gray-600 mb-2">{promotionData.description}</p>
-          )}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+              <h1 className="text-4xl font-bold">{promotionData.title}</h1>
+              {promotionData.description && (
+                <p className="text-gray-600 sm:max-w-[520px] sm:truncate">
+                  {promotionData.description}
+                </p>
+              )}
+            </div>
+            <form
+              onSubmit={handleSearch}
+              className="flex w-full gap-3 md:w-auto md:min-w-[320px] md:max-w-[520px]"
+            >
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="flex-1 px-4 py-2 border rounded-lg"
+              />
+              <button
+                type="submit"
+                className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Search
+              </button>
+            </form>
+          </div>
           {/* Note: promotion_code is not in the Promotion interface, but keeping for backward compatibility */}
           {(promotionData as PublicPromotion & { promotion_code?: string }).promotion_code && (
-            <p className="text-sm text-gray-500">
-              Promotion Code: <code className="bg-white px-2 py-1 rounded">{(promotionData as PublicPromotion & { promotion_code?: string }).promotion_code}</code>
+            <p className="text-sm text-gray-500 mt-2">
+              Promotion Code:{' '}
+              <code className="bg-white px-2 py-1 rounded">
+                {(promotionData as PublicPromotion & { promotion_code?: string }).promotion_code}
+              </code>
             </p>
           )}
         </div>
       ) : (
-        <h1 className="text-4xl font-bold mb-8">Products</h1>
-      )}
-
-      {/* Search Bar */}
-      <div className="mb-6">
-        <form onSubmit={handleSearch} className="flex gap-4">
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 px-4 py-2 border rounded-lg"
-          />
-          <button
-            type="submit"
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <h1 className="text-4xl font-bold">Products</h1>
+          <form
+            onSubmit={handleSearch}
+            className="flex w-full gap-3 md:w-auto md:min-w-[320px] md:max-w-[520px]"
           >
-            Search
-          </button>
-        </form>
-      </div>
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-1 px-4 py-2 border rounded-lg"
+            />
+            <button
+              type="submit"
+              className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Search
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Filters and Sort */}
       <ProductFilters onFiltersChange={handleFiltersChange} onSortChange={handleSortChange} />

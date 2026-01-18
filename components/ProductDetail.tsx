@@ -1,16 +1,16 @@
 'use client';
 
-import { useProduct, useProductBySlug, useProductUnits, useProducts } from '@/lib/hooks/useProducts';
+import { useProduct, useProductBySlug, useProductUnits } from '@/lib/hooks/useProducts';
 import { usePromotion } from '@/lib/hooks/usePromotions';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
-import { useCompare } from '@/lib/hooks/useCompare';
 import { PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo } from 'react';
 import { ReviewsShowcase } from './ReviewsShowcase';
 import { ProductRecommendations } from './ProductRecommendations';
+import { ComparisonPage } from './ComparisonPage';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getPlaceholderProductImage, getPlaceholderUnitImage, getPlaceholderVideoUrl, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
@@ -111,7 +111,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const { data: accessories } = useProductAccessories(product?.id || 0);
   const { data: promotion } = usePromotion(promotionId ? parseInt(promotionId) : 0);
   const { addToCart } = useCart();
-  const { addProduct: addToCompare, removeProduct: removeFromCompare, isInCompare, canAddMore, count, maxItems } = useCompare();
   const router = useRouter();
   
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
@@ -121,13 +120,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [compareSearchQuery, setCompareSearchQuery] = useState('');
-
-  const { data: compareSearchResults, isLoading: compareSearchLoading } = useProducts({
-    page_size: 6,
-    search: compareSearchQuery.trim() || undefined,
-    enabled: compareSearchQuery.trim().length >= 2,
-  });
 
   // Product images - include product primary image and all unit images
   const productImages = useMemo(() => {
@@ -381,19 +373,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     }
   };
 
-  const handleCompare = () => {
-    if (!product?.id) return;
-    
-    if (isInCompare(product.id)) {
-      removeFromCompare(product.id);
-    } else {
-      if (!canAddMore) {
-        alert('You can compare up to 4 products. Please remove one first.');
-        return;
-      }
-      addToCompare(product.id);
-    }
-  };
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -415,7 +394,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   const selectedUnitData = units?.find(u => u.id === selectedUnit);
   const processorDetails = (selectedUnitData as { processor_details?: string } | undefined)?.processor_details;
-  const inCompare = product?.id ? isInCompare(product.id) : false;
 
   // Get main display image - show selected unit's image if available, otherwise product image
   const mainDisplayImage = useMemo(() => {
@@ -1073,85 +1051,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             </div>
           )}
 
-          {activeTab === 'compare' && product && (
-            <div className="max-w-xl">
-              <h3 className="text-2xl font-bold mb-6">Compare</h3>
-
-              <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-                <div className="p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-semibold text-gray-900">Compare</h4>
-                    <span className="text-xs text-gray-600">{count} / {maxItems} selected</span>
-                  </div>
-
-                  <button
-                    onClick={handleCompare}
-                    disabled={!product?.id || (!inCompare && !canAddMore)}
-                    className={`w-full px-3 py-2 rounded font-semibold text-xs transition-all ${
-                      inCompare
-                        ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                    } ${(!product?.id || (!inCompare && !canAddMore)) ? 'opacity-60 cursor-not-allowed' : ''}`}
-                  >
-                    {inCompare ? 'Remove from compare' : 'Add this product to compare'}
-                  </button>
-
-                  <div className="mt-3">
-                    <label className="block text-[10px] font-semibold text-gray-700 mb-1">
-                      Add more products
-                    </label>
-                    <input
-                      type="text"
-                      value={compareSearchQuery}
-                      onChange={(e) => setCompareSearchQuery(e.target.value)}
-                      placeholder="Search products to add..."
-                      className="w-full px-3 py-2 text-xs border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-
-                    {compareSearchQuery.trim().length < 2 ? (
-                      <p className="mt-2 text-[11px] text-gray-500">Type at least 2 characters to search.</p>
-                    ) : compareSearchLoading ? (
-                      <div className="mt-2 text-xs text-gray-500">Searching…</div>
-                    ) : (
-                      <div className="mt-2 space-y-2">
-                        {compareSearchResults?.results?.length ? (
-                          compareSearchResults.results.map((p) => (
-                            <div key={p.id} className="flex items-center justify-between gap-2 text-xs">
-                              <span className="truncate">{p.product_name}</span>
-                              <button
-                                onClick={() => {
-                                  if (!p.id) return;
-                                  if (isInCompare(p.id)) {
-                                    removeFromCompare(p.id);
-                                  } else if (canAddMore) {
-                                    addToCompare(p.id);
-                                  }
-                                }}
-                                disabled={!p.id || (!isInCompare(p.id) && !canAddMore)}
-                                className="px-2 py-1 rounded border text-xs hover:bg-gray-50"
-                              >
-                                {p.id && isInCompare(p.id) ? 'Remove' : 'Add'}
-                              </button>
-                            </div>
-                          ))
-                        ) : (
-                          <p className="text-[11px] text-gray-500">No products found.</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {count > 0 && (
-                    <Link
-                      href="/compare"
-                      className="mt-3 inline-flex items-center justify-center w-full px-3 py-2 text-xs font-semibold bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-                    >
-                      Open comparison
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </div>
+          {activeTab === 'compare' && (
+            <ComparisonPage />
           )}
         </div>
       </div>

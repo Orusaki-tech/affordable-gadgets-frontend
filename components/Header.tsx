@@ -16,7 +16,6 @@ export function Header() {
     { href: '/products', label: 'Products' },
     { href: '/categories', label: 'Categories' },
     { href: '/budget-search', label: 'Budget Search' },
-    { href: '/compare', label: 'Compare' },
   ];
 
   return (

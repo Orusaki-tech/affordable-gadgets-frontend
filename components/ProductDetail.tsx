@@ -99,11 +99,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     : 0;
   const productIdFromSlug = isNumericSlug ? Number(slug) : fallbackProductId;
   const hasFallbackId = !isNumericSlug && fallbackProductId > 0;
+  const preferProductId = isNumericSlug || hasFallbackId;
   const { data: productBySlug, isLoading: productBySlugLoading, error: productBySlugError } = useProductBySlug(isNumericSlug ? '' : slug);
   const { data: productById, isLoading: productByIdLoading, error: productByIdError } = useProduct(productIdFromSlug);
-  const product = productBySlug ?? productById;
-  const productLoading = isNumericSlug
-    ? productByIdLoading
+  const product = preferProductId ? (productById ?? productBySlug) : (productBySlug ?? productById);
+  const productLoading = preferProductId
+    ? productByIdLoading || (!productById && productBySlugLoading)
     : productBySlugLoading || (hasFallbackId && productByIdLoading && !productBySlug);
   const productError = product ? undefined : (productBySlugError || productByIdError);
   const { data: units, isLoading: unitsLoading } = useProductUnits(product?.id || 0);

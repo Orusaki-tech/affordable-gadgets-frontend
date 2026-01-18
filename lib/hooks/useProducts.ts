@@ -60,6 +60,7 @@ export function useProduct(id: number) {
     queryKey: ['product', id],
     queryFn: () => ApiService.apiV1PublicProductsRetrieve(id),
     enabled: !!id,
+    staleTime: 30000, // Keep cached products fresh for short navigations
   });
 }
 

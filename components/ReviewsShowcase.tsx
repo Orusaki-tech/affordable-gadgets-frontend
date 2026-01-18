@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useAllReviews } from '@/lib/hooks/useReviews';
+import { useAllReviews, useProductReviews } from '@/lib/hooks/useReviews';
 import type { Review, PublicProduct } from '@/lib/api/generated';
 import { ApiService } from '@/lib/api/generated';
-import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
+import { getPlaceholderProductImage, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
 import { getProductHref } from '@/lib/utils/productRoutes';
+import { useQueryClient } from '@tanstack/react-query';
 
 function formatDate(dateString?: string | null): string {
   if (!dateString) return '—';
@@ -32,12 +33,25 @@ function formatPurchaseDate(dateString?: string | null): string | null {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export function ReviewsShowcase() {
-  const { data, isLoading, error } = useAllReviews({ page_size: 10 });
+interface ReviewsShowcaseProps {
+  productId?: number;
+}
+
+export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
+  const queryClient = useQueryClient();
+  const reviewsQuery = productId
+    ? useProductReviews(productId, { page_size: 10 })
+    : useAllReviews({ page_size: 10 });
+  const { data, isLoading, error } = reviewsQuery;
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [productById, setProductById] = useState<Record<number, PublicProduct | null>>({});
 
   const reviews = data?.results ?? [];
+
+  const prefillProductCache = (productIdToCache: number, product: PublicProduct | null) => {
+    if (!product) return;
+    queryClient.setQueryData(['product', productIdToCache], product);
+  };
 
   useEffect(() => {
     let isActive = true;
@@ -241,6 +255,10 @@ export function ReviewsShowcase() {
               .map((productId) => productById[productId] || null)
               .filter(Boolean);
             const productsForModal = productsToDisplay.length > 0 ? productsToDisplay : [null];
+            const reviewVideoUrl = selectedReview.video_url
+              ? convertToYouTubeEmbed(selectedReview.video_url)
+              : null;
+            const reviewVideoFileUrl = selectedReview.video_file_url || null;
 
             return (
           <div
@@ -309,6 +327,28 @@ export function ReviewsShowcase() {
                   <p className="mt-4 text-sm leading-relaxed text-gray-700">"{selectedReview.comment}"</p>
                 )}
 
+                {(reviewVideoUrl || reviewVideoFileUrl) && (
+                  <div className="mt-6">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Review video</p>
+                    <div className="relative aspect-video w-full max-w-md max-h-64 overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                      {reviewVideoUrl ? (
+                        <iframe
+                          src={reviewVideoUrl}
+                          className="h-full w-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <video
+                          src={reviewVideoFileUrl || ''}
+                          controls
+                          className="h-full w-full"
+                        />
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-6 space-y-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Product</p>
                   <div className="max-h-[200px] space-y-3 overflow-y-auto pr-1">
@@ -324,6 +364,7 @@ export function ReviewsShowcase() {
                           key={`${productId}-${index}`}
                           href={productHref}
                           className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md"
+                          onClick={() => prefillProductCache(productId, product ?? null)}
                         >
                           <div className="flex items-center gap-3">
                             <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">

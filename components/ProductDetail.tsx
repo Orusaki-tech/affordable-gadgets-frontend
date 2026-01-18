@@ -9,7 +9,7 @@ import { PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generat
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo } from 'react';
-import { ReviewsSection } from './ReviewsSection';
+import { ReviewsShowcase } from './ReviewsShowcase';
 import { ProductRecommendations } from './ProductRecommendations';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -1029,7 +1029,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           {activeTab === 'reviews' && typeof productId === 'number' && (
             <div>
-              <ReviewsSection productId={productId} />
+              <ReviewsShowcase productId={productId} />
             </div>
           )}
 

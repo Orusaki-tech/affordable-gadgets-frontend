@@ -141,9 +141,9 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
             )}
             
             {/* Review Video */}
-            <div className="mt-4">
+            <div className="mt-4 flex justify-start">
               {review.video_url ? (
-                <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
+                <div className="relative aspect-video w-full max-w-md rounded-lg overflow-hidden bg-gray-100">
                   <iframe
                     src={convertToYouTubeEmbed(review.video_url)}
                     className="w-full h-full"
@@ -152,7 +152,7 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
                   />
                 </div>
               ) : review.video_file_url ? (
-                <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
+                <div className="relative aspect-video w-full max-w-md rounded-lg overflow-hidden bg-gray-100">
                   <video
                     src={review.video_file_url}
                     controls
@@ -161,7 +161,7 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
                 </div>
               ) : (
                 // Show placeholder video for reviews without videos
-                <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
+                <div className="relative aspect-video w-full max-w-md rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
                   <iframe
                     src={convertToYouTubeEmbed(getPlaceholderVideoUrl(`Review: ${review.product_name || 'Product'}`))}
                     className="w-full h-full"

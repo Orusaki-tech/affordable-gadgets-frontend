@@ -21,10 +21,33 @@ export const metadata: Metadata = {
   },
   description: "Shop quality phones, laptops, tablets, and accessories at great prices",
   keywords: ["phones", "laptops", "tablets", "electronics", "accessories"],
+  metadataBase: new URL(brandConfig.siteUrl),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     locale: "en_KE",
     siteName: brandConfig.name,
+    url: brandConfig.siteUrl,
+    images: [
+      {
+        url: "/affordablegadgetslogo.png",
+        width: 1200,
+        height: 630,
+        alt: `${brandConfig.name} logo`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: brandConfig.name,
+    description: "Shop quality phones, laptops, tablets, and accessories at great prices",
+    images: ["/affordablegadgetslogo.png"],
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/affordablegadgetslogo.png",
   },
 };
 

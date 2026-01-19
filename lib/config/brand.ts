@@ -32,6 +32,7 @@ export const brandConfig = {
   code: process.env.NEXT_PUBLIC_BRAND_CODE || 'AFFORDABLE_GADGETS',
   name: process.env.NEXT_PUBLIC_BRAND_NAME || 'Affordable Gadgets',
   apiBaseUrl: normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL),
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
 } as const;
 
 

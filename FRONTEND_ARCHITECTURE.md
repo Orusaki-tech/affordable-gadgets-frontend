@@ -321,20 +321,20 @@ try {
 
 ```mermaid
 graph TB
-    Root[/] --> Home[Home Page]
-    Root --> Products[/products]
-    Root --> ProductDetail[/products/:slug]
-    Root --> Cart[/cart]
-    Root --> Checkout[/checkout]
-    Root --> Payment[/payment/:orderId]
-    Root --> PaymentCallback[/payment/callback]
-    Root --> PaymentSuccess[/payment/success]
-    Root --> PaymentCancelled[/payment/cancelled]
-    Root --> Orders[/orders/:orderId]
-    Root --> Promotions[/promotions]
-    Root --> BudgetSearch[/budget-search]
-    Root --> MatchScore[/match-score]
-    Root --> Reviews[/reviews]
+    Root["Root /"] --> Home["Home Page /"]
+    Root --> Products["Products /products"]
+    Root --> ProductDetail["Product Detail /products/:slug"]
+    Root --> Cart["Cart /cart"]
+    Root --> Checkout["Checkout /checkout"]
+    Root --> Payment["Payment /payment/:orderId"]
+    Root --> PaymentCallback["Payment Callback /payment/callback"]
+    Root --> PaymentSuccess["Payment Success /payment/success"]
+    Root --> PaymentCancelled["Payment Cancelled /payment/cancelled"]
+    Root --> Orders["Orders /orders/:orderId"]
+    Root --> Promotions["Promotions /promotions"]
+    Root --> BudgetSearch["Budget Search /budget-search"]
+    Root --> MatchScore["Match Score /match-score"]
+    Root --> Reviews["Reviews /reviews"]
     
     style Root fill:#9c27b0
     style Home fill:#4caf50

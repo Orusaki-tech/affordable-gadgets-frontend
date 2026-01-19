@@ -149,39 +149,46 @@ export function ComparisonPage() {
       )}
 
       {count > 0 && (
-        <div className="mt-4 overflow-x-auto">
-          <div className="flex gap-3 min-w-max">
-            {selectedProducts.map((product) => (
-              <div key={product.id} className="border border-gray-200 rounded-lg bg-white p-3 shadow-sm min-w-[220px]">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-gray-900 text-sm truncate">{product.product_name}</p>
-                    <p className="text-xs text-gray-600 truncate">
-                      {[product.brand, product.model_series].filter(Boolean).join(' • ') || 'N/A'}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => removeProduct(product.id)}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded p-1 transition-colors"
-                    title="Remove from comparison"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-
-                <div className="mt-3 space-y-2 text-xs text-gray-700">
-                  {comparisonRows.map((row) => (
-                    <div key={row.label} className="flex items-center justify-between gap-2">
-                      <span className="text-gray-500">{row.label}</span>
-                      <span className="text-right">{row.render(product)}</span>
+        <div className="mt-4 overflow-x-auto bg-white rounded-lg border border-gray-200">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border-b border-gray-200 p-3 text-left font-semibold text-gray-700 sticky left-0 bg-gray-50 z-10 min-w-[140px]">
+                  Feature
+                </th>
+                {selectedProducts.map((product) => (
+                  <th key={product.id} className="border-b border-gray-200 p-3 text-left min-w-[180px]">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold text-gray-900 block truncate">{product.product_name}</span>
+                      <button
+                        onClick={() => removeProduct(product.id)}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded p-1 transition-colors"
+                        title="Remove from comparison"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
                     </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {comparisonRows.map((row) => (
+                <tr key={row.label} className="hover:bg-gray-50 transition-colors">
+                  <td className="border-b border-gray-100 p-3 font-semibold text-gray-700 sticky left-0 bg-white z-10 text-sm">
+                    {row.label}
+                  </td>
+                  {selectedProducts.map((product) => (
+                    <td key={product.id} className="border-b border-gray-100 p-3 text-sm text-gray-700">
+                      {row.render(product)}
+                    </td>
                   ))}
-                </div>
-              </div>
-            ))}
-          </div>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

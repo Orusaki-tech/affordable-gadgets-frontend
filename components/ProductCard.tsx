@@ -21,12 +21,12 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
     : null;
 
   return (
-    <Link 
+    <Link
       href={getProductHref(product)}
-      className="group block bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-blue-200 animate-fade-in h-[320px] sm:h-[340px] lg:h-[360px] flex flex-col"
+      className="group block bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-200 hover:border-gray-300 animate-fade-in h-full flex flex-col"
     >
       {/* Product Image */}
-      <div className="relative flex-[60] sm:flex-[65] bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+      <div className="relative w-full aspect-[4/3] bg-gray-50 flex items-center justify-center overflow-hidden">
         <Image
           src={product.primary_image || getPlaceholderProductImage(product.product_name)}
           alt={product.product_name}
@@ -43,12 +43,12 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
         )}
         
         {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
       </div>
 
       {/* Product Info */}
-      <div className="flex-[40] sm:flex-[35] p-3 sm:p-4 lg:p-5 flex flex-col">
-        <h3 className="font-semibold text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors text-gray-900">
+      <div className="p-4 sm:p-5 flex flex-col flex-1">
+        <h3 className="font-semibold text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors text-gray-900">
           {product.product_name}
         </h3>
         
@@ -58,9 +58,12 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
 
         {/* Tags */}
         {product.tags && Array.isArray(product.tags) && product.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-2">
+          <div className="flex flex-wrap gap-1 mb-3">
             {product.tags.slice(0, 2).map((tag: string, idx: number) => (
-              <span key={idx} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[10px] rounded border border-blue-200">
+              <span
+                key={idx}
+                className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[11px] rounded-full border border-blue-200"
+              >
                 {tag}
               </span>
             ))}
@@ -68,19 +71,21 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
         )}
 
         {/* Price */}
-        <div className="mb-4 mt-auto">
+        <div className="mb-3 mt-auto">
         {product.min_price !== null && product.min_price !== undefined &&
         product.max_price !== null && product.max_price !== undefined ? (
-            <p className="text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px] font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <p className="text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px] font-bold text-gray-900">
             {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
             </p>
           ) : (
-            <p className="text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] font-semibold text-gray-700">Price on request</p>
+            <p className="text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] font-semibold text-gray-700">
+              Price on request
+            </p>
           )}
         </div>
 
         {/* Stock & Interest Info */}
-        <div className="flex items-center justify-between text-[13px] leading-[18px] sm:text-[14px] sm:leading-[20px] pt-3 border-t border-gray-100">
+        <div className="flex items-center justify-between text-[12px] leading-[18px] sm:text-[13px] sm:leading-[20px] pt-3 border-t border-gray-100">
           <span className={`font-semibold ${hasStock ? 'text-green-600' : 'text-red-600'}`}>
             {hasStock ? (
               <span className="flex items-center gap-1">

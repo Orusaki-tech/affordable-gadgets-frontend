@@ -10,7 +10,7 @@ export function ProductGrid() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {[...Array(8)].map((_, i) => (
           <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-96" />
         ))}
@@ -39,7 +39,7 @@ export function ProductGrid() {
   if (!data || data.results.length === 0) {
     // Show placeholder products
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {[...Array(8)].map((_, i) => (
           <div key={i} className="bg-white rounded-lg shadow-sm overflow-hidden">
             <div className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
@@ -58,7 +58,7 @@ export function ProductGrid() {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {data.results.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

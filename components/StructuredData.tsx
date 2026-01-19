@@ -111,7 +111,7 @@ export function StructuredData({ type = 'Organization', breadcrumbs }: Structure
     currenciesAccepted: 'KES',
     // Additional business info
     description: brandConfig.business.description,
-    slogan: 'Top smartphones and accessories at unbeatable prices',
+    slogan: 'Experience more, pay less',
   });
 
   const getBreadcrumbSchema = () => {

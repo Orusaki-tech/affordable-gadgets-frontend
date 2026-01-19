@@ -64,12 +64,6 @@ export function Footer() {
                   Categories
                 </Link>
               </li>
-              <li>
-                <Link href="/budget-search" className="text-gray-400 hover:text-blue-400 transition-colors flex items-center gap-2 group">
-                  <span className="w-1 h-1 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                  Budget Search
-                </Link>
-              </li>
             </ul>
           </div>
 

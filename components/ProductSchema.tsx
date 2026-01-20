@@ -29,22 +29,18 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
   const maxPrice = prices.length > 0 ? Math.max(...prices) : undefined;
   const price = selectedUnit ? Number(selectedUnit.selling_price) : minPrice;
 
-  // Get availability - at least one unit must be available
-  const availability = units.length > 0 && units.some((u) => u.quantity && u.quantity > 0)
+  // Get availability - units array already contains only available units
+  const availability = units.length > 0
     ? 'https://schema.org/InStock'
     : 'https://schema.org/OutOfStock';
 
-  // Build offers array
-  const offers = units
-    .filter((u) => u.quantity && u.quantity > 0)
-    .map((unit) => ({
+  // Build offers array - units are already filtered to available ones
+  const offers = units.map((unit) => ({
       '@type': 'Offer' as const,
       url: `${brandConfig.siteUrl}/products/${product.slug || product.id}`,
       priceCurrency: 'KES',
       price: Number(unit.selling_price).toFixed(2),
-      availability: unit.quantity && unit.quantity > 0
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
+      availability: 'https://schema.org/InStock',
       itemCondition: unit.condition === 'N'
         ? 'https://schema.org/NewCondition'
         : unit.condition === 'R'

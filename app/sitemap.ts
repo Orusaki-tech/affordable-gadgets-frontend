@@ -3,6 +3,7 @@ import { ApiService } from "@/lib/api/generated";
 import { brandConfig } from "@/lib/config/brand";
 
 const PAGE_SIZE = 200;
+const MAX_PAGES = Number(process.env.SITEMAP_MAX_PAGES || 5);
 
 const staticPaths = [
   "",
@@ -47,9 +48,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
 
     const totalPages = Math.max(1, Math.ceil(firstPage.count / PAGE_SIZE));
+    const cappedTotalPages = Math.min(totalPages, MAX_PAGES);
     const allResults = [...(firstPage.results ?? [])];
 
-    for (let page = 2; page <= totalPages; page += 1) {
+    for (let page = 2; page <= cappedTotalPages; page += 1) {
       const response = await ApiService.apiV1PublicProductsList(
         undefined,
         undefined,

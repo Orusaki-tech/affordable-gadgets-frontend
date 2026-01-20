@@ -274,7 +274,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           {bannerItem ? (
             <div className="lg:col-span-1">
               <div
-                className="group relative w-full h-full bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer"
+                className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer"
                 style={{
                   maxHeight: 'calc(100vh - 250px)',
                   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
@@ -286,7 +286,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                     src={bannerItem.banner_image_url || bannerItem.banner_image || getPlaceholderBannerImage(bannerItem.title)}
                     alt={bannerItem.title}
                       fill
-                      className="object-cover transition-transform duration-300"
+                      className="object-contain transition-transform duration-300"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                       unoptimized={process.env.NODE_ENV === 'development'}
                     />
@@ -502,7 +502,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   src={bannerItem.banner_image_url || bannerItem.banner_image || getPlaceholderBannerImage(bannerItem.title)}
                   alt={bannerItem.title}
                   fill
-                  className="object-cover transition-transform duration-300"
+                  className="object-contain transition-transform duration-300"
                   sizes="100vw"
                   unoptimized={process.env.NODE_ENV === 'development'}
                 />

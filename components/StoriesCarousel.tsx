@@ -281,7 +281,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                 }}
                 onClick={() => handlePromotionClick(bannerItem)}
               >
-                <div className="relative w-full h-full bg-gray-100 overflow-hidden">
+                <div className="relative w-full h-full bg-black overflow-hidden">
                     <Image
                     src={bannerItem.banner_image_url || bannerItem.banner_image || getPlaceholderBannerImage(bannerItem.title)}
                     alt={bannerItem.title}
@@ -290,7 +290,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                     sizes="(max-width: 1024px) 100vw, 50vw"
                       unoptimized={process.env.NODE_ENV === 'development'}
                     />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                   
                   {/* Badge */}
                   {bannerItem.discount_display && (
@@ -368,7 +368,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   }}
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                    <div className="relative w-full h-full bg-gray-100 overflow-hidden">
+                    <div className="relative w-full h-full bg-black overflow-hidden">
                       <Image
                         src={promotion.banner_image_url || promotion.banner_image || getPlaceholderBannerImage(promotion.title)}
                         alt={promotion.title}
@@ -377,7 +377,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                         sizes="(max-width: 1024px) 50vw, 25vw"
                         unoptimized={process.env.NODE_ENV === 'development'}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                       
                       {/* Badge */}
                       {promotion.discount_display && (
@@ -415,7 +415,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                       }}
                       onClick={() => handleVideoClick(product)}
                     >
-                      <div className="relative w-full h-full bg-gray-100 overflow-hidden">
+                      <div className="relative w-full h-full bg-black overflow-hidden">
                       <Image
                         src={product.primary_image || getPlaceholderVideoThumbnail(product.product_name)}
                         alt={product.product_name}
@@ -424,7 +424,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                         sizes="(max-width: 1024px) 50vw, 25vw"
                         unoptimized={process.env.NODE_ENV === 'development'}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                       
                       {/* Play Button Badge */}
                       <div className="absolute top-2 left-2">
@@ -497,7 +497,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               }}
               onClick={() => handlePromotionClick(bannerItem)}
             >
-              <div className="relative w-full h-full bg-gray-100 overflow-hidden">
+              <div className="relative w-full h-full bg-black overflow-hidden">
                 <Image
                   src={bannerItem.banner_image_url || bannerItem.banner_image || getPlaceholderBannerImage(bannerItem.title)}
                   alt={bannerItem.title}
@@ -506,7 +506,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   sizes="100vw"
                   unoptimized={process.env.NODE_ENV === 'development'}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                 
                 {/* Badge */}
                 {bannerItem.discount_display && (
@@ -568,7 +568,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                       }}
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                      <div className="relative w-full h-full bg-gray-100 overflow-hidden">
+                      <div className="relative w-full h-full bg-black overflow-hidden">
                         <Image
                           src={promotion.banner_image_url || promotion.banner_image || getPlaceholderBannerImage(promotion.title)}
                           alt={promotion.title}
@@ -577,7 +577,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                           sizes="50vw"
                           unoptimized={process.env.NODE_ENV === 'development'}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                         
                         {/* Badge */}
                         {promotion.discount_display && (
@@ -614,7 +614,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                       }}
                       onClick={() => handleVideoClick(product)}
                     >
-                      <div className="relative w-full h-full bg-gray-100 overflow-hidden">
+                      <div className="relative w-full h-full bg-black overflow-hidden">
                         <Image
                           src={product.primary_image || getPlaceholderVideoThumbnail(product.product_name)}
                           alt={product.product_name}
@@ -623,7 +623,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                           sizes="50vw"
                           unoptimized={process.env.NODE_ENV === 'development'}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                         
                         {/* Play Button Badge */}
                         <div className="absolute top-2 left-2">

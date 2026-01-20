@@ -326,15 +326,15 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                     >
                     <div className="relative w-full h-full">
                       {promotionImageSrc && (
-                        <Image
+                      <Image
                           src={promotionImageSrc}
-                          alt={promotion.title}
-                          fill
+                        alt={promotion.title}
+                        fill
                           className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                          sizes="(max-width: 1024px) 50vw, 25vw"
-                          style={{ objectFit: 'contain', objectPosition: 'center' }}
-                          unoptimized={process.env.NODE_ENV === 'development'}
-                        />
+                        sizes="(max-width: 1024px) 50vw, 25vw"
+                        style={{ objectFit: 'contain', objectPosition: 'center' }}
+                        unoptimized={process.env.NODE_ENV === 'development'}
+                      />
                       )}
                     </div>
                   </div>
@@ -355,18 +355,17 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                     >
                       <div className="relative w-full h-full">
                         {videoImageSrc && (
-                          <Image
+                      <Image
                             src={videoImageSrc}
-                            alt={product.product_name}
-                            fill
+                        alt={product.product_name}
+                        fill
                             className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                            sizes="(max-width: 1024px) 50vw, 25vw"
-                            style={{ objectFit: 'contain', objectPosition: 'center' }}
-                            unoptimized={process.env.NODE_ENV === 'development'}
-                          />
+                        sizes="(max-width: 1024px) 50vw, 25vw"
+                        style={{ objectFit: 'contain', objectPosition: 'center' }}
+                        unoptimized={process.env.NODE_ENV === 'development'}
+                      />
                         )}
-                      </div>
-                    </div>
+                </div>
               </div>
             );
               }
@@ -402,15 +401,15 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
             >
               <div className="relative w-full h-full">
                 {bannerImageSrc && (
-                  <Image
+                <Image
                     src={bannerImageSrc}
-                    alt={bannerItem.title}
-                    fill
+                  alt={bannerItem.title}
+                  fill
                     className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                    sizes="100vw"
-                    style={{ objectFit: 'contain', objectPosition: 'center' }}
-                    unoptimized={process.env.NODE_ENV === 'development'}
-                  />
+                  sizes="100vw"
+                  style={{ objectFit: 'contain', objectPosition: 'center' }}
+                  unoptimized={process.env.NODE_ENV === 'development'}
+                />
                 )}
               </div>
             </div>
@@ -434,19 +433,19 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                     >
                       <div className="relative w-full h-full">
                         {promotionImageSrc && (
-                          <Image
+                        <Image
                             src={promotionImageSrc}
-                            alt={promotion.title}
-                            fill
+                          alt={promotion.title}
+                          fill
                             className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                            sizes="50vw"
-                            style={{ objectFit: 'contain', objectPosition: 'center' }}
-                            unoptimized={process.env.NODE_ENV === 'development'}
-                          />
+                          sizes="50vw"
+                          style={{ objectFit: 'contain', objectPosition: 'center' }}
+                          unoptimized={process.env.NODE_ENV === 'development'}
+                        />
                         )}
                       </div>
-                    </div>
-                  );
+                </div>
+              );
                 } else {
                   // Product Video
                   const product = item.data as PublicProduct;
@@ -462,15 +461,15 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                     >
                       <div className="relative w-full h-full">
                         {videoImageSrc && (
-                          <Image
+                        <Image
                             src={videoImageSrc}
-                            alt={product.product_name}
-                            fill
+                          alt={product.product_name}
+                          fill
                             className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
-                            sizes="50vw"
-                            style={{ objectFit: 'contain', objectPosition: 'center' }}
-                            unoptimized={process.env.NODE_ENV === 'development'}
-                          />
+                          sizes="50vw"
+                          style={{ objectFit: 'contain', objectPosition: 'center' }}
+                          unoptimized={process.env.NODE_ENV === 'development'}
+                        />
                         )}
                       </div>
                     </div>

@@ -286,7 +286,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                     src={bannerItem.banner_image_url || bannerItem.banner_image || getPlaceholderBannerImage(bannerItem.title)}
                     alt={bannerItem.title}
                       fill
-                      className="object-contain transition-transform duration-300"
+                      className="object-cover transition-transform duration-300"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                       unoptimized={process.env.NODE_ENV === 'development'}
                     />
@@ -502,7 +502,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   src={bannerItem.banner_image_url || bannerItem.banner_image || getPlaceholderBannerImage(bannerItem.title)}
                   alt={bannerItem.title}
                   fill
-                  className="object-contain transition-transform duration-300"
+                  className="object-cover transition-transform duration-300"
                   sizes="100vw"
                   unoptimized={process.env.NODE_ENV === 'development'}
                 />

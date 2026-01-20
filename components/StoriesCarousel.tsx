@@ -352,14 +352,13 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
+                      className="group relative w-full rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                   style={{
-                        maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                    <div className="relative w-full h-full flex items-center justify-center" ref={gridItemRef}>
+                    <div className="relative w-full" ref={gridItemRef}>
                       {promotionImageSrc && (
                       <StoryImage
                         src={promotionImageSrc}
@@ -377,14 +376,13 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
+                      className="group relative w-full rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                       style={{
-                        maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handleVideoClick(product)}
                     >
-                      <div className="relative w-full h-full flex items-center justify-center">
+                      <div className="relative w-full">
                         {videoImageSrc && (
                       <StoryImage
                         src={videoImageSrc}
@@ -448,13 +446,13 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
+                      className="group relative w-full rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
                       style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                      <div className="relative w-full h-full flex items-center justify-center">
+                      <div className="relative w-full">
                         {promotionImageSrc && (
                         <StoryImage
                           src={promotionImageSrc}
@@ -472,13 +470,13 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
+                      className="group relative w-full rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
                       style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handleVideoClick(product)}
                     >
-                      <div className="relative w-full h-full flex items-center justify-center">
+                      <div className="relative w-full">
                         {videoImageSrc && (
                         <StoryImage
                           src={videoImageSrc}

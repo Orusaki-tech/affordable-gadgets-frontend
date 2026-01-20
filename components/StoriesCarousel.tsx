@@ -310,15 +310,14 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
       )}
 
       <div className="relative w-full mb-6">
-        {/* Desktop/Tablet: Large Banner + 2x2 Grid Layout - Matching Figma Design */}
-        <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Desktop: Large Banner + 2x2 Grid Layout - Matching Figma Design */}
+        <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
           {/* Large Banner - First Promotion (Left Side, 50% width, Square) */}
           {bannerItem ? (
-            <div className="lg:col-span-1 flex">
-                <div
-                className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mx-auto"
+            <div className="lg:col-span-1">
+              <div
+                className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                 style={{
-                  width: 'clamp(320px, 40vw, 520px)',
                   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                 }}
                 onClick={() => handlePromotionClick(bannerItem)}
@@ -329,12 +328,12 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                       src={bannerImageSrc}
                       alt={bannerItem.title}
                       sizes="(max-width: 1024px) 100vw, 50vw"
-                      fit="contain"
+                      fit="cover"
                     />
                   )}
                 </div>
               </div>
-        </div>
+            </div>
           ) : (
           <div
               className="lg:col-span-1 aspect-square bg-lime-100/60 rounded-2xl flex items-center justify-center mx-auto"
@@ -346,7 +345,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           )}
 
           {/* 2x2 Grid - Next 3 Promotions + 1 Product Video (Right Side, 50% width, Square cards) */}
-          <div className="lg:col-span-1 grid grid-cols-2 gap-4 items-end">
+          <div className="lg:col-span-1 grid grid-cols-2 gap-4">
             {gridItems.length > 0 ? (
               gridItems.map((item) => {
                 if (item.type === 'promotion') {
@@ -407,7 +406,6 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   key={`placeholder-${i}`}
                   className="w-full aspect-square bg-lime-100/60 rounded-2xl flex items-center justify-center"
                   style={{
-                    maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}
                 >
@@ -417,25 +415,24 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           </div>
         </div>
 
-        {/* Mobile: Vertical Stack Layout - Matching Figma Design (Banner on top, 2x2 grid below) */}
-        <div className="md:hidden space-y-4 mb-6">
+        {/* Mobile/Tablet: Vertical Stack Layout - Matching Figma Design (Banner on top, 2x2 grid below) */}
+        <div className="lg:hidden space-y-4 mb-6">
           {/* Large Banner - First Promotion (Full width on mobile) */}
           {bannerItem && (
             <div
-              className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4 mx-auto"
+              className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4 mx-auto"
               style={{
-                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                maxWidth: 'calc(100vh - 250px)'
+                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
               }}
               onClick={() => handlePromotionClick(bannerItem)}
             >
-              <div className="relative w-full h-full flex items-center justify-center">
+              <div className="relative w-full h-full">
                 {bannerImageSrc && (
                 <StoryImage
                   src={bannerImageSrc}
                   alt={bannerItem.title}
                   sizes="100vw"
-                  fit="contain"
+                  fit="cover"
                 />
                 )}
               </div>

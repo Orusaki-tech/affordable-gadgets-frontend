@@ -73,8 +73,8 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
   const videoSchema = product.product_video_url
     ? {
         '@type': 'VideoObject' as const,
-        name: `${product.product_name} - Product Video`,
-        description: product.product_description || `Watch ${product.product_name} product video`,
+        name: product.meta_title || `${product.product_name} - Product Video`,
+        description: product.meta_description || product.product_description || `Watch ${product.product_name} product video`,
         thumbnailUrl: product.primary_image || `${brandConfig.siteUrl}/affordablelogo.png`,
         uploadDate: new Date().toISOString(),
         contentUrl: product.product_video_url,

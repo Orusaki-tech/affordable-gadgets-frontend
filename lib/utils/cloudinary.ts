@@ -24,7 +24,8 @@ export function getCloudinarySizedImageUrl(
   const hasTransform = firstSegment ? hasTransformationSegment(firstSegment) : false;
   const remainingPath = hasTransform ? restSegments.join('/') : rest;
 
-  const cropMode = fit === 'contain' ? 'c_fit' : 'c_fill';
-  const transformation = `f_auto,q_auto,${cropMode},g_auto,w_${size},h_${size}`;
+  const transformation = fit === 'contain'
+    ? `f_auto,q_auto,c_fit,w_${size},h_${size}`
+    : `f_auto,q_auto,c_fill,g_auto,w_${size},h_${size}`;
   return `${prefix}${CLOUDINARY_UPLOAD_SEGMENT}${transformation}/${remainingPath}`;
 }

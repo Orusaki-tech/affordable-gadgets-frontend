@@ -66,12 +66,14 @@ interface StoryImageProps {
   src: string;
   alt: string;
   sizes: string;
+  fit?: 'contain' | 'cover';
   className?: string;
 }
 
-function StoryImage({ src, alt, sizes, className }: StoryImageProps) {
+function StoryImage({ src, alt, sizes, fit = 'contain', className }: StoryImageProps) {
   const sizeCandidates = [150, 300, 600, 1200, 2400];
   const src150 = getCloudinarySizedImageUrl(src, 150);
+  const fitClassName = fit === 'cover' ? 'object-cover' : 'object-contain';
 
   return (
     <img
@@ -83,7 +85,7 @@ function StoryImage({ src, alt, sizes, className }: StoryImageProps) {
       alt={alt}
       loading="lazy"
       decoding="async"
-      className={`block h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]${className ? ` ${className}` : ''}`}
+      className={`block h-full w-full ${fitClassName} transition-transform duration-300 group-hover:scale-[1.02]${className ? ` ${className}` : ''}`}
     />
   );
 }
@@ -327,6 +329,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                       src={bannerImageSrc}
                       alt={bannerItem.title}
                       sizes="(max-width: 1024px) 100vw, 50vw"
+                      fit="contain"
                     />
                   )}
                 </div>
@@ -365,6 +368,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                         src={promotionImageSrc}
                         alt={promotion.title}
                         sizes="(max-width: 1024px) 50vw, 25vw"
+                        fit="cover"
                       />
                       )}
                     </div>
@@ -390,6 +394,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                         src={videoImageSrc}
                         alt={product.product_name}
                         sizes="(max-width: 1024px) 50vw, 25vw"
+                        fit="cover"
                       />
                         )}
                 </div>
@@ -432,6 +437,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   src={bannerImageSrc}
                   alt={bannerItem.title}
                   sizes="100vw"
+                  fit="contain"
                 />
                 )}
               </div>
@@ -460,6 +466,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                           src={promotionImageSrc}
                           alt={promotion.title}
                           sizes="50vw"
+                          fit="cover"
                         />
                         )}
                       </div>
@@ -484,6 +491,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                           src={videoImageSrc}
                           alt={product.product_name}
                           sizes="50vw"
+                          fit="cover"
                         />
                         )}
                       </div>

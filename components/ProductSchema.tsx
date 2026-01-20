@@ -89,7 +89,7 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.product_name,
-    description: product.product_description || product.long_description || `${product.product_name} - Available at ${brandConfig.business.name}`,
+    description: product.meta_description || product.product_description || product.long_description || `${product.product_name} - Available at ${brandConfig.business.name}`,
     image: product.primary_image
       ? [product.primary_image]
       : [`${brandConfig.siteUrl}/affordablelogo.png`],
@@ -102,7 +102,11 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
           name: product.brand,
         }
       : undefined,
-    category: product.category || 'Electronics',
+    category: product.product_type === 'PH' ? 'Mobile Phones' 
+      : product.product_type === 'LT' ? 'Laptops'
+      : product.product_type === 'TB' ? 'Tablets'
+      : product.product_type === 'AC' ? 'Accessories'
+      : 'Electronics',
     productID: product.id?.toString(),
     ...(videoSchema && { video: videoSchema }),
     offers: offers.length > 0

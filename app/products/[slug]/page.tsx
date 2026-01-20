@@ -24,7 +24,9 @@ const resolveProductImage = (product?: PublicProduct | null) => {
 };
 
 const buildProductDescription = (product?: PublicProduct | null) => {
+  // Use meta_description for SEO if available, otherwise fall back to other descriptions
   return (
+    product?.meta_description ||
     product?.product_description ||
     product?.long_description ||
     `Explore ${product?.product_name ?? "this product"} at ${brandConfig.name}.`
@@ -60,7 +62,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     product = null;
   }
 
-  const title = product?.product_name ? `${product.product_name}` : "Product Details";
+  // Use meta_title for SEO if available, otherwise use product_name
+  const title = product?.meta_title || (product?.product_name ? `${product.product_name}` : "Product Details");
   const description = buildProductDescription(product);
   const imageUrl = resolveProductImage(product);
   const canonical = `/products/${slug}`;

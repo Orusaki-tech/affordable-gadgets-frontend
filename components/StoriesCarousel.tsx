@@ -272,11 +272,11 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
         <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Large Banner - First Promotion (Left Side, 50% width, Square) */}
           {bannerItem ? (
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 flex">
               <div
-                className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer"
+                className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer mx-auto"
                 style={{
-                  maxHeight: 'calc(100vh - 250px)',
+                  maxWidth: 'calc(100vh - 250px)',
                   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                 }}
                 onClick={() => handlePromotionClick(bannerItem)}
@@ -342,9 +342,9 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
         </div>
           ) : (
           <div
-              className="lg:col-span-1 aspect-square bg-gray-100 rounded-2xl flex items-center justify-center"
+              className="lg:col-span-1 aspect-square bg-gray-100 rounded-2xl flex items-center justify-center mx-auto"
             style={{
-                maxHeight: 'calc(100vh - 250px)'
+                maxWidth: 'calc(100vh - 250px)'
               }}
             >
               <p className="text-gray-400">No promotions available</p>
@@ -487,10 +487,10 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           {/* Large Banner - First Promotion (Full width on mobile) */}
           {bannerItem && (
             <div
-              className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer mb-4"
+              className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer mb-4 mx-auto"
               style={{
                 boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                maxHeight: 'calc(100vh - 250px)'
+                maxWidth: 'calc(100vh - 250px)'
               }}
               onClick={() => handlePromotionClick(bannerItem)}
             >

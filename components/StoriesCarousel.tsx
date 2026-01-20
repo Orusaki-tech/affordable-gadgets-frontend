@@ -83,7 +83,7 @@ function StoryImage({ src, alt, sizes, className }: StoryImageProps) {
       alt={alt}
       loading="lazy"
       decoding="async"
-      className={`block h-auto w-full max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]${className ? ` ${className}` : ''}`}
+      className={`block h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]${className ? ` ${className}` : ''}`}
     />
   );
 }
@@ -314,14 +314,14 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           {bannerItem ? (
             <div className="lg:col-span-1 flex">
                 <div
-                className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mx-auto"
+                className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mx-auto"
                 style={{
-                  maxWidth: 'calc(100vh - 250px)',
+                  width: 'clamp(320px, 40vw, 520px)',
                   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                 }}
                 onClick={() => handlePromotionClick(bannerItem)}
               >
-                <div className="relative w-full h-full flex items-center justify-center" ref={bannerContainerRef}>
+                <div className="relative w-full h-full" ref={bannerContainerRef}>
                   {bannerImageSrc && (
                     <StoryImage
                       src={bannerImageSrc}
@@ -352,13 +352,14 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
+                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                   style={{
+                        maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                    <div className="relative w-full" ref={gridItemRef}>
+                    <div className="relative w-full h-full" ref={gridItemRef}>
                       {promotionImageSrc && (
                       <StoryImage
                         src={promotionImageSrc}
@@ -376,13 +377,14 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
+                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                       style={{
+                        maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handleVideoClick(product)}
                     >
-                      <div className="relative w-full">
+                      <div className="relative w-full h-full">
                         {videoImageSrc && (
                       <StoryImage
                         src={videoImageSrc}
@@ -446,13 +448,13 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
+                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
                       style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                      <div className="relative w-full">
+                      <div className="relative w-full h-full">
                         {promotionImageSrc && (
                         <StoryImage
                           src={promotionImageSrc}
@@ -470,13 +472,13 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
+                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
                       style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handleVideoClick(product)}
                     >
-                      <div className="relative w-full">
+                      <div className="relative w-full h-full">
                         {videoImageSrc && (
                         <StoryImage
                           src={videoImageSrc}

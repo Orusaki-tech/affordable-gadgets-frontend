@@ -357,7 +357,6 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                       key={item.uniqueKey}
                       className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                   style={{
-                        maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}
                       onClick={() => handlePromotionClick(promotion)}
@@ -383,7 +382,6 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                       key={item.uniqueKey}
                       className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                       style={{
-                        maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handleVideoClick(product)}

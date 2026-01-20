@@ -3,7 +3,10 @@ import { ApiService } from "@/lib/api/generated";
 import { brandConfig } from "@/lib/config/brand";
 
 const PAGE_SIZE = 200;
-const MAX_PAGES = Number(process.env.SITEMAP_MAX_PAGES || 5);
+const MAX_PAGES = Number(process.env.SITEMAP_MAX_PAGES || 20);
+
+export const dynamic = "force-dynamic";
+export const revalidate = 60 * 60;
 
 const staticPaths = [
   "",

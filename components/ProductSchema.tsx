@@ -89,7 +89,7 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.product_name,
-    description: product.product_description || product.meta_description || `${product.product_name} - Available at ${brandConfig.business.name}`,
+    description: product.product_description || product.long_description || `${product.product_name} - Available at ${brandConfig.business.name}`,
     image: product.primary_image
       ? [product.primary_image]
       : [`${brandConfig.siteUrl}/affordablelogo.png`],

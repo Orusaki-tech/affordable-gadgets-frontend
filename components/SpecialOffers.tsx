@@ -6,7 +6,6 @@ import { PublicPromotion } from '@/lib/api/generated';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { getPlaceholderBannerImage } from '@/lib/utils/placeholders';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
 interface SpecialOffersProps {
@@ -19,40 +18,21 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-48" />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-lime-100/60 animate-pulse rounded-2xl aspect-square" />
         ))}
       </div>
     );
   }
 
   if (!data || data.results.length === 0) {
-    // Show placeholder offers
-    const placeholderOffers = [
-      { id: 1, title: 'Flash Sale', discount: '50% OFF', description: 'Limited time offer', icon: '🎁' },
-      { id: 2, title: 'New Arrivals', discount: '30% OFF', description: 'Latest products', icon: '🆕' },
-      { id: 3, title: 'Weekend Deal', discount: '25% OFF', description: 'Special weekend prices', icon: '📅' },
-    ];
-
     return (
       <div>
         <h2 className="text-3xl font-bold mb-6">Special Offers</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {placeholderOffers.map((offer) => (
-            <div
-              key={offer.id}
-              className="relative block rounded-lg overflow-hidden shadow-md bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 hover:shadow-lg transition-shadow"
-            >
-              <div className="relative h-48 flex items-center justify-center">
-                <div className="text-center text-white p-6">
-                  <div className="text-5xl mb-3 opacity-80">{offer.icon}</div>
-                  <h3 className="font-semibold text-xl mb-2">{offer.title}</h3>
-                  <p className="text-2xl font-bold mb-1">{offer.discount}</p>
-                  <p className="text-sm opacity-90">{offer.description}</p>
-                </div>
-              </div>
-            </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="rounded-2xl bg-lime-100/60 aspect-square" />
           ))}
         </div>
       </div>
@@ -89,12 +69,13 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {specialOffersPromotions.map((promotion: PublicPromotion) => {
             // Get first product ID from promotion
             const firstProductId = promotion.products && promotion.products.length > 0 
               ? promotion.products[0] 
               : null;
+            const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
             
             // Component to handle product slug fetching and redirect
             const PromotionCard = () => {
@@ -117,24 +98,17 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
               return (
                 <div
                   onClick={handleClick}
-                  className="relative block rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                  className="relative block rounded-2xl bg-lime-100/80 p-6 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer aspect-square"
                 >
-                  <div className="relative h-48">
-                    <Image
-                      src={promotion.banner_image || getPlaceholderBannerImage(promotion.title)}
-                      alt={promotion.title}
-                      fill
-                      className="object-contain bg-gray-50"
-                      unoptimized={!promotion.banner_image || promotion.banner_image.includes('placehold.co')}
-                    />
-                  </div>
-                  <div className="p-4 bg-white">
-                    <h3 className="font-semibold text-lg mb-2">{promotion.title}</h3>
-                    {promotion.discount_display && (
-                      <p className="text-red-600 font-bold text-xl">{promotion.discount_display}</p>
-                    )}
-                    {promotion.description && (
-                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">{promotion.description}</p>
+                  <div className="relative w-full h-full">
+                    {promotionImageSrc && (
+                      <Image
+                        src={promotionImageSrc}
+                        alt={promotion.title}
+                        fill
+                        className="object-contain transition-transform duration-300 hover:scale-[1.02]"
+                        unoptimized={promotionImageSrc.includes('placehold.co')}
+                      />
                     )}
                   </div>
                 </div>

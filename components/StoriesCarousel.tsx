@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { PublicPromotion, PublicProduct } from '@/lib/api/generated';
-import { getPlaceholderBannerImage, getPlaceholderVideoThumbnail } from '@/lib/utils/placeholders';
 import { useRouter } from 'next/navigation';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
@@ -78,19 +77,14 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   // Process promotions - combine special_offers and flash_sales
   const allPromotions = useMemo(() => {
     const promotions = (promotionsData?.results || []) as PublicPromotion[];
-    const filtered = promotions.filter((promo) => {
+    return promotions.filter((promo) => {
       const locations = promo.display_locations || [];
-      if (!Array.isArray(locations) || locations.length === 0) {
-        return true;
-      }
-      return (
-        locations.includes('special_offers') ||
+      return Array.isArray(locations) && (
+        locations.includes('special_offers') || 
         locations.includes('flash_sales') ||
         locations.includes('stories_carousel')
       );
-    });
-    const visiblePromotions = filtered.length > 0 ? filtered : promotions;
-    return visiblePromotions.sort((a, b) => {
+    }).sort((a, b) => {
       // Sort by carousel_position if set, otherwise by start_date
       const aPos = a.carousel_position;
       const bPos = b.carousel_position;
@@ -125,6 +119,8 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     // Fallback to first promotion if no position 1 is set
     return allPromotions.length > 0 ? allPromotions[0] : null;
   }, [allPromotions]);
+
+  const bannerImageSrc = bannerItem?.banner_image_url || bannerItem?.banner_image;
 
   const gridItems = useMemo(() => {
     const items: Array<{ type: 'promotion' | 'video'; data: PublicPromotion | PublicProduct; uniqueKey: string; position: number }> = [];
@@ -246,14 +242,14 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={{ maxHeight: 'calc(100vh - 200px)' }}>
         <div 
-          className="lg:col-span-1 bg-gray-200 animate-pulse rounded-lg" 
+          className="lg:col-span-1 bg-gray-100 animate-pulse rounded-2xl" 
           style={{ height: 'min(50vw, calc((100vh - 200px) * 0.9))' }}
         />
         <div className="lg:col-span-1 grid grid-cols-2 gap-4">
           {[...Array(4)].map((_, i) => (
             <div 
               key={i} 
-              className="bg-gray-200 animate-pulse rounded-lg"
+              className="bg-gray-100 animate-pulse rounded-2xl"
               style={{ height: 'min(25vw, calc((100vh - 200px) * 0.45))' }}
             />
           ))}
@@ -279,80 +275,35 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           {bannerItem ? (
             <div className="lg:col-span-1 flex">
               <div
-                className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer mx-auto"
+                className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mx-auto"
                 style={{
                   maxWidth: 'calc(100vh - 250px)',
                   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                 }}
                 onClick={() => handlePromotionClick(bannerItem)}
               >
-                <div className="relative w-full h-full overflow-hidden">
+                <div className="relative w-full h-full">
+                  {bannerImageSrc && (
                     <Image
-                    src={bannerItem.banner_image_url || bannerItem.banner_image || getPlaceholderBannerImage(bannerItem.title)}
-                    alt={bannerItem.title}
+                      src={bannerImageSrc}
+                      alt={bannerItem.title}
                       fill
-                      className="object-contain transition-transform duration-300"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      style={{ objectFit: 'contain', objectPosition: 'center' }}
                       unoptimized={process.env.NODE_ENV === 'development'}
                     />
-                  
-                  {/* Badge */}
-                  {bannerItem.discount_display && (
-                    <div className="absolute top-3 left-3">
-                      <div className="bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold text-gray-900 shadow-sm">
-                        {bannerItem.discount_display}
-                      </div>
-                    </div>
                   )}
-
-                  {/* Content Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <div className="flex items-center gap-2.5 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center text-lg">
-                        🎉
-                      </div>
-                      <div>
-                        <h3 className="text-white font-semibold text-base">Promotions</h3>
-                        <p className="text-white/80 text-xs">{allPromotions.length} available</p>
-                      </div>
-                    </div>
-                    <h4 className="text-white font-bold text-xl mb-2 line-clamp-2">
-                      {bannerItem.title}
-                    </h4>
-                    {bannerItem.description && (
-                      <p className="text-white/90 text-sm line-clamp-2 mb-4">
-                        {bannerItem.description}
-                      </p>
-                    )}
-                      <button
-                      className="flex items-center gap-2 bg-white text-gray-900 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-all text-sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const promotionsSection = document.getElementById('promotions');
-                          if (promotionsSection) {
-                            promotionsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                          } else {
-                            router.push('/#promotions');
-                          }
-                      }}
-                    >
-                      View All
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                  </div>
                 </div>
               </div>
         </div>
           ) : (
           <div
-              className="lg:col-span-1 aspect-square bg-gray-100 rounded-2xl flex items-center justify-center mx-auto"
+              className="lg:col-span-1 aspect-square bg-lime-100/60 rounded-2xl flex items-center justify-center mx-auto"
             style={{
                 maxWidth: 'calc(100vh - 250px)'
               }}
             >
-              <p className="text-gray-400">No promotions available</p>
             </div>
           )}
 
@@ -362,109 +313,60 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               gridItems.map((item) => {
                 if (item.type === 'promotion') {
                   const promotion = item.data as PublicPromotion;
+                  const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
               return (
                 <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer"
+                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                   style={{
                         maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                    <div className="relative w-full h-full overflow-hidden">
-                      <Image
-                        src={promotion.banner_image_url || promotion.banner_image || getPlaceholderBannerImage(promotion.title)}
-                        alt={promotion.title}
-                        fill
-                        className="object-contain transition-transform duration-300"
-                        sizes="(max-width: 1024px) 50vw, 25vw"
-                        unoptimized={process.env.NODE_ENV === 'development'}
-                      />
-                      
-                      {/* Badge */}
-                      {promotion.discount_display && (
-                        <div className="absolute top-2 left-2">
-                          <div className="bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-gray-900 shadow-sm">
-                            {promotion.discount_display}
-                          </div>
-                    </div>
-                  )}
-
-                      {/* Content Overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4">
-                        <h4 className="text-white font-bold text-base mb-1 line-clamp-2">
-                          {promotion.title}
-                        </h4>
-                        {promotion.description && (
-                          <p className="text-white/90 text-xs line-clamp-1">
-                            {promotion.description}
-                          </p>
-                        )}
-                      </div>
+                    <div className="relative w-full h-full">
+                      {promotionImageSrc && (
+                        <Image
+                          src={promotionImageSrc}
+                          alt={promotion.title}
+                          fill
+                          className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                          sizes="(max-width: 1024px) 50vw, 25vw"
+                          style={{ objectFit: 'contain', objectPosition: 'center' }}
+                          unoptimized={process.env.NODE_ENV === 'development'}
+                        />
+                      )}
                     </div>
                   </div>
                 );
                 } else {
                   // Product Video
                   const product = item.data as PublicProduct;
+                  const videoImageSrc = product.primary_image;
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer"
+                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                       style={{
                         maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handleVideoClick(product)}
                     >
-                      <div className="relative w-full h-full overflow-hidden">
-                      <Image
-                        src={product.primary_image || getPlaceholderVideoThumbnail(product.product_name)}
-                        alt={product.product_name}
-                        fill
-                        className="object-contain transition-transform duration-300"
-                        sizes="(max-width: 1024px) 50vw, 25vw"
-                        unoptimized={process.env.NODE_ENV === 'development'}
-                      />
-                      
-                      {/* Play Button Badge */}
-                      <div className="absolute top-2 left-2">
-                        <div className="bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-gray-900 shadow-sm flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                          Play
-                        </div>
+                      <div className="relative w-full h-full">
+                        {videoImageSrc && (
+                          <Image
+                            src={videoImageSrc}
+                            alt={product.product_name}
+                            fill
+                            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                            sizes="(max-width: 1024px) 50vw, 25vw"
+                            style={{ objectFit: 'contain', objectPosition: 'center' }}
+                            unoptimized={process.env.NODE_ENV === 'development'}
+                          />
+                        )}
                       </div>
-
-                      {/* Video Play Overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-all z-10">
-                        <div className="w-16 h-16 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-125 transition-transform duration-300">
-                          <svg className="w-8 h-8 text-gray-900 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        </div>
-                      </div>
-
-                      {/* Content Overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="w-6 h-6 rounded bg-white/20 backdrop-blur-sm flex items-center justify-center text-xs">
-                            🎥
-                          </div>
-                          <span className="text-white/90 text-xs">Product Video</span>
-                        </div>
-                        <h4 className="text-white font-bold text-base mb-1 line-clamp-2">
-                          {product.product_name}
-                        </h4>
-                        {product.brand && (
-                          <p className="text-white/80 text-xs line-clamp-1">
-                            {product.brand}
-                          </p>
-                    )}
-                  </div>
-                </div>
+                    </div>
               </div>
             );
               }
@@ -474,13 +376,12 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               [...Array(4)].map((_, i) => (
                 <div
                   key={`placeholder-${i}`}
-                  className="w-full aspect-square bg-gray-100 rounded-2xl flex items-center justify-center"
+                  className="w-full aspect-square bg-lime-100/60 rounded-2xl flex items-center justify-center"
                   style={{
                     maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}
                 >
-                  <p className="text-gray-400 text-xs">No content</p>
                 </div>
               ))
             )}
@@ -492,64 +393,25 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           {/* Large Banner - First Promotion (Full width on mobile) */}
           {bannerItem && (
             <div
-              className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer mb-4 mx-auto"
+              className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4 mx-auto"
               style={{
                 boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
                 maxWidth: 'calc(100vh - 250px)'
               }}
               onClick={() => handlePromotionClick(bannerItem)}
             >
-              <div className="relative w-full h-full overflow-hidden">
-                <Image
-                  src={bannerItem.banner_image_url || bannerItem.banner_image || getPlaceholderBannerImage(bannerItem.title)}
-                  alt={bannerItem.title}
-                  fill
-                  className="object-contain transition-transform duration-300"
-                  sizes="100vw"
-                  unoptimized={process.env.NODE_ENV === 'development'}
-                />
-                
-                {/* Badge */}
-                {bannerItem.discount_display && (
-                  <div className="absolute top-3 left-3">
-                    <div className="bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold text-gray-900 shadow-sm">
-                      {bannerItem.discount_display}
-                    </div>
-                  </div>
+              <div className="relative w-full h-full">
+                {bannerImageSrc && (
+                  <Image
+                    src={bannerImageSrc}
+                    alt={bannerItem.title}
+                    fill
+                    className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                    sizes="100vw"
+                    style={{ objectFit: 'contain', objectPosition: 'center' }}
+                    unoptimized={process.env.NODE_ENV === 'development'}
+                  />
                 )}
-
-                {/* Content Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <div className="flex items-center gap-2.5 mb-3">
-                    <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center text-lg">
-                      🎉
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold text-base">Promotions</h3>
-                      <p className="text-white/80 text-xs">{allPromotions.length} available</p>
-                    </div>
-                  </div>
-                  <h4 className="text-white font-bold text-xl mb-2 line-clamp-2">
-                    {bannerItem.title}
-                  </h4>
-                  {bannerItem.description && (
-                    <p className="text-white/90 text-sm line-clamp-2 mb-4">
-                      {bannerItem.description}
-                    </p>
-                  )}
-                        <button
-                    className="flex items-center gap-2 bg-white text-gray-900 px-4 py-2 rounded-full font-semibold hover:bg-gray-100 transition-all text-sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                      router.push('/products');
-                    }}
-                  >
-                    View All
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                </div>
               </div>
             </div>
           )}
@@ -560,106 +422,56 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               gridItems.map((item) => {
                 if (item.type === 'promotion') {
                   const promotion = item.data as PublicPromotion;
+                  const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer mb-4"
+                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
                       style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                      <div className="relative w-full h-full overflow-hidden">
-                        <Image
-                          src={promotion.banner_image_url || promotion.banner_image || getPlaceholderBannerImage(promotion.title)}
-                          alt={promotion.title}
-                          fill
-                          className="object-contain transition-transform duration-300"
-                          sizes="50vw"
-                          unoptimized={process.env.NODE_ENV === 'development'}
-                        />
-                        
-                        {/* Badge */}
-                        {promotion.discount_display && (
-                          <div className="absolute top-2 left-2">
-                            <div className="bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-gray-900 shadow-sm">
-                              {promotion.discount_display}
-                            </div>
-                          </div>
+                      <div className="relative w-full h-full">
+                        {promotionImageSrc && (
+                          <Image
+                            src={promotionImageSrc}
+                            alt={promotion.title}
+                            fill
+                            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                            sizes="50vw"
+                            style={{ objectFit: 'contain', objectPosition: 'center' }}
+                            unoptimized={process.env.NODE_ENV === 'development'}
+                          />
                         )}
-
-                        {/* Content Overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 p-4">
-                          <h4 className="text-white font-bold text-base mb-1 line-clamp-2">
-                            {promotion.title}
-                          </h4>
-                          {promotion.description && (
-                            <p className="text-white/90 text-xs line-clamp-1">
-                              {promotion.description}
-                            </p>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
+                  );
                 } else {
                   // Product Video
                   const product = item.data as PublicProduct;
+                  const videoImageSrc = product.primary_image;
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer mb-4"
+                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
                       style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handleVideoClick(product)}
                     >
-                      <div className="relative w-full h-full overflow-hidden">
-                        <Image
-                          src={product.primary_image || getPlaceholderVideoThumbnail(product.product_name)}
-                          alt={product.product_name}
-                          fill
-                          className="object-contain transition-transform duration-300"
-                          sizes="50vw"
-                          unoptimized={process.env.NODE_ENV === 'development'}
-                        />
-                        
-                        {/* Play Button Badge */}
-                        <div className="absolute top-2 left-2">
-                          <div className="bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-gray-900 shadow-sm flex items-center gap-1">
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                            Play
-                          </div>
-                        </div>
-
-                        {/* Video Play Overlay */}
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-all z-10">
-                          <div className="w-16 h-16 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-125 transition-transform duration-300">
-                            <svg className="w-8 h-8 text-gray-900 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                          </div>
-                        </div>
-
-                        {/* Content Overlay */}
-                        <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-                          <div className="flex items-center gap-2 mb-1">
-                            <div className="w-6 h-6 rounded bg-white/20 backdrop-blur-sm flex items-center justify-center text-xs">
-                              🎥
-                            </div>
-                            <span className="text-white/90 text-xs">Product Video</span>
-                          </div>
-                          <h4 className="text-white font-bold text-base mb-1 line-clamp-2">
-                            {product.product_name}
-                          </h4>
-                          {product.brand && (
-                            <p className="text-white/80 text-xs line-clamp-1">
-                              {product.brand}
-                            </p>
-                          )}
-                        </div>
+                      <div className="relative w-full h-full">
+                        {videoImageSrc && (
+                          <Image
+                            src={videoImageSrc}
+                            alt={product.product_name}
+                            fill
+                            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                            sizes="50vw"
+                            style={{ objectFit: 'contain', objectPosition: 'center' }}
+                            unoptimized={process.env.NODE_ENV === 'development'}
+                          />
+                        )}
                       </div>
                     </div>
                   );
@@ -670,9 +482,8 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               [...Array(4)].map((_, i) => (
                 <div
                   key={`placeholder-mobile-${i}`}
-                  className="w-full aspect-square bg-gray-100 rounded-2xl flex items-center justify-center mb-4"
+                  className="w-full aspect-square bg-lime-100/60 rounded-2xl flex items-center justify-center mb-4"
                 >
-                  <p className="text-gray-400 text-xs">No content</p>
                 </div>
               ))
             )}

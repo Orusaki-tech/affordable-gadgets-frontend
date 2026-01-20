@@ -9252,6 +9252,14 @@ components:
           items:
             type: string
           readOnly: true
+        meta_title:
+          type: string
+          description: SEO title (50-60 chars recommended)
+          maxLength: 60
+        meta_description:
+          type: string
+          description: SEO description (150-160 chars recommended)
+          maxLength: 160
       required:
       - product_name
     PublicPromotion:

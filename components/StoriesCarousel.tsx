@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import Image from 'next/image';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { PublicPromotion, PublicProduct } from '@/lib/api/generated';
 import { useRouter } from 'next/navigation';
 import { getProductHref } from '@/lib/utils/productRoutes';
+import { getCloudinarySizedImageUrl } from '@/lib/utils/cloudinary';
 
 interface VideoModalProps {
   videoUrl: string;
@@ -62,6 +62,32 @@ function VideoModal({ videoUrl, title, onClose }: VideoModalProps) {
   );
 }
 
+interface StoryImageProps {
+  src: string;
+  alt: string;
+  sizes: string;
+  className?: string;
+}
+
+function StoryImage({ src, alt, sizes, className }: StoryImageProps) {
+  const sizeCandidates = [150, 300, 600, 1200, 2400];
+  const src150 = getCloudinarySizedImageUrl(src, 150);
+
+  return (
+    <img
+      src={src150}
+      srcSet={sizeCandidates
+        .map((size) => `${getCloudinarySizedImageUrl(src, size)} ${size}w`)
+        .join(', ')}
+      sizes={sizes}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      className={`block h-auto w-full max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-[1.02]${className ? ` ${className}` : ''}`}
+    />
+  );
+}
+
 interface StoriesCarouselProps {
   autoAdvanceDuration?: number;
 }
@@ -69,6 +95,9 @@ interface StoriesCarouselProps {
 export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProps) {
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; title: string } | null>(null);
   const router = useRouter();
+  const bannerContainerRef = useRef<HTMLDivElement | null>(null);
+  const gridItemRef = useRef<HTMLDivElement | null>(null);
+  const loggedLayoutRef = useRef(false);
 
   // Fetch promotions and products with videos
   const { data: promotionsData, isLoading: promotionsLoading } = usePromotions({ page_size: 30 });
@@ -211,6 +240,16 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     return items.sort((a, b) => a.position - b.position).slice(0, 4);
   }, [allPromotions, productsWithVideos, bannerItem]);
 
+  useEffect(() => {
+    if (loggedLayoutRef.current) return;
+    const bannerBox = bannerContainerRef.current?.getBoundingClientRect();
+    const gridBox = gridItemRef.current?.getBoundingClientRect();
+    // #region agent log
+    fetch('http://127.0.0.1:7248/ingest/c7e9cd5d-25bc-49e1-b867-7ef6aa4798bb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'StoriesCarousel.tsx:layout',message:'container sizes',data:{banner:{width:bannerBox?.width,height:bannerBox?.height},gridItem:{width:gridBox?.width,height:gridBox?.height}},timestamp:Date.now(),sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H1'}),}).catch(()=>{});
+    // #endregion agent log
+    loggedLayoutRef.current = true;
+  }, [bannerItem, gridItems]);
+
   const handlePromotionClick = (promotion: PublicPromotion) => {
     const firstProductId = promotion.products && promotion.products.length > 0 
       ? promotion.products[0] 
@@ -274,24 +313,20 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           {/* Large Banner - First Promotion (Left Side, 50% width, Square) */}
           {bannerItem ? (
             <div className="lg:col-span-1 flex">
-              <div
-                className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mx-auto"
+                <div
+                className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mx-auto"
                 style={{
                   maxWidth: 'calc(100vh - 250px)',
                   boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                 }}
                 onClick={() => handlePromotionClick(bannerItem)}
               >
-                <div className="relative w-full h-full">
+                <div className="relative w-full h-full flex items-center justify-center" ref={bannerContainerRef}>
                   {bannerImageSrc && (
-                    <Image
+                    <StoryImage
                       src={bannerImageSrc}
                       alt={bannerItem.title}
-                      fill
-                      className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                       sizes="(max-width: 1024px) 100vw, 50vw"
-                      style={{ objectFit: 'contain', objectPosition: 'center' }}
-                      unoptimized={process.env.NODE_ENV === 'development'}
                     />
                   )}
                 </div>
@@ -315,25 +350,21 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   const promotion = item.data as PublicPromotion;
                   const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
               return (
-                <div
+                    <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
+                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                   style={{
                         maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                   }}
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                    <div className="relative w-full h-full">
+                    <div className="relative w-full h-full flex items-center justify-center" ref={gridItemRef}>
                       {promotionImageSrc && (
-                      <Image
-                          src={promotionImageSrc}
+                      <StoryImage
+                        src={promotionImageSrc}
                         alt={promotion.title}
-                        fill
-                          className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                         sizes="(max-width: 1024px) 50vw, 25vw"
-                        style={{ objectFit: 'contain', objectPosition: 'center' }}
-                        unoptimized={process.env.NODE_ENV === 'development'}
                       />
                       )}
                     </div>
@@ -346,23 +377,19 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
+                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
                       style={{
                         maxHeight: 'calc((100vh - 250px) / 2 - 8px)',
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handleVideoClick(product)}
                     >
-                      <div className="relative w-full h-full">
+                      <div className="relative w-full h-full flex items-center justify-center">
                         {videoImageSrc && (
-                      <Image
-                            src={videoImageSrc}
+                      <StoryImage
+                        src={videoImageSrc}
                         alt={product.product_name}
-                        fill
-                            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                         sizes="(max-width: 1024px) 50vw, 25vw"
-                        style={{ objectFit: 'contain', objectPosition: 'center' }}
-                        unoptimized={process.env.NODE_ENV === 'development'}
                       />
                         )}
                 </div>
@@ -392,23 +419,19 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           {/* Large Banner - First Promotion (Full width on mobile) */}
           {bannerItem && (
             <div
-              className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4 mx-auto"
+              className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4 mx-auto"
               style={{
                 boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
                 maxWidth: 'calc(100vh - 250px)'
               }}
               onClick={() => handlePromotionClick(bannerItem)}
             >
-              <div className="relative w-full h-full">
+              <div className="relative w-full h-full flex items-center justify-center">
                 {bannerImageSrc && (
-                <Image
-                    src={bannerImageSrc}
+                <StoryImage
+                  src={bannerImageSrc}
                   alt={bannerItem.title}
-                  fill
-                    className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                   sizes="100vw"
-                  style={{ objectFit: 'contain', objectPosition: 'center' }}
-                  unoptimized={process.env.NODE_ENV === 'development'}
                 />
                 )}
               </div>
@@ -425,22 +448,18 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
+                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
                       style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                      <div className="relative w-full h-full">
+                      <div className="relative w-full h-full flex items-center justify-center">
                         {promotionImageSrc && (
-                        <Image
-                            src={promotionImageSrc}
+                        <StoryImage
+                          src={promotionImageSrc}
                           alt={promotion.title}
-                          fill
-                            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                           sizes="50vw"
-                          style={{ objectFit: 'contain', objectPosition: 'center' }}
-                          unoptimized={process.env.NODE_ENV === 'development'}
                         />
                         )}
                       </div>
@@ -453,22 +472,18 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 p-6 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
+                      className="group relative w-full aspect-square rounded-2xl bg-lime-100/80 overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
                       style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
                       onClick={() => handleVideoClick(product)}
                     >
-                      <div className="relative w-full h-full">
+                      <div className="relative w-full h-full flex items-center justify-center">
                         {videoImageSrc && (
-                        <Image
-                            src={videoImageSrc}
+                        <StoryImage
+                          src={videoImageSrc}
                           alt={product.product_name}
-                          fill
-                            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                           sizes="50vw"
-                          style={{ objectFit: 'contain', objectPosition: 'center' }}
-                          unoptimized={process.env.NODE_ENV === 'development'}
                         />
                         )}
                       </div>

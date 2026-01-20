@@ -6,7 +6,11 @@ function hasTransformationSegment(segment: string): boolean {
   return TRANSFORM_KEYS.some((key) => segment.includes(key));
 }
 
-export function getCloudinarySizedImageUrl(url: string, size: number): string {
+export function getCloudinarySizedImageUrl(
+  url: string,
+  size: number,
+  fit: 'cover' | 'contain' = 'cover'
+): string {
   if (!url || !url.includes(CLOUDINARY_UPLOAD_SEGMENT)) {
     return url;
   }
@@ -20,6 +24,7 @@ export function getCloudinarySizedImageUrl(url: string, size: number): string {
   const hasTransform = firstSegment ? hasTransformationSegment(firstSegment) : false;
   const remainingPath = hasTransform ? restSegments.join('/') : rest;
 
-  const transformation = `f_auto,q_auto,c_fill,g_auto,w_${size},h_${size}`;
+  const cropMode = fit === 'contain' ? 'c_fit' : 'c_fill';
+  const transformation = `f_auto,q_auto,${cropMode},g_auto,w_${size},h_${size}`;
   return `${prefix}${CLOUDINARY_UPLOAD_SEGMENT}${transformation}/${remainingPath}`;
 }

@@ -72,20 +72,20 @@ interface StoryImageProps {
 
 function StoryImage({ src, alt, sizes, fit = 'contain', className }: StoryImageProps) {
   const sizeCandidates = [150, 300, 600, 1200, 2400];
-  const src150 = getCloudinarySizedImageUrl(src, 150);
+  const src150 = getCloudinarySizedImageUrl(src, 150, fit);
   const fitClassName = fit === 'cover' ? 'object-cover' : 'object-contain';
 
   return (
     <img
       src={src150}
       srcSet={sizeCandidates
-        .map((size) => `${getCloudinarySizedImageUrl(src, size)} ${size}w`)
+        .map((size) => `${getCloudinarySizedImageUrl(src, size, fit)} ${size}w`)
         .join(', ')}
       sizes={sizes}
       alt={alt}
       loading="lazy"
       decoding="async"
-      className={`block h-full w-full ${fitClassName} transition-transform duration-300 group-hover:scale-[1.02]${className ? ` ${className}` : ''}`}
+      className={`block h-full w-full ${fitClassName} transition-transform duration-300${className ? ` ${className}` : ''}`}
     />
   );
 }
@@ -368,7 +368,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                         src={promotionImageSrc}
                         alt={promotion.title}
                         sizes="(max-width: 1024px) 50vw, 25vw"
-                        fit="cover"
+                        fit="contain"
                       />
                       )}
                     </div>
@@ -394,7 +394,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                         src={videoImageSrc}
                         alt={product.product_name}
                         sizes="(max-width: 1024px) 50vw, 25vw"
-                        fit="cover"
+                        fit="contain"
                       />
                         )}
                 </div>
@@ -466,7 +466,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                           src={promotionImageSrc}
                           alt={promotion.title}
                           sizes="50vw"
-                          fit="cover"
+                          fit="contain"
                         />
                         )}
                       </div>
@@ -491,7 +491,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                           src={videoImageSrc}
                           alt={product.product_name}
                           sizes="50vw"
-                          fit="cover"
+                          fit="contain"
                         />
                         )}
                       </div>

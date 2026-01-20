@@ -78,14 +78,19 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   // Process promotions - combine special_offers and flash_sales
   const allPromotions = useMemo(() => {
     const promotions = (promotionsData?.results || []) as PublicPromotion[];
-    return promotions.filter((promo) => {
+    const filtered = promotions.filter((promo) => {
       const locations = promo.display_locations || [];
-      return Array.isArray(locations) && (
-        locations.includes('special_offers') || 
+      if (!Array.isArray(locations) || locations.length === 0) {
+        return true;
+      }
+      return (
+        locations.includes('special_offers') ||
         locations.includes('flash_sales') ||
         locations.includes('stories_carousel')
       );
-    }).sort((a, b) => {
+    });
+    const visiblePromotions = filtered.length > 0 ? filtered : promotions;
+    return visiblePromotions.sort((a, b) => {
       // Sort by carousel_position if set, otherwise by start_date
       const aPos = a.carousel_position;
       const bPos = b.carousel_position;

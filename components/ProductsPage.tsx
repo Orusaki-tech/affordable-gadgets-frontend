@@ -83,6 +83,11 @@ export function ProductsPage() {
     ordering: sort || undefined,
     promotion: promotionId ? parseInt(promotionId) : undefined, // Backend will filter by promotion
   });
+  const filteredResults = useMemo(() => {
+    if (!data?.results) return [];
+    if (!filters.type) return data.results;
+    return data.results.filter((product) => product.product_type === filters.type);
+  }, [data?.results, filters.type]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,7 +191,7 @@ export function ProductsPage() {
         <div className="text-center py-12">
           <p className="text-red-600">Error loading products. Please try again later.</p>
         </div>
-      ) : !data || data.results.length === 0 ? (
+      ) : !data || filteredResults.length === 0 ? (
         <div className="text-center py-12">
           {promotionId && promotionData ? (
             <p className="text-gray-600 mb-4">No products available for this promotion.</p>
@@ -197,7 +202,7 @@ export function ProductsPage() {
       ) : (
         <>
           <p className="text-gray-600 mb-4">
-            Showing {data.results.length} of {data.count} product{data.count !== 1 ? 's' : ''}
+            Showing {filteredResults.length} of {data.count} product{data.count !== 1 ? 's' : ''}
             {promotionId && promotionData && (
               <span className="ml-2 text-sm text-blue-600">
                 (filtered by promotion: {promotionData.title})
@@ -205,7 +210,7 @@ export function ProductsPage() {
             )}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {data.results.map((product) => (
+            {filteredResults.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

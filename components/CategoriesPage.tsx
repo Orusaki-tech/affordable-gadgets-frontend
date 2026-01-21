@@ -75,6 +75,9 @@ type Category = {
 
 function CategoryProducts({ category }: { category: Category }) {
   const { data, isLoading } = useProducts({ type: category.code, page_size: 4 });
+  const filteredResults = (data?.results ?? []).filter(
+    (product) => product.product_type === category.code
+  );
 
   if (isLoading) {
     return (
@@ -89,7 +92,7 @@ function CategoryProducts({ category }: { category: Category }) {
     );
   }
 
-  if (!data || data.results.length === 0) {
+  if (!data || filteredResults.length === 0) {
     return null;
   }
 
@@ -105,7 +108,7 @@ function CategoryProducts({ category }: { category: Category }) {
         </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {data.results.map((product) => (
+        {filteredResults.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>

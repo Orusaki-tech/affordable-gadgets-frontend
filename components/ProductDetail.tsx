@@ -655,7 +655,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                            selectedUnitData.condition}
               </span>
               </div>
-              <span className="text-[10px] font-semibold text-gray-600">Quality assured product</span>
+              <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded border border-blue-200 text-xs font-semibold">
+                Quality assured product
+              </span>
             </div>
           )}
 

@@ -90,6 +90,36 @@ function StoryImage({ src, alt, sizes, fit = 'contain', className }: StoryImageP
   );
 }
 
+function isDirectVideoUrl(url?: string | null): boolean {
+  if (!url) return false;
+  return /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
+}
+
+interface StoryVideoProps {
+  src: string;
+  poster?: string | null;
+  fit?: 'contain' | 'cover';
+  onRef?: (el: HTMLVideoElement | null) => void;
+}
+
+function StoryVideo({ src, poster, fit = 'contain', onRef }: StoryVideoProps) {
+  const fitClassName = fit === 'cover' ? 'object-cover' : 'object-contain';
+
+  return (
+    <video
+      ref={onRef}
+      src={src}
+      poster={poster || undefined}
+      muted
+      loop
+      playsInline
+      autoPlay
+      preload="metadata"
+      className={`block h-full w-full ${fitClassName}`}
+    />
+  );
+}
+
 interface StoriesCarouselProps {
   autoAdvanceDuration?: number;
 }
@@ -100,6 +130,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   const bannerContainerRef = useRef<HTMLDivElement | null>(null);
   const gridItemRef = useRef<HTMLDivElement | null>(null);
   const loggedLayoutRef = useRef(false);
+  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
 
   // Fetch promotions and products with videos
   const { data: promotionsData, isLoading: promotionsLoading } = usePromotions({ page_size: 30 });
@@ -376,6 +407,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   // Product Video
                   const product = item.data as PublicProduct;
                   const videoImageSrc = product.primary_image;
+                  const hasInlineVideo = isDirectVideoUrl(product.product_video_url);
                   return (
                     <div
                       key={item.uniqueKey}
@@ -383,16 +415,44 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                       style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
-                      onClick={() => handleVideoClick(product)}
+                      onClick={() => {
+                        if (hasInlineVideo && product.product_video_url) {
+                          const video = videoRefs.current.get(item.uniqueKey);
+                          if (video) {
+                            if (video.paused) {
+                              video.play().catch(() => {});
+                            } else {
+                              video.pause();
+                            }
+                          }
+                          return;
+                        }
+                        handleVideoClick(product);
+                      }}
                     >
                       <div className="relative w-full h-full">
-                        {videoImageSrc && (
-                      <StoryImage
-                        src={videoImageSrc}
-                        alt={product.product_name}
-                        sizes="(max-width: 1024px) 50vw, 25vw"
-                        fit="contain"
-                      />
+                        {hasInlineVideo && product.product_video_url ? (
+                          <StoryVideo
+                            src={product.product_video_url}
+                            poster={videoImageSrc}
+                            fit="contain"
+                            onRef={(el) => {
+                              if (el) {
+                                videoRefs.current.set(item.uniqueKey, el);
+                              } else {
+                                videoRefs.current.delete(item.uniqueKey);
+                              }
+                            }}
+                          />
+                        ) : (
+                          videoImageSrc && (
+                            <StoryImage
+                              src={videoImageSrc}
+                              alt={product.product_name}
+                              sizes="(max-width: 1024px) 50vw, 25vw"
+                              fit="contain"
+                            />
+                          )
                         )}
                 </div>
               </div>
@@ -471,6 +531,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   // Product Video
                   const product = item.data as PublicProduct;
                   const videoImageSrc = product.primary_image;
+                  const hasInlineVideo = isDirectVideoUrl(product.product_video_url);
                   return (
                     <div
                       key={item.uniqueKey}
@@ -478,16 +539,44 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                       style={{
                         boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
                       }}
-                      onClick={() => handleVideoClick(product)}
+                      onClick={() => {
+                        if (hasInlineVideo && product.product_video_url) {
+                          const video = videoRefs.current.get(item.uniqueKey);
+                          if (video) {
+                            if (video.paused) {
+                              video.play().catch(() => {});
+                            } else {
+                              video.pause();
+                            }
+                          }
+                          return;
+                        }
+                        handleVideoClick(product);
+                      }}
                     >
                       <div className="relative w-full h-full">
-                        {videoImageSrc && (
-                        <StoryImage
-                          src={videoImageSrc}
-                          alt={product.product_name}
-                          sizes="50vw"
-                          fit="contain"
-                        />
+                        {hasInlineVideo && product.product_video_url ? (
+                          <StoryVideo
+                            src={product.product_video_url}
+                            poster={videoImageSrc}
+                            fit="contain"
+                            onRef={(el) => {
+                              if (el) {
+                                videoRefs.current.set(item.uniqueKey, el);
+                              } else {
+                                videoRefs.current.delete(item.uniqueKey);
+                              }
+                            }}
+                          />
+                        ) : (
+                          videoImageSrc && (
+                            <StoryImage
+                              src={videoImageSrc}
+                              alt={product.product_name}
+                              sizes="50vw"
+                              fit="contain"
+                            />
+                          )
                         )}
                       </div>
                     </div>

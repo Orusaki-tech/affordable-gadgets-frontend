@@ -1,6 +1,5 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { StoriesCarousel } from '@/components/StoriesCarousel';
 import { ProductGrid } from '@/components/ProductGrid';
 import { SpecialOffers } from '@/components/SpecialOffers';
 import { QuickAccessBar } from '@/components/QuickAccessBar';
@@ -14,11 +13,9 @@ export default function HomePage() {
       <Header />
       
       <main className="flex-1">
-        {/* Stories Carousel */}
+        {/* Stories Carousel (UI removed, section spacing preserved) */}
         <section className="bg-white border-b-2 border-gray-100 shadow-sm">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
-            <StoriesCarousel autoAdvanceDuration={5} />
-          </div>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6" />
         </section>
 
         {/* Quick Access Bar */}

@@ -7,6 +7,7 @@ import { usePromotion } from '@/lib/hooks/usePromotions';
 import { PublicPromotion } from '@/lib/api/generated';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, FilterState } from './ProductFilters';
+import { getProductHref } from '@/lib/utils/productRoutes';
 import Link from 'next/link';
 
 export function ProductsPage() {
@@ -30,6 +31,23 @@ export function ProductsPage() {
 
   // Fetch promotion details if promotion ID is in URL
   const { data: promotionData } = usePromotion(promotionId ? parseInt(promotionId) : 0);
+
+  const singlePromotionProductId = useMemo(() => {
+    if (!promotionData || !Array.isArray(promotionData.products)) return null;
+    return promotionData.products.length === 1 ? promotionData.products[0] : null;
+  }, [promotionData]);
+
+  useEffect(() => {
+    if (!promotionId || singlePromotionProductId === null) return;
+    const promotionIdValue = parseInt(promotionId);
+    if (Number.isNaN(promotionIdValue)) return;
+    router.replace(
+      getProductHref(undefined, {
+        fallbackId: singlePromotionProductId,
+        promotionId: promotionIdValue,
+      })
+    );
+  }, [promotionId, router, singlePromotionProductId]);
 
   useEffect(() => {
     setFilters(initialFilters);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useProducts } from '@/lib/hooks/useProducts';
+import { getApiErrorInfo } from '@/lib/utils/apiError';
 import { ProductCard } from './ProductCard';
 import { useState } from 'react';
 
@@ -19,7 +20,8 @@ export function ProductGrid() {
   }
 
   if (error) {
-    console.error('Product loading error:', error);
+    const { message, status, url } = getApiErrorInfo(error);
+    console.error('Product loading error:', { message, status, url });
     return (
       <div className="text-center py-12">
         <p className="text-red-600 mb-2">Error loading products. Please try again later.</p>

@@ -5,6 +5,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { ApiService, Cart, CartItemRequest, CartRequest } from '@/lib/api/generated';
+import { getApiErrorInfo } from '@/lib/utils/apiError';
 
 interface CartContextType {
   cart: Cart | null;
@@ -57,16 +58,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setCart(newCart);
         console.log('Cart initialized successfully:', newCart.id);
       } catch (err: any) {
-        const errorData = err?.response?.data || {};
-        const errorMessage = errorData.error || errorData.detail || err?.message || 'Unknown error';
-        const brandCode = errorData.brand_code || 'Unknown';
+        const { data: errorData, message: errorMessage, brandCode, status, url } = getApiErrorInfo(err);
         
         console.error('Cart initialization error:', {
           message: errorMessage,
-          brand_code: brandCode,
+          brand_code: brandCode || 'Unknown',
           response: errorData,
-          status: err?.response?.status,
-          url: err?.config?.url,
+          status,
+          url,
           fullError: err,
         });
         
@@ -80,9 +79,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Cart will be created when first item is added
         if (err?.response?.status === 400 || err?.response?.status === 404) {
           if (errorMessage.includes('Brand') || errorMessage.includes('brand')) {
-            console.error(`Brand configuration error: Brand code "${brandCode}" is not configured or inactive.`);
+            console.error(`Brand configuration error: Brand code "${brandCode || 'Unknown'}" is not configured or inactive.`);
             console.error('To fix this, run: python manage.py create_default_brand');
-            setError(`Brand not configured: ${brandCode}. Run 'python manage.py create_default_brand' to create it.`);
+            setError(`Brand not configured: ${brandCode || 'Unknown'}. Run 'python manage.py create_default_brand' to create it.`);
           } else {
             console.warn('Cart not available yet, will be created on first add:', errorMessage);
             setCart(null);
@@ -142,12 +141,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
           setCart(currentCart);
           console.log('Cart created successfully:', currentCart.id);
         } catch (cartErr: any) {
+          const { data, message, status, url } = getApiErrorInfo(cartErr);
           console.error('Failed to create cart:', {
-            message: cartErr?.message,
-            response: cartErr?.response?.data,
-            status: cartErr?.response?.status,
+            message,
+            response: data,
+            status,
+            url,
           });
-          throw new Error(cartErr?.response?.data?.error || cartErr?.message || 'Failed to create cart');
+          throw new Error(message || 'Failed to create cart');
         }
       }
       
@@ -170,15 +171,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       await updateCart();
       console.log('Item added successfully');
     } catch (err: any) {
+      const { data, message, status, url } = getApiErrorInfo(err);
       console.error('Add to cart error details:', {
-        message: err?.message,
-        response: err?.response?.data,
-        status: err?.response?.status,
-        statusText: err?.response?.statusText,
-        url: err?.config?.url,
+        message,
+        response: data,
+        status,
+        url,
       });
-      const errorMessage = err?.response?.data?.error || err?.message || 'Failed to add item to cart';
-      setError(errorMessage);
+      setError(message || 'Failed to add item to cart');
       throw err;
     }
   }, [cart, updateCart]);
@@ -200,8 +200,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       console.log('Cart updated successfully');
     } catch (err: any) {
       console.error('Error removing item from cart:', err);
-      const errorMessage = err?.response?.data?.error || err?.message || 'Failed to remove item from cart';
-      setError(errorMessage);
+      const { message } = getApiErrorInfo(err);
+      setError(message || 'Failed to remove item from cart');
       throw err; // Re-throw so UI can handle it
     }
   }, [cart, updateCart]);
@@ -217,7 +217,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       await updateCart();
       return response;
     } catch (err: any) {
-      setError(err.message || 'Failed to checkout');
+      const { message } = getApiErrorInfo(err);
+      setError(message || 'Failed to checkout');
       throw err;
     }
   }, [cart, updateCart]);

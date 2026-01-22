@@ -288,13 +288,10 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
       ? promotion.products[0] 
       : null;
 
-    const promotionId = promotion.id;
-    const promotionQuery = typeof promotionId === 'number' ? `?promotion=${promotionId}` : '';
-
-    if (typeof firstProductId === 'number') {
-      router.push(`/products/${firstProductId}${promotionQuery}`);
+    if (firstProductId) {
+      router.push(`/products/${firstProductId}?promotion=${promotion.id}`);
     } else {
-      router.push(promotionQuery ? `/products${promotionQuery}` : '/products');
+      router.push(`/products?promotion=${promotion.id}`);
     }
   };
 

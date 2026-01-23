@@ -42,19 +42,23 @@ function sortPromotions(promotions: PublicPromotion[]) {
 async function fetchPromotions(): Promise<PublicPromotion[]> {
   const url = `${brandConfig.apiBaseUrl}/api/v1/public/promotions/?page_size=${PROMOTIONS_PAGE_SIZE}`;
 
-  const response = await fetch(url, {
-    next: { revalidate: 60 },
-    headers: {
-      'X-Brand-Code': brandConfig.code,
-    },
-  });
+  try {
+    const response = await fetch(url, {
+      next: { revalidate: 60 },
+      headers: {
+        'X-Brand-Code': brandConfig.code,
+      },
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
+      return [];
+    }
+
+    const data = (await response.json()) as PaginatedPublicPromotionList;
+    return Array.isArray(data?.results) ? (data.results as PublicPromotion[]) : [];
+  } catch {
     return [];
   }
-
-  const data = (await response.json()) as PaginatedPublicPromotionList;
-  return Array.isArray(data?.results) ? (data.results as PublicPromotion[]) : [];
 }
 
 function getPromotionHref(promotion: PublicPromotion): string {

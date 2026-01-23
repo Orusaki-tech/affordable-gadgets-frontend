@@ -1,77 +1,13 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { HeroPromotions } from '@/components/HeroPromotions';
-import dynamic from 'next/dynamic';
-
-const SpecialOffers = dynamic(
-  () => import('@/components/SpecialOffers').then((mod) => mod.SpecialOffers),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {[...Array(4)].map((_, i) => (
-          <div key={`special-offers-skeleton-${i}`} className="bg-lime-100/60 animate-pulse rounded-2xl aspect-square" />
-        ))}
-      </div>
-    ),
-  }
-);
-
-const ProductGrid = dynamic(
-  () => import('@/components/ProductGrid').then((mod) => mod.ProductGrid),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {[...Array(8)].map((_, i) => (
-          <div key={`product-grid-skeleton-${i}`} className="bg-gray-200 animate-pulse rounded-lg h-96" />
-        ))}
-      </div>
-    ),
-  }
-);
-
-const ReviewsShowcase = dynamic(
-  () => import('@/components/ReviewsShowcase').then((mod) => mod.ReviewsShowcase),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(3)].map((_, i) => (
-          <div key={`reviews-skeleton-${i}`} className="bg-gray-100 animate-pulse rounded-2xl h-56" />
-        ))}
-      </div>
-    ),
-  }
-);
-
-const CategoriesSection = dynamic(
-  () => import('@/components/CategoriesSection').then((mod) => mod.CategoriesSection),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {[...Array(4)].map((_, i) => (
-          <div key={`categories-skeleton-${i}`} className="bg-gray-100 animate-pulse rounded-2xl h-40" />
-        ))}
-      </div>
-    ),
-  }
-);
-
-const RecentlyViewed = dynamic(
-  () => import('@/components/RecentlyViewed').then((mod) => mod.RecentlyViewed),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {[...Array(4)].map((_, i) => (
-          <div key={`recently-viewed-skeleton-${i}`} className="bg-gray-100 animate-pulse rounded-lg h-48" />
-        ))}
-      </div>
-    ),
-  }
-);
+import {
+  SpecialOffersClient,
+  ProductGridClient,
+  ReviewsShowcaseClient,
+  CategoriesSectionClient,
+  RecentlyViewedClient,
+} from '@/components/HomeSectionsClient';
 
 export default function HomePage() {
   return (
@@ -94,7 +30,7 @@ export default function HomePage() {
               <p className="text-gray-600 text-lg sm:text-xl">Don't miss out on these amazing deals</p>
               <div className="w-32 h-1.5 bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
-            <SpecialOffers pageSize={12} />
+            <SpecialOffersClient pageSize={12} />
           </div>
         </section>
 
@@ -110,7 +46,7 @@ export default function HomePage() {
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Handpicked for you</p>
               <div className="w-32 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
-            <ProductGrid pageSize={8} showPagination={false} />
+            <ProductGridClient pageSize={8} showPagination={false} />
           </div>
         </section>
 
@@ -126,7 +62,7 @@ export default function HomePage() {
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Real reviews from real customers</p>
               <div className="w-32 h-1.5 bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
-            <ReviewsShowcase />
+            <ReviewsShowcaseClient />
           </div>
         </section>
 
@@ -142,7 +78,7 @@ export default function HomePage() {
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Find exactly what you're looking for</p>
               <div className="w-32 h-1.5 bg-gradient-to-r from-green-600 via-teal-600 to-blue-600 mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
-            <CategoriesSection />
+            <CategoriesSectionClient />
           </div>
         </section>
 
@@ -158,7 +94,7 @@ export default function HomePage() {
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Continue browsing where you left off</p>
               <div className="w-32 h-1.5 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
-            <RecentlyViewed />
+            <RecentlyViewedClient />
           </div>
         </section>
       </main>

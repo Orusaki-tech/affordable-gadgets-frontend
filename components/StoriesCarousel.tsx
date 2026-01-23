@@ -67,10 +67,20 @@ interface StoryImageProps {
   alt: string;
   sizes: string;
   fit?: 'contain' | 'cover';
+  loading?: 'lazy' | 'eager';
+  fetchPriority?: 'high' | 'low' | 'auto';
   className?: string;
 }
 
-function StoryImage({ src, alt, sizes, fit = 'contain', className }: StoryImageProps) {
+function StoryImage({
+  src,
+  alt,
+  sizes,
+  fit = 'contain',
+  loading = 'lazy',
+  fetchPriority = 'auto',
+  className,
+}: StoryImageProps) {
   const sizeCandidates = [150, 300, 600, 1200, 2400];
   const src150 = getCloudinarySizedImageUrl(src, 150, fit);
   const fitClassName = fit === 'cover' ? 'object-cover' : 'object-contain';
@@ -83,7 +93,8 @@ function StoryImage({ src, alt, sizes, fit = 'contain', className }: StoryImageP
         .join(', ')}
       sizes={sizes}
       alt={alt}
-      loading="lazy"
+      loading={loading}
+      fetchPriority={fetchPriority}
       decoding="async"
       className={`block h-full w-full ${fitClassName} transition-transform duration-300${className ? ` ${className}` : ''}`}
     />
@@ -188,7 +199,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     return (productsData?.results || []).filter((product) => product.product_video_url);
   }, [productsData]);
 
-  const isLoading = promotionsLoading || productsLoading;
+  const showSkeleton = promotionsLoading && !promotionsData;
 
   // Get items for display: use carousel_position if set, otherwise use order
   const bannerItem = useMemo(() => {
@@ -292,11 +303,6 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
 
   useEffect(() => {
     if (loggedLayoutRef.current) return;
-    const bannerBox = bannerContainerRef.current?.getBoundingClientRect();
-    const gridBox = gridItemRef.current?.getBoundingClientRect();
-    // #region agent log
-    fetch('http://127.0.0.1:7248/ingest/c7e9cd5d-25bc-49e1-b867-7ef6aa4798bb',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'StoriesCarousel.tsx:layout',message:'container sizes',data:{banner:{width:bannerBox?.width,height:bannerBox?.height},gridItem:{width:gridBox?.width,height:gridBox?.height}},timestamp:Date.now(),sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H1'}),}).catch(()=>{});
-    // #endregion agent log
     loggedLayoutRef.current = true;
   }, [bannerItem, gridItems]);
 
@@ -324,7 +330,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   };
 
 
-  if (isLoading) {
+  if (showSkeleton) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={{ maxHeight: 'calc(100vh - 200px)' }}>
         <div 
@@ -374,6 +380,8 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                       alt={bannerItem.title}
                       sizes="(max-width: 1024px) 100vw, 50vw"
                       fit="cover"
+                      loading="eager"
+                      fetchPriority="high"
                     />
                   )}
                 </div>
@@ -507,6 +515,8 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   alt={bannerItem.title}
                   sizes="100vw"
                   fit="cover"
+                  loading="eager"
+                  fetchPriority="high"
                 />
                 )}
               </div>

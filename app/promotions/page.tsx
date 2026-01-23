@@ -28,7 +28,7 @@ function PromotionsContent() {
 
       {/* Special Offers / Flash Sales (filtered if filter param exists) */}
       <section className="container mx-auto px-4 py-8">
-        <SpecialOffers filter={filter} />
+        <SpecialOffers filter={filter} pageSize={100} />
       </section>
 
       {/* Featured Products */}

@@ -8,10 +8,16 @@ import { getProductHref } from '@/lib/utils/productRoutes';
 
 interface SpecialOffersProps {
   filter?: 'special_offers' | 'flash_sales';
+  pageSize?: number;
 }
 
-export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
-  const { data, isLoading } = usePromotions({ page_size: 100 });
+export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
+  const resolvedPageSize = typeof pageSize === 'number'
+    ? pageSize
+    : filter
+      ? 100
+      : 12;
+  const { data, isLoading } = usePromotions({ page_size: resolvedPageSize });
 
   if (isLoading) {
     return (

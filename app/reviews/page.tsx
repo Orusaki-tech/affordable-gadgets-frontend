@@ -23,7 +23,7 @@ export default function ReviewsPage() {
 
         {/* Special Offers */}
         <section className="container mx-auto px-4 py-8">
-          <SpecialOffers />
+          <SpecialOffers pageSize={12} />
         </section>
 
         {/* Featured Products */}

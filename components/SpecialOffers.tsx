@@ -51,11 +51,17 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
 
     if (filter === 'special_offers') {
       return locations.includes('special_offers');
-    } else if (filter === 'flash_sales') {
+    }
+    if (filter === 'flash_sales') {
       return locations.includes('flash_sales');
     }
-    // Default: show both special_offers and flash_sales
-    return locations.includes('special_offers') || locations.includes('flash_sales');
+
+    // Default: show all allowed promo locations.
+    return (
+      locations.includes('special_offers') ||
+      locations.includes('flash_sales') ||
+      locations.includes('stories_carousel')
+    );
   });
 
   const sectionTitle = filter === 'flash_sales' 

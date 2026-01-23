@@ -6,13 +6,12 @@ import { SpecialOffersServer } from '@/components/SpecialOffersServer';
 import { ReviewsShowcase } from '@/components/ReviewsShowcase';
 
 type PromotionsPageProps = {
-  searchParams?: {
-    filter?: string;
-  };
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default function PromotionsPage({ searchParams }: PromotionsPageProps) {
-  const filterParam = searchParams?.filter;
+export default async function PromotionsPage({ searchParams }: PromotionsPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const filterParam = resolvedSearchParams?.filter;
   const filter: 'special_offers' | 'flash_sales' | undefined =
     filterParam === 'special_offers' || filterParam === 'flash_sales'
       ? filterParam

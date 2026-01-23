@@ -145,7 +145,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
 
   // Fetch promotions and products with videos
   const { data: promotionsData, isLoading: promotionsLoading } = usePromotions({ page_size: 30 });
-  const { data: productsData, isLoading: productsLoading } = useProducts({ page_size: 40 });
+  const { data: productsData, isLoading: productsLoading } = useProducts({ page_size: 8 });
 
   const normalizeLocations = (value: unknown): string[] => {
     if (Array.isArray(value)) {

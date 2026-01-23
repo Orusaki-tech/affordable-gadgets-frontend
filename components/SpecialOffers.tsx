@@ -1,11 +1,9 @@
 'use client';
 
 import { usePromotions } from '@/lib/hooks/usePromotions';
-import { useProduct } from '@/lib/hooks/useProducts';
 import { PublicPromotion } from '@/lib/api/generated';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
 interface SpecialOffersProps {
@@ -14,7 +12,6 @@ interface SpecialOffersProps {
 
 export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
   const { data, isLoading } = usePromotions({ page_size: 100 });
-  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -101,52 +98,41 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {specialOffersPromotions.map((promotion: PublicPromotion) => {
+          {specialOffersPromotions.map((promotion: PublicPromotion, index) => {
             // Get first product ID from promotion
             const firstProductId = promotion.products && promotion.products.length > 0 
               ? promotion.products[0] 
               : null;
             const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
-            
-            // Component to handle product slug fetching and redirect
-            const PromotionCard = () => {
-              const { data: product } = useProduct(firstProductId || 0);
-              
-              const handleClick = (e: React.MouseEvent) => {
-                e.preventDefault();
-                const promotionId = typeof promotion.id === 'number' ? promotion.id : null;
-                if (product || firstProductId) {
-                  router.push(getProductHref(product ?? undefined, { fallbackId: firstProductId, promotionId }));
-                  return;
-                }
-                if (promotionId) {
-                  router.push(`/products?promotion=${promotionId}`);
-                  return;
-                }
-                router.push('/products');
-              };
-              
-              return (
-                <div
-                  onClick={handleClick}
-                  className="relative block rounded-2xl bg-lime-100/80 p-6 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer aspect-square"
-                >
-                  <div className="relative w-full h-full">
-                    {promotionImageSrc && (
-                      <Image
-                        src={promotionImageSrc}
-                        alt={promotion.title}
-                        fill
-                        className="object-contain transition-transform duration-300 hover:scale-[1.02]"
-                        unoptimized={promotionImageSrc.includes('placehold.co')}
-                      />
-                    )}
-                  </div>
+            const promotionId = typeof promotion.id === 'number' ? promotion.id : null;
+            const href = firstProductId
+              ? getProductHref(undefined, { fallbackId: firstProductId, promotionId })
+              : promotionId
+                ? `/products?promotion=${promotionId}`
+                : '/products';
+
+            return (
+              <Link
+                key={promotion.id ?? `${promotion.title}-${index}`}
+                href={href}
+                className="relative block rounded-2xl bg-lime-100/80 p-6 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer aspect-square"
+              >
+                <div className="relative w-full h-full">
+                  {promotionImageSrc && (
+                    <Image
+                      src={promotionImageSrc}
+                      alt={promotion.title}
+                      fill
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      priority={index === 0}
+                      loading={index < 2 ? 'eager' : 'lazy'}
+                      className="object-contain transition-transform duration-300 hover:scale-[1.02]"
+                      unoptimized={promotionImageSrc.includes('placehold.co')}
+                    />
+                  )}
                 </div>
-              );
-            };
-            
-            return <PromotionCard key={promotion.id} />;
+              </Link>
+            );
           })}
         </div>
       )}

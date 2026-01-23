@@ -1,11 +1,77 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { ProductGrid } from '@/components/ProductGrid';
-import { SpecialOffers } from '@/components/SpecialOffers';
-import { StoriesCarousel } from '@/components/StoriesCarousel';
-import { ReviewsShowcase } from '@/components/ReviewsShowcase';
-import { CategoriesSection } from '@/components/CategoriesSection';
-import { RecentlyViewed } from '@/components/RecentlyViewed';
+import { HeroPromotions } from '@/components/HeroPromotions';
+import dynamic from 'next/dynamic';
+
+const SpecialOffers = dynamic(
+  () => import('@/components/SpecialOffers').then((mod) => mod.SpecialOffers),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={`special-offers-skeleton-${i}`} className="bg-lime-100/60 animate-pulse rounded-2xl aspect-square" />
+        ))}
+      </div>
+    ),
+  }
+);
+
+const ProductGrid = dynamic(
+  () => import('@/components/ProductGrid').then((mod) => mod.ProductGrid),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {[...Array(8)].map((_, i) => (
+          <div key={`product-grid-skeleton-${i}`} className="bg-gray-200 animate-pulse rounded-lg h-96" />
+        ))}
+      </div>
+    ),
+  }
+);
+
+const ReviewsShowcase = dynamic(
+  () => import('@/components/ReviewsShowcase').then((mod) => mod.ReviewsShowcase),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(3)].map((_, i) => (
+          <div key={`reviews-skeleton-${i}`} className="bg-gray-100 animate-pulse rounded-2xl h-56" />
+        ))}
+      </div>
+    ),
+  }
+);
+
+const CategoriesSection = dynamic(
+  () => import('@/components/CategoriesSection').then((mod) => mod.CategoriesSection),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {[...Array(4)].map((_, i) => (
+          <div key={`categories-skeleton-${i}`} className="bg-gray-100 animate-pulse rounded-2xl h-40" />
+        ))}
+      </div>
+    ),
+  }
+);
+
+const RecentlyViewed = dynamic(
+  () => import('@/components/RecentlyViewed').then((mod) => mod.RecentlyViewed),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {[...Array(4)].map((_, i) => (
+          <div key={`recently-viewed-skeleton-${i}`} className="bg-gray-100 animate-pulse rounded-lg h-48" />
+        ))}
+      </div>
+    ),
+  }
+);
 
 export default function HomePage() {
   return (
@@ -17,7 +83,7 @@ export default function HomePage() {
         <section id="promotions" className="bg-white scroll-mt-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
             <div className="mb-10 lg:mb-12">
-              <StoriesCarousel autoAdvanceDuration={5} />
+              <HeroPromotions />
             </div>
             <div className="text-center mb-10 lg:mb-12">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">

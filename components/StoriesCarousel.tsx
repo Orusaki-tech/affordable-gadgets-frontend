@@ -144,8 +144,9 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
 
   // Fetch promotions and products with videos
-  const { data: promotionsData, isLoading: promotionsLoading } = usePromotions({ page_size: 30 });
-  const { data: productsData, isLoading: productsLoading } = useProducts({ page_size: 8 });
+  const { data: promotionsData, isLoading: promotionsLoading } = usePromotions({ page_size: 12 });
+  const shouldFetchProducts = !promotionsLoading && (promotionsData?.results?.length ?? 0) < 5;
+  const { data: productsData } = useProducts({ page_size: 8, enabled: shouldFetchProducts });
 
   const normalizeLocations = (value: unknown): string[] => {
     if (Array.isArray(value)) {
@@ -196,8 +197,9 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
 
   // Process products with videos
   const productsWithVideos = useMemo(() => {
+    if (!shouldFetchProducts) return [];
     return (productsData?.results || []).filter((product) => product.product_video_url);
-  }, [productsData]);
+  }, [productsData, shouldFetchProducts]);
 
   const showSkeleton = promotionsLoading && !promotionsData;
 

@@ -3,7 +3,6 @@ import { Footer } from '@/components/Footer';
 import { ProductGrid } from '@/components/ProductGrid';
 import { SpecialOffers } from '@/components/SpecialOffers';
 import { StoriesCarousel } from '@/components/StoriesCarousel';
-import { QuickAccessBar } from '@/components/QuickAccessBar';
 import { ReviewsShowcase } from '@/components/ReviewsShowcase';
 import { CategoriesSection } from '@/components/CategoriesSection';
 import { RecentlyViewed } from '@/components/RecentlyViewed';
@@ -14,18 +13,6 @@ export default function HomePage() {
       <Header />
       
       <main className="flex-1">
-        {/* Stories Carousel (UI removed, section spacing preserved) */}
-        <section className="bg-white border-b-2 border-gray-100 shadow-sm">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6" />
-        </section>
-
-        {/* Quick Access Bar */}
-        <section className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 border-b-2 border-gray-100 shadow-sm">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <QuickAccessBar />
-          </div>
-        </section>
-
         {/* Promotions */}
         <section id="promotions" className="bg-white scroll-mt-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">

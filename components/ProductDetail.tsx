@@ -9,9 +9,8 @@ import { PricingModeEnum, PublicBundle, PublicBundleItem, PublicInventoryUnitPub
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo } from 'react';
-import { ReviewsShowcase } from './ReviewsShowcase';
-import { ProductRecommendations } from './ProductRecommendations';
-import { ComparisonPage } from './ComparisonPage';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getPlaceholderProductImage, getPlaceholderUnitImage, getPlaceholderVideoUrl, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
@@ -21,6 +20,36 @@ interface ProductDetailProps {
 }
 
 type TabType = 'overview' | 'specs' | 'reviews' | 'videos' | 'compare';
+
+const LazyReviewsShowcase = dynamic(
+  () => import('./ReviewsShowcase').then((mod) => mod.ReviewsShowcase),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="text-sm text-gray-600">Loading reviews...</div>
+    ),
+  }
+);
+
+const LazyComparisonPage = dynamic(
+  () => import('./ComparisonPage').then((mod) => mod.ComparisonPage),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="text-sm text-gray-600">Loading comparison...</div>
+    ),
+  }
+);
+
+const LazyProductRecommendations = dynamic(
+  () => import('./ProductRecommendations').then((mod) => mod.ProductRecommendations),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="text-sm text-gray-600">Loading recommendations...</div>
+    ),
+  }
+);
 
 type BundleItemWithId = PublicBundleItem & { id: number };
 type ActiveBundle = PublicBundle & { id: number; items: BundleItemWithId[] };
@@ -612,12 +641,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         <div className="space-y-2">
           {/* Main Image */}
           <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 max-h-[400px]">
-              <Image
+            <Image
               src={mainDisplayImage || getPlaceholderProductImage(product.product_name)}
-                alt={product.product_name}
-                fill
-                className="object-contain bg-gray-50"
-                priority
+              alt={product.product_name}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-contain bg-gray-50"
+              priority
               unoptimized={!mainDisplayImage || mainDisplayImage.includes('localhost') || mainDisplayImage.includes('placehold.co')}
             />
           </div>
@@ -651,8 +681,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 >
                   <Image
                     src={img}
-                      alt={`${product.product_name} view ${index + 1}${imageColor ? ` - ${imageColor}` : ''}`}
+                    alt={`${product.product_name} view ${index + 1}${imageColor ? ` - ${imageColor}` : ''}`}
                     fill
+                    sizes="64px"
                     className="object-contain bg-gray-50"
                     unoptimized={img.includes('localhost') || img.includes('placehold.co')}
                   />
@@ -1307,7 +1338,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           {activeTab === 'reviews' && typeof productId === 'number' && (
             <div>
-              <ReviewsShowcase productId={productId} />
+              <Suspense fallback={<div className="text-sm text-gray-600">Loading reviews...</div>}>
+                <LazyReviewsShowcase productId={productId} />
+              </Suspense>
             </div>
           )}
 
@@ -1343,7 +1376,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           )}
 
           {activeTab === 'compare' && (
-            <ComparisonPage />
+            <Suspense fallback={<div className="text-sm text-gray-600">Loading comparison...</div>}>
+              <LazyComparisonPage />
+            </Suspense>
           )}
         </div>
       </div>
@@ -1351,7 +1386,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       {/* Product Recommendations */}
       {typeof productId === 'number' && (
         <div className="mt-16">
-          <ProductRecommendations productId={productId} />
+          <Suspense fallback={<div className="text-sm text-gray-600">Loading recommendations...</div>}>
+            <LazyProductRecommendations productId={productId} />
+          </Suspense>
         </div>
       )}
     </div>

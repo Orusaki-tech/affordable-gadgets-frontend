@@ -158,11 +158,13 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
               >
                 <div className="relative bg-gray-100">
                   {imageUrl ? (
-                    <img
+                    <Image
                       src={imageUrl}
                       alt={review.product_name ?? 'Product review'}
-                      className="h-full w-full object-contain bg-gray-50"
-                      loading="lazy"
+                      fill
+                      sizes="(max-width: 640px) 260px, (max-width: 1024px) 280px, 300px"
+                      className="object-contain bg-gray-50"
+                      unoptimized={imageUrl.includes('localhost') || imageUrl.includes('placehold.co')}
                     />
                   ) : (
                     <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
@@ -284,11 +286,19 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                 <div className="w-full max-w-[420px] rounded-2xl bg-white p-3 shadow-sm">
                   <div className="flex items-center justify-center rounded-2xl bg-gray-100 p-2">
                     {selectedReview.review_image_url || selectedReview.review_image ? (
-                      <img
-                        src={selectedReview.review_image_url || selectedReview.review_image || ''}
-                        alt={selectedReview.product_name ?? 'Product review'}
-                        className="w-full max-h-[52vh] object-contain bg-white"
-                      />
+                      <div className="relative w-full h-[52vh] max-h-[52vh]">
+                        <Image
+                          src={selectedReview.review_image_url || selectedReview.review_image || ''}
+                          alt={selectedReview.product_name ?? 'Product review'}
+                          fill
+                          sizes="(max-width: 768px) 90vw, 420px"
+                          className="object-contain bg-white"
+                          unoptimized={
+                            (selectedReview.review_image_url || selectedReview.review_image || '').includes('localhost') ||
+                            (selectedReview.review_image_url || selectedReview.review_image || '').includes('placehold.co')
+                          }
+                        />
+                      </div>
                     ) : (
                       <div className="h-[52vh] w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center rounded-2xl">
                         <span className="text-sm text-gray-600">{selectedReview.product_name ?? 'Product'}</span>

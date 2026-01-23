@@ -33,6 +33,7 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
           src={product.primary_image || getPlaceholderProductImage(product.product_name)}
           alt={product.product_name}
           fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           className="object-contain transition-transform duration-300"
           unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
         />

@@ -21,7 +21,9 @@ export function usePromotions(params?: {
       if (typeof params?.page_size === 'number') {
         query.set('page_size', String(params.page_size));
       }
-      const headers = await OpenAPI.HEADERS();
+      const headers = typeof OpenAPI.HEADERS === 'function'
+        ? await OpenAPI.HEADERS({} as never)
+        : (OpenAPI.HEADERS ?? {});
       const response = await fetch(`${apiBaseUrl}/api/v1/public/promotions/?${query.toString()}`, {
         headers,
         credentials: 'include',

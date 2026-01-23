@@ -1028,6 +1028,10 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           </div>
           <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
             {accessories.map((accessory) => (
+              (() => {
+                const firstVariant = accessory.accessory_color_variants?.[0];
+                const canAdd = Boolean(firstVariant?.units && firstVariant.units.length > 0);
+                return (
               <Link
                 key={accessory.id}
                 href={`/products/${accessory.accessory_slug}`}
@@ -1066,8 +1070,24 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         }
                       </p>
                     )}
+                  <button
+                    type="button"
+                    className={`mt-1 text-[11px] font-semibold ${canAdd ? 'text-blue-600 hover:text-blue-700' : 'text-gray-400 cursor-not-allowed'}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (firstVariant && canAdd) {
+                        handleAddAccessoryVariantToCart(accessory, firstVariant);
+                      }
+                    }}
+                    disabled={!canAdd}
+                  >
+                    Add to cart
+                  </button>
                 </div>
               </Link>
+                );
+              })()
             ))}
           </div>
         </div>

@@ -1,8 +1,8 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { HeroPromotions } from '@/components/HeroPromotions';
+import { SpecialOffersServer } from '@/components/SpecialOffersServer';
 import {
-  SpecialOffersClient,
   ProductGridClient,
   ReviewsShowcaseClient,
   CategoriesSectionClient,
@@ -30,7 +30,7 @@ export default function HomePage() {
               <p className="text-gray-600 text-lg sm:text-xl">Don't miss out on these amazing deals</p>
               <div className="w-32 h-1.5 bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
-            <SpecialOffersClient pageSize={12} />
+            <SpecialOffersServer pageSize={12} />
           </div>
         </section>
 

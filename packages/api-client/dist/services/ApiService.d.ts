@@ -244,10 +244,11 @@ export declare class ApiService {
     /**
      * @param page A page number within the paginated result set.
      * @param pageSize Number of results to return per page.
+     * @param displayLocation Comma-separated display locations to include.
      * @returns PaginatedPublicPromotionList
      * @throws ApiError
      */
-    static apiV1PublicPromotionsList(page?: number, pageSize?: number): CancelablePromise<PaginatedPublicPromotionList>;
+    static apiV1PublicPromotionsList(page?: number, pageSize?: number, displayLocation?: string): CancelablePromise<PaginatedPublicPromotionList>;
     /**
      * @param id A unique integer value identifying this promotion.
      * @returns PublicPromotion

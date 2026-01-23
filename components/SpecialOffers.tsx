@@ -17,7 +17,13 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
     : filter
       ? 100
       : 12;
-  const { data, isLoading } = usePromotions({ page_size: resolvedPageSize });
+  const displayLocations = filter
+    ? [filter]
+    : ['special_offers', 'flash_sales', 'stories_carousel'];
+  const { data, isLoading } = usePromotions({
+    page_size: resolvedPageSize,
+    display_location: displayLocations,
+  });
 
   if (isLoading) {
     return (

@@ -548,12 +548,14 @@ export class ApiService {
     /**
      * @param page A page number within the paginated result set.
      * @param pageSize Number of results to return per page.
+     * @param displayLocation Comma-separated display locations to include.
      * @returns PaginatedPublicPromotionList
      * @throws ApiError
      */
     public static apiV1PublicPromotionsList(
         page?: number,
         pageSize?: number,
+        displayLocation?: string,
     ): CancelablePromise<PaginatedPublicPromotionList> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -561,6 +563,7 @@ export class ApiService {
             query: {
                 'page': page,
                 'page_size': pageSize,
+                'display_location': displayLocation,
             },
         });
     }

@@ -9,10 +9,19 @@ import { ApiService, PublicPromotion, PaginatedPublicPromotionList } from '@/lib
 export function usePromotions(params?: {
   page?: number;
   page_size?: number;
+  display_location?: string | string[];
 }) {
+  const displayLocationParam = Array.isArray(params?.display_location)
+    ? params?.display_location.join(',')
+    : params?.display_location;
   return useQuery<PaginatedPublicPromotionList>({
     queryKey: ['promotions', params],
-    queryFn: () => ApiService.apiV1PublicPromotionsList(params?.page, params?.page_size),
+    queryFn: () =>
+      ApiService.apiV1PublicPromotionsList(
+        params?.page,
+        params?.page_size,
+        displayLocationParam
+      ),
     staleTime: 60000, // 1 minute
   });
 }

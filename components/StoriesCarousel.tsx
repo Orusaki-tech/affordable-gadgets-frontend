@@ -144,7 +144,10 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
 
   // Fetch promotions and products with videos
-  const { data: promotionsData, isLoading: promotionsLoading } = usePromotions({ page_size: 12 });
+  const { data: promotionsData, isLoading: promotionsLoading } = usePromotions({
+    page_size: 12,
+    display_location: ['special_offers', 'flash_sales', 'stories_carousel'],
+  });
   const shouldFetchProducts = !promotionsLoading && (promotionsData?.results?.length ?? 0) < 5;
   const { data: productsData } = useProducts({ page_size: 8, enabled: shouldFetchProducts });
 

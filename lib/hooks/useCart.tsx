@@ -12,6 +12,7 @@ interface CartContextType {
   isLoading: boolean;
   error: string | null;
   addToCart: (inventoryUnitId: number, quantity?: number, promotionId?: number, unitPrice?: number) => Promise<void>;
+  addBundleToCart: (bundleId: number, mainInventoryUnitId?: number, bundleItemIds?: number[]) => Promise<void>;
   removeFromCart: (itemId: number) => Promise<void>;
   updateCart: () => Promise<void>;
   checkout: (checkoutData: CartRequest) => Promise<Cart>;
@@ -30,6 +31,11 @@ const getCartId = (currentCart: Cart): number => {
 type CartItemCreateRequest = CartItemRequest & {
   promotion_id?: number;
   unit_price?: number;
+};
+type BundleAddRequest = {
+  bundle_id: number;
+  main_inventory_unit_id?: number;
+  bundle_item_ids?: number[];
 };
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -183,6 +189,35 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [cart, updateCart]);
 
+  const addBundleToCart = useCallback(async (
+    bundleId: number,
+    mainInventoryUnitId?: number,
+    bundleItemIds?: number[]
+  ) => {
+    try {
+      let currentCart = cart;
+      if (!currentCart) {
+        const sessionKey = typeof window !== 'undefined' ? localStorage.getItem('session_key') || undefined : undefined;
+        currentCart = await ApiService.apiV1PublicCartCreate({
+          session_key: sessionKey,
+        });
+        setCart(currentCart);
+      }
+      const cartId = getCartId(currentCart);
+      const payload: BundleAddRequest = {
+        bundle_id: bundleId,
+        main_inventory_unit_id: mainInventoryUnitId,
+        bundle_item_ids: bundleItemIds,
+      };
+      await ApiService.apiV1PublicCartBundlesCreate(cartId, payload as unknown as CartRequest);
+      await updateCart();
+    } catch (err: any) {
+      const { message } = getApiErrorInfo(err);
+      setError(message || 'Failed to add bundle to cart');
+      throw err;
+    }
+  }, [cart, updateCart]);
+
   const removeFromCart = useCallback(async (itemId: number) => {
     if (!cart) {
       console.error('Cannot remove item: No cart available');
@@ -235,6 +270,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     isLoading,
     error,
     addToCart,
+    addBundleToCart,
     removeFromCart,
     updateCart,
     checkout,

@@ -2,6 +2,7 @@
 
 import { useProduct, useProductBySlug, useProductUnits } from '@/lib/hooks/useProducts';
 import { usePromotion } from '@/lib/hooks/usePromotions';
+import { useBundles } from '@/lib/hooks/useBundles';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
 import { PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
@@ -110,7 +111,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const { data: units, isLoading: unitsLoading } = useProductUnits(product?.id || 0);
   const { data: accessories } = useProductAccessories(product?.id || 0);
   const { data: promotion } = usePromotion(promotionId ? parseInt(promotionId) : 0);
-  const { addToCart } = useCart();
+  const { data: bundlesData } = useBundles({ productId: product?.id });
+  const { addToCart, addBundleToCart } = useCart();
   const router = useRouter();
   
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
@@ -120,6 +122,27 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [bundleAddingId, setBundleAddingId] = useState<number | null>(null);
+  const [selectedBundleItems, setSelectedBundleItems] = useState<Record<number, Set<number>>>({});
+  const [bundleSuccessMessage, setBundleSuccessMessage] = useState<string | null>(null);
+
+  const activeBundles = useMemo(() => {
+    const bundles = bundlesData?.results || [];
+    return bundles.filter((bundle) => bundle.is_currently_active);
+  }, [bundlesData?.results]);
+
+  useEffect(() => {
+    if (!activeBundles.length) return;
+    setSelectedBundleItems((prev) => {
+      const next: Record<number, Set<number>> = { ...prev };
+      activeBundles.forEach((bundle) => {
+        if (!next[bundle.id]) {
+          next[bundle.id] = new Set(bundle.items.map((item) => item.id));
+        }
+      });
+      return next;
+    });
+  }, [activeBundles]);
 
   // Product images - include product primary image and all unit images
   const productImages = useMemo(() => {
@@ -338,6 +361,29 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     }
   };
 
+  const handleAddBundleToCart = async (bundleId: number) => {
+    if (!selectedUnit) {
+      alert('Please select a variant first');
+      return;
+    }
+    const selectedIds = Array.from(selectedBundleItems[bundleId] ?? []);
+    if (selectedIds.length === 0) {
+      alert('Please select at least one bundle item');
+      return;
+    }
+    setBundleAddingId(bundleId);
+    try {
+      await addBundleToCart(bundleId, selectedUnit, selectedIds);
+      setBundleSuccessMessage('Bundle added to cart successfully!');
+      setTimeout(() => setBundleSuccessMessage(null), 3000);
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.error || error?.message || 'Failed to add bundle to cart';
+      alert(`Failed to add bundle to cart: ${errorMessage}`);
+    } finally {
+      setBundleAddingId(null);
+    }
+  };
+
   const handleAddAccessoryVariantToCart = async (
     accessory: NonNullable<typeof accessories>[0],
     variant: NonNullable<NonNullable<typeof accessories>[0]['accessory_color_variants']>[0]
@@ -419,6 +465,31 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       return originalPrice;
     };
   }, [promotion]);
+
+  const getBundleDisplayPrice = (bundle: { pricing_mode: string; bundle_price?: number | null; discount_percentage?: number | null; discount_amount?: number | null; items_min_total?: number | null; items_max_total?: number | null; }) => {
+    if (bundle.pricing_mode === 'FX' && bundle.bundle_price !== null && bundle.bundle_price !== undefined) {
+      return formatPrice(bundle.bundle_price);
+    }
+    const minTotal = bundle.items_min_total ?? null;
+    const maxTotal = bundle.items_max_total ?? null;
+    if (minTotal === null || maxTotal === null) {
+      return 'Price on request';
+    }
+    let minPrice = minTotal;
+    let maxPrice = maxTotal;
+    if (bundle.pricing_mode === 'PC' && bundle.discount_percentage) {
+      const factor = 1 - Number(bundle.discount_percentage) / 100;
+      minPrice = Math.max(0, minTotal * factor);
+      maxPrice = Math.max(0, maxTotal * factor);
+    } else if (bundle.pricing_mode === 'AM' && bundle.discount_amount) {
+      minPrice = Math.max(0, minTotal - Number(bundle.discount_amount));
+      maxPrice = Math.max(0, maxTotal - Number(bundle.discount_amount));
+    }
+    if (minPrice === maxPrice) {
+      return formatPrice(minPrice);
+    }
+    return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
+  };
 
   // Check if product is eligible for promotion
   const isEligibleForPromotion = useMemo(() => {
@@ -759,6 +830,82 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 </div>
                             </div>
                             </div>
+
+          {/* Bundle Offers */}
+          {activeBundles.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-semibold text-gray-700">Bundle offers</p>
+                {bundleSuccessMessage && (
+                  <span className="text-[10px] text-green-700 font-semibold">{bundleSuccessMessage}</span>
+                )}
+              </div>
+              {activeBundles.map((bundle) => {
+                const selectedItems = selectedBundleItems[bundle.id] ?? new Set<number>();
+                return (
+                  <div key={bundle.id} className="border border-orange-200 bg-orange-50/40 rounded p-2 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-xs font-bold text-orange-700">{bundle.title}</p>
+                        <p className="text-[10px] text-gray-600">
+                          Buy {product?.product_name} and get these items together.
+                        </p>
+                      </div>
+                      <div className="text-sm font-bold text-red-600">
+                        {getBundleDisplayPrice(bundle)}
+                      </div>
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto pb-1">
+                      {bundle.items.map((item) => {
+                        const isChecked = selectedItems.has(item.id);
+                        return (
+                          <label
+                            key={item.id}
+                            className="flex flex-col items-center gap-1 bg-white border border-gray-200 rounded px-2 py-1 min-w-[72px]"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => {
+                                setSelectedBundleItems((prev) => {
+                                  const next = new Set(prev[bundle.id] ?? []);
+                                  if (next.has(item.id)) {
+                                    next.delete(item.id);
+                                  } else {
+                                    next.add(item.id);
+                                  }
+                                  return { ...prev, [bundle.id]: next };
+                                });
+                              }}
+                            />
+                            <div className="relative w-12 h-12">
+                              <Image
+                                src={item.primary_image || getPlaceholderProductImage(item.product_name)}
+                                alt={item.product_name}
+                                fill
+                                className="object-contain"
+                                unoptimized={!item.primary_image || item.primary_image.includes('placehold.co')}
+                              />
+                            </div>
+                            <span className="text-[10px] text-gray-700 text-center line-clamp-2">
+                              {item.product_name}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    <button
+                      onClick={() => handleAddBundleToCart(bundle.id)}
+                      disabled={!selectedUnit || bundleAddingId === bundle.id}
+                      className="w-full bg-orange-600 text-white px-3 py-2 rounded font-bold text-xs hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all"
+                    >
+                      {bundleAddingId === bundle.id ? 'Adding bundle...' : 'Add bundle to cart'}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Add to Cart Button - Prominent */}
           {Number(product.available_units_count ?? 0) > 0 && (

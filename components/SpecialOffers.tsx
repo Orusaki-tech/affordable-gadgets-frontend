@@ -42,14 +42,20 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
   // Filter promotions based on filter prop or default behavior
   const specialOffersPromotions = (data?.results || []).filter((promo: PublicPromotion) => {
     const locations = promo.display_locations || [];
-    if (filter === 'special_offers') {
-      return Array.isArray(locations) && locations.includes('special_offers');
-    } else if (filter === 'flash_sales') {
-      return Array.isArray(locations) && locations.includes('flash_sales');
-    } else {
-      // Default: show both special_offers and flash_sales
-      return Array.isArray(locations) && (locations.includes('special_offers') || locations.includes('flash_sales'));
+    const hasLocations = Array.isArray(locations) && locations.length > 0;
+
+    // If no display_locations configured, show by default (backward compat).
+    if (!hasLocations) {
+      return true;
     }
+
+    if (filter === 'special_offers') {
+      return locations.includes('special_offers');
+    } else if (filter === 'flash_sales') {
+      return locations.includes('flash_sales');
+    }
+    // Default: show both special_offers and flash_sales
+    return locations.includes('special_offers') || locations.includes('flash_sales');
   });
 
   const sectionTitle = filter === 'flash_sales' 

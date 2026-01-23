@@ -16,6 +16,8 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
   const availableCount = Number(product.available_units_count ?? 0);
   const interestCount = Number(product.interest_count ?? 0);
   const hasStock = availableCount > 0;
+  const hasBundle = Boolean((product as PublicProduct & { has_active_bundle?: boolean }).has_active_bundle);
+  const bundlePricePreview = (product as PublicProduct & { bundle_price_preview?: number | null }).bundle_price_preview;
   const interestText = interestCount > 0 
     ? `${interestCount} ${interestCount === 1 ? 'person' : 'people'} interested`
     : null;
@@ -35,6 +37,12 @@ export function ProductCard({ product, showInterestCount = true }: ProductCardPr
           unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
         />
         
+        {hasBundle && (
+          <div className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+            {bundlePricePreview ? `Bundle from ${formatPrice(bundlePricePreview)}` : 'Bundle available'}
+          </div>
+        )}
+
         {/* Stock Badge */}
         {!hasStock && (
           <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">

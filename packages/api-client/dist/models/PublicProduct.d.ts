@@ -43,6 +43,11 @@ export type PublicProduct = {
      */
     product_video_url?: string | null;
     readonly tags?: Array<string>;
+    readonly has_active_bundle?: boolean;
+    /**
+     * Return minimum effective bundle price for listings (if available).
+     */
+    readonly bundle_price_preview?: number;
     /**
      * SEO title (50-60 chars recommended)
      */

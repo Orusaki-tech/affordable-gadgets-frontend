@@ -29,7 +29,7 @@ export default function ReviewsPage() {
         {/* Featured Products */}
         <section className="container mx-auto px-4 py-8">
           <h2 className="text-3xl font-bold mb-6">Featured Products</h2>
-          <ProductGrid />
+        <ProductGrid pageSize={8} showPagination={false} />
         </section>
       </main>
 

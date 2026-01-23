@@ -5,9 +5,14 @@ import { getApiErrorInfo } from '@/lib/utils/apiError';
 import { ProductCard } from './ProductCard';
 import { useState } from 'react';
 
-export function ProductGrid() {
+interface ProductGridProps {
+  pageSize?: number;
+  showPagination?: boolean;
+}
+
+export function ProductGrid({ pageSize = 12, showPagination = true }: ProductGridProps = {}) {
   const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useProducts({ page, page_size: 12 });
+  const { data, isLoading, error } = useProducts({ page, page_size: pageSize });
 
   if (isLoading) {
     return (
@@ -67,7 +72,7 @@ export function ProductGrid() {
       </div>
 
       {/* Pagination */}
-      {(data.next || data.previous) && (
+      {showPagination && (data.next || data.previous) && (
         <div className="flex justify-center items-center gap-4 mt-12">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -77,7 +82,7 @@ export function ProductGrid() {
             Previous
           </button>
           <span className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold shadow-md">
-            Page {page} of {Math.ceil(data.count / 12)}
+            Page {page} of {Math.ceil(data.count / pageSize)}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}

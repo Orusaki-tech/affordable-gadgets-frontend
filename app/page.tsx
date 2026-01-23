@@ -44,7 +44,7 @@ export default function HomePage() {
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Handpicked for you</p>
               <div className="w-32 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
-            <ProductGrid />
+            <ProductGrid pageSize={8} showPagination={false} />
           </div>
         </section>
 

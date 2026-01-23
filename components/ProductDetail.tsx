@@ -1019,6 +1019,60 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         </div>
       </div>
 
+      {/* Recommended Accessories */}
+      {accessories && accessories.length > 0 && (
+        <div className="mt-4">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-semibold text-gray-900">Recommended Accessories</h2>
+            <span className="text-[11px] text-gray-500">{accessories.length} items</span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+            {accessories.map((accessory) => (
+              <Link
+                key={accessory.id}
+                href={`/products/${accessory.accessory_slug}`}
+                className="min-w-[220px] flex items-center gap-3 border border-gray-200 rounded-lg p-2 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                <div className="relative w-14 h-14 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                  <Image
+                    src={accessory.accessory_primary_image || getPlaceholderProductImage(accessory.accessory_name)}
+                    alt={accessory.accessory_name ?? 'Accessory'}
+                    fill
+                    className="object-contain bg-gray-50"
+                    sizes="56px"
+                    unoptimized={process.env.NODE_ENV === 'development'}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      if (!target.src.includes('placehold.co')) {
+                        target.src = getPlaceholderProductImage(accessory.accessory_name);
+                      }
+                    }}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-gray-900 truncate">
+                    {accessory.accessory_name}
+                  </p>
+                  <p className="text-[11px] text-gray-500 truncate">
+                    For {accessory.main_product_name}
+                  </p>
+                  {accessory.accessory_price_range &&
+                    accessory.accessory_price_range.min !== null &&
+                    accessory.accessory_price_range.max !== null && (
+                      <p className="text-[11px] text-gray-700 mt-0.5">
+                        {accessory.accessory_price_range.min === accessory.accessory_price_range.max
+                          ? formatPrice(accessory.accessory_price_range.min)
+                          : `${formatPrice(accessory.accessory_price_range.min)} - ${formatPrice(accessory.accessory_price_range.max)}`
+                        }
+                      </p>
+                    )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Tabs Section */}
       <div className="mt-3">
         {/* Tab Navigation */}
@@ -1250,151 +1304,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           )}
         </div>
       </div>
-
-      {/* Recommended Accessories */}
-      {accessories && accessories.length > 0 && (
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold mb-8">Recommended Accessories</h2>
-          <div className="space-y-8">
-            {accessories.map((accessory) => (
-              <div
-                key={accessory.id}
-                className="border-2 border-gray-200 rounded-xl overflow-hidden"
-              >
-                {/* Accessory Header - Clickable */}
-                <Link href={`/products/${accessory.accessory_slug}`}>
-                  <div className="p-6 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
-                    <div className="flex items-start gap-4">
-                      {/* Accessory Image */}
-                      <div className="relative w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                        <Image
-                          src={accessory.accessory_primary_image || getPlaceholderProductImage(accessory.accessory_name)}
-                          alt={accessory.accessory_name ?? 'Accessory'}
-                          fill
-                          className="object-contain bg-gray-50"
-                          sizes="96px"
-                          unoptimized={process.env.NODE_ENV === 'development'}
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            if (!target.src.includes('placehold.co')) {
-                              target.src = getPlaceholderProductImage(accessory.accessory_name);
-                            }
-                          }}
-                        />
-                      </div>
-                      
-                      {/* Accessory Info */}
-                      <div className="flex-1">
-                        <h3 className="font-bold text-xl mb-2 hover:text-blue-600 transition-colors">
-                          {accessory.accessory_name}
-                        </h3>
-                        <p className="text-sm text-gray-600 mb-2">
-                          Compatible with: {accessory.main_product_name}
-                        </p>
-                        {accessory.accessory_price_range && accessory.accessory_price_range.min !== null && accessory.accessory_price_range.max !== null && (
-                          <p className="text-sm font-semibold text-gray-800">
-                            {accessory.accessory_price_range.min === accessory.accessory_price_range.max
-                              ? formatPrice(accessory.accessory_price_range.min)
-                              : `${formatPrice(accessory.accessory_price_range.min)} - ${formatPrice(accessory.accessory_price_range.max)}`
-                            }
-                          </p>
-                        )}
-                        <p className="text-xs text-blue-600 mt-2 font-medium">
-                          View Details →
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                
-                {/* Color Variants */}
-                {accessory.accessory_color_variants && accessory.accessory_color_variants.length > 0 && (
-                  <div className="p-6">
-                    <h4 className="font-semibold mb-4">Available Colors:</h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {accessory.accessory_color_variants.map((variant) => (
-                        <div
-                          key={variant.color_id || 'universal'}
-                          className="border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 transition-colors relative"
-                        >
-                          {/* Clickable area - links to accessory page */}
-                          <Link 
-                            href={`/products/${accessory.accessory_slug}`}
-                            className="block mb-2"
-                          >
-                            {/* Color Swatch and Name */}
-                            <div className="flex items-center gap-2 mb-2">
-                              {variant.hex_code && (
-                                <div
-                                  className="w-6 h-6 rounded-full border-2 border-gray-300"
-                                  style={{ backgroundColor: variant.hex_code }}
-                                />
-                              )}
-                              <span className="font-medium text-sm hover:text-blue-600 transition-colors">
-                                {variant.color_name}
-                              </span>
-                            </div>
-                            
-                            {/* Variant Image */}
-                            <div className="relative w-full h-32 bg-gray-100 rounded mb-2 overflow-hidden cursor-pointer">
-                              <Image
-                                src={
-                                  variant.units[0]?.image_url || 
-                                  accessory.accessory_primary_image || 
-                                  getPlaceholderProductImage(accessory.accessory_name)
-                                }
-                                alt={`${accessory.accessory_name} - ${variant.color_name}`}
-                                fill
-                                className="object-contain bg-gray-50"
-                                sizes="(max-width: 640px) 50vw, 25vw"
-                                unoptimized={process.env.NODE_ENV === 'development'}
-                                onError={(e) => {
-                                  // Fallback to placeholder if image fails to load
-                                  const target = e.target as HTMLImageElement;
-                                  if (target.src !== getPlaceholderProductImage(accessory.accessory_name)) {
-                                    target.src = getPlaceholderProductImage(accessory.accessory_name);
-                                  }
-                                }}
-                              />
-                            </div>
-                            
-                            {/* Price */}
-                            {variant.min_price !== null && variant.max_price !== null && (
-                              <p className="text-sm font-semibold text-gray-800 mb-2">
-                                {variant.min_price === variant.max_price
-                                  ? formatPrice(variant.min_price)
-                                  : `${formatPrice(variant.min_price)} - ${formatPrice(variant.max_price)}`
-                                }
-                              </p>
-                            )}
-                            
-                            {/* Stock Info */}
-                            <p className="text-xs text-gray-600 mb-2">
-                              {variant.total_quantity} in stock
-                            </p>
-                          </Link>
-                          
-                          {/* Add to Cart Button - stops event propagation */}
-                          <button
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleAddAccessoryVariantToCart(accessory, variant);
-                            }}
-                            className="w-full px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-                          >
-                            Add to Cart
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Product Recommendations */}
       {typeof productId === 'number' && (

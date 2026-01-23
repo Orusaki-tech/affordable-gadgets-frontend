@@ -5,7 +5,7 @@ import { usePromotion } from '@/lib/hooks/usePromotions';
 import { useBundles } from '@/lib/hooks/useBundles';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
-import { PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
+import { PricingModeEnum, PublicBundle, PublicBundleItem, PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo } from 'react';
@@ -21,6 +21,9 @@ interface ProductDetailProps {
 }
 
 type TabType = 'overview' | 'specs' | 'reviews' | 'videos' | 'compare';
+
+type BundleItemWithId = PublicBundleItem & { id: number };
+type ActiveBundle = PublicBundle & { id: number; items: BundleItemWithId[] };
 
 interface UnitCardProps {
   unit: PublicInventoryUnitPublic;
@@ -126,9 +129,21 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [selectedBundleItems, setSelectedBundleItems] = useState<Record<number, Set<number>>>({});
   const [bundleSuccessMessage, setBundleSuccessMessage] = useState<string | null>(null);
 
-  const activeBundles = useMemo(() => {
+  const activeBundles = useMemo<ActiveBundle[]>(() => {
     const bundles = bundlesData?.results || [];
-    return bundles.filter((bundle) => bundle.is_currently_active);
+    return bundles
+      .filter(
+        (bundle): bundle is PublicBundle & { id: number } =>
+          bundle.is_currently_active === true && typeof bundle.id === 'number'
+      )
+      .map((bundle) => {
+        const items: BundleItemWithId[] = (bundle.items ?? []).filter(
+          (item): item is BundleItemWithId => typeof item.id === 'number'
+        );
+        const activeBundle: ActiveBundle = { ...bundle, items };
+        return activeBundle;
+      })
+      .filter((bundle) => bundle.items.length > 0);
   }, [bundlesData?.results]);
 
   useEffect(() => {
@@ -136,8 +151,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     setSelectedBundleItems((prev) => {
       const next: Record<number, Set<number>> = { ...prev };
       activeBundles.forEach((bundle) => {
+        if (bundle.id === undefined) {
+          return;
+        }
         if (!next[bundle.id]) {
-          next[bundle.id] = new Set(bundle.items.map((item) => item.id));
+          const itemIds = bundle.items
+            .map((item) => item.id)
+            .filter((id): id is number => typeof id === 'number');
+          next[bundle.id] = new Set(itemIds);
         }
       });
       return next;
@@ -466,9 +487,22 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     };
   }, [promotion]);
 
-  const getBundleDisplayPrice = (bundle: { pricing_mode: string; bundle_price?: number | null; discount_percentage?: number | null; discount_amount?: number | null; items_min_total?: number | null; items_max_total?: number | null; }) => {
-    if (bundle.pricing_mode === 'FX' && bundle.bundle_price !== null && bundle.bundle_price !== undefined) {
-      return formatPrice(bundle.bundle_price);
+  const getBundleDisplayPrice = (
+    bundle: Pick<
+      PublicBundle,
+      | 'pricing_mode'
+      | 'bundle_price'
+      | 'discount_percentage'
+      | 'discount_amount'
+      | 'items_min_total'
+      | 'items_max_total'
+    >
+  ) => {
+    const bundlePrice = bundle.bundle_price === null || bundle.bundle_price === undefined
+      ? null
+      : Number(bundle.bundle_price);
+    if (bundle.pricing_mode === PricingModeEnum.FX && bundlePrice !== null) {
+      return formatPrice(bundlePrice);
     }
     const minTotal = bundle.items_min_total ?? null;
     const maxTotal = bundle.items_max_total ?? null;
@@ -477,11 +511,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     }
     let minPrice = minTotal;
     let maxPrice = maxTotal;
-    if (bundle.pricing_mode === 'PC' && bundle.discount_percentage) {
+    if (bundle.pricing_mode === PricingModeEnum.PC && bundle.discount_percentage) {
       const factor = 1 - Number(bundle.discount_percentage) / 100;
       minPrice = Math.max(0, minTotal * factor);
       maxPrice = Math.max(0, maxTotal * factor);
-    } else if (bundle.pricing_mode === 'AM' && bundle.discount_amount) {
+    } else if (bundle.pricing_mode === PricingModeEnum.AM && bundle.discount_amount) {
       minPrice = Math.max(0, minTotal - Number(bundle.discount_amount));
       maxPrice = Math.max(0, maxTotal - Number(bundle.discount_amount));
     }
@@ -842,6 +876,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               </div>
               {activeBundles.map((bundle) => {
                 const selectedItems = selectedBundleItems[bundle.id] ?? new Set<number>();
+                const bundleItems = bundle.items.filter(
+                  (item): item is BundleItemWithId => typeof item.id === 'number'
+                );
                 return (
                   <div key={bundle.id} className="border border-orange-200 bg-orange-50/40 rounded p-2 space-y-2">
                     <div className="flex items-start justify-between gap-2">
@@ -856,8 +893,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       </div>
                     </div>
                     <div className="flex gap-2 overflow-x-auto pb-1">
-                      {bundle.items.map((item) => {
+                      {bundleItems.map((item) => {
                         const isChecked = selectedItems.has(item.id);
+                        const itemName = item.product_name ?? 'Bundle item';
                         return (
                           <label
                             key={item.id}
@@ -880,15 +918,15 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                             />
                             <div className="relative w-12 h-12">
                               <Image
-                                src={item.primary_image || getPlaceholderProductImage(item.product_name)}
-                                alt={item.product_name}
+                                src={item.primary_image || getPlaceholderProductImage(itemName)}
+                                alt={itemName}
                                 fill
                                 className="object-contain"
                                 unoptimized={!item.primary_image || item.primary_image.includes('placehold.co')}
                               />
                             </div>
                             <span className="text-[10px] text-gray-700 text-center line-clamp-2">
-                              {item.product_name}
+                              {itemName}
                             </span>
                           </label>
                         );

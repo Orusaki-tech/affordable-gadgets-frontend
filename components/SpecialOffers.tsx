@@ -39,10 +39,26 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
     );
   }
 
+  const normalizeLocations = (value: unknown): string[] => {
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item));
+    }
+    if (typeof value === 'string') {
+      return value
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+    return [];
+  };
+
+  const isLocationMatch = (locations: string[], location: 'special_offers' | 'flash_sales') =>
+    locations.includes(location);
+
   // Filter promotions based on filter prop or default behavior
-  const specialOffersPromotions = (data?.results || []).filter((promo: PublicPromotion) => {
-    const locations = promo.display_locations || [];
-    const hasLocations = Array.isArray(locations) && locations.length > 0;
+  const filteredPromotions = (data?.results || []).filter((promo: PublicPromotion) => {
+    const locations = normalizeLocations(promo.display_locations);
+    const hasLocations = locations.length > 0;
 
     // If no display_locations configured, show by default (backward compat).
     if (!hasLocations) {
@@ -50,10 +66,10 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
     }
 
     if (filter === 'special_offers') {
-      return locations.includes('special_offers');
+      return isLocationMatch(locations, 'special_offers');
     }
     if (filter === 'flash_sales') {
-      return locations.includes('flash_sales');
+      return isLocationMatch(locations, 'flash_sales');
     }
 
     // Default: show all allowed promo locations.
@@ -63,6 +79,9 @@ export function SpecialOffers({ filter }: SpecialOffersProps = {}) {
       locations.includes('stories_carousel')
     );
   });
+
+  const specialOffersPromotions =
+    filter || filteredPromotions.length > 0 ? filteredPromotions : data?.results || [];
 
   const sectionTitle = filter === 'flash_sales' 
     ? 'Flash Sales' 

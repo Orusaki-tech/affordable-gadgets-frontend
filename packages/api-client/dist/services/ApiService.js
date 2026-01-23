@@ -445,15 +445,17 @@ export class ApiService {
     }
     /**
      * @param page A page number within the paginated result set.
+     * @param pageSize Number of results to return per page.
      * @returns PaginatedPublicPromotionList
      * @throws ApiError
      */
-    static apiV1PublicPromotionsList(page) {
+    static apiV1PublicPromotionsList(page, pageSize) {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/promotions/',
             query: {
                 'page': page,
+                'page_size': pageSize,
             },
         });
     }

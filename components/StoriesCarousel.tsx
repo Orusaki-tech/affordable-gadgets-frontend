@@ -136,12 +136,29 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   const { data: promotionsData, isLoading: promotionsLoading } = usePromotions({ page_size: 30 });
   const { data: productsData, isLoading: productsLoading } = useProducts({ page_size: 40 });
 
+  const normalizeLocations = (value: unknown): string[] => {
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item));
+    }
+    if (typeof value === 'string') {
+      return value
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+    return [];
+  };
+
   // Process promotions - combine special_offers and flash_sales
   const allPromotions = useMemo(() => {
     const promotions = (promotionsData?.results || []) as PublicPromotion[];
     return promotions.filter((promo) => {
-      const locations = promo.display_locations || [];
-      return Array.isArray(locations) && (
+      const locations = normalizeLocations(promo.display_locations);
+      const hasLocations = locations.length > 0;
+      if (!hasLocations) {
+        return true;
+      }
+      return (
         locations.includes('special_offers') || 
         locations.includes('flash_sales') ||
         locations.includes('stories_carousel')

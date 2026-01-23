@@ -2,6 +2,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ProductGrid } from '@/components/ProductGrid';
 import { SpecialOffers } from '@/components/SpecialOffers';
+import { StoriesCarousel } from '@/components/StoriesCarousel';
 import { QuickAccessBar } from '@/components/QuickAccessBar';
 import { ReviewsShowcase } from '@/components/ReviewsShowcase';
 import { CategoriesSection } from '@/components/CategoriesSection';
@@ -28,6 +29,9 @@ export default function HomePage() {
         {/* Promotions */}
         <section id="promotions" className="bg-white scroll-mt-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+            <div className="mb-10 lg:mb-12">
+              <StoriesCarousel autoAdvanceDuration={5} />
+            </div>
             <div className="text-center mb-10 lg:mb-12">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
                 <span className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 bg-clip-text text-transparent">

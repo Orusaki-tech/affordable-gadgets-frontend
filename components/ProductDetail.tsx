@@ -128,6 +128,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [bundleAddingId, setBundleAddingId] = useState<number | null>(null);
   const [selectedBundleItems, setSelectedBundleItems] = useState<Record<number, Set<number>>>({});
   const [bundleSuccessMessage, setBundleSuccessMessage] = useState<string | null>(null);
+  const [selectedAccessoryVariants, setSelectedAccessoryVariants] = useState<Record<number, number>>({});
 
   const activeBundles = useMemo<ActiveBundle[]>(() => {
     const bundles = bundlesData?.results || [];
@@ -1027,57 +1028,81 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <span className="text-[11px] text-gray-500">{accessories.length} items</span>
           </div>
           <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
-            {accessories.map((accessory) => (
-              (() => {
-                const firstVariant = accessory.accessory_color_variants?.[0];
-                const canAdd = Boolean(firstVariant?.units && firstVariant.units.length > 0);
-                return (
-              <Link
-                key={accessory.id}
-                href={`/products/${accessory.accessory_slug}`}
-                className="min-w-[220px] flex items-center gap-3 border border-gray-200 rounded-lg p-2 hover:border-gray-300 hover:bg-gray-50 transition-colors"
-              >
-                <div className="relative w-14 h-14 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
-                  <Image
-                    src={accessory.accessory_primary_image || getPlaceholderProductImage(accessory.accessory_name)}
-                    alt={accessory.accessory_name ?? 'Accessory'}
-                    fill
-                    className="object-contain bg-gray-50"
-                    sizes="56px"
-                    unoptimized={process.env.NODE_ENV === 'development'}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      if (!target.src.includes('placehold.co')) {
-                        target.src = getPlaceholderProductImage(accessory.accessory_name);
-                      }
-                    }}
-                  />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-gray-900 truncate">
-                    {accessory.accessory_name}
-                  </p>
-                  <p className="text-[11px] text-gray-500 truncate">
-                    For {accessory.main_product_name}
-                  </p>
-                  {accessory.accessory_price_range &&
-                    accessory.accessory_price_range.min !== null &&
-                    accessory.accessory_price_range.max !== null && (
-                      <p className="text-[11px] text-gray-700 mt-0.5">
-                        {accessory.accessory_price_range.min === accessory.accessory_price_range.max
-                          ? formatPrice(accessory.accessory_price_range.min)
-                          : `${formatPrice(accessory.accessory_price_range.min)} - ${formatPrice(accessory.accessory_price_range.max)}`
-                        }
+            {accessories.map((accessory, index) => {
+              const accessoryKey = accessory.id ?? index;
+              const variants = accessory.accessory_color_variants ?? [];
+              const selectedVariantIndex = selectedAccessoryVariants[accessoryKey] ?? 0;
+              const selectedVariant = variants[selectedVariantIndex] ?? variants[0];
+              const canAdd = Boolean(selectedVariant?.units && selectedVariant.units.length > 0);
+              return (
+                <div
+                  key={accessoryKey}
+                  className="min-w-[220px] border border-gray-200 rounded-lg p-2 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+                >
+                  <Link
+                    href={`/products/${accessory.accessory_slug}`}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="relative w-14 h-14 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                      <Image
+                        src={accessory.accessory_primary_image || getPlaceholderProductImage(accessory.accessory_name)}
+                        alt={accessory.accessory_name ?? 'Accessory'}
+                        fill
+                        className="object-contain bg-gray-50"
+                        sizes="56px"
+                        unoptimized={process.env.NODE_ENV === 'development'}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          if (!target.src.includes('placehold.co')) {
+                            target.src = getPlaceholderProductImage(accessory.accessory_name);
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-gray-900 truncate">
+                        {accessory.accessory_name}
                       </p>
-                    )}
+                      <p className="text-[11px] text-gray-500 truncate">
+                        For {accessory.main_product_name}
+                      </p>
+                      {accessory.accessory_price_range &&
+                        accessory.accessory_price_range.min !== null &&
+                        accessory.accessory_price_range.max !== null && (
+                          <p className="text-[11px] text-gray-700 mt-0.5">
+                            {accessory.accessory_price_range.min === accessory.accessory_price_range.max
+                              ? formatPrice(accessory.accessory_price_range.min)
+                              : `${formatPrice(accessory.accessory_price_range.min)} - ${formatPrice(accessory.accessory_price_range.max)}`
+                            }
+                          </p>
+                        )}
+                    </div>
+                  </Link>
+                  {variants.length > 1 && (
+                    <select
+                      className="mt-1 w-full border border-gray-200 rounded px-2 py-1 text-[11px] text-gray-700 bg-white"
+                      value={selectedVariantIndex}
+                      onChange={(e) => {
+                        const nextIndex = Number(e.target.value);
+                        setSelectedAccessoryVariants((prev) => ({
+                          ...prev,
+                          [accessoryKey]: Number.isFinite(nextIndex) ? nextIndex : 0,
+                        }));
+                      }}
+                    >
+                      {variants.map((variant, vIndex) => (
+                        <option key={`${variant.color_id ?? 'variant'}-${vIndex}`} value={vIndex}>
+                          {variant.color_name || `Variant ${vIndex + 1}`}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <button
                     type="button"
                     className={`mt-1 text-[11px] font-semibold ${canAdd ? 'text-blue-600 hover:text-blue-700' : 'text-gray-400 cursor-not-allowed'}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (firstVariant && canAdd) {
-                        handleAddAccessoryVariantToCart(accessory, firstVariant);
+                    onClick={() => {
+                      if (selectedVariant && canAdd) {
+                        handleAddAccessoryVariantToCart(accessory, selectedVariant);
                       }
                     }}
                     disabled={!canAdd}
@@ -1085,10 +1110,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     Add to cart
                   </button>
                 </div>
-              </Link>
-                );
-              })()
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

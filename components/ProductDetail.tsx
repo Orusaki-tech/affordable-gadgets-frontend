@@ -897,11 +897,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                             </div>
                             </div>
 
-          {/* Bundle Offers */}
+          {/* Bundle Items */}
           {activeBundles.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] font-semibold text-gray-700">Bundle offers</p>
+                <p className="text-[10px] font-semibold text-gray-700">Bundle items</p>
                 {bundleSuccessMessage && (
                   <span className="text-[10px] text-green-700 font-semibold">{bundleSuccessMessage}</span>
                 )}
@@ -926,41 +926,47 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     </div>
                     <div className="flex gap-2 overflow-x-auto pb-1">
                       {bundleItems.map((item) => {
-                        const isChecked = selectedItems.has(item.id);
                         const itemName = item.product_name ?? 'Bundle item';
+                        const itemHref = item.product_slug
+                          ? `/products/${item.product_slug}`
+                          : item.product_id
+                            ? `/products/${item.product_id}`
+                            : null;
+                        const ItemWrapper = itemHref ? Link : 'div';
                         return (
-                          <label
+                          <div
                             key={item.id}
-                            className="flex flex-col items-center gap-1 bg-white border border-gray-200 rounded px-2 py-1 min-w-[72px]"
+                            className="min-w-[200px] border border-gray-200 rounded-lg p-2 hover:border-gray-300 hover:bg-gray-50 transition-colors bg-white"
                           >
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              onChange={() => {
-                                setSelectedBundleItems((prev) => {
-                                  const next = new Set(prev[bundle.id] ?? []);
-                                  if (next.has(item.id)) {
-                                    next.delete(item.id);
-                                  } else {
-                                    next.add(item.id);
-                                  }
-                                  return { ...prev, [bundle.id]: next };
-                                });
-                              }}
-                            />
-                            <div className="relative w-12 h-12">
-                              <Image
-                                src={item.primary_image || getPlaceholderProductImage(itemName)}
-                                alt={itemName}
-                                fill
-                                className="object-contain"
-                                unoptimized={!item.primary_image || item.primary_image.includes('placehold.co')}
-                              />
-                            </div>
-                            <span className="text-[10px] text-gray-700 text-center line-clamp-2">
-                              {itemName}
-                            </span>
-                          </label>
+                            <ItemWrapper
+                              {...(itemHref ? { href: itemHref } : {})}
+                              className="flex items-center gap-3"
+                            >
+                              <div className="relative w-12 h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                                <Image
+                                  src={item.primary_image || getPlaceholderProductImage(itemName)}
+                                  alt={itemName}
+                                  fill
+                                  className="object-contain bg-gray-50"
+                                  sizes="48px"
+                                  unoptimized={!item.primary_image || item.primary_image.includes('placehold.co')}
+                                />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-xs font-semibold text-gray-900 truncate">
+                                  {itemName}
+                                </p>
+                                <p className="text-[11px] text-gray-500 truncate">
+                                  Bundle item
+                                </p>
+                                {typeof item.quantity === 'number' && item.quantity > 0 && (
+                                  <p className="text-[11px] text-gray-700 mt-0.5">
+                                    Qty {item.quantity}
+                                  </p>
+                                )}
+                              </div>
+                            </ItemWrapper>
+                          </div>
                         );
                       })}
                     </div>
@@ -969,7 +975,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       disabled={!selectedUnit || bundleAddingId === bundle.id}
                       className="w-full bg-orange-600 text-white px-3 py-2 rounded font-bold text-xs hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all"
                     >
-                      {bundleAddingId === bundle.id ? 'Adding bundle...' : 'Add bundle to cart'}
+                      {bundleAddingId === bundle.id ? 'Adding bundle...' : 'Add bundle (all items)'}
                     </button>
                   </div>
                 );

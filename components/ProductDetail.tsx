@@ -932,40 +932,45 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                           : item.product_id
                             ? `/products/${item.product_id}`
                             : null;
-                        const ItemWrapper = itemHref ? Link : 'div';
+                        const itemContent = (
+                          <>
+                            <div className="relative w-12 h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                              <Image
+                                src={item.primary_image || getPlaceholderProductImage(itemName)}
+                                alt={itemName}
+                                fill
+                                className="object-contain bg-gray-50"
+                                sizes="48px"
+                                unoptimized={!item.primary_image || item.primary_image.includes('placehold.co')}
+                              />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-gray-900 truncate">
+                                {itemName}
+                              </p>
+                              <p className="text-[11px] text-gray-500 truncate">
+                                Bundle item
+                              </p>
+                              {typeof item.quantity === 'number' && item.quantity > 0 && (
+                                <p className="text-[11px] text-gray-700 mt-0.5">
+                                  Qty {item.quantity}
+                                </p>
+                              )}
+                            </div>
+                          </>
+                        );
                         return (
                           <div
                             key={item.id}
                             className="min-w-[200px] border border-gray-200 rounded-lg p-2 hover:border-gray-300 hover:bg-gray-50 transition-colors bg-white"
                           >
-                            <ItemWrapper
-                              {...(itemHref ? { href: itemHref } : {})}
-                              className="flex items-center gap-3"
-                            >
-                              <div className="relative w-12 h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
-                                <Image
-                                  src={item.primary_image || getPlaceholderProductImage(itemName)}
-                                  alt={itemName}
-                                  fill
-                                  className="object-contain bg-gray-50"
-                                  sizes="48px"
-                                  unoptimized={!item.primary_image || item.primary_image.includes('placehold.co')}
-                                />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-xs font-semibold text-gray-900 truncate">
-                                  {itemName}
-                                </p>
-                                <p className="text-[11px] text-gray-500 truncate">
-                                  Bundle item
-                                </p>
-                                {typeof item.quantity === 'number' && item.quantity > 0 && (
-                                  <p className="text-[11px] text-gray-700 mt-0.5">
-                                    Qty {item.quantity}
-                                  </p>
-                                )}
-                              </div>
-                            </ItemWrapper>
+                            {itemHref ? (
+                              <Link href={itemHref} className="flex items-center gap-3">
+                                {itemContent}
+                              </Link>
+                            ) : (
+                              <div className="flex items-center gap-3">{itemContent}</div>
+                            )}
                           </div>
                         );
                       })}

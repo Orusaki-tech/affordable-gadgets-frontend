@@ -24,6 +24,8 @@ export function useBundles(params?: { productId?: number }) {
   return useQuery<PaginatedPublicBundleList>({
     queryKey: ['bundles', params?.productId],
     queryFn: () => ApiService.apiV1PublicBundlesList(1, params?.productId),
-    staleTime: 60000,
+    staleTime: 30000, // Reduced from 60s to 30s for faster updates
+    refetchOnWindowFocus: true, // Refetch when user returns to tab
+    enabled: params?.productId !== undefined && params.productId > 0, // Only fetch if productId is valid
   });
 }

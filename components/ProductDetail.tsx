@@ -143,7 +143,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const { data: units, isLoading: unitsLoading } = useProductUnits(product?.id || 0);
   const { data: accessories } = useProductAccessories(product?.id || 0);
   const { data: promotion } = usePromotion(promotionId ? parseInt(promotionId) : 0);
-  const { data: bundlesData } = useBundles({ productId: product?.id });
+  const { data: bundlesData, isLoading: bundlesLoading } = useBundles({ productId: product?.id });
   const { addToCart, addBundleToCart } = useCart();
   const router = useRouter();
   
@@ -878,32 +878,17 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   </div>
           ) : null}
 
-          {/* Comes With Section */}
-          <div className="space-y-1">
-            <p className="text-[10px] font-semibold text-gray-700">Comes with</p>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
-                <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>6 months warranty</span>
-                  </div>
-              <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
-                <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-                <span>Affordable shipping</span>
-                </div>
-                            </div>
-                            </div>
-
-          {/* Bundle Items */}
-          {activeBundles.length > 0 && (
-            <div className="space-y-2">
+          {/* Bundle Items - Display FIRST, before other sections */}
+          {bundlesLoading ? (
+            <div className="border-t border-gray-200 pt-3">
+              <p className="text-xs text-gray-500">Loading bundle items...</p>
+            </div>
+          ) : activeBundles.length > 0 ? (
+            <div className="space-y-3 border-t border-gray-200 pt-3">
               <div className="flex items-center justify-between">
-                <p className="text-[10px] font-semibold text-gray-700">Bundle items</p>
+                <p className="text-sm font-bold text-gray-900">Bundle Items</p>
                 {bundleSuccessMessage && (
-                  <span className="text-[10px] text-green-700 font-semibold">{bundleSuccessMessage}</span>
+                  <span className="text-xs text-green-700 font-semibold">{bundleSuccessMessage}</span>
                 )}
               </div>
               {activeBundles.map((bundle) => {
@@ -911,20 +896,21 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 const bundleItems = bundle.items.filter(
                   (item): item is BundleItemWithId => typeof item.id === 'number'
                 );
+                if (bundleItems.length === 0) return null;
                 return (
-                  <div key={bundle.id} className="border border-orange-200 bg-orange-50/40 rounded p-2 space-y-2">
+                  <div key={bundle.id} className="border-2 border-orange-300 bg-orange-50 rounded-lg p-3 space-y-3 shadow-sm">
                     <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="text-xs font-bold text-orange-700">{bundle.title}</p>
-                        <p className="text-[10px] text-gray-600">
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-orange-800">{bundle.title}</p>
+                        <p className="text-xs text-gray-700 mt-0.5">
                           Buy {product?.product_name} and get these items together.
                         </p>
                       </div>
-                      <div className="text-sm font-bold text-red-600">
+                      <div className="text-base font-bold text-red-600 whitespace-nowrap">
                         {getBundleDisplayPrice(bundle)}
                       </div>
                     </div>
-                    <div className="flex gap-2 overflow-x-auto pb-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {bundleItems.map((item) => {
                         const itemName = item.product_name ?? 'Bundle item';
                         const itemHref = item.product_slug
@@ -932,28 +918,36 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                           : item.product_id
                             ? `/products/${item.product_id}`
                             : null;
+                        const itemPrice = item.override_price !== null && item.override_price !== undefined
+                          ? Number(item.override_price)
+                          : (item.min_price !== null && item.min_price !== undefined ? item.min_price : null);
                         const itemContent = (
                           <>
-                            <div className="relative w-12 h-12 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                            <div className="relative w-16 h-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                               <Image
                                 src={item.primary_image || getPlaceholderProductImage(itemName)}
                                 alt={itemName}
                                 fill
                                 className="object-contain bg-gray-50"
-                                sizes="48px"
+                                sizes="64px"
                                 unoptimized={!item.primary_image || item.primary_image.includes('placehold.co')}
                               />
                             </div>
-                            <div className="min-w-0">
-                              <p className="text-xs font-semibold text-gray-900 truncate">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-gray-900 truncate">
                                 {itemName}
                               </p>
-                              <p className="text-[11px] text-gray-500 truncate">
+                              <p className="text-xs text-gray-500 truncate">
                                 Bundle item
                               </p>
                               {typeof item.quantity === 'number' && item.quantity > 0 && (
-                                <p className="text-[11px] text-gray-700 mt-0.5">
-                                  Qty {item.quantity}
+                                <p className="text-xs text-gray-700 mt-0.5 font-medium">
+                                  Qty: {item.quantity}
+                                </p>
+                              )}
+                              {itemPrice !== null && (
+                                <p className="text-xs font-bold text-blue-600 mt-0.5">
+                                  {formatPrice(itemPrice)}
                                 </p>
                               )}
                             </div>
@@ -962,14 +956,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         return (
                           <div
                             key={item.id}
-                            className="min-w-[200px] border border-gray-200 rounded-lg p-2 hover:border-gray-300 hover:bg-gray-50 transition-colors bg-white"
+                            className="border border-gray-300 rounded-lg p-2.5 hover:border-orange-400 hover:bg-orange-50/50 transition-colors bg-white"
                           >
                             {itemHref ? (
-                              <Link href={itemHref} className="flex items-center gap-3">
+                              <Link href={itemHref} className="flex items-start gap-3">
                                 {itemContent}
                               </Link>
                             ) : (
-                              <div className="flex items-center gap-3">{itemContent}</div>
+                              <div className="flex items-start gap-3">{itemContent}</div>
                             )}
                           </div>
                         );
@@ -986,7 +980,26 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 );
               })}
             </div>
-          )}
+          ) : null}
+
+          {/* Comes With Section */}
+          <div className="space-y-1">
+            <p className="text-[10px] font-semibold text-gray-700">Comes with</p>
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
+                <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>6 months warranty</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
+                <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+                <span>Affordable shipping</span>
+              </div>
+            </div>
+          </div>
 
           {/* Add to Cart Button - Prominent */}
           {Number(product.available_units_count ?? 0) > 0 && (

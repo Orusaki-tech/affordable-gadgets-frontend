@@ -303,7 +303,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
 
   if (isLoading) {
     return (
-      <div className="relative">
+      <div className="relative z-[60] pointer-events-auto">
         {reviewActionHeader}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, index) => (
@@ -319,7 +319,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
 
   if (error) {
     return (
-      <div className="relative">
+      <div className="relative z-[60] pointer-events-auto">
         {reviewActionHeader}
         <div className="text-center py-8 text-red-500">
           Unable to load reviews right now. Please try again later.
@@ -330,7 +330,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
 
   if (reviews.length === 0) {
     return (
-      <div className="relative">
+      <div className="relative z-[60] pointer-events-auto">
         {reviewActionHeader}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, index) => (
@@ -349,7 +349,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   }
 
     return (
-      <div className="relative">
+      <div className="relative z-[60] pointer-events-auto">
       {reviewActionHeader}
       <div className="relative">
         <ProductCarousel

@@ -276,7 +276,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   };
 
   const reviewActionHeader = (
-    <div className="relative z-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+    <div className="relative z-[60] isolate flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
       <div>
         <h3 className="text-xl font-semibold text-gray-900">Customer reviews</h3>
         <p className="text-sm text-gray-500">
@@ -303,7 +303,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
 
   if (isLoading) {
     return (
-      <div>
+      <div className="relative">
         {reviewActionHeader}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, index) => (
@@ -319,7 +319,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
 
   if (error) {
     return (
-      <div>
+      <div className="relative">
         {reviewActionHeader}
         <div className="text-center py-8 text-red-500">
           Unable to load reviews right now. Please try again later.
@@ -330,7 +330,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
 
   if (reviews.length === 0) {
     return (
-      <div>
+      <div className="relative">
         {reviewActionHeader}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(3)].map((_, index) => (
@@ -349,7 +349,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   }
 
     return (
-      <div>
+      <div className="relative">
       {reviewActionHeader}
       <div className="relative">
         <ProductCarousel

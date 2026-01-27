@@ -3,6 +3,7 @@
 import { useProducts } from '@/lib/hooks/useProducts';
 import { getApiErrorInfo } from '@/lib/utils/apiError';
 import { ProductCard } from './ProductCard';
+import { ProductCarousel } from './ProductCarousel';
 import { useState } from 'react';
 
 interface ProductGridProps {
@@ -65,11 +66,16 @@ export function ProductGrid({ pageSize = 12, showPagination = true }: ProductGri
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <ProductCarousel
+        itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
+        showNavigation={true}
+        showPagination={showPagination}
+        autoPlay={false}
+      >
         {data.results.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
-      </div>
+      </ProductCarousel>
 
       {/* Pagination */}
       {showPagination && (data.next || data.previous) && (

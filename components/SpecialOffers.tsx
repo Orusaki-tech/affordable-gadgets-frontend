@@ -5,6 +5,7 @@ import { PublicPromotion } from '@/lib/api/generated';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getProductHref } from '@/lib/utils/productRoutes';
+import { ProductCarousel } from './ProductCarousel';
 
 interface SpecialOffersProps {
   filter?: 'special_offers' | 'flash_sales';
@@ -109,7 +110,12 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <ProductCarousel
+          itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
+          showNavigation={true}
+          showPagination={false}
+          autoPlay={false}
+        >
           {specialOffersPromotions.map((promotion: PublicPromotion, index) => {
             // Get first product ID from promotion
             const firstProductId = promotion.products && promotion.products.length > 0 
@@ -146,7 +152,7 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
               </Link>
             );
           })}
-        </div>
+        </ProductCarousel>
       )}
     </div>
   );

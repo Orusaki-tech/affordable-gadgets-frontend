@@ -1,8 +1,6 @@
-import Image from 'next/image';
-import Link from 'next/link';
 import { brandConfig } from '@/lib/config/brand';
-import { getProductHref } from '@/lib/utils/productRoutes';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
+import { SpecialOffersCarousel } from './SpecialOffersCarousel';
 
 interface SpecialOffersServerProps {
   filter?: 'special_offers' | 'flash_sales';
@@ -101,59 +99,5 @@ export async function SpecialOffersServer(
     ? 'Flash Sales'
     : 'Special Offers';
 
-  if (specialOffersPromotions.length === 0) {
-    return (
-      <div>
-        <h2 className="text-3xl font-bold mb-6">{sectionTitle}</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-2xl bg-lime-100/60 aspect-square" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <h2 className="text-3xl font-bold mb-6">{sectionTitle}</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {specialOffersPromotions.map((promotion, index) => {
-          const firstProductId = promotion.products && promotion.products.length > 0
-            ? promotion.products[0]
-            : null;
-          const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
-          const promotionId = typeof promotion.id === 'number' ? promotion.id : null;
-          const href = firstProductId
-            ? getProductHref(undefined, { fallbackId: firstProductId, promotionId })
-            : promotionId
-              ? `/products?promotion=${promotionId}`
-              : '/products';
-
-          return (
-            <Link
-              key={promotion.id ?? `${promotion.title}-${index}`}
-              href={href}
-              className="relative block rounded-2xl bg-lime-100/80 p-6 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer aspect-square"
-            >
-              <div className="relative w-full h-full">
-                {promotionImageSrc && (
-                  <Image
-                    src={promotionImageSrc}
-                    alt={promotion.title}
-                    fill
-                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                    priority={index === 0}
-                    loading={index < 2 ? 'eager' : 'lazy'}
-                    className="object-contain transition-transform duration-300 hover:scale-[1.02]"
-                    unoptimized={promotionImageSrc.includes('placehold.co')}
-                  />
-                )}
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-    </div>
-  );
+  return <SpecialOffersCarousel promotions={specialOffersPromotions} sectionTitle={sectionTitle} />;
 }

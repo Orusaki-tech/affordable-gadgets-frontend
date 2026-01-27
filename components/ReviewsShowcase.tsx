@@ -9,6 +9,7 @@ import { ApiService } from '@/lib/api/generated';
 import { getPlaceholderProductImage, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { useQueryClient } from '@tanstack/react-query';
+import { ProductCarousel } from './ProductCarousel';
 
 function formatDate(dateString?: string | null): string {
   if (!dateString) return '—';
@@ -139,7 +140,12 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
     return (
       <div>
       <div className="relative">
-        <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory">
+        <ProductCarousel
+          itemsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+          showNavigation={true}
+          showPagination={false}
+          autoPlay={false}
+        >
           {reviews.map((review) => {
             const imageUrl = review.review_image_url || review.review_image || null;
             const productIds = Array.from(
@@ -154,7 +160,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                 key={review.id}
                 type="button"
                 onClick={() => setSelectedReview(review)}
-                className="group relative w-[260px] sm:w-[280px] lg:w-[300px] h-[320px] sm:h-[340px] lg:h-[360px] shrink-0 snap-start rounded-2xl overflow-hidden bg-white shadow-md ring-1 ring-black/5 text-left transition-all hover:-translate-y-0.5 hover:shadow-xl focus:outline-none grid grid-rows-[60%_40%] sm:grid-rows-[65%_35%]"
+                className="group relative w-full h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl overflow-hidden bg-white shadow-md ring-1 ring-black/5 text-left transition-all hover:-translate-y-0.5 hover:shadow-xl focus:outline-none grid grid-rows-[60%_40%] sm:grid-rows-[65%_35%]"
               >
                 <div className="relative bg-gray-100">
                   {imageUrl ? (
@@ -228,9 +234,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
               </button>
             );
           })}
-        </div>
-
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-white to-transparent" />
+        </ProductCarousel>
       </div>
 
       {selectedReview && (

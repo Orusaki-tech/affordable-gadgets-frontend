@@ -7,6 +7,7 @@ import { PublicPromotion, PublicProduct } from '@/lib/api/generated';
 import { useRouter } from 'next/navigation';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { getCloudinarySizedImageUrl } from '@/lib/utils/cloudinary';
+import { ProductCarousel } from './ProductCarousel';
 
 interface VideoModalProps {
   videoUrl: string;
@@ -207,13 +208,19 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
   const showSkeleton = promotionsLoading && !promotionsData;
 
   // Get items for display: use carousel_position if set, otherwise use order
+  // Support carousel at position 1 - if multiple items have position 1, show as carousel
+  const position1Items = useMemo(() => {
+    return allPromotions.filter(p => p.carousel_position === 1);
+  }, [allPromotions]);
+
   const bannerItem = useMemo(() => {
-    // Find promotion with position 1, or first promotion if no position set
-    const position1Promo = allPromotions.find(p => p.carousel_position === 1);
-    if (position1Promo) return position1Promo;
+    // If multiple items have position 1, return null (will show as carousel)
+    if (position1Items.length > 1) return null;
+    // If single item with position 1, return it
+    if (position1Items.length === 1) return position1Items[0];
     // Fallback to first promotion if no position 1 is set
     return allPromotions.length > 0 ? allPromotions[0] : null;
-  }, [allPromotions]);
+  }, [allPromotions, position1Items]);
 
   const bannerImageSrc = bannerItem?.banner_image_url || bannerItem?.banner_image;
 
@@ -221,10 +228,12 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     const items: Array<{ type: 'promotion' | 'video'; data: PublicPromotion | PublicProduct; uniqueKey: string; position: number }> = [];
     const usedPromotionIds = new Set<number>();
     
-    // Add banner item to used set
-    if (bannerItem && typeof bannerItem.id === 'number') {
-      usedPromotionIds.add(bannerItem.id);
-    }
+    // Add position 1 items to used set (whether single banner or carousel)
+    position1Items.forEach(item => {
+      if (typeof item.id === 'number') {
+        usedPromotionIds.add(item.id);
+      }
+    });
     
     // Get promotions with positions 2-5
     const positionedPromotions = allPromotions
@@ -304,7 +313,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
     
     // Sort by position and return
     return items.sort((a, b) => a.position - b.position).slice(0, 4);
-  }, [allPromotions, productsWithVideos, bannerItem]);
+  }, [allPromotions, productsWithVideos, position1Items]);
 
   useEffect(() => {
     if (loggedLayoutRef.current) return;
@@ -368,8 +377,48 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
       <div className="relative w-full mb-6">
         {/* Desktop: Large Banner + 2x2 Grid Layout - Matching Figma Design */}
         <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-          {/* Large Banner - First Promotion (Left Side, 50% width, Square) */}
-          {bannerItem ? (
+          {/* Large Banner or Carousel - Position 1 (Left Side, 50% width, Square) */}
+          {position1Items.length > 1 ? (
+            // Show carousel if multiple items have position 1
+            <div className="lg:col-span-1">
+              <ProductCarousel
+                itemsPerView={{ mobile: 1, tablet: 1, desktop: 1 }}
+                showNavigation={true}
+                showPagination={true}
+                autoPlay={true}
+                autoPlayInterval={autoAdvanceDuration * 1000}
+                className="aspect-square"
+              >
+                {position1Items.map((promo) => {
+                  const promoImageSrc = promo.banner_image_url || promo.banner_image;
+                  return (
+                    <div
+                      key={promo.id ?? promo.title}
+                      className="group relative w-full h-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
+                      style={{
+                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+                      }}
+                      onClick={() => handlePromotionClick(promo)}
+                    >
+                      <div className="relative w-full h-full" ref={bannerContainerRef}>
+                        {promoImageSrc && (
+                          <StoryImage
+                            src={promoImageSrc}
+                            alt={promo.title}
+                            sizes="(max-width: 1024px) 100vw, 50vw"
+                            fit="cover"
+                            loading="eager"
+                            fetchPriority="high"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </ProductCarousel>
+            </div>
+          ) : bannerItem ? (
+            // Show single banner if one item has position 1
             <div className="lg:col-span-1">
               <div
                 className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
@@ -504,8 +553,48 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
 
         {/* Mobile/Tablet: Vertical Stack Layout - Matching Figma Design (Banner on top, 2x2 grid below) */}
         <div className="lg:hidden space-y-4 mb-6">
-          {/* Large Banner - First Promotion (Full width on mobile) */}
-          {bannerItem && (
+          {/* Large Banner or Carousel - Position 1 (Full width on mobile) */}
+          {position1Items.length > 1 ? (
+            // Show carousel if multiple items have position 1
+            <div className="mb-4">
+              <ProductCarousel
+                itemsPerView={{ mobile: 1, tablet: 1, desktop: 1 }}
+                showNavigation={true}
+                showPagination={true}
+                autoPlay={true}
+                autoPlayInterval={autoAdvanceDuration * 1000}
+                className="aspect-square"
+              >
+                {position1Items.map((promo) => {
+                  const promoImageSrc = promo.banner_image_url || promo.banner_image;
+                  return (
+                    <div
+                      key={promo.id ?? promo.title}
+                      className="group relative w-full h-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
+                      style={{
+                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
+                      }}
+                      onClick={() => handlePromotionClick(promo)}
+                    >
+                      <div className="relative w-full h-full">
+                        {promoImageSrc && (
+                          <StoryImage
+                            src={promoImageSrc}
+                            alt={promo.title}
+                            sizes="100vw"
+                            fit="cover"
+                            loading="eager"
+                            fetchPriority="high"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </ProductCarousel>
+            </div>
+          ) : bannerItem && (
+            // Show single banner if one item has position 1
             <div
               className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4 mx-auto"
               style={{

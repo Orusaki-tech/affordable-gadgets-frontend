@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from './ProductCard';
+import { ProductCarousel } from './ProductCarousel';
 
 export function RecentlyViewed() {
   const [productIds, setProductIds] = useState<number[]>([]);
@@ -33,7 +34,12 @@ export function RecentlyViewed() {
     // Show placeholder recently viewed
     return (
       <div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <ProductCarousel
+          itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
+          showNavigation={true}
+          showPagination={false}
+          autoPlay={false}
+        >
           {[...Array(4)].map((_, i) => (
             <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden opacity-60 border-2 border-gray-100">
               <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
@@ -46,18 +52,23 @@ export function RecentlyViewed() {
               </div>
             </div>
           ))}
-        </div>
+        </ProductCarousel>
       </div>
     );
   }
 
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <ProductCarousel
+        itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
+        showNavigation={true}
+        showPagination={false}
+        autoPlay={false}
+      >
         {sortedProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
-      </div>
+      </ProductCarousel>
     </div>
   );
 }

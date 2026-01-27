@@ -304,56 +304,41 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
     </div>
   );
 
+  let content: React.ReactNode;
   if (isLoading) {
-    return (
-      <div className="relative z-[60] pointer-events-auto">
-        {reviewActionHeader}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[...Array(3)].map((_, index) => (
-            <div
-              key={`review-skeleton-${index}`}
-              className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl bg-gray-100 animate-pulse"
-            />
-          ))}
-        </div>
+    content = (
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(3)].map((_, index) => (
+          <div
+            key={`review-skeleton-${index}`}
+            className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl bg-gray-100 animate-pulse"
+          />
+        ))}
       </div>
     );
-  }
-
-  if (error) {
-    return (
-      <div className="relative z-[60] pointer-events-auto">
-        {reviewActionHeader}
-        <div className="text-center py-8 text-red-500">
-          Unable to load reviews right now. Please try again later.
-        </div>
+  } else if (error) {
+    content = (
+      <div className="text-center py-8 text-red-500">
+        Unable to load reviews right now. Please try again later.
       </div>
     );
-  }
-
-  if (reviews.length === 0) {
-    return (
-      <div className="relative z-[60] pointer-events-auto">
-        {reviewActionHeader}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[...Array(3)].map((_, index) => (
-            <div
-              key={`review-empty-${index}`}
-              className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl border border-dashed border-gray-300 bg-white p-4 sm:p-6 text-center text-gray-500"
-            >
-              <div className="text-4xl mb-4">💬</div>
-              <p className="font-semibold">Be the first to review</p>
-              <p className="text-sm mt-2">Share your experience to help others.</p>
-            </div>
-          ))}
-        </div>
+  } else if (reviews.length === 0) {
+    content = (
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {[...Array(3)].map((_, index) => (
+          <div
+            key={`review-empty-${index}`}
+            className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl border border-dashed border-gray-300 bg-white p-4 sm:p-6 text-center text-gray-500"
+          >
+            <div className="text-4xl mb-4">💬</div>
+            <p className="font-semibold">Be the first to review</p>
+            <p className="text-sm mt-2">Share your experience to help others.</p>
+          </div>
+        ))}
       </div>
     );
-  }
-
-    return (
-      <div className="relative z-[60] pointer-events-auto">
-      {reviewActionHeader}
+  } else {
+    content = (
       <div className="relative">
         <ProductCarousel
           itemsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
@@ -451,6 +436,13 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
           })}
         </ProductCarousel>
       </div>
+    );
+  }
+
+  return (
+    <div className="relative z-[60] pointer-events-auto">
+      {reviewActionHeader}
+      {content}
 
       {selectedReview && (
         <div

@@ -15,6 +15,7 @@ export function Header() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/categories', label: 'Categories' },
+    { href: '/reviews/eligible', label: 'Review Purchases' },
   ];
 
   const productCategories = [

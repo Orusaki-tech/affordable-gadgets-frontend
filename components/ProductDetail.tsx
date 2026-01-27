@@ -159,6 +159,16 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [bundleSuccessMessage, setBundleSuccessMessage] = useState<string | null>(null);
   const [selectedAccessoryVariants, setSelectedAccessoryVariants] = useState<Record<number, number>>({});
 
+  const jumpToReviews = () => {
+    setActiveTab('reviews');
+    setTimeout(() => {
+      const target = document.getElementById('product-reviews');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 50);
+  };
+
   const activeBundles = useMemo<ActiveBundle[]>(() => {
     const bundles = bundlesData?.results || [];
     return bundles
@@ -712,6 +722,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <p className="text-sm text-gray-600">
               <span className="font-semibold">{product.brand}</span> {product.model_series && <span className="text-gray-500">• {product.model_series}</span>}
             </p>
+            <button
+              type="button"
+              onClick={jumpToReviews}
+              className="mt-2 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700"
+            >
+              Leave a review
+            </button>
           </div>
 
           {/* Promotion Banner */}
@@ -1172,7 +1189,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       )}
 
       {/* Tabs Section */}
-      <div className="mt-3">
+      <div className="mt-3" id="product-reviews">
         {/* Tab Navigation */}
         <div className="border-b border-gray-200 mb-2">
           <nav className="flex gap-1 overflow-x-auto scrollbar-hide pb-0.5">

@@ -283,13 +283,18 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
           Purchased with us? Verify your phone to leave a review.
         </p>
       </div>
-      <button
-        type="button"
-        onClick={openReviewModal}
-        className="inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
-      >
-        Leave a review
-      </button>
+      <div className="flex flex-col items-start gap-2 sm:items-end">
+        <button
+          type="button"
+          onClick={openReviewModal}
+          className="inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+        >
+          Leave a review
+        </button>
+        <Link href="/reviews/eligible" className="text-xs font-semibold text-blue-600 hover:text-blue-700">
+          Check eligible purchases
+        </Link>
+      </div>
     </div>
   );
 

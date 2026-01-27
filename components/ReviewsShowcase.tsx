@@ -276,7 +276,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   };
 
   const reviewActionHeader = (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+    <div className="relative z-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
       <div>
         <h3 className="text-xl font-semibold text-gray-900">Customer reviews</h3>
         <p className="text-sm text-gray-500">
@@ -287,11 +287,14 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
         <button
           type="button"
           onClick={openReviewModal}
-          className="inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+          className="pointer-events-auto inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
         >
           Leave a review
         </button>
-        <Link href="/reviews/eligible" className="text-xs font-semibold text-blue-600 hover:text-blue-700">
+        <Link
+          href="/reviews/eligible"
+          className="pointer-events-auto text-xs font-semibold text-blue-600 hover:text-blue-700"
+        >
           Check eligible purchases
         </Link>
       </div>

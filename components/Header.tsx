@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useQuery } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { brandConfig } from '@/lib/config/brand';
 import { SearchBar } from './SearchBar';
@@ -13,9 +14,37 @@ export function Header() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/products', label: 'Products' },
     { href: '/categories', label: 'Categories' },
   ];
+
+  const productCategories = [
+    { name: 'Phones', code: 'PH' },
+    { name: 'Laptops', code: 'LT' },
+    { name: 'Tablets', code: 'TB' },
+    { name: 'Accessories', code: 'AC' },
+  ];
+
+  const { data: menuBrands, isLoading: isMenuBrandsLoading } = useQuery({
+    queryKey: ['menu-brands'],
+    queryFn: async () => {
+      const response = await fetch(
+        `${brandConfig.apiBaseUrl}/api/v1/public/products/brands/`,
+        {
+          headers: {
+            'X-Brand-Code': brandConfig.code,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        return { results: {} as Record<string, string[]> };
+      }
+
+      return (await response.json()) as { results: Record<string, string[]> };
+    },
+    staleTime: 1000 * 60 * 60 * 12, // 12 hours
+    gcTime: 1000 * 60 * 60 * 24, // 24 hours
+  });
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md border-b border-gray-100">
@@ -60,6 +89,62 @@ export function Header() {
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
             ))}
+
+            <div className="relative group">
+              <Link
+                href="/products"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-medium text-sm relative group"
+              >
+                Products
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
+              </Link>
+
+              <div className="absolute left-0 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
+                <div className="bg-white border border-gray-200 shadow-xl rounded-xl p-6 w-[720px]">
+                  <div className="grid grid-cols-2 gap-8">
+                    {productCategories.map((category) => {
+                      const brands = menuBrands?.results?.[category.code] ?? [];
+                      return (
+                        <div key={category.code}>
+                          <Link
+                            href={`/products?type=${category.code}`}
+                            className="font-semibold text-gray-900 hover:text-blue-600"
+                          >
+                            {category.name}
+                          </Link>
+                          <div className="mt-3 space-y-2">
+                            {isMenuBrandsLoading ? (
+                              <p className="text-sm text-gray-400">Loading brands...</p>
+                            ) : brands.length > 0 ? (
+                              brands.map((brand) => (
+                                <Link
+                                  key={brand}
+                                  href={`/products?type=${category.code}&brand=${encodeURIComponent(brand)}`}
+                                  className="block text-sm text-gray-600 hover:text-blue-600"
+                                >
+                                  {brand}
+                                </Link>
+                              ))
+                            ) : (
+                              <p className="text-sm text-gray-400">No brands yet</p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-6 border-t border-gray-100 pt-4">
+                    <Link
+                      href="/products"
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      View all products →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
           </nav>
 
           {/* Cart Icon */}
@@ -133,6 +218,46 @@ export function Header() {
                   {link.label}
                 </Link>
               ))}
+
+              <details className="px-4 py-3 rounded-lg hover:bg-blue-50">
+                <summary className="cursor-pointer text-gray-700 font-medium">
+                  Products
+                </summary>
+                <div className="mt-3 space-y-4">
+                  {productCategories.map((category) => {
+                    const brands = menuBrands?.results?.[category.code] ?? [];
+                    return (
+                      <div key={category.code}>
+                        <Link
+                          href={`/products?type=${category.code}`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block text-gray-900 font-semibold"
+                        >
+                          {category.name}
+                        </Link>
+                        <div className="mt-2 space-y-1">
+                          {isMenuBrandsLoading ? (
+                            <p className="text-sm text-gray-400">Loading brands...</p>
+                          ) : brands.length > 0 ? (
+                            brands.map((brand) => (
+                              <Link
+                                key={brand}
+                                href={`/products?type=${category.code}&brand=${encodeURIComponent(brand)}`}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="block text-sm text-gray-600"
+                              >
+                                {brand}
+                              </Link>
+                            ))
+                          ) : (
+                            <p className="text-sm text-gray-400">No brands yet</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </details>
             </div>
           </nav>
         )}

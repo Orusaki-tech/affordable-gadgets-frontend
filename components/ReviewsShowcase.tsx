@@ -10,6 +10,8 @@ import { getPlaceholderProductImage, convertToYouTubeEmbed } from '@/lib/utils/p
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { useQueryClient } from '@tanstack/react-query';
 import { ProductCarousel } from './ProductCarousel';
+import { apiBaseUrl } from '@/lib/api/openapi';
+import { brandConfig } from '@/lib/config/brand';
 
 function formatDate(dateString?: string | null): string {
   if (!dateString) return '—';
@@ -34,6 +36,22 @@ function formatPurchaseDate(dateString?: string | null): string | null {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+interface EligibleReviewItem {
+  product_id: number;
+  product_name: string;
+  product_slug?: string;
+  order_id: string;
+  order_item_id: number;
+  purchase_date?: string | null;
+}
+
+interface ReviewCustomerProfile {
+  name: string;
+  phone: string;
+  email: string;
+  delivery_address: string;
+}
+
 interface ReviewsShowcaseProps {
   productId?: number;
 }
@@ -46,8 +64,24 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   const { data, isLoading, error } = reviewsQuery;
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [productById, setProductById] = useState<Record<number, PublicProduct | null>>({});
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewStep, setReviewStep] = useState<'phone' | 'otp' | 'form'>('phone');
+  const [reviewPhone, setReviewPhone] = useState('');
+  const [reviewOtp, setReviewOtp] = useState('');
+  const [eligibleItems, setEligibleItems] = useState<EligibleReviewItem[]>([]);
+  const [selectedOrderItemId, setSelectedOrderItemId] = useState<number | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewImage, setReviewImage] = useState<File | null>(null);
+  const [reviewCustomer, setReviewCustomer] = useState<ReviewCustomerProfile | null>(null);
+  const [reviewMessage, setReviewMessage] = useState<string | null>(null);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isCheckingEligibility, setIsCheckingEligibility] = useState(false);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const reviews = data?.results ?? [];
+  const selectedEligibleItem = eligibleItems.find((item) => item.order_item_id === selectedOrderItemId) || null;
 
   const prefillProductCache = (productIdToCache: number, product: PublicProduct | null) => {
     if (!product) return;
@@ -99,46 +133,216 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
     };
   }, [reviews]);
 
+  const resetReviewFlow = () => {
+    setReviewStep('phone');
+    setReviewPhone('');
+    setReviewOtp('');
+    setEligibleItems([]);
+    setSelectedOrderItemId(null);
+    setReviewRating(5);
+    setReviewComment('');
+    setReviewImage(null);
+    setReviewCustomer(null);
+    setReviewMessage(null);
+    setReviewError(null);
+  };
+
+  const openReviewModal = () => {
+    resetReviewFlow();
+    setIsReviewModalOpen(true);
+  };
+
+  const closeReviewModal = () => {
+    setIsReviewModalOpen(false);
+    resetReviewFlow();
+  };
+
+  const sendReviewOtp = async () => {
+    if (!reviewPhone.trim()) {
+      setReviewError('Please enter your phone number.');
+      return;
+    }
+    setReviewError(null);
+    setReviewMessage(null);
+    setIsSendingOtp(true);
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/v1/public/reviews/otp/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Brand-Code': brandConfig.code,
+        },
+        body: JSON.stringify({ phone: reviewPhone.trim() }),
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to send OTP.');
+      }
+      if (data?.debug_code) {
+        setReviewMessage(`OTP sent. Debug code: ${data.debug_code}`);
+      } else {
+        setReviewMessage('OTP sent to your phone. Please enter it below.');
+      }
+      setReviewStep('otp');
+    } catch (err: any) {
+      setReviewError(err?.message || 'Failed to send OTP.');
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
+  const checkReviewEligibility = async () => {
+    if (!reviewOtp.trim()) {
+      setReviewError('Please enter the OTP.');
+      return;
+    }
+    setReviewError(null);
+    setReviewMessage(null);
+    setIsCheckingEligibility(true);
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/v1/public/reviews/eligibility/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Brand-Code': brandConfig.code,
+        },
+        body: JSON.stringify({ phone: reviewPhone.trim(), otp: reviewOtp.trim() }),
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to verify OTP.');
+      }
+      setReviewCustomer(data?.customer ?? null);
+      const items = Array.isArray(data?.eligible_items) ? data.eligible_items : [];
+      setEligibleItems(items);
+      setSelectedOrderItemId(items[0]?.order_item_id ?? null);
+      setReviewStep('form');
+      if (items.length === 0) {
+        setReviewMessage('No eligible purchases found for this phone number.');
+      }
+    } catch (err: any) {
+      setReviewError(err?.message || 'Failed to verify OTP.');
+    } finally {
+      setIsCheckingEligibility(false);
+    }
+  };
+
+  const submitReview = async () => {
+    if (!selectedEligibleItem) {
+      setReviewError('Please select a product to review.');
+      return;
+    }
+    if (!reviewComment.trim()) {
+      setReviewError('Please share a short review.');
+      return;
+    }
+    setReviewError(null);
+    setIsSubmittingReview(true);
+    try {
+      const formData = new FormData();
+      formData.append('phone', reviewPhone.trim());
+      formData.append('otp', reviewOtp.trim());
+      formData.append('product_id', String(selectedEligibleItem.product_id));
+      formData.append('order_item_id', String(selectedEligibleItem.order_item_id));
+      formData.append('rating', String(reviewRating));
+      formData.append('comment', reviewComment.trim());
+      if (reviewImage) {
+        formData.append('review_image', reviewImage);
+      }
+
+      const response = await fetch(`${apiBaseUrl}/api/v1/public/reviews/submit/`, {
+        method: 'POST',
+        headers: {
+          'X-Brand-Code': brandConfig.code,
+        },
+        body: formData,
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to submit review.');
+      }
+      setReviewMessage('Thanks! Your review has been submitted.');
+      setIsReviewModalOpen(false);
+      resetReviewFlow();
+      queryClient.invalidateQueries({ queryKey: ['reviews'] });
+    } catch (err: any) {
+      setReviewError(err?.message || 'Failed to submit review.');
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const reviewActionHeader = (
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+      <div>
+        <h3 className="text-xl font-semibold text-gray-900">Customer reviews</h3>
+        <p className="text-sm text-gray-500">
+          Purchased with us? Verify your phone to leave a review.
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={openReviewModal}
+        className="inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+      >
+        Leave a review
+      </button>
+    </div>
+  );
+
   if (isLoading) {
     return (
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {[...Array(3)].map((_, index) => (
-          <div
-            key={`review-skeleton-${index}`}
-            className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl bg-gray-100 animate-pulse"
-          />
-        ))}
+      <div>
+        {reviewActionHeader}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, index) => (
+            <div
+              key={`review-skeleton-${index}`}
+              className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl bg-gray-100 animate-pulse"
+            />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-8 text-red-500">
-        Unable to load reviews right now. Please try again later.
+      <div>
+        {reviewActionHeader}
+        <div className="text-center py-8 text-red-500">
+          Unable to load reviews right now. Please try again later.
+        </div>
       </div>
     );
   }
 
   if (reviews.length === 0) {
     return (
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {[...Array(3)].map((_, index) => (
-          <div
-            key={`review-empty-${index}`}
-            className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl border border-dashed border-gray-300 bg-white p-4 sm:p-6 text-center text-gray-500"
-          >
-            <div className="text-4xl mb-4">💬</div>
-            <p className="font-semibold">Be the first to review</p>
-            <p className="text-sm mt-2">Share your experience to help others.</p>
-          </div>
-        ))}
+      <div>
+        {reviewActionHeader}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, index) => (
+            <div
+              key={`review-empty-${index}`}
+              className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl border border-dashed border-gray-300 bg-white p-4 sm:p-6 text-center text-gray-500"
+            >
+              <div className="text-4xl mb-4">💬</div>
+              <p className="font-semibold">Be the first to review</p>
+              <p className="text-sm mt-2">Share your experience to help others.</p>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
     return (
       <div>
+      {reviewActionHeader}
       <div className="relative">
         <ProductCarousel
           itemsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
@@ -415,6 +619,197 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
           </div>
             );
           })()}
+        </div>
+      )}
+
+      {isReviewModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={closeReviewModal}
+        >
+          <div
+            className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <p className="text-lg font-semibold text-gray-900">Leave a review</p>
+                <p className="text-sm text-gray-500">Verify your purchase to continue.</p>
+              </div>
+              <button
+                type="button"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
+                onClick={closeReviewModal}
+                aria-label="Close review modal"
+              >
+                ✕
+              </button>
+            </div>
+
+            {reviewError && (
+              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {reviewError}
+              </div>
+            )}
+            {reviewMessage && (
+              <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {reviewMessage}
+              </div>
+            )}
+
+            {reviewStep === 'phone' && (
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Phone number
+                  <input
+                    type="tel"
+                    value={reviewPhone}
+                    onChange={(event) => setReviewPhone(event.target.value)}
+                    placeholder="e.g. 0712345678"
+                    className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={sendReviewOtp}
+                  disabled={isSendingOtp}
+                  className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isSendingOtp ? 'Sending OTP...' : 'Send OTP'}
+                </button>
+              </div>
+            )}
+
+            {reviewStep === 'otp' && (
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  OTP code
+                  <input
+                    type="text"
+                    value={reviewOtp}
+                    onChange={(event) => setReviewOtp(event.target.value)}
+                    placeholder="Enter the 6-digit code"
+                    className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                  />
+                </label>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={checkReviewEligibility}
+                    disabled={isCheckingEligibility}
+                    className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {isCheckingEligibility ? 'Verifying...' : 'Verify & Continue'}
+                  </button>
+                  <button
+                    type="button"
+                    className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    onClick={() => setReviewStep('phone')}
+                  >
+                    Change phone
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {reviewStep === 'form' && (
+              <div className="space-y-4">
+                {reviewCustomer && (
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+                    Signed in as <span className="font-semibold">{reviewCustomer.name || 'Customer'}</span> • {reviewCustomer.phone}
+                  </div>
+                )}
+
+                {eligibleItems.length === 0 ? (
+                  <div className="rounded-xl border border-gray-200 bg-white px-4 py-4 text-sm text-gray-600">
+                    We could not find any paid or delivered purchases for this phone number.
+                  </div>
+                ) : (
+                  <>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Purchased product
+                      <select
+                        value={selectedOrderItemId ?? ''}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setSelectedOrderItemId(value ? Number(value) : null);
+                        }}
+                        className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                      >
+                        <option value="" disabled>
+                          Select a product
+                        </option>
+                        {eligibleItems.map((item) => (
+                          <option key={item.order_item_id} value={item.order_item_id}>
+                            {item.product_name}
+                            {formatPurchaseDate(item.purchase_date) ? ` • ${formatPurchaseDate(item.purchase_date)}` : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    {selectedEligibleItem && (
+                      <Link
+                        href={getProductHref(
+                          { id: selectedEligibleItem.product_id, slug: selectedEligibleItem.product_slug ?? '' },
+                          { fallbackId: selectedEligibleItem.product_id }
+                        )}
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700"
+                      >
+                        View product details
+                      </Link>
+                    )}
+
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Your rating</p>
+                      <div className="mt-2 flex gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setReviewRating(star)}
+                            className={`text-2xl ${star <= reviewRating ? 'text-yellow-400' : 'text-gray-300'}`}
+                          >
+                            ★
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <label className="block text-sm font-medium text-gray-700">
+                      Your review
+                      <textarea
+                        value={reviewComment}
+                        onChange={(event) => setReviewComment(event.target.value)}
+                        rows={4}
+                        className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                        placeholder="Share what you liked about the product."
+                      />
+                    </label>
+
+                    <label className="block text-sm font-medium text-gray-700">
+                      Add a photo (optional)
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => setReviewImage(event.target.files?.[0] ?? null)}
+                        className="mt-2 block w-full text-sm text-gray-600"
+                      />
+                    </label>
+
+                    <button
+                      type="button"
+                      onClick={submitReview}
+                      disabled={isSubmittingReview}
+                      className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {isSubmittingReview ? 'Submitting...' : 'Submit review'}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

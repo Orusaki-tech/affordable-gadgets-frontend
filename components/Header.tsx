@@ -15,7 +15,6 @@ export function Header() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/categories', label: 'Categories' },
-    { href: '/reviews/eligible', label: 'Review Purchases' },
   ];
 
   const productCategories = [
@@ -101,19 +100,19 @@ export function Header() {
               </Link>
 
               <div className="absolute left-0 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
-                <div className="bg-white border border-gray-200 shadow-xl rounded-xl p-6 w-[720px]">
-                  <div className="grid grid-cols-2 gap-8">
+                <div className="bg-white/95 border border-gray-200 shadow-2xl rounded-2xl p-6 w-[720px] max-h-[70vh] overflow-y-auto backdrop-blur">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     {productCategories.map((category) => {
                       const brands = menuBrands?.results?.[category.code] ?? [];
                       return (
-                        <div key={category.code}>
+                        <div key={category.code} className="space-y-3">
                           <Link
                             href={`/products?type=${category.code}`}
-                            className="font-semibold text-gray-900 hover:text-blue-600"
+                            className="inline-flex items-center gap-2 font-semibold text-gray-900 hover:text-blue-600"
                           >
                             {category.name}
                           </Link>
-                          <div className="mt-3 space-y-2">
+                          <div className="space-y-2">
                             {isMenuBrandsLoading ? (
                               <p className="text-sm text-gray-400">Loading brands...</p>
                             ) : brands.length > 0 ? (
@@ -127,7 +126,12 @@ export function Header() {
                                 </Link>
                               ))
                             ) : (
-                              <p className="text-sm text-gray-400">No brands yet</p>
+                              <Link
+                                href={`/products?type=${category.code}`}
+                                className="inline-flex text-sm text-gray-500 hover:text-blue-600"
+                              >
+                                Browse all {category.name}
+                              </Link>
                             )}
                           </div>
                         </div>

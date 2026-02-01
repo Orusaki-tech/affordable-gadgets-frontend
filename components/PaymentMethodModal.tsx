@@ -46,11 +46,26 @@ export function PaymentMethodModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white rounded-lg max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Please select your preferred payment option
-        </h2>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+      <div className="relative bg-white rounded-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          aria-label="Close payment modal"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <div className="mb-6 text-center">
+          <h2 className="text-2xl font-bold text-gray-900">
+            Choose a payment option
+          </h2>
+          <p className="text-sm text-gray-500 mt-2">
+            Secure checkout powered by trusted payment providers.
+          </p>
+        </div>
 
         {/* Payment Options */}
         <div className="space-y-3 mb-6">
@@ -157,7 +172,7 @@ export function PaymentMethodModal({
         </div>
 
         {/* Payment Summary */}
-        <div className="bg-gray-50 p-5 rounded-lg mb-6 border border-gray-200">
+        <div className="bg-gray-50 p-5 rounded-xl mb-6 border border-gray-200">
           <p className="text-center font-semibold text-lg text-gray-800">
             Pay <span className="font-bold text-gray-900">"{merchantName}"</span> {formatPrice(totalAmount)}
           </p>
@@ -165,7 +180,7 @@ export function PaymentMethodModal({
 
         {/* MPESA Instructions */}
         {(selectedMethod === 'mpesa' || selectedMethod === 'airtel') && (
-          <div className="mb-6 space-y-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div className="mb-6 space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
             <h3 className="font-semibold text-base text-gray-800 mb-3">
               {selectedMethod === 'mpesa' ? 'M-PESA Payment Instructions:' : 'Airtel Money Payment Instructions:'}
             </h3>

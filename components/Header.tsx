@@ -99,8 +99,8 @@ export function Header() {
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
 
-              <div className="absolute left-0 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
-                <div className="bg-white/95 border border-gray-200 shadow-2xl rounded-2xl p-6 w-[720px] max-h-[70vh] overflow-y-auto backdrop-blur">
+              <div className="absolute left-1/2 top-full w-[calc(100vw-2rem)] max-w-7xl -translate-x-1/2 pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
+                <div className="bg-white/95 border border-gray-200 shadow-2xl rounded-2xl p-6 w-full max-h-[70vh] overflow-y-auto backdrop-blur">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     {productCategories.map((category) => {
                       const brands = menuBrands?.results?.[category.code] ?? [];

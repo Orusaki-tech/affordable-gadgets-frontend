@@ -44,7 +44,18 @@ function getCustomerPhone() {
 }
 
 async function getHeaders() {
-  const headers = (await OpenAPI.HEADERS?.()) ?? {};
+  const rawHeaders = OpenAPI.HEADERS;
+  let headers: Record<string, string> = {};
+
+  if (typeof rawHeaders === 'function') {
+    const resolved = await rawHeaders({} as any);
+    headers = resolved instanceof Headers ? Object.fromEntries(resolved.entries()) : resolved;
+  } else if (rawHeaders instanceof Headers) {
+    headers = Object.fromEntries(rawHeaders.entries());
+  } else if (rawHeaders) {
+    headers = rawHeaders;
+  }
+
   return {
     ...headers,
     'Content-Type': 'application/json',

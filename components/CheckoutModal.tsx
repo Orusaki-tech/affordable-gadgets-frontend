@@ -39,6 +39,14 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
 
   // Auto-fill form when phone number is entered
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (formData.customer_phone) {
+        localStorage.setItem('customer_phone', formData.customer_phone);
+      } else {
+        localStorage.removeItem('customer_phone');
+      }
+    }
+
     const recognizeCustomer = async () => {
       if (formData.customer_phone && formData.customer_phone.length >= 10) {
         setIsRecognizing(true);

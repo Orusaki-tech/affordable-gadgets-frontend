@@ -6,12 +6,22 @@ import { ProductCard } from './ProductCard';
 import { ProductCarousel } from './ProductCarousel';
 import { useState } from 'react';
 
+type ProductCardOptions = {
+  showInterestCount?: boolean;
+  showQuickActions?: boolean;
+  showQuickView?: boolean;
+  showRatings?: boolean;
+  showSwatches?: boolean;
+  showShippingBadges?: boolean;
+};
+
 interface ProductGridProps {
   pageSize?: number;
   showPagination?: boolean;
+  cardOptions?: ProductCardOptions;
 }
 
-export function ProductGrid({ pageSize = 12, showPagination = true }: ProductGridProps = {}) {
+export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions }: ProductGridProps = {}) {
   const [page, setPage] = useState(1);
   const { data, isLoading, error } = useProducts({ page, page_size: pageSize });
 
@@ -73,7 +83,7 @@ export function ProductGrid({ pageSize = 12, showPagination = true }: ProductGri
         autoPlay={false}
       >
         {data.results.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} {...cardOptions} />
         ))}
       </ProductCarousel>
 

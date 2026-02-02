@@ -91,7 +91,12 @@ export function useProductBySlug(slug: string) {
   });
 }
 
-export function useProductUnits(productId: number) {
+export function useProductUnits(
+  productId: number,
+  options?: {
+    enabled?: boolean;
+  }
+) {
   return useQuery<PublicInventoryUnitPublic[]>({
     queryKey: ['product', productId, 'units'],
     queryFn: async () => {
@@ -101,7 +106,7 @@ export function useProductUnits(productId: number) {
       }
       return response?.results ?? [];
     },
-    enabled: productId > 0,
+    enabled: (options?.enabled ?? true) && productId > 0,
     staleTime: 10000, // 10 seconds (more frequent updates for stock)
   });
 }

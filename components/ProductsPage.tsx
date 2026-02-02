@@ -10,7 +10,20 @@ import { ProductFilters, FilterState } from './ProductFilters';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import Link from 'next/link';
 
-export function ProductsPage() {
+type ProductCardOptions = {
+  showInterestCount?: boolean;
+  showQuickActions?: boolean;
+  showQuickView?: boolean;
+  showRatings?: boolean;
+  showSwatches?: boolean;
+  showShippingBadges?: boolean;
+};
+
+interface ProductsPageProps {
+  cardOptions?: ProductCardOptions;
+}
+
+export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const promotionId = searchParams.get('promotion');
@@ -229,7 +242,7 @@ export function ProductsPage() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredResults.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} {...cardOptions} />
             ))}
           </div>
 

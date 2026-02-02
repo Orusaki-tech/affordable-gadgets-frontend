@@ -30,6 +30,26 @@ export type PublicProductList = {
      * Get max price for available units - use prefetched list for accurate brand filtering.
      */
     readonly max_price?: number;
+    /**
+     * Get min compare-at price for available units.
+     */
+    readonly compare_at_min_price?: number;
+    /**
+     * Get max compare-at price for available units.
+     */
+    readonly compare_at_max_price?: number;
+    /**
+     * Discount percent based on compare-at price.
+     */
+    readonly discount_percent?: number;
+    /**
+     * Total review count for product.
+     */
+    readonly review_count?: number;
+    /**
+     * Average rating for product.
+     */
+    readonly average_rating?: number;
     readonly primary_image?: string | null;
     /**
      * URL-friendly slug (auto-generated from product_name if not provided)

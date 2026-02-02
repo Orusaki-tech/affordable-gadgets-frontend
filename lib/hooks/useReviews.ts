@@ -9,11 +9,12 @@ import { ApiService, Review, PaginatedReviewList } from '@/lib/api/generated';
 export function useProductReviews(productId: number, params?: {
   page?: number;
   page_size?: number;
+  enabled?: boolean;
 }) {
   return useQuery<PaginatedReviewList>({
     queryKey: ['reviews', 'product', productId, params],
     queryFn: () => ApiService.apiV1PublicReviewsList(undefined, params?.page, productId),
-    enabled: !!productId,
+    enabled: (params?.enabled ?? true) && !!productId,
     staleTime: 60000, // 1 minute
   });
 }

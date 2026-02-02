@@ -11,6 +11,7 @@ export type PublicInventoryUnitPublic = {
     readonly product_name?: string;
     readonly product_slug?: string;
     selling_price: string;
+    compare_at_price?: string | null;
     condition?: ConditionEnum;
     grade?: (GradeEnum | BlankEnum | NullEnum) | null;
     storage_gb?: number | null;

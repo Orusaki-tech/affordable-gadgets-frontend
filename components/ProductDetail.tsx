@@ -126,20 +126,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const promotionId = searchParams.get('promotion');
 
   const isNumericSlug = /^\d+$/.test(slug);
-  const fallbackProductIdParam = searchParams.get('pid');
-  const fallbackProductId = fallbackProductIdParam && /^\d+$/.test(fallbackProductIdParam)
-    ? Number(fallbackProductIdParam)
-    : 0;
-  const productIdFromSlug = isNumericSlug ? Number(slug) : fallbackProductId;
-  const hasFallbackId = !isNumericSlug && fallbackProductId > 0;
-  const preferProductId = isNumericSlug || hasFallbackId;
-  const { data: productBySlug, isLoading: productBySlugLoading, error: productBySlugError } = useProductBySlug(isNumericSlug ? '' : slug);
+  const productIdFromSlug = isNumericSlug ? Number(slug) : 0;
+  const { data: productBySlug, isLoading: productBySlugLoading, error: productBySlugError } = useProductBySlug(
+    isNumericSlug ? '' : slug
+  );
   const { data: productById, isLoading: productByIdLoading, error: productByIdError } = useProduct(productIdFromSlug);
-  const product = preferProductId ? (productById ?? productBySlug) : (productBySlug ?? productById);
-  const productLoading = preferProductId
-    ? productByIdLoading || (!productById && productBySlugLoading)
-    : productBySlugLoading || (hasFallbackId && productByIdLoading && !productBySlug);
-  const productError = product ? undefined : (productBySlugError || productByIdError);
+  const product = isNumericSlug ? productById : productBySlug;
+  const productLoading = isNumericSlug ? productByIdLoading : productBySlugLoading;
+  const productError = product ? undefined : (isNumericSlug ? productByIdError : productBySlugError);
   const { data: units, isLoading: unitsLoading } = useProductUnits(product?.id || 0);
   const { data: accessories } = useProductAccessories(product?.id || 0);
   const { data: promotion } = usePromotion(promotionId ? parseInt(promotionId) : 0);

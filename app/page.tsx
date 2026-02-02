@@ -17,7 +17,7 @@ export default function HomePage() {
       <main className="flex-1">
         {/* Promotions */}
         <section id="promotions" className="bg-white scroll-mt-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-[10px] pb-12 sm:py-12 lg:py-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-[30px] pb-12 sm:py-12 lg:py-16">
             <div className="mb-10 lg:mb-12">
               <HeroPromotions />
             </div>

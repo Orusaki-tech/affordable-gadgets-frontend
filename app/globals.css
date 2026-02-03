@@ -118,6 +118,27 @@ html {
   }
 }
 
+/* Samsung-style carousel entrance */
+.samsung-carousel-item {
+  opacity: 0;
+  transform: translateY(20%);
+  animation:
+    samsungOpacity 0.2s linear forwards,
+    samsungTranslate 0.5s cubic-bezier(0, 0.18, 0.07, 1) forwards;
+}
+
+@keyframes samsungOpacity {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes samsungTranslate {
+  to {
+    transform: translateY(0);
+  }
+}
+
 /* Custom animations */
 @keyframes fadeIn {
   from {

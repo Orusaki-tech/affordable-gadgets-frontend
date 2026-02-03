@@ -184,7 +184,7 @@ export function ProductCarousel({
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="flex gap-6 overflow-x-auto scroll-smooth scrollbar-hide pb-6 snap-x snap-mandatory"
+        className="flex overflow-x-auto scroll-smooth scrollbar-hide pb-6 snap-x snap-mandatory -mx-3"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
@@ -192,18 +192,16 @@ export function ProductCarousel({
       >
         {children.map((child, index) => {
           // Calculate width based on items per slide
-          // Gap is 24px (1.5rem = 24px), so we need to account for gaps between items
-          const gapPx = 24;
-          const gaps = itemsPerSlide > 1 ? (itemsPerSlide - 1) * gapPx : 0;
-          const itemWidth = `calc((100% - ${gaps}px) / ${itemsPerSlide})`;
+          const itemWidth = `calc(100% / ${itemsPerSlide})`;
           
           return (
             <div
               key={index}
-              className="flex-shrink-0 snap-start"
+              className="flex-shrink-0 snap-start px-3 samsung-carousel-item"
               style={{
                 width: itemWidth,
                 minWidth: itemWidth,
+                animationDelay: `${Math.min(index + 1, 4) * 0.15}s`,
               }}
             >
               {child}

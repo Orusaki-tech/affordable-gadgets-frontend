@@ -53,7 +53,7 @@ function RatingStars({ rating, count }: { rating: number | null; count: number }
 
 export function ProductCard({
   product,
-  variant = 'default',
+  variant = 'featured',
   showInterestCount = true,
   showQuickActions = true,
   showQuickView = true,
@@ -61,8 +61,10 @@ export function ProductCard({
   showSwatches = true,
   showShippingBadges = true,
 }: ProductCardProps) {
-  const isMinimal = variant === 'minimal';
-  const isFeaturedVariant = variant === 'featured';
+  const normalizedVariant =
+    variant === 'default' || variant === 'minimal' ? 'featured' : variant;
+  const isMinimal = normalizedVariant === 'minimal';
+  const isFeaturedVariant = normalizedVariant === 'featured';
   const allowQuickActions = showQuickActions && !isMinimal && !isFeaturedVariant;
   const allowQuickView = showQuickView && !isMinimal && !isFeaturedVariant;
   const allowSwatches = showSwatches && !isMinimal && !isFeaturedVariant;
@@ -210,12 +212,9 @@ export function ProductCard({
     return (
       <Link
         href={getProductHref(product)}
-        className="group block bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-200 hover:border-gray-300 animate-fade-in h-full flex flex-col items-center text-center p-4 sm:p-5"
+        className="group block bg-white rounded-2xl border border-[#e8e8ed] overflow-hidden animate-fade-in h-full transition-shadow duration-300 hover:shadow-sm"
       >
-        <h3 className="font-semibold text-[19px] leading-[25.5px] text-gray-900 mb-4 line-clamp-2">
-          {product.product_name}
-        </h3>
-        <div className="relative w-full aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
+        <div className="relative w-full aspect-square bg-white flex items-center justify-center overflow-hidden">
           <Image
             src={primaryImage}
             alt={product.product_name}
@@ -224,20 +223,23 @@ export function ProductCard({
             className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
             unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
           />
-          <div className="absolute inset-0 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button
-              type="button"
-              onClick={(event) => {
-                if (!selectedUnit?.id) return;
-                handleAddToCart(event, 1);
-              }}
-              disabled={!canAddToCart}
-              className="rounded-full border border-black bg-black text-white text-[11px] leading-[15px] font-semibold px-5 py-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Buy"
-            >
-              {isAddingToCart ? 'Adding...' : 'Buy'}
-            </button>
-          </div>
+        </div>
+        <div className="flex flex-col items-center text-center px-[19.2px] pt-4 pb-[19.2px]">
+          <h3 className="font-semibold text-[19.2px] leading-[25.536px] text-gray-900 mb-4 line-clamp-2">
+            {product.product_name}
+          </h3>
+          <button
+            type="button"
+            onClick={(event) => {
+              if (!selectedUnit?.id) return;
+              handleAddToCart(event, 1);
+            }}
+            disabled={!canAddToCart}
+            className="rounded-[16px] border border-black bg-black text-white text-[11.2px] leading-[15.2px] font-semibold px-[18.4px] pt-[7.2px] pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Buy"
+          >
+            {isAddingToCart ? 'Adding...' : 'Buy'}
+          </button>
         </div>
       </Link>
     );

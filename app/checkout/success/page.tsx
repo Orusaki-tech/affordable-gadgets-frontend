@@ -19,7 +19,7 @@ function CheckoutSuccessContent() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-4xl font-bold mb-4">Thank You!</h1>
+          <h1 className="section-label mb-4">Thank You!</h1>
           <p className="text-xl text-gray-600 mb-2">
             Your inquiry has been submitted successfully.
           </p>

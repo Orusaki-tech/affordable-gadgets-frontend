@@ -7,6 +7,7 @@ import { ProductCarousel } from './ProductCarousel';
 import { useState } from 'react';
 
 type ProductCardOptions = {
+  variant?: 'default' | 'minimal';
   showInterestCount?: boolean;
   showQuickActions?: boolean;
   showQuickView?: boolean;

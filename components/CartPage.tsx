@@ -311,7 +311,7 @@ export function CartPage() {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-8">Shopping Cart</h1>
+      <h1 className="section-label mb-8">Shopping Cart</h1>
       {error && (
         <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}

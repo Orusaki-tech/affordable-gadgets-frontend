@@ -46,7 +46,7 @@ export function MatchScorePage() {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-8">Find Your Perfect Match</h1>
+      <h1 className="section-label mb-8">Find Your Perfect Match</h1>
 
       {/* Criteria Form */}
       <div className="bg-white p-6 rounded-lg shadow-sm mb-8">

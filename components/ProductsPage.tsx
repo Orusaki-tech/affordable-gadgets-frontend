@@ -11,6 +11,7 @@ import { getProductHref } from '@/lib/utils/productRoutes';
 import Link from 'next/link';
 
 type ProductCardOptions = {
+  variant?: 'default' | 'minimal';
   showInterestCount?: boolean;
   showQuickActions?: boolean;
   showQuickView?: boolean;
@@ -143,7 +144,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-              <h1 className="text-4xl font-bold">{promotionData.title}</h1>
+              <h1 className="section-label">{promotionData.title}</h1>
               {promotionData.description && (
                 <p className="text-gray-600 sm:max-w-[520px] sm:truncate">
                   {promotionData.description}
@@ -181,7 +182,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
         </div>
       ) : (
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <h1 className="text-4xl font-bold">Products</h1>
+          <h1 className="section-label">Products</h1>
           <form
             onSubmit={handleSearch}
             className="flex w-full gap-3 md:w-auto md:min-w-[320px] md:max-w-[520px]"

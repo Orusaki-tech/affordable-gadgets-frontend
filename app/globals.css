@@ -97,6 +97,27 @@ html {
   display: none;  /* Chrome, Safari and Opera */
 }
 
+/* Section labels (match Samsung "Recommended for you" heading) */
+.section-label {
+  font-size: 32px;
+  line-height: 42.56px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .section-label {
+    font-size: 25px;
+    line-height: 33.25px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .section-label {
+    font-size: 28px;
+    line-height: 37.24px;
+  }
+}
+
 /* Custom animations */
 @keyframes fadeIn {
   from {

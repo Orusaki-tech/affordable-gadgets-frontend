@@ -13,6 +13,7 @@ import { useWishlist } from '@/lib/hooks/useWishlist';
 
 interface ProductCardProps {
   product: PublicProduct;
+  variant?: 'default' | 'minimal';
   showInterestCount?: boolean;
   showQuickActions?: boolean;
   showQuickView?: boolean;
@@ -52,6 +53,7 @@ function RatingStars({ rating, count }: { rating: number | null; count: number }
 
 export function ProductCard({
   product,
+  variant = 'default',
   showInterestCount = true,
   showQuickActions = true,
   showQuickView = true,
@@ -59,6 +61,12 @@ export function ProductCard({
   showSwatches = true,
   showShippingBadges = true,
 }: ProductCardProps) {
+  const isMinimal = variant === 'minimal';
+  const allowQuickActions = showQuickActions && !isMinimal;
+  const allowQuickView = showQuickView && !isMinimal;
+  const allowSwatches = showSwatches && !isMinimal;
+  const allowShippingBadges = showShippingBadges && !isMinimal;
+  const allowInterestCount = showInterestCount && !isMinimal;
   const availableCount = Number(product.available_units_count ?? 0);
   const interestCount = Number(product.interest_count ?? 0);
   const hasStock = availableCount > 0;
@@ -74,12 +82,12 @@ export function ProductCard({
   const isNew = normalizedTags.some((tag) => tag.includes('new') || tag.includes('latest'));
   const isFeatured = normalizedTags.some((tag) => tag.includes('featured') || tag.includes('popular') || tag.includes('trending'));
   const tagSale = normalizedTags.some((tag) => tag.includes('sale') || tag.includes('discount') || tag.includes('promo') || tag.includes('deal'));
-  const shippingTags = showShippingBadges
+  const shippingTags = allowShippingBadges
     ? rawTags.filter((tag) => /ship|delivery|shipping/i.test(tag)).slice(0, 1)
     : [];
   const lowStock = hasStock && availableCount > 0 && availableCount <= 3;
 
-  const shouldLoadUnits = showSwatches || showQuickActions || showQuickView;
+  const shouldLoadUnits = allowSwatches || allowQuickActions || allowQuickView;
   const { data: units = [], isLoading: unitsLoading } = useProductUnits(product.id ?? 0, {
     enabled: shouldLoadUnits,
   });
@@ -179,15 +187,35 @@ export function ProductCard({
 
   const placeholderImage = getPlaceholderProductImage(product.product_name);
   const primaryImage = product.primary_image || placeholderImage;
+  const productTypeLabels: Record<string, string> = {
+    PH: 'Phone',
+    LT: 'Laptop',
+    TB: 'Tablet',
+    AC: 'Accessory',
+  };
+  const productTypeLabel = product.product_type ? productTypeLabels[product.product_type] : null;
+  const specLine = [productTypeLabel, product.model_series].filter(Boolean).join(' • ');
+  const brandLine = product.brand || null;
+  const savings =
+    showComparePrice &&
+    typeof product.min_price === 'number' &&
+    compareAtDisplay !== null &&
+    compareAtDisplay > product.min_price
+      ? compareAtDisplay - product.min_price
+      : null;
 
   return (
     <>
     <Link
       href={getProductHref(product)}
-      className="group block bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-200 hover:border-gray-300 animate-fade-in h-full flex flex-col"
+      className={`group block bg-white overflow-hidden border border-gray-200 animate-fade-in h-full flex flex-col transition-all duration-300 ${
+        isMinimal
+          ? 'rounded-xl shadow-none hover:shadow-sm hover:border-gray-300'
+          : 'rounded-2xl shadow-sm hover:shadow-md hover:border-gray-300'
+      }`}
     >
       {/* Product Image */}
-      <div className="relative w-full aspect-[4/3] bg-gray-50 flex items-center justify-center overflow-hidden">
+      <div className={`relative w-full bg-gray-50 flex items-center justify-center overflow-hidden ${isMinimal ? 'aspect-square' : 'aspect-[4/3]'}`}>
         <Image
             src={primaryImage}
           alt={product.product_name}
@@ -209,7 +237,7 @@ export function ProductCard({
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
-        {hasBundle && (
+        {!isMinimal && hasBundle && (
               <div className="bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
             {bundlePricePreview ? `Bundle from ${formatPrice(bundlePricePreview)}` : 'Bundle available'}
           </div>
@@ -219,17 +247,17 @@ export function ProductCard({
                 {discountPercent ? `Save ${discountPercent}%` : 'Sale'}
               </div>
             )}
-            {isNew && (
+            {!isMinimal && isNew && (
               <div className="bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
                 New
               </div>
             )}
-            {isFeatured && (
+            {!isMinimal && isFeatured && (
               <div className="bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
                 Trending
               </div>
             )}
-            {lowStock && (
+            {!isMinimal && lowStock && (
               <div className="bg-amber-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
                 Low stock
               </div>
@@ -244,7 +272,7 @@ export function ProductCard({
         )}
 
           {/* Quick Actions */}
-          {showQuickActions && (
+          {allowQuickActions && (
             <div className="absolute right-3 bottom-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 type="button"
@@ -258,7 +286,7 @@ export function ProductCard({
                   <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.343l-6.828-6.829a4 4 0 010-5.656z" />
                 </svg>
               </button>
-              {showQuickView && (
+              {allowQuickView && (
                 <button
                   type="button"
                   onClick={handleQuickViewOpen}
@@ -284,26 +312,36 @@ export function ProductCard({
           )}
         
         {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
+        {!isMinimal && (
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
+        )}
       </div>
 
       {/* Product Info */}
-      <div className="p-4 sm:p-5 flex flex-col flex-1">
-        <h3 className="font-semibold text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors text-gray-900">
+      <div className={`flex flex-col flex-1 ${isMinimal ? 'p-4' : 'p-4 sm:p-5'}`}>
+        <h3 className={`font-semibold line-clamp-2 transition-colors text-gray-900 ${
+          isMinimal
+            ? 'text-[15px] leading-[22px]'
+            : 'text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] group-hover:text-blue-600'
+        }`}>
           {product.product_name}
         </h3>
         
-        <p className="text-[13px] leading-[18px] sm:text-[14px] sm:leading-[20px] text-gray-500 mb-3 font-medium">
-          {product.brand} {product.model_series && `• ${product.model_series}`}
-        </p>
+        {(brandLine || specLine) && (
+          <p className={`text-gray-500 font-medium ${isMinimal ? 'text-[12px] leading-[18px] mt-1' : 'text-[13px] leading-[18px] sm:text-[14px] sm:leading-[20px] mb-3'}`}>
+            {brandLine}
+            {brandLine && specLine ? ' • ' : ''}
+            {specLine}
+          </p>
+        )}
 
           {showRatings && (
-            <div className="mb-3">
+            <div className={isMinimal ? 'mt-2' : 'mb-3'}>
               <RatingStars rating={averageRating} count={reviewCount} />
             </div>
           )}
 
-          {shippingTags.length > 0 && (
+          {shippingTags.length > 0 && !isMinimal && (
             <div className="flex flex-wrap gap-1 mb-3">
               {shippingTags.map((tag) => (
                 <span
@@ -317,7 +355,7 @@ export function ProductCard({
           )}
 
         {/* Tags */}
-          {rawTags.length > 0 && (
+          {rawTags.length > 0 && !isMinimal && (
           <div className="flex flex-wrap gap-1 mb-3">
               {rawTags.slice(0, 2).map((tag, idx) => (
               <span
@@ -331,7 +369,7 @@ export function ProductCard({
         )}
 
           {/* Swatches */}
-          {showSwatches && colorOptions.length > 0 && (
+          {allowSwatches && colorOptions.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-3">
               {colorOptions.slice(0, 4).map((color) => (
                 <span
@@ -351,31 +389,36 @@ export function ProductCard({
           )}
 
         {/* Price */}
-        <div className="mb-3 mt-auto">
+        <div className={`${isMinimal ? 'mt-3' : 'mb-3 mt-auto'}`}>
             {hasPriceRange ? (
               showComparePrice ? (
                 <div className="flex items-center gap-2">
-                  <p className="text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px] font-bold text-gray-900">
+                  <p className={`font-bold text-gray-900 ${isMinimal ? 'text-[16px] leading-[22px]' : 'text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px]'}`}>
                     {formatPrice(product.min_price ?? null)}
                   </p>
-                  <p className="text-[12px] leading-[18px] sm:text-[13px] sm:leading-[20px] font-semibold text-gray-400 line-through">
+                  <p className={`font-semibold text-gray-400 line-through ${isMinimal ? 'text-[12px] leading-[18px]' : 'text-[12px] leading-[18px] sm:text-[13px] sm:leading-[20px]'}`}>
                     {formatPrice(compareAtDisplay ?? null)}
                   </p>
+                  {isMinimal && savings !== null && (
+                    <span className="text-[11px] leading-[16px] font-semibold text-emerald-600">
+                      Save {formatPrice(savings)}
+                    </span>
+                  )}
                 </div>
               ) : (
-            <p className="text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px] font-bold text-gray-900">
+            <p className={`font-bold text-gray-900 ${isMinimal ? 'text-[16px] leading-[22px]' : 'text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px]'}`}>
             {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
             </p>
               )
           ) : (
-            <p className="text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] font-semibold text-gray-700">
+            <p className={`font-semibold text-gray-700 ${isMinimal ? 'text-[14px] leading-[20px]' : 'text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px]'}`}>
               Price on request
             </p>
           )}
         </div>
 
           {/* Quick Add */}
-          {showQuickActions && isQuickAddOpen && (
+          {allowQuickActions && isQuickAddOpen && (
             <div
               className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm"
               onClick={(event) => {
@@ -431,28 +474,39 @@ export function ProductCard({
           )}
 
         {/* Stock & Interest Info */}
-        <div className="flex items-center justify-between text-[12px] leading-[18px] sm:text-[13px] sm:leading-[20px] pt-3 border-t border-gray-100">
-          <span className={`font-semibold ${hasStock ? 'text-green-600' : 'text-red-600'}`}>
-            {hasStock ? (
-              <span className="flex items-center gap-1">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                {product.available_units_count} {product.available_units_count === 1 ? 'unit' : 'units'}
-              </span>
-            ) : (
-              'Out of stock'
-            )}
-          </span>
-          {showInterestCount && interestText && (
-            <span className="text-orange-600 font-semibold flex items-center gap-1 bg-orange-50 px-2 py-1 rounded-full">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              {interestText}
+        {!isMinimal ? (
+          <div className="flex items-center justify-between text-[12px] leading-[18px] sm:text-[13px] sm:leading-[20px] pt-3 border-t border-gray-100">
+            <span className={`font-semibold ${hasStock ? 'text-green-600' : 'text-red-600'}`}>
+              {hasStock ? (
+                <span className="flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  {product.available_units_count} {product.available_units_count === 1 ? 'unit' : 'units'}
+                </span>
+              ) : (
+                'Out of stock'
+              )}
             </span>
-          )}
-        </div>
+            {allowInterestCount && interestText && (
+              <span className="text-orange-600 font-semibold flex items-center gap-1 bg-orange-50 px-2 py-1 rounded-full">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                {interestText}
+              </span>
+            )}
+          </div>
+        ) : (
+          <div className="mt-3 text-[12px] leading-[18px] text-gray-600">
+            <span className={`font-semibold ${hasStock ? 'text-emerald-600' : 'text-red-600'}`}>
+              {hasStock ? 'In stock' : 'Out of stock'}
+            </span>
+            {lowStock && hasStock && (
+              <span className="ml-2 text-amber-600 font-semibold">Low stock</span>
+            )}
+          </div>
+        )}
       </div>
     </Link>
 

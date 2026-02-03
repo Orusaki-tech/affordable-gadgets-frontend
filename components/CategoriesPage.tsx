@@ -38,7 +38,7 @@ const categories = [
 export function CategoriesPage() {
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-8">Shop by Category</h1>
+      <h1 className="section-label mb-8">Shop by Category</h1>
 
       {/* Category Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">

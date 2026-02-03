@@ -692,11 +692,11 @@ export function CartPage() {
             onChange={(e) => setOrdersPhone(e.target.value)}
             className="w-full px-3 py-2 border rounded-lg"
           />
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <button
               onClick={sendOrdersOtp}
               disabled={ordersLoading}
-              className="px-4 py-2 bg-gray-800 text-white rounded-lg"
+              className="w-full sm:w-auto px-4 py-2 bg-gray-800 text-white rounded-lg"
             >
               {ordersOtpSent ? 'Resend OTP' : 'Send OTP'}
             </button>
@@ -705,12 +705,12 @@ export function CartPage() {
               placeholder="Enter OTP"
               value={ordersOtp}
               onChange={(e) => setOrdersOtp(e.target.value)}
-              className="flex-1 px-3 py-2 border rounded-lg"
+              className="w-full sm:flex-1 px-3 py-2 border rounded-lg"
             />
             <button
               onClick={fetchOrderHistory}
               disabled={ordersLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+              className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg"
             >
               Verify
             </button>

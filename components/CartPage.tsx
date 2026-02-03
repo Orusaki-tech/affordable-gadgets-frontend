@@ -181,7 +181,7 @@ export function CartPage() {
 
       const previousBase = OpenAPI.BASE;
       OpenAPI.BASE = inventoryBaseUrl;
-      const order = await OrdersService.ordersCreate({
+      const orderPayload = {
         order_items: orderItems,
         customer_name: formData.customer_name.trim(),
         customer_phone: formData.customer_phone.trim(),
@@ -193,7 +193,8 @@ export function CartPage() {
         delivery_window_end: deliveryWindowEnd,
         delivery_notes: formData.delivery_notes.trim() || undefined,
         order_source: 'ONLINE',
-      });
+      } as any;
+      const order = await OrdersService.ordersCreate(orderPayload);
 
       const callbackUrl = `${window.location.origin}/payment/callback`;
       const cancellationUrl = `${window.location.origin}/payment/cancelled`;

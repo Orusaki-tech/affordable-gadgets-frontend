@@ -16,8 +16,11 @@ function OrderDetailContent() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [polling, setPolling] = useState(true);
 
   useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+
     const fetchOrder = async () => {
       try {
         setLoading(true);
@@ -27,6 +30,10 @@ function OrderDetailContent() {
         OpenAPI.BASE = previousBase;
         setOrder(orderData);
         setError(null);
+        const status = (orderData.status || '').toLowerCase();
+        if (status === 'delivered' || status === 'canceled') {
+          setPolling(false);
+        }
       } catch (err: any) {
         console.error('Error fetching order:', err);
         setError(err.message || 'Failed to load order details');
@@ -38,7 +45,15 @@ function OrderDetailContent() {
     if (orderId) {
       fetchOrder();
     }
-  }, [orderId]);
+
+    if (orderId && polling) {
+      interval = setInterval(fetchOrder, 10000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [orderId, polling]);
 
   const downloadReceipt = () => {
     if (!orderId) return;
@@ -239,9 +254,31 @@ function OrderDetailContent() {
                 {formatPrice(Number(order.total_amount ?? 0))}
               </span>
             </div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-gray-600">Delivery Fee:</span>
+              <span className="text-sm font-semibold">
+                {formatPrice(Number((order as any).delivery_fee ?? 0))}
+              </span>
+            </div>
             {order.customer_username && (
               <p className="text-sm text-gray-600">
                 Customer: {order.customer_username}
+              </p>
+            )}
+            {(order as any).delivery_address && (
+              <p className="text-sm text-gray-600 mt-2">
+                Delivery Address: {(order as any).delivery_address}
+              </p>
+            )}
+            {((order as any).delivery_county || (order as any).delivery_ward) && (
+              <p className="text-sm text-gray-600">
+                Location: {(order as any).delivery_county || 'N/A'}{(order as any).delivery_ward ? `, ${(order as any).delivery_ward}` : ''}
+              </p>
+            )}
+            {((order as any).delivery_window_start || (order as any).delivery_window_end) && (
+              <p className="text-sm text-gray-600">
+                Delivery Window: {(order as any).delivery_window_start ? new Date((order as any).delivery_window_start).toLocaleString() : 'N/A'}{" "}
+                - {(order as any).delivery_window_end ? new Date((order as any).delivery_window_end).toLocaleString() : 'N/A'}
               </p>
             )}
           </div>

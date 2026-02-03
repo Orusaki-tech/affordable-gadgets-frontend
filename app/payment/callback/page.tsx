@@ -53,11 +53,11 @@ function PaymentCallbackContent() {
           setStatus('success');
           setMessage('Payment completed successfully!');
           
-          // Redirect to success page after 2 seconds
-          console.log('[PESAPAL] Will redirect to success page in 2 seconds...');
+          // Redirect to order details after 2 seconds
+          console.log('[PESAPAL] Will redirect to order details in 2 seconds...');
           setTimeout(() => {
-            console.log('[PESAPAL] Redirecting to success page...');
-            router.push(`/payment/success?order_id=${orderId}`);
+            console.log('[PESAPAL] Redirecting to order details page...');
+            router.push(`/orders/${orderId}`);
           }, 2000);
         } else if (paymentStatus.status === OrderStatusEnum.CANCELED) {
           console.log('[PESAPAL] Payment is', paymentStatus.status, '- showing failure');

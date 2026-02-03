@@ -293,6 +293,21 @@ export function CartPage() {
     return `${apiUrl}/api/inventory/orders/${orderId}/receipt/?format=pdf`;
   };
 
+  const deliveryDateLabel = formData.delivery_date
+    ? new Date(formData.delivery_date).toLocaleDateString('en-GB', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+      })
+    : 'Not selected';
+
+  const scrollToDeliveryDetails = () => {
+    const section = document.getElementById('delivery-details');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   if (!cart || items.length === 0) {
     return (
       <div className="text-center py-12">
@@ -319,7 +334,7 @@ export function CartPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-5">
           {groupedItems.map((group) => {
             const groupTotal = group.items.reduce((sum, item) => {
               const basePrice = Number(item.inventory_unit?.selling_price ?? 0);
@@ -331,7 +346,7 @@ export function CartPage() {
             if (group.isBundle) {
               const groupId = group.key.replace('bundle-', '');
               return (
-                <div key={group.key} className="bg-white rounded-lg shadow-sm border-2 border-orange-100">
+                <div key={group.key} className="bg-white rounded-xl shadow-sm border border-orange-100 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-orange-100">
                     <div>
                       <p className="text-sm font-bold text-orange-700">Bundle deal</p>
@@ -355,13 +370,13 @@ export function CartPage() {
                         inventoryUnit?.images?.[0]?.image_url ||
                         '/affordablelogo.png';
                       return (
-                        <div key={item.id} className="flex gap-4 border border-gray-100 rounded-lg p-3">
-                          <div className="h-20 w-20 flex-shrink-0 rounded-lg border border-gray-100 overflow-hidden bg-gray-50">
+                        <div key={item.id} className="flex gap-4 border border-gray-100 rounded-xl p-3">
+                          <div className="h-24 w-24 flex-shrink-0 rounded-xl border border-gray-100 overflow-hidden bg-gray-50">
                             <Image
                               src={imageUrl}
                               alt={inventoryUnit?.product_name ?? 'Product'}
-                              width={80}
-                              height={80}
+                              width={96}
+                              height={96}
                               className="h-full w-full object-contain"
                             />
                           </div>
@@ -397,6 +412,17 @@ export function CartPage() {
                         </div>
                       );
                     })}
+                  </div>
+                  <div className="px-4 pb-4 text-sm text-gray-600">
+                    <div className="flex items-center justify-between">
+                      <span>Delivery date: {deliveryDateLabel}</span>
+                      <button
+                        onClick={scrollToDeliveryDetails}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        Choose delivery
+                      </button>
+                    </div>
                   </div>
                   <div className="px-4 pb-4">
                     <button
@@ -435,17 +461,18 @@ export function CartPage() {
               return (
                 <div
                   key={item.id}
-                  className="flex gap-4 bg-white p-4 rounded-lg shadow-sm border-2 border-gray-100"
+                  className="flex flex-col gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-100"
                 >
-                  <div className="h-24 w-24 flex-shrink-0 rounded-xl border border-gray-100 overflow-hidden bg-gray-50">
-                    <Image
-                      src={imageUrl}
-                      alt={inventoryUnit?.product_name ?? 'Product'}
-                      width={96}
-                      height={96}
-                      className="h-full w-full object-contain"
-                    />
-                  </div>
+                  <div className="flex gap-4">
+                    <div className="h-24 w-24 flex-shrink-0 rounded-xl border border-gray-100 overflow-hidden bg-gray-50">
+                      <Image
+                        src={imageUrl}
+                        alt={inventoryUnit?.product_name ?? 'Product'}
+                        width={96}
+                        height={96}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg">{inventoryUnit?.product_name ?? 'Product'}</h3>
                     <p className="text-gray-600 text-sm">
@@ -500,6 +527,16 @@ export function CartPage() {
                       className="text-red-600 hover:text-red-700 text-sm hover:underline mt-2"
                     >
                       Remove
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-sm text-gray-600 border-t pt-3">
+                    <span>Delivery date: {deliveryDateLabel}</span>
+                    <button
+                      onClick={scrollToDeliveryDetails}
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      Choose delivery
                     </button>
                   </div>
                 </div>
@@ -509,8 +546,8 @@ export function CartPage() {
         </div>
 
         {/* Checkout & Summary */}
-        <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-lg shadow-sm sticky top-4 space-y-6">
+        <div className="lg:col-span-1 space-y-6">
+          <div id="delivery-details" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">Delivery Details</h2>
               <p className="text-sm text-gray-600">
@@ -602,43 +639,42 @@ export function CartPage() {
                 rows={2}
               />
             </div>
-
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between">
-                  <span>Items ({itemCount})</span>
-                  <span>{formatPrice(totalValue)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Delivery fee</span>
-                  <span>{formatPrice(deliveryFee)}</span>
-                </div>
+          </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-bold mb-4">Payment Summary</h2>
+            <div className="space-y-2 mb-4 text-sm text-gray-700">
+              <div className="flex justify-between">
+                <span>Items ({itemCount})</span>
+                <span>{formatPrice(totalValue)}</span>
               </div>
-              <div className="border-t pt-4 mb-4">
-                <div className="flex justify-between text-xl font-bold">
-                  <span>Total</span>
-                  <span>{formatPrice(totalWithDelivery)}</span>
-                </div>
+              <div className="flex justify-between">
+                <span>Shipping &amp; handling</span>
+                <span>{formatPrice(deliveryFee)}</span>
               </div>
-              <button
-                onClick={handleCheckout}
-                disabled={cart.is_submitted || isSubmitting}
-                className={`w-full px-6 py-3 rounded-lg font-semibold transition-colors ${
-                  cart.is_submitted || isSubmitting
-                    ? 'bg-gray-400 text-white cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}
-              >
-                {isSubmitting ? 'Redirecting to payment...' : cart.is_submitted ? 'Already Submitted' : 'Checkout'}
-              </button>
-              <Link
-                href="/products"
-                className="block text-center mt-4 text-blue-600 hover:text-blue-700"
-              >
-                Continue Shopping
-              </Link>
             </div>
+            <div className="border-t pt-4 mb-4">
+              <div className="flex justify-between text-xl font-bold">
+                <span>Order total</span>
+                <span>{formatPrice(totalWithDelivery)}</span>
+              </div>
+            </div>
+            <button
+              onClick={handleCheckout}
+              disabled={cart.is_submitted || isSubmitting}
+              className={`w-full px-6 py-3 rounded-lg font-semibold transition-colors ${
+                cart.is_submitted || isSubmitting
+                  ? 'bg-gray-400 text-white cursor-not-allowed'
+                  : 'bg-green-600 text-white hover:bg-green-700'
+              }`}
+            >
+              {isSubmitting ? 'Redirecting to payment...' : cart.is_submitted ? 'Already Submitted' : 'Proceed to Payment'}
+            </button>
+            <Link
+              href="/products"
+              className="block text-center mt-4 text-blue-600 hover:text-blue-700"
+            >
+              Continue Shopping
+            </Link>
           </div>
         </div>
       </div>

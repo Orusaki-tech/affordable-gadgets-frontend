@@ -66,7 +66,7 @@ export function RecentlyViewed() {
         autoPlay={false}
       >
         {sortedProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} variant="featured" />
         ))}
       </ProductCarousel>
     </div>

@@ -3,6 +3,7 @@
 import { useCart } from '@/lib/hooks/useCart';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect, useMemo } from 'react';
 import { OpenAPI, OrdersService } from '@/lib/api/generated';
 import { inventoryBaseUrl, apiBaseUrl } from '@/lib/api/openapi';
@@ -349,8 +350,21 @@ export function CartPage() {
                       const originalPrice = basePrice;
                       const hasPromotion = item.unit_price !== undefined && item.unit_price !== null && unitPrice < originalPrice;
                       const quantity = Number(item.quantity ?? 0);
+                      const imageUrl =
+                        inventoryUnit?.images?.[0]?.thumbnail_url ||
+                        inventoryUnit?.images?.[0]?.image_url ||
+                        '/affordablelogo.png';
                       return (
                         <div key={item.id} className="flex gap-4 border border-gray-100 rounded-lg p-3">
+                          <div className="h-20 w-20 flex-shrink-0 rounded-lg border border-gray-100 overflow-hidden bg-gray-50">
+                            <Image
+                              src={imageUrl}
+                              alt={inventoryUnit?.product_name ?? 'Product'}
+                              width={80}
+                              height={80}
+                              className="h-full w-full object-contain"
+                            />
+                          </div>
                           <div className="flex-1">
                             <h3 className="font-semibold text-sm">{inventoryUnit?.product_name ?? 'Product'}</h3>
                             <p className="text-gray-600 text-xs">
@@ -414,11 +428,24 @@ export function CartPage() {
               const originalPrice = basePrice;
               const hasPromotion = item.unit_price !== undefined && item.unit_price !== null && unitPrice < originalPrice;
               const quantity = Number(item.quantity ?? 0);
+              const imageUrl =
+                inventoryUnit?.images?.[0]?.thumbnail_url ||
+                inventoryUnit?.images?.[0]?.image_url ||
+                '/affordablelogo.png';
               return (
                 <div
                   key={item.id}
                   className="flex gap-4 bg-white p-4 rounded-lg shadow-sm border-2 border-gray-100"
                 >
+                  <div className="h-24 w-24 flex-shrink-0 rounded-xl border border-gray-100 overflow-hidden bg-gray-50">
+                    <Image
+                      src={imageUrl}
+                      alt={inventoryUnit?.product_name ?? 'Product'}
+                      width={96}
+                      height={96}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg">{inventoryUnit?.product_name ?? 'Product'}</h3>
                     <p className="text-gray-600 text-sm">

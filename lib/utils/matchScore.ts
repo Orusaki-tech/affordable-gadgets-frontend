@@ -45,7 +45,7 @@ export function calculateMatchScore(
   let priceScore = 0;
   let specsScore = 0;
   let availabilityScore = 0;
-  let ratingScore = 50; // Default rating score (can be enhanced with actual ratings)
+  const ratingScore = 50; // Default rating score (can be enhanced with actual ratings)
 
   // Price matching (40% weight)
   if (criteria.priceMin !== undefined && criteria.priceMax !== undefined) {

@@ -129,6 +129,8 @@ export function ProductCarousel({
   }
 
   const totalSlides = Math.ceil(children.length / itemsPerSlide);
+  const progressPercent =
+    totalSlides > 1 ? ((currentIndex + 1) / totalSlides) * 100 : 100;
 
   return (
     <div className={`relative ${className}`}>
@@ -209,6 +211,18 @@ export function ProductCarousel({
           );
         })}
       </div>
+
+      {/* Progress Bar */}
+      {totalSlides > 1 && (
+        <div className="mt-3">
+          <div className="h-1.5 w-full rounded-full bg-gray-200/60">
+            <div
+              className="h-full rounded-full bg-gray-900 transition-all duration-300"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Pagination Dots */}
       {showPagination && totalSlides > 1 && (

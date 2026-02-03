@@ -13,7 +13,7 @@ import { useWishlist } from '@/lib/hooks/useWishlist';
 
 interface ProductCardProps {
   product: PublicProduct;
-  variant?: 'default' | 'minimal';
+  variant?: 'default' | 'minimal' | 'featured';
   showInterestCount?: boolean;
   showQuickActions?: boolean;
   showQuickView?: boolean;
@@ -62,11 +62,12 @@ export function ProductCard({
   showShippingBadges = true,
 }: ProductCardProps) {
   const isMinimal = variant === 'minimal';
-  const allowQuickActions = showQuickActions && !isMinimal;
-  const allowQuickView = showQuickView && !isMinimal;
-  const allowSwatches = showSwatches && !isMinimal;
-  const allowShippingBadges = showShippingBadges && !isMinimal;
-  const allowInterestCount = showInterestCount && !isMinimal;
+  const isFeaturedVariant = variant === 'featured';
+  const allowQuickActions = showQuickActions && !isMinimal && !isFeaturedVariant;
+  const allowQuickView = showQuickView && !isMinimal && !isFeaturedVariant;
+  const allowSwatches = showSwatches && !isMinimal && !isFeaturedVariant;
+  const allowShippingBadges = showShippingBadges && !isMinimal && !isFeaturedVariant;
+  const allowInterestCount = showInterestCount && !isMinimal && !isFeaturedVariant;
   const availableCount = Number(product.available_units_count ?? 0);
   const interestCount = Number(product.interest_count ?? 0);
   const hasStock = availableCount > 0;
@@ -87,7 +88,7 @@ export function ProductCard({
     : [];
   const lowStock = hasStock && availableCount > 0 && availableCount <= 3;
 
-  const shouldLoadUnits = allowSwatches || allowQuickActions || allowQuickView;
+  const shouldLoadUnits = allowSwatches || allowQuickActions || allowQuickView || isFeaturedVariant;
   const { data: units = [], isLoading: unitsLoading } = useProductUnits(product.id ?? 0, {
     enabled: shouldLoadUnits,
   });
@@ -203,6 +204,44 @@ export function ProductCard({
     compareAtDisplay > product.min_price
       ? compareAtDisplay - product.min_price
       : null;
+
+  if (isFeaturedVariant) {
+    const canAddToCart = Boolean(selectedUnit?.id) && !isAddingToCart && !unitsLoading;
+    return (
+      <Link
+        href={getProductHref(product)}
+        className="group block bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-200 hover:border-gray-300 animate-fade-in h-full flex flex-col items-center text-center p-4 sm:p-5"
+      >
+        <h3 className="font-semibold text-[19px] leading-[25.5px] text-gray-900 mb-4 line-clamp-2">
+          {product.product_name}
+        </h3>
+        <div className="relative w-full aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
+          <Image
+            src={primaryImage}
+            alt={product.product_name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+            unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
+          />
+          <div className="absolute inset-0 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <button
+              type="button"
+              onClick={(event) => {
+                if (!selectedUnit?.id) return;
+                handleAddToCart(event, 1);
+              }}
+              disabled={!canAddToCart}
+              className="rounded-full border border-black bg-black text-white text-[11px] leading-[15px] font-semibold px-5 py-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Buy"
+            >
+              {isAddingToCart ? 'Adding...' : 'Buy'}
+            </button>
+          </div>
+        </div>
+      </Link>
+    );
+  }
 
   return (
     <>

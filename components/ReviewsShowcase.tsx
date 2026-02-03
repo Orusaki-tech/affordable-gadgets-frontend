@@ -58,9 +58,12 @@ interface ReviewsShowcaseProps {
 
 export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   const queryClient = useQueryClient();
-  const reviewsQuery = productId
-    ? useProductReviews(productId, { page_size: 10 })
-    : useAllReviews({ page_size: 10 });
+  const productReviewsQuery = useProductReviews(productId ?? 0, {
+    page_size: 10,
+    enabled: Boolean(productId),
+  });
+  const allReviewsQuery = useAllReviews({ page_size: 10 });
+  const reviewsQuery = productId ? productReviewsQuery : allReviewsQuery;
   const { data, isLoading, error } = reviewsQuery;
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [productById, setProductById] = useState<Record<number, PublicProduct | null>>({});

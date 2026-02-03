@@ -11,7 +11,7 @@ import { getProductHref } from '@/lib/utils/productRoutes';
 import Link from 'next/link';
 
 type ProductCardOptions = {
-  variant?: 'default' | 'minimal';
+  variant?: 'default' | 'minimal' | 'featured';
   showInterestCount?: boolean;
   showQuickActions?: boolean;
   showQuickView?: boolean;

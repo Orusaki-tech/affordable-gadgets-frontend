@@ -57,7 +57,8 @@ export function CartPage() {
           throw new Error('Failed to load delivery rates');
         }
         const data = await response.json();
-        setDeliveryRates(Array.isArray(data) ? data : []);
+        const rates = Array.isArray(data) ? data : data?.results || [];
+        setDeliveryRates(rates);
       } catch (err: any) {
         console.error('Failed to fetch delivery rates:', err);
       }

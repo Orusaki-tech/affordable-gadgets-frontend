@@ -475,7 +475,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
 
             return (
           <div
-            className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-gray-200 bg-slate-50 shadow-2xl"
+            className="relative w-full max-w-4xl max-h-[85vh] overflow-hidden rounded-3xl border border-gray-200 bg-slate-50 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="relative flex items-center justify-center border-b border-gray-200 px-6 py-4">
@@ -492,7 +492,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
               </button>
             </div>
 
-            <div className="grid max-h-[calc(78vh-56px)] grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-0">
+            <div className="grid max-h-[calc(85vh-56px)] grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-0 overflow-y-auto">
               <div className="flex items-center justify-center bg-slate-50 p-5 md:p-6">
                 <div className="w-full max-w-[420px] rounded-2xl bg-white p-3 shadow-sm">
                   <div className="flex items-center justify-center rounded-2xl bg-gray-100 p-2">
@@ -631,7 +631,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
           onClick={closeReviewModal}
         >
           <div
-            className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl"
+            className="w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4 mb-4">

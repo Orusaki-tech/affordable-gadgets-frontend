@@ -187,10 +187,6 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
             onSubmit={handleSearch}
             className="flex w-full gap-3 md:w-auto md:min-w-[280px] md:max-w-[440px] lg:max-w-[480px]"
           >
-          <form
-            onSubmit={handleSearch}
-            className="flex w-full gap-3 md:w-auto md:min-w-[280px] md:max-w-[440px] lg:max-w-[480px]"
-          >
             <input
               type="text"
               placeholder="Search products..."

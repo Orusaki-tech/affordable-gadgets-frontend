@@ -14,11 +14,11 @@ interface SpecialOffersCarouselProps {
 export function SpecialOffersCarousel({ promotions, sectionTitle = 'Special Offers' }: SpecialOffersCarouselProps) {
   if (promotions.length === 0) {
     return (
-      <div>
-        <h2 className="section-label mb-6">{sectionTitle}</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="special-offers-carousel">
+        <h2 className="special-offers-carousel__title section-label">{sectionTitle}</h2>
+        <div className="special-offers-carousel__grid">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-2xl bg-lime-100/60 aspect-square" />
+            <div key={i} className="special-offers-carousel__card" />
           ))}
         </div>
       </div>
@@ -26,8 +26,8 @@ export function SpecialOffersCarousel({ promotions, sectionTitle = 'Special Offe
   }
 
   return (
-    <div>
-      <h2 className="section-label mb-6">{sectionTitle}</h2>
+    <div className="special-offers-carousel">
+      <h2 className="special-offers-carousel__title section-label">{sectionTitle}</h2>
       <ProductCarousel
         itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
         showNavigation={true}
@@ -50,9 +50,9 @@ export function SpecialOffersCarousel({ promotions, sectionTitle = 'Special Offe
             <Link
               key={promotion.id ?? `${promotion.title}-${index}`}
               href={href}
-              className="relative block rounded-2xl bg-lime-100/80 p-6 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer aspect-square"
+              className="special-offers-carousel__promo"
             >
-              <div className="relative w-full h-full">
+              <div className="special-offers-carousel__promo-media">
                 {promotionImageSrc && (
                   <Image
                     src={promotionImageSrc}
@@ -61,7 +61,7 @@ export function SpecialOffersCarousel({ promotions, sectionTitle = 'Special Offe
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     priority={index === 0}
                     loading={index < 2 ? 'eager' : 'lazy'}
-                    className="object-contain transition-transform duration-300 hover:scale-[1.02]"
+                    className="special-offers-carousel__promo-image"
                     unoptimized={promotionImageSrc.includes('placehold.co')}
                   />
                 )}

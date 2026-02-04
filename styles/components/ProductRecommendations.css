@@ -1,0 +1,50 @@
+.section-label {
+  font-size: 25px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.product-recommendations {
+  margin-top: 48px;
+}
+
+.product-recommendations__title {
+  margin-bottom: 24px;
+}
+
+.product-recommendations__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .product-recommendations__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .product-recommendations__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .section-label {
+    font-size: 28px;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .section-label {
+    font-size: 32px;
+  }
+}
+
+@media (min-width: 1441px) {
+  .section-label {
+    font-size: 64px;
+  }
+}

@@ -74,35 +74,35 @@ export function ComparisonPage() {
   ];
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between mb-1">
-        <h3 className="product-card-name text-gray-900">Compare</h3>
-        <span className="text-xs text-gray-600">{count} / {maxItems} selected</span>
+    <div className="comparison-page">
+      <div className="comparison-page__header">
+        <h3 className="comparison-page__title">Compare</h3>
+        <span className="comparison-page__count">{count} / {maxItems} selected</span>
       </div>
-      <p className="text-xs text-gray-500 mb-2">Search and add up to {maxItems} products.</p>
+      <p className="comparison-page__hint">Search and add up to {maxItems} products.</p>
 
-          <input
-            type="text"
+      <input
+        type="text"
         placeholder="Search products to compare..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full px-3 py-2 text-xs border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="comparison-page__input"
       />
 
-      <div className="mt-2 space-y-2">
+      <div className="comparison-page__suggestions">
         {trimmedQuery.length === 0 ? (
-          <p className="text-[11px] text-gray-500">Start typing to see suggestions.</p>
+          <p className="comparison-page__empty">Start typing to see suggestions.</p>
         ) : isLoading ? (
-          <div className="text-xs text-gray-500">Searching…</div>
+          <div className="comparison-page__loading">Searching…</div>
         ) : suggestions.length > 0 ? (
           suggestions.map((product) => {
             const inCompare = product.id !== undefined && compareList.includes(product.id);
             return (
               <div
                 key={product.id}
-                className="flex items-center justify-between gap-2 text-xs border border-gray-100 rounded px-2 py-2 bg-white"
+                className="comparison-page__suggestion"
               >
-                <span className="truncate">{product.product_name}</span>
+                <span className="comparison-page__suggestion-name">{product.product_name}</span>
                 <button
                   onClick={() => {
                     if (product.id === undefined) return;
@@ -113,7 +113,7 @@ export function ComparisonPage() {
                     }
                   }}
                   disabled={product.id === undefined || (!inCompare && compareList.length >= maxItems)}
-                  className="px-2 py-1 rounded border text-xs hover:bg-gray-50"
+                  className="comparison-page__suggestion-action"
                 >
                   {inCompare ? 'Remove' : 'Add'}
                 </button>
@@ -121,18 +121,18 @@ export function ComparisonPage() {
             );
           })
         ) : (
-          <p className="text-[11px] text-gray-500">No products found.</p>
+          <p className="comparison-page__empty">No products found.</p>
         )}
       </div>
 
       {count > 0 && (
-        <div className="mt-3 space-y-2">
-          <div className="flex flex-wrap gap-2">
+        <div className="comparison-page__selected">
+          <div className="comparison-page__selected-list">
             {selectedProducts.map((product) => (
               <button
                 key={product.id}
                 onClick={() => removeProduct(product.id)}
-                className="text-[11px] px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                className="comparison-page__selected-item"
                 title="Remove from compare"
               >
                 {product.product_name} ×
@@ -141,7 +141,7 @@ export function ComparisonPage() {
           </div>
           <button
             onClick={clearCompare}
-            className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 rounded px-2 py-1"
+            className="comparison-page__clear"
           >
             Clear selection
           </button>
@@ -149,23 +149,23 @@ export function ComparisonPage() {
       )}
 
       {count > 0 && (
-        <div className="mt-4 overflow-x-auto bg-white rounded-lg border border-gray-200">
-          <table className="w-full border-collapse">
+        <div className="comparison-page__table-wrapper">
+          <table className="comparison-page__table">
             <thead>
-              <tr className="bg-gray-50">
-                <th className="border-b border-gray-200 p-3 text-left font-semibold text-gray-700 sticky left-0 bg-gray-50 z-10 min-w-[140px]">
+              <tr className="comparison-page__table-head-row">
+                <th className="comparison-page__table-head-cell comparison-page__table-head-cell--sticky">
                   Feature
                 </th>
                 {selectedProducts.map((product) => (
-                  <th key={product.id} className="border-b border-gray-200 p-3 text-left min-w-[180px]">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-gray-900 block truncate">{product.product_name}</span>
+                  <th key={product.id} className="comparison-page__table-head-cell">
+                    <div className="comparison-page__table-head-content">
+                      <span className="comparison-page__table-head-title">{product.product_name}</span>
                       <button
                         onClick={() => removeProduct(product.id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded p-1 transition-colors"
+                        className="comparison-page__remove"
                         title="Remove from comparison"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="comparison-page__remove-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
@@ -176,12 +176,12 @@ export function ComparisonPage() {
             </thead>
             <tbody>
               {comparisonRows.map((row) => (
-                <tr key={row.label} className="hover:bg-gray-50 transition-colors">
-                  <td className="border-b border-gray-100 p-3 font-semibold text-gray-700 sticky left-0 bg-white z-10 text-sm">
+                <tr key={row.label} className="comparison-page__table-row">
+                  <td className="comparison-page__table-cell comparison-page__table-cell--sticky">
                     {row.label}
                   </td>
                   {selectedProducts.map((product) => (
-                    <td key={product.id} className="border-b border-gray-100 p-3 text-sm text-gray-700">
+                    <td key={product.id} className="comparison-page__table-cell">
                       {row.render(product)}
                     </td>
                   ))}

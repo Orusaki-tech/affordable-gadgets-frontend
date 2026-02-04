@@ -133,16 +133,12 @@ export function ProductCarousel({
     totalSlides > 1 ? ((currentIndex + 1) / totalSlides) * 100 : 100;
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`product-carousel ${className}`}>
       {/* Carousel Container */}
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="flex overflow-x-auto scroll-smooth scrollbar-hide pb-6 snap-x snap-mandatory -mx-3"
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
+        className="product-carousel__track scrollbar-hide"
       >
         {children.map((child, index) => {
           // Calculate width based on items per slide
@@ -151,7 +147,7 @@ export function ProductCarousel({
           return (
             <div
               key={index}
-              className="flex-shrink-0 snap-start px-3 samsung-carousel-item"
+              className="product-carousel__item samsung-carousel-item"
               style={{
                 width: itemWidth,
                 minWidth: itemWidth,
@@ -211,11 +207,6 @@ export function ProductCarousel({
         </div>
       )}
 
-      <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 }

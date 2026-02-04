@@ -28,9 +28,9 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="product-grid product-grid__list product-grid__list--loading">
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-96" />
+          <div key={i} className="product-grid__skeleton" />
         ))}
       </div>
     );
@@ -40,14 +40,14 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
     const { message, status, url } = getApiErrorInfo(error);
     console.error('Product loading error:', { message, status, url });
     return (
-      <div className="text-center py-12">
-        <p className="text-red-600 mb-2">Error loading products. Please try again later.</p>
-        <p className="text-sm text-gray-500">
+      <div className="product-grid product-grid__error">
+        <p className="product-grid__error-title">Error loading products. Please try again later.</p>
+        <p className="product-grid__error-details">
           {error instanceof Error ? error.message : 'Unable to connect to the server'}
         </p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-[var(--primary)] text-white rounded hover:bg-[var(--primary-dark)]"
+          className="product-grid__error-action"
         >
           Retry
         </button>
@@ -58,16 +58,16 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
   if (!data || data.results.length === 0) {
     // Show placeholder products
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="product-grid product-grid__list product-grid__list--placeholder">
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-              <span className="text-5xl opacity-50">📱</span>
+          <div key={i} className="product-grid__placeholder-card">
+            <div className="product-grid__placeholder-media">
+              <span className="product-grid__placeholder-icon">📱</span>
             </div>
-            <div className="p-4">
-              <div className="h-4 bg-gray-200 rounded mb-2 animate-pulse"></div>
-              <div className="h-3 bg-gray-200 rounded w-2/3 mb-3 animate-pulse"></div>
-              <div className="h-6 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+            <div className="product-grid__placeholder-body">
+              <div className="product-grid__placeholder-line product-grid__placeholder-line--primary"></div>
+              <div className="product-grid__placeholder-line product-grid__placeholder-line--secondary"></div>
+              <div className="product-grid__placeholder-line product-grid__placeholder-line--tertiary"></div>
             </div>
           </div>
         ))}
@@ -76,7 +76,7 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
   }
 
   return (
-    <>
+    <div className="product-grid">
       <ProductCarousel
         itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
         showNavigation={true}
@@ -90,27 +90,27 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
 
       {/* Pagination */}
       {showPagination && (data.next || data.previous) && (
-        <div className="flex justify-center items-center gap-4 mt-12">
+        <div className="product-grid__pagination">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={!data.previous}
-            className="btn-cta px-6 py-2.5 bg-white border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-[var(--primary-light)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md disabled:hover:shadow-sm"
+            className="product-grid__pagination-button"
           >
             Previous
           </button>
-          <span className="btn-cta px-6 py-2.5 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dark)] text-white rounded-lg shadow-md">
+          <span className="product-grid__pagination-status">
             Page {page} of {Math.ceil(data.count / pageSize)}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={!data.next}
-            className="btn-cta px-6 py-2.5 bg-white border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-[var(--primary-light)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md disabled:hover:shadow-sm"
+            className="product-grid__pagination-button"
           >
             Next
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

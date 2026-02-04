@@ -11,21 +11,21 @@ const categories = [
 
 export function QuickAccessBar() {
   return (
-    <div className="w-full">
-      <h3 className="product-card-name text-gray-800 mb-4 text-center">
+    <div className="quick-access">
+      <h3 className="quick-access__title">
         Quick Access
       </h3>
-      <div className="flex items-center justify-center gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="quick-access__list">
         {categories.map((category) => (
           <Link
             key={category.name}
             href={category.href}
-            className="flex flex-col items-center gap-2 min-w-[88px] sm:min-w-[100px] px-3 py-4 sm:px-4 sm:py-5 bg-white rounded-lg border border-gray-200 text-gray-700 transition-colors duration-200 hover:border-gray-300 hover:text-gray-900"
+            className="quick-access__item"
           >
-            <div className="text-3xl sm:text-4xl">
+            <div className="quick-access__icon">
               {category.icon}
             </div>
-            <span className="text-xs sm:text-sm font-medium">
+            <span className="quick-access__label">
               {category.name}
             </span>
           </Link>

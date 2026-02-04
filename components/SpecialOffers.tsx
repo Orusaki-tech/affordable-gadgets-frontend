@@ -28,9 +28,9 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="special-offers special-offers__grid special-offers__grid--loading">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-lime-100/60 animate-pulse rounded-2xl aspect-square" />
+          <div key={i} className="special-offers__card special-offers__card--loading" />
         ))}
       </div>
     );
@@ -38,11 +38,11 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
 
   if (!data || data.results.length === 0) {
     return (
-      <div>
-        <h2 className="text-3xl font-bold mb-6">Special Offers</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="special-offers">
+        <h2 className="special-offers__heading">Special Offers</h2>
+        <div className="special-offers__grid">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-2xl bg-lime-100/60 aspect-square" />
+            <div key={i} className="special-offers__card" />
           ))}
         </div>
       </div>
@@ -100,12 +100,12 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
     : 'Special Offers';
 
   return (
-    <div>
-      <h2 className="section-label mb-6">{sectionTitle}</h2>
+    <div className="special-offers">
+      <h2 className="special-offers__title section-label">{sectionTitle}</h2>
       {specialOffersPromotions.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 mb-4">No special offers available at the moment.</p>
-          <Link href="/products" className="text-[var(--primary)] hover:underline">
+        <div className="special-offers__empty">
+          <p className="special-offers__empty-text">No special offers available at the moment.</p>
+          <Link href="/products" className="special-offers__empty-link">
             View All Products
           </Link>
         </div>
@@ -133,9 +133,9 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
               <Link
                 key={promotion.id ?? `${promotion.title}-${index}`}
                 href={href}
-                className="relative block rounded-2xl bg-lime-100/80 p-6 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer aspect-square"
+                className="special-offers__promo"
               >
-                <div className="relative w-full h-full">
+                <div className="special-offers__promo-media">
                   {promotionImageSrc && (
                     <Image
                       src={promotionImageSrc}
@@ -144,7 +144,7 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                       priority={index === 0}
                       loading={index < 2 ? 'eager' : 'lazy'}
-                      className="object-contain transition-transform duration-300 hover:scale-[1.02]"
+                      className="special-offers__promo-image"
                       unoptimized={promotionImageSrc.includes('placehold.co')}
                     />
                   )}

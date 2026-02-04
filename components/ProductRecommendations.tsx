@@ -29,9 +29,9 @@ export function ProductRecommendations({ productId }: ProductRecommendationsProp
   }
 
   return (
-    <div className="mt-12">
-      <h2 className="section-label mb-6">You May Also Like</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="product-recommendations">
+      <h2 className="product-recommendations__title section-label">You May Also Like</h2>
+      <div className="product-recommendations__grid">
         {recommendations.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

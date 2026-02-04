@@ -37,26 +37,26 @@ const categories = [
 
 export function CategoriesPage() {
   return (
-    <div>
-      <h1 className="section-label mb-8">Shop by Category</h1>
+    <div className="categories-page">
+      <h1 className="categories-page__title section-label">Shop by Category</h1>
 
       {/* Category Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <div className="categories-page__grid">
         {categories.map((category) => (
           <Link
             key={category.code}
             href={category.href}
-            className="block bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden p-6 text-center"
+            className="categories-page__card"
           >
-            <div className="text-6xl mb-4">{category.icon}</div>
-            <h2 className="text-2xl font-semibold mb-2">{category.name}</h2>
-            <p className="text-gray-600 text-sm">{category.description}</p>
+            <div className="categories-page__card-icon">{category.icon}</div>
+            <h2 className="categories-page__card-title">{category.name}</h2>
+            <p className="categories-page__card-description">{category.description}</p>
           </Link>
         ))}
       </div>
 
       {/* Featured Products by Category */}
-      <div className="space-y-12">
+      <div className="categories-page__sections">
         {categories.map((category) => (
           <CategoryProducts key={category.code} category={category} />
         ))}
@@ -81,11 +81,11 @@ function CategoryProducts({ category }: { category: Category }) {
 
   if (isLoading) {
     return (
-      <div>
-        <h2 className="text-3xl font-bold mb-6">{category.name}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="categories-page__section">
+        <h2 className="categories-page__section-heading">{category.name}</h2>
+        <div className="categories-page__products">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-96" />
+            <div key={i} className="categories-page__skeleton" />
           ))}
         </div>
       </div>
@@ -97,17 +97,17 @@ function CategoryProducts({ category }: { category: Category }) {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="section-label">{category.name}</h2>
+    <div className="categories-page__section">
+      <div className="categories-page__section-header">
+        <h2 className="categories-page__section-title section-label">{category.name}</h2>
         <Link
           href={category.href}
-          className="text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium"
+          className="categories-page__section-link"
         >
           View All →
         </Link>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="categories-page__products">
         {filteredResults.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

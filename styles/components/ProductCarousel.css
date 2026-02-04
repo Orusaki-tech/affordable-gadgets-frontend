@@ -1,0 +1,124 @@
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.product-carousel {
+  position: relative;
+}
+
+.product-carousel__track {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: 1.5rem;
+  scroll-snap-type: x mandatory;
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+}
+
+.product-carousel__item {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.samsung-carousel-item {
+  opacity: 0;
+  transform: translateY(20%);
+  animation:
+    samsungOpacity 0.2s linear forwards,
+    samsungTranslate 0.5s cubic-bezier(0, 0.18, 0.07, 1) forwards;
+}
+
+.samsung-progressbar {
+  margin-top: 35px;
+  display: block;
+}
+
+.samsung-progressbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+}
+
+.samsung-progressbar-bar {
+  position: relative;
+  border-radius: 1000px;
+  width: 562px;
+  height: 2px;
+  background-color: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.samsung-progressbar-fill {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 1000px;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  transform-origin: left top;
+  transform: scaleX(0);
+}
+
+.samsung-progressbar-arrows {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.samsung-progressbar-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background: #fff;
+  color: #000;
+  transition: border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.samsung-progressbar-arrow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.samsung-progressbar-icon {
+  width: 40px;
+  height: 40px;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1440px) {
+  .samsung-progressbar {
+    margin-top: 2.43055556vw;
+  }
+
+  .samsung-progressbar-inner {
+    gap: 4.16666667vw;
+  }
+
+  .samsung-progressbar-bar {
+    width: 39.02777778vw;
+  }
+
+  .samsung-progressbar-arrows {
+    gap: 0.83333333vw;
+  }
+
+  .samsung-progressbar-arrow {
+    width: 2.77777778vw;
+    height: 2.77777778vw;
+  }
+}

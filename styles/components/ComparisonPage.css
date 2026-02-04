@@ -1,0 +1,229 @@
+.comparison-page {
+  width: 100%;
+}
+
+.comparison-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.comparison-page__title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #111827;
+}
+
+.comparison-page__count {
+  font-size: 12px;
+  color: #4b5563;
+}
+
+.comparison-page__hint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.comparison-page__input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.comparison-page__input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(29, 29, 31, 0.35);
+  border-color: var(--primary);
+}
+
+.comparison-page__suggestions {
+  margin-top: 8px;
+  display: grid;
+  gap: 8px;
+}
+
+.comparison-page__empty,
+.comparison-page__loading {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.comparison-page__suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  border: 1px solid #f3f4f6;
+  border-radius: 6px;
+  padding: 8px;
+  background: #fff;
+}
+
+.comparison-page__suggestion-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comparison-page__suggestion-action {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  font-size: 12px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 200ms;
+}
+
+.comparison-page__suggestion-action:hover {
+  background: #f9fafb;
+}
+
+.comparison-page__selected {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.comparison-page__selected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.comparison-page__selected-item {
+  font-size: 11px;
+  padding: 4px 8px;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 200ms;
+}
+
+.comparison-page__selected-item:hover {
+  background: #e5e7eb;
+}
+
+.comparison-page__clear {
+  font-size: 12px;
+  color: #dc2626;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: color 200ms, background 200ms;
+}
+
+.comparison-page__clear:hover {
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+.comparison-page__table-wrapper {
+  margin-top: 16px;
+  overflow-x: auto;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.comparison-page__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.comparison-page__table-head-row {
+  background: #f9fafb;
+}
+
+.comparison-page__table-head-cell {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px;
+  text-align: left;
+  min-width: 180px;
+}
+
+.comparison-page__table-head-cell--sticky {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  min-width: 140px;
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.comparison-page__table-head-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.comparison-page__table-head-title {
+  font-weight: 600;
+  color: #111827;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comparison-page__remove {
+  color: #dc2626;
+  border-radius: 6px;
+  padding: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: color 200ms, background 200ms;
+}
+
+.comparison-page__remove:hover {
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+.comparison-page__remove-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.comparison-page__table-row {
+  transition: background 200ms;
+}
+
+.comparison-page__table-row:hover {
+  background: #f9fafb;
+}
+
+.comparison-page__table-cell {
+  border-bottom: 1px solid #f3f4f6;
+  padding: 12px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.comparison-page__table-cell--sticky {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: #fff;
+  font-weight: 600;
+}
+
+@media (min-width: 1025px) {
+  .comparison-page__title {
+    font-size: 20px;
+  }
+}

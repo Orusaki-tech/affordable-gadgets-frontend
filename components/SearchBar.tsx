@@ -39,9 +39,9 @@ export function SearchBar() {
   };
 
   return (
-    <div ref={searchRef} className="relative flex-1 w-full">
-      <form onSubmit={handleSubmit} className="relative">
-        <div className="relative flex items-center">
+    <div ref={searchRef} className="search-bar">
+      <form onSubmit={handleSubmit} className="search-bar__form">
+        <div className="search-bar__field">
           <input
             type="text"
             placeholder="Search products..."
@@ -51,14 +51,14 @@ export function SearchBar() {
               setIsOpen(e.target.value.length > 0);
             }}
             onFocus={() => setIsOpen(searchQuery.length > 0 && suggestions.length > 0)}
-            className="w-full pl-4 pr-12 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent bg-white shadow-sm hover:border-gray-400 transition-colors"
+            className="search-bar__input"
           />
           <button
             type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[var(--primary)] hover:bg-gray-50 rounded-md transition-colors"
+            className="search-bar__submit"
             aria-label="Search"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="search-bar__submit-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </button>
@@ -67,7 +67,7 @@ export function SearchBar() {
 
       {/* Autocomplete Suggestions */}
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl max-h-80 overflow-y-auto">
+        <div className="search-bar__suggestions">
           {suggestions.map((product) => (
             <Link
               key={product.id}
@@ -76,10 +76,10 @@ export function SearchBar() {
                 setIsOpen(false);
                 setSearchQuery('');
               }}
-              className="block px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
+              className="search-bar__suggestion"
             >
-              <div className="font-medium text-gray-900">{product.product_name}</div>
-              <div className="text-sm text-gray-500 mt-0.5">
+              <div className="search-bar__suggestion-title">{product.product_name}</div>
+              <div className="search-bar__suggestion-subtitle">
                 {product.brand} {product.model_series && `• ${product.model_series}`}
               </div>
             </Link>
@@ -90,7 +90,7 @@ export function SearchBar() {
               onClick={() => {
                 setIsOpen(false);
               }}
-              className="block px-4 py-3 hover:bg-blue-50 border-t border-gray-200 font-medium text-blue-600 transition-colors"
+              className="search-bar__view-all"
             >
               View all results for "{searchQuery}"
             </Link>

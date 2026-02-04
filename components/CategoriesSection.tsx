@@ -32,35 +32,38 @@ const categories = [
 export function CategoriesSection() {
   const categoryIcons = ['📱', '💻', '📱', '🎧'];
   const categoryGradients = [
-    'from-blue-500 to-blue-700',
-    'from-purple-500 to-purple-700',
-    'from-pink-500 to-pink-700',
-    'from-green-500 to-green-700',
+    'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+    'linear-gradient(135deg, #a855f7, #6d28d9)',
+    'linear-gradient(135deg, #ec4899, #be185d)',
+    'linear-gradient(135deg, #22c55e, #15803d)',
   ];
 
   return (
-    <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+    <div className="categories-section">
+      <div className="categories-section__grid">
         {categories.map((category, index) => (
           <Link
             key={category.name}
             href={category.href}
-            className="group block bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-[var(--primary-light)] transform hover:scale-105"
+            className="categories-section__card"
           >
-            <div className={`aspect-video bg-gradient-to-br ${categoryGradients[index]} flex items-center justify-center relative overflow-hidden`}>
-              <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors"></div>
-              <span className="text-6xl transform group-hover:scale-110 transition-transform duration-300 relative z-10">
+            <div
+              className="categories-section__media"
+              style={{ backgroundImage: categoryGradients[index] }}
+            >
+              <div className="categories-section__overlay"></div>
+              <span className="categories-section__icon">
                 {categoryIcons[index]}
               </span>
             </div>
-            <div className="p-5 sm:p-6">
-              <h3 className="product-card-name mb-2 text-gray-900 group-hover:text-[var(--primary)] transition-colors">
+            <div className="categories-section__content">
+              <h3 className="categories-section__title product-card-name">
                 {category.name}
               </h3>
-              <p className="product-card-spec text-gray-600">{category.description}</p>
-              <div className="btn-cta product-card-cta mt-4 flex items-center text-[var(--primary)] group-hover:gap-2 transition-all">
+              <p className="categories-section__description product-card-spec">{category.description}</p>
+              <div className="categories-section__cta btn-cta product-card-cta">
                 <span>Explore</span>
-                <svg className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="categories-section__cta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>

@@ -1,0 +1,145 @@
+.section-label {
+  font-size: 25px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.categories-page {
+  width: 100%;
+}
+
+.categories-page__title {
+  margin-bottom: 32px;
+}
+
+.categories-page__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.categories-page__card {
+  display: block;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 200ms;
+  overflow: hidden;
+  padding: 24px;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.categories-page__card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.categories-page__card-icon {
+  font-size: 3.75rem;
+  margin-bottom: 16px;
+}
+
+.categories-page__card-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.categories-page__card-description {
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.categories-page__sections {
+  display: grid;
+  gap: 48px;
+}
+
+.categories-page__section {
+  width: 100%;
+}
+
+.categories-page__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.categories-page__section-heading {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.categories-page__section-title {
+  margin: 0;
+}
+
+.categories-page__section-link {
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.categories-page__section-link:hover {
+  color: var(--primary-dark);
+}
+
+.categories-page__products {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.categories-page__skeleton {
+  background: #e5e7eb;
+  border-radius: 12px;
+  height: 24rem;
+  animation: categories-page-pulse 1.6s ease-in-out infinite;
+}
+
+@media (min-width: 640px) {
+  .categories-page__grid,
+  .categories-page__products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .categories-page__grid,
+  .categories-page__products {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .section-label {
+    font-size: 28px;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .section-label {
+    font-size: 32px;
+  }
+}
+
+@media (min-width: 1441px) {
+  .section-label {
+    font-size: 64px;
+  }
+}
+
+@keyframes categories-page-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

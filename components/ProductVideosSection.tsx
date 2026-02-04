@@ -87,9 +87,9 @@ export function ProductVideosSection() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="product-videos product-videos__grid product-videos__grid--loading">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-[320px] sm:h-[340px] lg:h-[360px]" />
+          <div key={i} className="product-videos__skeleton" />
         ))}
       </div>
     );
@@ -97,9 +97,9 @@ export function ProductVideosSection() {
 
   if (productsToShowWithId.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-600 mb-4">No product videos available at the moment.</p>
-        <Link href="/products" className="text-[var(--primary)] hover:underline">
+      <div className="product-videos product-videos__empty">
+        <p className="product-videos__empty-text">No product videos available at the moment.</p>
+        <Link href="/products" className="product-videos__empty-link">
           View All Products
         </Link>
       </div>
@@ -107,30 +107,30 @@ export function ProductVideosSection() {
   }
 
   return (
-    <div ref={sectionRef}>
-      <h2 className="section-label mb-4 sm:mb-6">Product Videos</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div ref={sectionRef} className="product-videos">
+      <h2 className="product-videos__title section-label">Product Videos</h2>
+      <div className="product-videos__grid">
         {productsToShowWithId.map((product) => (
           <div
             key={product.id}
             id={`video-card-${product.id}`}
-            className="relative rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer group h-[320px] sm:h-[340px] lg:h-[360px] grid grid-rows-[60%_40%] sm:grid-rows-[65%_35%]"
+            className="product-videos__card"
             onClick={() => setSelectedVideo(selectedVideo === product.id ? null : product.id)}
           >
             {/* Product Image/Thumbnail */}
-            <div className="relative bg-gray-100">
+            <div className="product-videos__media">
               <Image
                 src={product.primary_image || getPlaceholderVideoThumbnail(product.product_name)}
                 alt={product.product_name}
                 fill
-                className="object-contain"
+                className="product-videos__media-image"
                 unoptimized={!product.primary_image || product.primary_image.includes('placehold.co')}
               />
               
               {/* Play Button Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-                <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 group-hover:scale-110 transition-transform">
-                  <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <div className="product-videos__overlay">
+                <div className="product-videos__overlay-button">
+                  <svg className="product-videos__overlay-icon" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
@@ -138,17 +138,17 @@ export function ProductVideosSection() {
             </div>
 
             {/* Product Info */}
-            <div className="p-3 sm:p-4 lg:p-5 bg-white">
-              <h3 className="product-card-name mb-2 line-clamp-2">
+            <div className="product-videos__info">
+              <h3 className="product-videos__name product-card-name">
                 {product.product_name}
               </h3>
               {product.brand && (
-                <p className="product-card-spec text-gray-600 mb-2">
+                <p className="product-videos__brand product-card-spec">
                   {product.brand}
                 </p>
               )}
               {product.min_price && product.max_price && (
-                <p className="product-card-price text-[var(--primary)]">
+                <p className="product-videos__price product-card-price">
                   KES {product.min_price.toLocaleString()} - {product.max_price.toLocaleString()}
                 </p>
               )}
@@ -156,20 +156,20 @@ export function ProductVideosSection() {
 
             {/* Video Player (shown when selected) */}
             {selectedVideo === product.id && (
-              <div className="absolute inset-0 z-10 bg-black/95 flex items-center justify-center p-4">
-                <div className="relative w-full max-w-4xl aspect-video">
+              <div className="product-videos__player">
+                <div className="product-videos__player-frame">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedVideo(null);
                     }}
-                    className="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl font-bold"
+                    className="product-videos__player-close"
                   >
                     ×
                   </button>
                   <iframe
                     src={convertToYouTubeEmbed(product.product_video_url || getPlaceholderVideoUrl(product.product_name))}
-                    className="w-full h-full rounded-lg"
+                    className="product-videos__player-embed"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />

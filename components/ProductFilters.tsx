@@ -151,7 +151,7 @@ export function ProductFilters({
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:border-gray-300 shadow-sm flex items-center gap-2 text-gray-700 font-medium"
+          className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:border-gray-300 shadow-sm flex items-center gap-2 text-gray-700 font-medium lg:hidden"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -186,14 +186,13 @@ export function ProductFilters({
         )}
       </div>
 
-      {isOpen && (
-        <div className="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm space-y-4">
+      <div className={`bg-white border border-gray-200 p-5 rounded-2xl shadow-sm space-y-4 ${isOpen ? 'block' : 'hidden'} lg:block`}>
           <div className="flex items-center justify-between">
             <h3 className="text-base font-semibold text-gray-900">Filter products</h3>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="text-sm text-gray-500 hover:text-gray-700"
+              className="text-sm text-gray-500 hover:text-gray-700 lg:hidden"
             >
               Close
             </button>
@@ -275,7 +274,6 @@ export function ProductFilters({
             )}
           </div>
         </div>
-      )}
     </div>
   );
 }

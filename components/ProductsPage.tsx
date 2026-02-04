@@ -204,73 +204,79 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
         </div>
       )}
 
-      {/* Filters and Sort */}
-      <ProductFilters
-        onFiltersChange={handleFiltersChange}
-        onSortChange={handleSortChange}
-        initialFilters={filters}
-        autoOpen={autoOpenFilters}
-      />
+      <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
+        {/* Filters Sidebar */}
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <ProductFilters
+            onFiltersChange={handleFiltersChange}
+            onSortChange={handleSortChange}
+            initialFilters={filters}
+            autoOpen={autoOpenFilters}
+          />
+        </div>
 
-      {/* Results */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-96" />
-          ))}
-        </div>
-      ) : error ? (
-        <div className="text-center py-12">
-          <p className="text-red-600">Error loading products. Please try again later.</p>
-        </div>
-      ) : !data || filteredResults.length === 0 ? (
-        <div className="text-center py-12">
-          {promotionId && promotionData ? (
-            <p className="text-gray-600 mb-4">No products available for this promotion.</p>
-          ) : (
-            <p className="text-gray-600">No products found.</p>
-          )}
-        </div>
-      ) : (
-        <>
-          <p className="text-gray-600 mb-4">
-            Showing {filteredResults.length} of {data.count} product{data.count !== 1 ? 's' : ''}
-            {promotionId && promotionData && (
-              <span className="ml-2 text-sm text-blue-600">
-                (filtered by promotion: {promotionData.title})
-              </span>
-            )}
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredResults.map((product) => (
-              <ProductCard key={product.id} product={product} {...cardOptions} />
-            ))}
-          </div>
-
-          {/* Pagination */}
-          {(data.next || data.previous) && (
-            <div className="flex justify-center gap-4 mt-8">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={!data.previous}
-                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
-              <span className="px-4 py-2">
-                Page {page} of {Math.ceil(data.count / 24)}
-              </span>
-              <button
-                onClick={() => setPage((p) => p + 1)}
-                disabled={!data.next}
-                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
+        {/* Results */}
+        <div>
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-96" />
+              ))}
             </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-red-600">Error loading products. Please try again later.</p>
+            </div>
+          ) : !data || filteredResults.length === 0 ? (
+            <div className="text-center py-12">
+              {promotionId && promotionData ? (
+                <p className="text-gray-600 mb-4">No products available for this promotion.</p>
+              ) : (
+                <p className="text-gray-600">No products found.</p>
+              )}
+            </div>
+          ) : (
+            <>
+              <p className="text-gray-600 mb-4">
+                Showing {filteredResults.length} of {data.count} product{data.count !== 1 ? 's' : ''}
+                {promotionId && promotionData && (
+                  <span className="ml-2 text-sm text-blue-600">
+                    (filtered by promotion: {promotionData.title})
+                  </span>
+                )}
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {filteredResults.map((product) => (
+                  <ProductCard key={product.id} product={product} {...cardOptions} />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {(data.next || data.previous) && (
+                <div className="flex justify-center gap-4 mt-8">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={!data.previous}
+                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <span className="px-4 py-2">
+                    Page {page} of {Math.ceil(data.count / 24)}
+                  </span>
+                  <button
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={!data.next}
+                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

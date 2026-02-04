@@ -99,7 +99,7 @@ function CategoryProducts({ category }: { category: Category }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold">{category.name}</h2>
+        <h2 className="section-label">{category.name}</h2>
         <Link
           href={category.href}
           className="text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium"

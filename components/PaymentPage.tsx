@@ -157,7 +157,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold mb-2 text-green-600">Payment Successful!</h2>
+              <h2 className="product-card-name mb-2 text-green-600">Payment Successful!</h2>
               <p className="text-gray-600 mb-4">
                 Your payment has been confirmed. Your order is being processed.
               </p>
@@ -172,7 +172,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
             </div>
             <Link
               href="/products"
-              className="block w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold"
+              className="btn-cta block w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)]"
             >
               Continue Shopping
             </Link>
@@ -211,7 +211,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                   />
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold mb-2 text-red-600">Payment Failed</h2>
+              <h2 className="product-card-name mb-2 text-red-600">Payment Failed</h2>
               <p className="text-gray-600 mb-4">
                 {(paymentStatus as { message?: string }).message ||
                   'Your payment could not be processed. Please try again.'}
@@ -220,7 +220,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
             <div className="space-y-2">
               <button
                 onClick={() => window.location.reload()}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold"
+                className="btn-cta w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)]"
               >
                 Try Again
               </button>
@@ -253,9 +253,9 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                 priority
               />
             </div>
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
               <svg
-                className="animate-spin h-8 w-8 text-blue-600"
+                className="animate-spin h-8 w-8 text-[var(--primary)]"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -275,7 +275,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                 ></path>
               </svg>
             </div>
-            <h2 className="text-2xl font-bold mb-2">Redirecting to Payment</h2>
+            <h2 className="product-card-name mb-2">Redirecting to Payment</h2>
             <p className="text-gray-600 mb-4">
               {redirectUrl ? 'Please wait while we redirect you to Pesapal...' : 'Initializing payment...'}
             </p>
@@ -305,9 +305,9 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                 priority
               />
             </div>
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
               <svg
-                className="animate-spin h-8 w-8 text-blue-600"
+                className="animate-spin h-8 w-8 text-[var(--primary)]"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -327,7 +327,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                 ></path>
               </svg>
             </div>
-            <h2 className="text-2xl font-bold mb-2">Processing Payment</h2>
+            <h2 className="product-card-name mb-2">Processing Payment</h2>
             <p className="text-gray-600 mb-4">Payment is being processed...</p>
             <div className="text-sm text-gray-500">
               <p>Order: {orderId}</p>
@@ -370,13 +370,13 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold mb-2 text-red-600">Payment Error</h2>
+            <h2 className="product-card-name mb-2 text-red-600">Payment Error</h2>
             <p className="text-gray-600 mb-4">{error}</p>
           </div>
           <div className="space-y-2">
             <button
               onClick={() => window.location.reload()}
-              className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold"
+              className="btn-cta w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)]"
             >
               Try Again
             </button>

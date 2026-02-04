@@ -45,7 +45,7 @@ export function CategoriesSection() {
           <Link
             key={category.name}
             href={category.href}
-            className="group block bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-blue-300 transform hover:scale-105"
+            className="group block bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-[var(--primary-light)] transform hover:scale-105"
           >
             <div className={`aspect-video bg-gradient-to-br ${categoryGradients[index]} flex items-center justify-center relative overflow-hidden`}>
               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors"></div>
@@ -54,11 +54,11 @@ export function CategoriesSection() {
               </span>
             </div>
             <div className="p-5 sm:p-6">
-              <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-blue-600 transition-colors">
+              <h3 className="product-card-name mb-2 text-gray-900 group-hover:text-[var(--primary)] transition-colors">
                 {category.name}
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">{category.description}</p>
-              <div className="mt-4 flex items-center text-blue-600 font-semibold text-sm group-hover:gap-2 transition-all">
+              <p className="product-card-spec text-gray-600">{category.description}</p>
+              <div className="btn-cta product-card-cta mt-4 flex items-center text-[var(--primary)] group-hover:gap-2 transition-all">
                 <span>Explore</span>
                 <svg className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

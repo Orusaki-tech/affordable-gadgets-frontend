@@ -29,7 +29,7 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
   if (isLoading) {
     return (
       <div className="mt-12">
-        <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+        <h2 className="section-label mb-6">Customer Reviews</h2>
         <div className="text-center py-8 text-gray-500">Loading reviews...</div>
       </div>
     );
@@ -38,7 +38,7 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
   if (error) {
     return (
       <div className="mt-12">
-        <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+        <h2 className="section-label mb-6">Customer Reviews</h2>
         <div className="text-center py-8 text-red-500">Error loading reviews</div>
       </div>
     );
@@ -47,7 +47,7 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
   if (!data || data.results.length === 0) {
     return (
       <div className="mt-12">
-        <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+        <h2 className="section-label mb-6">Customer Reviews</h2>
         <div className="text-center py-8 text-gray-500">
           <p>No reviews yet. Be the first to review this product!</p>
         </div>
@@ -63,7 +63,7 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
 
   return (
     <div className="mt-12">
-      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Customer Reviews</h2>
+      <h2 className="section-label mb-4 sm:mb-6">Customer Reviews</h2>
       
       {/* Rating Summary */}
       <div className="bg-gray-50 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">

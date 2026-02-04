@@ -76,7 +76,7 @@ export function ComparisonPage() {
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-lg font-semibold text-gray-900">Compare</h3>
+        <h3 className="product-card-name text-gray-900">Compare</h3>
         <span className="text-xs text-gray-600">{count} / {maxItems} selected</span>
       </div>
       <p className="text-xs text-gray-500 mb-2">Search and add up to {maxItems} products.</p>

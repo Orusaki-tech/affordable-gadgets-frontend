@@ -94,17 +94,17 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={!data.previous}
-            className="px-6 py-2.5 bg-white border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 hover:border-[var(--primary-light)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md disabled:hover:shadow-sm"
+            className="btn-cta px-6 py-2.5 bg-white border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-[var(--primary-light)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md disabled:hover:shadow-sm"
           >
             Previous
           </button>
-          <span className="px-6 py-2.5 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dark)] text-white rounded-lg font-semibold shadow-md">
+          <span className="btn-cta px-6 py-2.5 bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dark)] text-white rounded-lg shadow-md">
             Page {page} of {Math.ceil(data.count / pageSize)}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={!data.next}
-            className="px-6 py-2.5 bg-white border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 hover:border-[var(--primary-light)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md disabled:hover:shadow-sm"
+            className="btn-cta px-6 py-2.5 bg-white border-2 border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 hover:border-[var(--primary-light)] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md disabled:hover:shadow-sm"
           >
             Next
           </button>

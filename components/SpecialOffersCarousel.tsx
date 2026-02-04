@@ -15,7 +15,7 @@ export function SpecialOffersCarousel({ promotions, sectionTitle = 'Special Offe
   if (promotions.length === 0) {
     return (
       <div>
-        <h2 className="text-3xl font-bold mb-6">{sectionTitle}</h2>
+        <h2 className="section-label mb-6">{sectionTitle}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="rounded-2xl bg-lime-100/60 aspect-square" />
@@ -27,7 +27,7 @@ export function SpecialOffersCarousel({ promotions, sectionTitle = 'Special Offe
 
   return (
     <div>
-      <h2 className="text-3xl font-bold mb-6">{sectionTitle}</h2>
+      <h2 className="section-label mb-6">{sectionTitle}</h2>
       <ProductCarousel
         itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
         showNavigation={true}

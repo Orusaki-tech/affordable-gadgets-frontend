@@ -12,7 +12,7 @@ const categories = [
 export function QuickAccessBar() {
   return (
     <div className="w-full">
-      <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 text-center">
+      <h3 className="product-card-name text-gray-800 mb-4 text-center">
         Quick Access
       </h3>
       <div className="flex items-center justify-center gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-hide">

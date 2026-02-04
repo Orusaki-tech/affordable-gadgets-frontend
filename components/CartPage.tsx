@@ -546,10 +546,7 @@ export function CartPage() {
 
         {/* Checkout & Summary */}
         <div className="lg:col-span-1 space-y-6">
-          <div
-            id="delivery-details"
-            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6 lg:sticky lg:top-6 lg:max-h-[calc(100vh-3rem)] lg:overflow-auto"
-          >
+          <div id="delivery-details" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">Delivery Details</h2>
               <p className="text-sm text-gray-600">

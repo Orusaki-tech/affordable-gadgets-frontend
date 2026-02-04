@@ -388,17 +388,19 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                   </div>
 
                   <div className="absolute bottom-12 sm:bottom-14 left-3 right-3 text-white">
-                    <div className="flex gap-1 text-yellow-300 mb-1 text-[12px] sm:text-[13px]">
+                    <div className="flex gap-1 text-yellow-300 text-[12px] sm:text-[13px]">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span key={star} className={star <= review.rating ? 'text-yellow-300' : 'text-white/40'}>
                           ★
                         </span>
                       ))}
                     </div>
-                    {review.comment && (
-                      <p className="text-[12px] sm:text-[13px] leading-[18px] sm:leading-[20px] line-clamp-3">"{review.comment}"</p>
-                    )}
                   </div>
+                  {review.comment && (
+                    <p className="absolute bottom-4 left-3 right-3 text-[12px] sm:text-[13px] leading-[18px] sm:leading-[20px] line-clamp-1 text-white">
+                      "{review.comment}"
+                    </p>
+                  )}
                 </div>
 
                 <div className="border-t border-gray-100 bg-white p-3 sm:p-4">

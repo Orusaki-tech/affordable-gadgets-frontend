@@ -33,7 +33,7 @@ export function RecentlyViewed() {
   if (productIds.length === 0 || sortedProducts.length === 0) {
     // Show placeholder recently viewed
     return (
-      <div>
+      <div className="recently-viewed">
         <ProductCarousel
           itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
           showNavigation={true}
@@ -41,14 +41,14 @@ export function RecentlyViewed() {
           autoPlay={false}
         >
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden opacity-60 border-2 border-gray-100">
-              <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                <span className="text-5xl opacity-50">👁️</span>
+            <div key={i} className="recently-viewed__placeholder">
+              <div className="recently-viewed__placeholder-media">
+                <span className="recently-viewed__placeholder-icon">👁️</span>
               </div>
-              <div className="p-5">
-                <div className="h-4 bg-gray-200 rounded mb-3 animate-pulse"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3 mb-4 animate-pulse"></div>
-                <div className="h-6 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+              <div className="recently-viewed__placeholder-body">
+                <div className="recently-viewed__placeholder-line recently-viewed__placeholder-line--title"></div>
+                <div className="recently-viewed__placeholder-line recently-viewed__placeholder-line--subtitle"></div>
+                <div className="recently-viewed__placeholder-line recently-viewed__placeholder-line--price"></div>
               </div>
             </div>
           ))}
@@ -58,7 +58,7 @@ export function RecentlyViewed() {
   }
 
   return (
-    <div>
+    <div className="recently-viewed">
       <ProductCarousel
         itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
         showNavigation={true}

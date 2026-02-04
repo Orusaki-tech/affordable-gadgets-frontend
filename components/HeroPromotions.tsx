@@ -96,17 +96,14 @@ export async function HeroPromotions() {
   const bannerImageSrc = bannerItem?.banner_image_url || bannerItem?.banner_image || null;
 
   return (
-    <div className="relative w-full mb-6">
-      <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-        <div className="lg:col-span-1">
+    <div className="hero-promotions">
+      <div className="hero-promotions__desktop">
+        <div className="hero-promotions__banner-column">
           <div
-            className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md"
-            style={{
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-            }}
+            className="hero-promotions__tile hero-promotions__tile--banner"
           >
             {bannerItem && bannerImageSrc ? (
-              <Link href={getPromotionHref(bannerItem)} className="block w-full h-full">
+              <Link href={getPromotionHref(bannerItem)} className="hero-promotions__link">
                 <Image
                   src={getCloudinarySizedImageUrl(bannerImageSrc, HERO_IMAGE_SIZE, 'cover')}
                   alt={bannerItem.title}
@@ -115,16 +112,16 @@ export async function HeroPromotions() {
                   priority
                   fetchPriority="high"
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover w-full h-full transition-transform duration-300"
+                  className="hero-promotions__image hero-promotions__image--cover"
                 />
               </Link>
             ) : (
-              <div className="w-full h-full bg-lime-100/60" />
+              <div className="hero-promotions__placeholder" />
             )}
           </div>
         </div>
 
-        <div className="lg:col-span-1 grid grid-cols-2 gap-4">
+        <div className="hero-promotions__grid">
           {gridItems.length > 0
             ? gridItems.map((promotion) => {
                 const imageSrc = promotion.banner_image_url || promotion.banner_image;
@@ -132,10 +129,7 @@ export async function HeroPromotions() {
                   <Link
                     key={promotion.id ?? promotion.title}
                     href={getPromotionHref(promotion)}
-                    className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md"
-                    style={{
-                      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                    }}
+                    className="hero-promotions__tile"
                   >
                     {imageSrc ? (
                       <Image
@@ -144,10 +138,10 @@ export async function HeroPromotions() {
                         width={GRID_IMAGE_SIZE}
                         height={GRID_IMAGE_SIZE}
                         sizes="(max-width: 1024px) 50vw, 25vw"
-                        className="object-contain w-full h-full transition-transform duration-300"
+                        className="hero-promotions__image hero-promotions__image--contain"
                       />
                     ) : (
-                      <div className="w-full h-full bg-lime-100/60" />
+                      <div className="hero-promotions__placeholder" />
                     )}
                   </Link>
                 );
@@ -155,23 +149,17 @@ export async function HeroPromotions() {
             : [...Array(4)].map((_, i) => (
                 <div
                   key={`promo-grid-placeholder-${i}`}
-                  className="w-full aspect-square bg-lime-100/60 rounded-2xl"
-                  style={{
-                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                  }}
+                  className="hero-promotions__tile hero-promotions__tile--placeholder"
                 />
               ))}
         </div>
       </div>
 
-      <div className="lg:hidden space-y-4 mb-6">
+      <div className="hero-promotions__mobile">
         {bannerItem && bannerImageSrc ? (
           <Link
             href={getPromotionHref(bannerItem)}
-            className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md block"
-            style={{
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-            }}
+            className="hero-promotions__tile hero-promotions__tile--banner"
           >
             <Image
               src={getCloudinarySizedImageUrl(bannerImageSrc, HERO_IMAGE_SIZE, 'cover')}
@@ -181,14 +169,14 @@ export async function HeroPromotions() {
               priority
               fetchPriority="high"
               sizes="100vw"
-              className="object-cover w-full h-full transition-transform duration-300"
+              className="hero-promotions__image hero-promotions__image--cover"
             />
           </Link>
         ) : (
-          <div className="w-full aspect-square bg-lime-100/60 rounded-2xl" />
+          <div className="hero-promotions__tile hero-promotions__tile--placeholder" />
         )}
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="hero-promotions__grid">
           {gridItems.length > 0
             ? gridItems.map((promotion) => {
                 const imageSrc = promotion.banner_image_url || promotion.banner_image;
@@ -196,10 +184,7 @@ export async function HeroPromotions() {
                   <Link
                     key={promotion.id ?? promotion.title}
                     href={getPromotionHref(promotion)}
-                    className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md block"
-                    style={{
-                      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                    }}
+                    className="hero-promotions__tile"
                   >
                     {imageSrc ? (
                       <Image
@@ -208,10 +193,10 @@ export async function HeroPromotions() {
                         width={GRID_IMAGE_SIZE}
                         height={GRID_IMAGE_SIZE}
                         sizes="50vw"
-                        className="object-contain w-full h-full transition-transform duration-300"
+                        className="hero-promotions__image hero-promotions__image--contain"
                       />
                     ) : (
-                      <div className="w-full h-full bg-lime-100/60" />
+                      <div className="hero-promotions__placeholder" />
                     )}
                   </Link>
                 );
@@ -219,7 +204,7 @@ export async function HeroPromotions() {
             : [...Array(4)].map((_, i) => (
                 <div
                   key={`promo-grid-mobile-placeholder-${i}`}
-                  className="w-full aspect-square bg-lime-100/60 rounded-2xl"
+                  className="hero-promotions__tile hero-promotions__tile--placeholder"
                 />
               ))}
         </div>

@@ -45,17 +45,17 @@ export function MatchScorePage() {
   };
 
   return (
-    <div>
-      <h1 className="section-label mb-8">Find Your Perfect Match</h1>
+    <div className="match-score">
+      <h1 className="match-score__title section-label">Find Your Perfect Match</h1>
 
       {/* Criteria Form */}
-      <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
-        <h2 className="text-2xl font-semibold mb-6">Your Preferences</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="match-score__panel">
+        <h2 className="match-score__panel-title">Your Preferences</h2>
+        <div className="match-score__grid">
           {/* Price Range */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Price Range (KES)</label>
-            <div className="flex gap-2">
+          <div className="match-score__field">
+            <label className="match-score__label">Price Range (KES)</label>
+            <div className="match-score__row">
               <input
                 type="number"
                 placeholder="Min"
@@ -63,7 +63,7 @@ export function MatchScorePage() {
                 onChange={(e) =>
                   setCriteria({ ...criteria, priceMin: e.target.value ? Number(e.target.value) : undefined })
                 }
-                className="flex-1 px-4 py-2 border rounded-lg"
+                className="match-score__input"
               />
               <input
                 type="number"
@@ -72,15 +72,15 @@ export function MatchScorePage() {
                 onChange={(e) =>
                   setCriteria({ ...criteria, priceMax: e.target.value ? Number(e.target.value) : undefined })
                 }
-                className="flex-1 px-4 py-2 border rounded-lg"
+                className="match-score__input"
               />
             </div>
           </div>
 
           {/* Storage */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Storage (GB)</label>
-            <div className="flex flex-wrap gap-2">
+          <div className="match-score__field">
+            <label className="match-score__label">Storage (GB)</label>
+            <div className="match-score__chips">
               {[64, 128, 256, 512, 1024].map((size) => (
                 <button
                   key={size}
@@ -90,11 +90,7 @@ export function MatchScorePage() {
                       : [...(criteria.storage || []), size];
                     setCriteria({ ...criteria, storage: newStorage });
                   }}
-                  className={`px-3 py-1 rounded ${
-                    criteria.storage?.includes(size)
-                      ? 'bg-[var(--primary)] text-white'
-                      : 'bg-gray-200 text-gray-700'
-                  }`}
+                  className={`match-score__chip ${criteria.storage?.includes(size) ? 'match-score__chip--active' : ''}`}
                 >
                   {size}GB
                 </button>
@@ -103,9 +99,9 @@ export function MatchScorePage() {
           </div>
 
           {/* RAM */}
-          <div>
-            <label className="block text-sm font-medium mb-2">RAM (GB)</label>
-            <div className="flex flex-wrap gap-2">
+          <div className="match-score__field">
+            <label className="match-score__label">RAM (GB)</label>
+            <div className="match-score__chips">
               {[4, 6, 8, 12, 16].map((size) => (
                 <button
                   key={size}
@@ -115,11 +111,7 @@ export function MatchScorePage() {
                       : [...(criteria.ram || []), size];
                     setCriteria({ ...criteria, ram: newRam });
                   }}
-                  className={`px-3 py-1 rounded ${
-                    criteria.ram?.includes(size)
-                      ? 'bg-[var(--primary)] text-white'
-                      : 'bg-gray-200 text-gray-700'
-                  }`}
+                  className={`match-score__chip ${criteria.ram?.includes(size) ? 'match-score__chip--active' : ''}`}
                 >
                   {size}GB
                 </button>
@@ -128,9 +120,9 @@ export function MatchScorePage() {
           </div>
 
           {/* Condition */}
-          <div>
-            <label className="block text-sm font-medium mb-2">Condition</label>
-            <div className="flex flex-wrap gap-2">
+          <div className="match-score__field">
+            <label className="match-score__label">Condition</label>
+            <div className="match-score__chips">
               {['New', 'Refurbished', 'Used'].map((cond) => (
                 <button
                   key={cond}
@@ -140,11 +132,7 @@ export function MatchScorePage() {
                       : [...(criteria.condition || []), cond];
                     setCriteria({ ...criteria, condition: newCondition });
                   }}
-                  className={`px-3 py-1 rounded ${
-                    criteria.condition?.includes(cond)
-                      ? 'bg-[var(--primary)] text-white'
-                      : 'bg-gray-200 text-gray-700'
-                  }`}
+                  className={`match-score__chip ${criteria.condition?.includes(cond) ? 'match-score__chip--active' : ''}`}
                 >
                   {cond}
                 </button>
@@ -153,15 +141,15 @@ export function MatchScorePage() {
           </div>
 
           {/* Must be in stock */}
-          <div className="flex items-center">
+          <div className="match-score__checkbox">
             <input
               type="checkbox"
               id="mustBeInStock"
               checked={criteria.mustBeInStock}
               onChange={(e) => setCriteria({ ...criteria, mustBeInStock: e.target.checked })}
-              className="mr-2"
+              className="match-score__checkbox-input"
             />
-            <label htmlFor="mustBeInStock" className="text-sm font-medium">
+            <label htmlFor="mustBeInStock" className="match-score__checkbox-label">
               Must be in stock
             </label>
           </div>
@@ -169,7 +157,7 @@ export function MatchScorePage() {
 
         <button
           onClick={handleCalculate}
-          className="mt-6 px-6 py-3 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)] font-semibold"
+          className="match-score__submit"
         >
           Find Matches
         </button>
@@ -177,52 +165,52 @@ export function MatchScorePage() {
 
       {/* Results */}
       {results.length > 0 && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Top Matches</h2>
-          <div className="space-y-4">
+        <div className="match-score__results">
+          <h2 className="match-score__results-title">Top Matches</h2>
+          <div className="match-score__results-list">
             {results.map((result) => (
               <div
                 key={result.product.id}
-                className="bg-white p-6 rounded-lg shadow-sm"
+                className="match-score__card"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
+                <div className="match-score__card-header">
+                  <div className="match-score__card-main">
                     <Link
                       href={getProductHref(result.product)}
-                      className="text-xl font-semibold hover:text-[var(--primary)]"
+                      className="match-score__card-title"
                     >
                       {result.product.product_name}
                     </Link>
-                    <p className="text-gray-600 mt-1">
+                    <p className="match-score__card-subtitle">
                       {result.product.brand} {result.product.model_series}
                     </p>
                     {result.product.min_price !== null && result.product.max_price !== null && (
-                      <p className="text-lg font-semibold mt-2">
+                      <p className="match-score__card-price">
                         {formatPrice(result.product.min_price)} - {formatPrice(result.product.max_price)}
                       </p>
                     )}
                   </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-[var(--primary)]">{result.score}%</div>
-                    <div className="text-sm text-gray-600">Match Score</div>
+                  <div className="match-score__score">
+                    <div className="match-score__score-value">{result.score}%</div>
+                    <div className="match-score__score-label">Match Score</div>
                   </div>
                 </div>
-                <div className="mt-4 grid grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <div className="text-gray-600">Price</div>
-                    <div className="font-semibold">{result.breakdown.price}%</div>
+                <div className="match-score__breakdown">
+                  <div className="match-score__breakdown-item">
+                    <div className="match-score__breakdown-label">Price</div>
+                    <div className="match-score__breakdown-value">{result.breakdown.price}%</div>
                   </div>
-                  <div>
-                    <div className="text-gray-600">Specs</div>
-                    <div className="font-semibold">{result.breakdown.specs}%</div>
+                  <div className="match-score__breakdown-item">
+                    <div className="match-score__breakdown-label">Specs</div>
+                    <div className="match-score__breakdown-value">{result.breakdown.specs}%</div>
                   </div>
-                  <div>
-                    <div className="text-gray-600">Availability</div>
-                    <div className="font-semibold">{result.breakdown.availability}%</div>
+                  <div className="match-score__breakdown-item">
+                    <div className="match-score__breakdown-label">Availability</div>
+                    <div className="match-score__breakdown-value">{result.breakdown.availability}%</div>
                   </div>
-                  <div>
-                    <div className="text-gray-600">Rating</div>
-                    <div className="font-semibold">{result.breakdown.rating}%</div>
+                  <div className="match-score__breakdown-item">
+                    <div className="match-score__breakdown-label">Rating</div>
+                    <div className="match-score__breakdown-value">{result.breakdown.rating}%</div>
                   </div>
                 </div>
               </div>

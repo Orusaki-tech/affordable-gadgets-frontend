@@ -46,34 +46,34 @@ export function PaymentMethodModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-      <div className="relative bg-white rounded-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
+    <div className="payment-method-modal">
+      <div className="payment-method-modal__panel">
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="payment-method-modal__close"
           aria-label="Close payment modal"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="payment-method-modal__close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">
+        <div className="payment-method-modal__header">
+          <h2 className="payment-method-modal__title">
             Choose a payment option
           </h2>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="payment-method-modal__subtitle">
             Secure checkout powered by trusted payment providers.
           </p>
         </div>
 
         {/* Payment Options */}
-        <div className="space-y-3 mb-6">
+        <div className="payment-method-modal__options">
           {/* M-PESA Option */}
-          <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+          <label className={`payment-method-modal__option payment-method-modal__option--mpesa ${
             selectedMethod === 'mpesa' 
-              ? 'border-green-500 bg-green-50' 
-              : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+              ? 'payment-method-modal__option--active'
+              : ''
           }`}>
             <input
               type="radio"
@@ -81,21 +81,21 @@ export function PaymentMethodModal({
               value="mpesa"
               checked={selectedMethod === 'mpesa'}
               onChange={(e) => setSelectedMethod(e.target.value as PaymentMethod)}
-              className="mr-4 w-5 h-5 text-green-600"
+              className="payment-method-modal__radio payment-method-modal__radio--mpesa"
             />
-            <div className="flex items-center flex-1">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-4 shadow-sm">
-                <span className="text-white font-bold text-xl">M</span>
+            <div className="payment-method-modal__option-content">
+              <div className="payment-method-modal__brand payment-method-modal__brand--mpesa">
+                <span className="payment-method-modal__brand-text">M</span>
               </div>
-              <span className="font-semibold text-lg text-gray-800">M-PESA</span>
+              <span className="payment-method-modal__option-label">M-PESA</span>
             </div>
           </label>
 
           {/* Airtel Money Option */}
-          <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+          <label className={`payment-method-modal__option payment-method-modal__option--airtel ${
             selectedMethod === 'airtel' 
-              ? 'border-red-500 bg-red-50' 
-              : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+              ? 'payment-method-modal__option--active'
+              : ''
           }`}>
             <input
               type="radio"
@@ -103,21 +103,21 @@ export function PaymentMethodModal({
               value="airtel"
               checked={selectedMethod === 'airtel'}
               onChange={(e) => setSelectedMethod(e.target.value as PaymentMethod)}
-              className="mr-4 w-5 h-5 text-red-600"
+              className="payment-method-modal__radio payment-method-modal__radio--airtel"
             />
-            <div className="flex items-center flex-1">
-              <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mr-4 shadow-sm">
-                <span className="text-white font-bold text-xl">A</span>
+            <div className="payment-method-modal__option-content">
+              <div className="payment-method-modal__brand payment-method-modal__brand--airtel">
+                <span className="payment-method-modal__brand-text">A</span>
               </div>
-              <span className="font-semibold text-lg text-gray-800">Airtel Money</span>
+              <span className="payment-method-modal__option-label">Airtel Money</span>
             </div>
           </label>
 
           {/* Card Payments Option */}
-          <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+          <label className={`payment-method-modal__option payment-method-modal__option--card ${
             selectedMethod === 'card' 
-              ? 'border-[var(--primary)] bg-gray-50' 
-              : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+              ? 'payment-method-modal__option--active'
+              : ''
           }`}>
             <input
               type="radio"
@@ -125,29 +125,29 @@ export function PaymentMethodModal({
               value="card"
               checked={selectedMethod === 'card'}
               onChange={(e) => setSelectedMethod(e.target.value as PaymentMethod)}
-              className="mr-4 w-5 h-5 text-[var(--primary)]"
+              className="payment-method-modal__radio payment-method-modal__radio--card"
             />
-            <div className="flex items-center flex-1">
-              <div className="flex items-center gap-2 mr-4">
-                <div className="w-10 h-7 bg-[var(--primary)] rounded flex items-center justify-center shadow-sm">
-                  <span className="text-white text-[10px] font-bold">VISA</span>
+            <div className="payment-method-modal__option-content">
+              <div className="payment-method-modal__card-icons">
+                <div className="payment-method-modal__card-icon payment-method-modal__card-icon--visa">
+                  <span className="payment-method-modal__card-text">VISA</span>
                 </div>
-                <div className="w-10 h-7 bg-red-500 rounded flex items-center justify-center shadow-sm">
-                  <span className="text-white text-[10px] font-bold">MC</span>
+                <div className="payment-method-modal__card-icon payment-method-modal__card-icon--mc">
+                  <span className="payment-method-modal__card-text">MC</span>
                 </div>
-                <div className="w-10 h-7 bg-[var(--primary-dark)] rounded flex items-center justify-center shadow-sm">
-                  <span className="text-white text-[10px] font-bold">AE</span>
+                <div className="payment-method-modal__card-icon payment-method-modal__card-icon--ae">
+                  <span className="payment-method-modal__card-text">AE</span>
                 </div>
               </div>
-              <span className="font-semibold text-lg text-gray-800">Card Payments</span>
+              <span className="payment-method-modal__option-label">Card Payments</span>
             </div>
           </label>
 
           {/* Pesapal Gateway Option */}
-          <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+          <label className={`payment-method-modal__option payment-method-modal__option--pesapal ${
             selectedMethod === 'pesapal' 
-              ? 'border-orange-500 bg-orange-50' 
-              : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+              ? 'payment-method-modal__option--active'
+              : ''
           }`}>
             <input
               type="radio"
@@ -155,36 +155,36 @@ export function PaymentMethodModal({
               value="pesapal"
               checked={selectedMethod === 'pesapal'}
               onChange={(e) => setSelectedMethod(e.target.value as PaymentMethod)}
-              className="mr-4 w-5 h-5 text-orange-600"
+              className="payment-method-modal__radio payment-method-modal__radio--pesapal"
             />
-            <div className="flex items-center flex-1">
-              <div className="flex items-center gap-2 mr-4">
-                <div className="w-10 h-7 bg-[var(--primary)] rounded flex items-center justify-center shadow-sm">
-                  <span className="text-white text-[10px] font-bold">VISA</span>
+            <div className="payment-method-modal__option-content">
+              <div className="payment-method-modal__card-icons">
+                <div className="payment-method-modal__card-icon payment-method-modal__card-icon--visa">
+                  <span className="payment-method-modal__card-text">VISA</span>
                 </div>
-                <div className="w-10 h-7 bg-orange-500 rounded flex items-center justify-center shadow-sm">
-                  <span className="text-white text-[9px] font-bold px-1">e-wallet</span>
+                <div className="payment-method-modal__card-icon payment-method-modal__card-icon--wallet">
+                  <span className="payment-method-modal__card-text payment-method-modal__card-text--wallet">e-wallet</span>
                 </div>
               </div>
-              <span className="font-semibold text-lg text-gray-800">Pesapal Gateway</span>
+              <span className="payment-method-modal__option-label">Pesapal Gateway</span>
             </div>
           </label>
         </div>
 
         {/* Payment Summary */}
-        <div className="bg-gray-50 p-5 rounded-xl mb-6 border border-gray-200">
-          <p className="text-center font-semibold text-lg text-gray-800">
-            Pay <span className="font-bold text-gray-900">"{merchantName}"</span> {formatPrice(totalAmount)}
+        <div className="payment-method-modal__summary">
+          <p className="payment-method-modal__summary-text">
+            Pay <span className="payment-method-modal__summary-merchant">"{merchantName}"</span> {formatPrice(totalAmount)}
           </p>
         </div>
 
         {/* MPESA Instructions */}
         {(selectedMethod === 'mpesa' || selectedMethod === 'airtel') && (
-          <div className="mb-6 space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
-            <h3 className="font-semibold text-base text-gray-800 mb-3">
+          <div className="payment-method-modal__instructions">
+            <h3 className="payment-method-modal__instructions-title">
               {selectedMethod === 'mpesa' ? 'M-PESA Payment Instructions:' : 'Airtel Money Payment Instructions:'}
             </h3>
-            <ol className="list-decimal list-inside space-y-2.5 text-sm text-gray-700 leading-relaxed">
+            <ol className="payment-method-modal__instructions-list">
               <li>
                 Provide your {selectedMethod === 'mpesa' ? 'MPESA' : 'Airtel Money'} [KE] mobile number below
               </li>
@@ -198,10 +198,10 @@ export function PaymentMethodModal({
             </ol>
 
             {/* Mobile Number Input */}
-            <div className="mt-5">
-              <label className="flex items-center text-sm font-medium mb-2.5 text-gray-700">
+            <div className="payment-method-modal__input-group">
+              <label className="payment-method-modal__label">
                 <svg
-                  className="w-5 h-5 mr-2 text-gray-600"
+                  className="payment-method-modal__label-icon"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -215,11 +215,11 @@ export function PaymentMethodModal({
                 </svg>
                 Provide your {selectedMethod === 'mpesa' ? 'Mpesa' : 'Airtel Money'} [KE] Mobile number
               </label>
-              <div className="flex gap-2">
+              <div className="payment-method-modal__input-row">
                 <select
                   value={countryCode}
                   onChange={(e) => setCountryCode(e.target.value)}
-                  className="px-3 py-2.5 border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:border-[var(--primary)] text-sm font-medium"
+                  className="payment-method-modal__select"
                 >
                   <option value="+254">+254</option>
                   <option value="+255">+255</option>
@@ -231,7 +231,7 @@ export function PaymentMethodModal({
                   value={mobileNumber}
                   onChange={(e) => setMobileNumber(formatPhoneNumber(e.target.value))}
                   placeholder="727504393"
-                  className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[var(--primary)] text-sm"
+                  className="payment-method-modal__input"
                   maxLength={9}
                 />
               </div>
@@ -241,24 +241,24 @@ export function PaymentMethodModal({
 
         {/* Card/Pesapal Instructions */}
         {(selectedMethod === 'card' || selectedMethod === 'pesapal') && (
-          <div className="mb-6">
-            <p className="text-sm text-gray-600">
+          <div className="payment-method-modal__note">
+            <p>
               You will be redirected to a secure payment page to complete your transaction using your preferred card.
             </p>
           </div>
         )}
 
         {/* Regulatory Information */}
-        <p className="text-xs text-gray-500 text-center mb-6">
+        <p className="payment-method-modal__regulatory">
           Pesapal is Regulated by the Central Bank of Kenya
         </p>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 mt-6">
+        <div className="payment-method-modal__actions">
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 font-semibold transition-colors text-gray-700"
+            className="payment-method-modal__button payment-method-modal__button--secondary"
             disabled={isLoading}
           >
             Cancel
@@ -267,7 +267,7 @@ export function PaymentMethodModal({
             type="button"
             onClick={handleProceed}
             disabled={isLoading || (selectedMethod !== 'card' && selectedMethod !== 'pesapal' && !mobileNumber)}
-            className="flex-1 px-4 py-3 bg-[#8B4513] text-white rounded-lg hover:bg-[#6B3410] font-semibold transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm"
+            className="payment-method-modal__button payment-method-modal__button--primary"
           >
             {isLoading ? 'Processing...' : 'Proceed'}
           </button>

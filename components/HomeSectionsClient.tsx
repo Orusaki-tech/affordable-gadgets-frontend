@@ -7,9 +7,9 @@ export const SpecialOffersClient = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="home-sections__grid home-sections__grid--offers">
         {[...Array(4)].map((_, i) => (
-          <div key={`special-offers-skeleton-${i}`} className="bg-lime-100/60 animate-pulse rounded-2xl aspect-square" />
+          <div key={`special-offers-skeleton-${i}`} className="home-sections__skeleton home-sections__skeleton--offer" />
         ))}
       </div>
     ),
@@ -21,9 +21,9 @@ export const ProductGridClient = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="home-sections__grid home-sections__grid--products">
         {[...Array(8)].map((_, i) => (
-          <div key={`product-grid-skeleton-${i}`} className="bg-gray-200 animate-pulse rounded-lg h-96" />
+          <div key={`product-grid-skeleton-${i}`} className="home-sections__skeleton home-sections__skeleton--product" />
         ))}
       </div>
     ),
@@ -35,9 +35,9 @@ export const ReviewsShowcaseClient = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="home-sections__grid home-sections__grid--reviews">
         {[...Array(3)].map((_, i) => (
-          <div key={`reviews-skeleton-${i}`} className="bg-gray-100 animate-pulse rounded-2xl h-56" />
+          <div key={`reviews-skeleton-${i}`} className="home-sections__skeleton home-sections__skeleton--review" />
         ))}
       </div>
     ),
@@ -49,9 +49,9 @@ export const CategoriesSectionClient = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="home-sections__grid home-sections__grid--categories">
         {[...Array(4)].map((_, i) => (
-          <div key={`categories-skeleton-${i}`} className="bg-gray-100 animate-pulse rounded-2xl h-40" />
+          <div key={`categories-skeleton-${i}`} className="home-sections__skeleton home-sections__skeleton--category" />
         ))}
       </div>
     ),
@@ -63,9 +63,9 @@ export const RecentlyViewedClient = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="home-sections__grid home-sections__grid--recent">
         {[...Array(4)].map((_, i) => (
-          <div key={`recently-viewed-skeleton-${i}`} className="bg-gray-100 animate-pulse rounded-lg h-48" />
+          <div key={`recently-viewed-skeleton-${i}`} className="home-sections__skeleton home-sections__skeleton--recent" />
         ))}
       </div>
     ),

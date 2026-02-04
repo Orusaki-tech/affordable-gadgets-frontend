@@ -47,81 +47,81 @@ export function Header() {
   });
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-md border-b border-gray-100 relative">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between gap-4">
+    <header className="site-header">
+      <div className="site-header__container">
+        <div className="site-header__bar">
           {/* Logo */}
           <Link 
             href="/" 
-            className="flex items-center gap-3 shrink-0 hover:opacity-80 transition-opacity group"
+            className="site-header__logo-link"
           >
-            <div className="relative w-20 h-20 flex items-center justify-center overflow-hidden">
+            <div className="site-header__logo-wrap">
               <Image 
                 src="/affordablelogo.png" 
                 alt={`${brandConfig.name} logo`}
                 width={80}
                 height={80}
-                className="object-contain w-full h-full"
+                className="site-header__logo"
                 priority
               /> 
             </div>
             
             {/* Logo Text - Hidden on mobile/tablet, visible on desktop */}
-            <span className="hidden lg:block text-2xl font-bold text-black">
+            <span className="site-header__logo-text">
               {brandConfig.name}
             </span>
           </Link>
 
           {/* Search Bar - Desktop */}
-          <div className="hidden md:block flex-1 max-w-3xl mx-6">
+          <div className="site-header__search site-header__search--desktop">
             <SearchBar />
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-6 shrink-0">
+          <nav className="site-header__nav">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-gray-700 hover:text-[var(--primary)] transition-colors font-medium text-sm relative group"
+                className="site-header__nav-link"
               >
                 {link.label}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
+                <span className="site-header__nav-underline"></span>
               </Link>
             ))}
 
-            <div className="group">
+            <div className="site-header__products">
               <Link
                 href="/products"
-                className="text-gray-700 hover:text-[var(--primary)] transition-colors font-medium text-sm relative group"
+                className="site-header__nav-link"
               >
                 Products
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
+                <span className="site-header__nav-underline"></span>
               </Link>
 
-              <div className="absolute left-0 right-0 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
-                <div className="container mx-auto px-4">
-                  <div className="bg-white/95 border border-gray-200 shadow-2xl rounded-2xl p-6 w-full max-h-[70vh] overflow-y-auto backdrop-blur">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <div className="site-header__dropdown">
+                <div className="site-header__dropdown-container">
+                  <div className="site-header__dropdown-panel">
+                  <div className="site-header__dropdown-grid">
                     {productCategories.map((category) => {
                       const brands = menuBrands?.results?.[category.code] ?? [];
                       return (
-                        <div key={category.code} className="space-y-3">
+                        <div key={category.code} className="site-header__dropdown-group">
                           <Link
                             href={`/products?type=${category.code}`}
-                            className="inline-flex items-center gap-2 font-semibold text-gray-900 hover:text-[var(--primary)]"
+                            className="site-header__dropdown-title"
                           >
                             {category.name}
                           </Link>
-                          <div className="space-y-2">
+                          <div className="site-header__dropdown-list">
                             {isMenuBrandsLoading ? (
-                              <p className="text-sm text-gray-400">Loading brands...</p>
+                              <p className="site-header__dropdown-muted">Loading brands...</p>
                             ) : brands.length > 0 ? (
                               brands.map((brand) => (
                                 <Link
                                   key={brand}
                                   href={`/products?type=${category.code}&brand=${encodeURIComponent(brand)}`}
-                                  className="block text-sm text-gray-600 hover:text-[var(--primary)]"
+                                  className="site-header__dropdown-link"
                                 >
                                   {brand}
                                 </Link>
@@ -129,7 +129,7 @@ export function Header() {
                             ) : (
                               <Link
                                 href={`/products?type=${category.code}`}
-                                className="inline-flex text-sm text-gray-500 hover:text-[var(--primary)]"
+                                className="site-header__dropdown-link site-header__dropdown-link--muted"
                               >
                                 Browse all {category.name}
                               </Link>
@@ -140,10 +140,10 @@ export function Header() {
                     })}
                   </div>
 
-                  <div className="mt-6 border-t border-gray-100 pt-4">
+                  <div className="site-header__dropdown-footer">
                     <Link
                       href="/products"
-                      className="text-sm text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium"
+                      className="site-header__dropdown-cta"
                     >
                       View all products →
                     </Link>
@@ -157,9 +157,9 @@ export function Header() {
           {/* Cart Icon */}
           <Link
             href="/cart"
-            className="relative flex items-center gap-2 text-gray-700 hover:text-[var(--primary)] transition-colors shrink-0 p-2 rounded-lg hover:bg-gray-50"
+            className="site-header__cart"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="site-header__cart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -168,21 +168,21 @@ export function Header() {
               />
             </svg>
             {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+              <span className="site-header__cart-badge">
                 {itemCount}
               </span>
             )}
-            <span className="hidden md:inline font-medium">Cart</span>
+            <span className="site-header__cart-label">Cart</span>
           </Link>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="site-header__menu-button"
             aria-label="Toggle menu"
           >
             <svg
-              className="w-6 h-6"
+              className="site-header__menu-icon"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -207,57 +207,57 @@ export function Header() {
         </div>
 
         {/* Mobile Search */}
-        <div className="md:hidden mt-4">
+        <div className="site-header__search site-header__search--mobile">
           <SearchBar />
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <nav className="lg:hidden mt-4 pb-4 border-t border-gray-200 animate-fade-in">
-            <div className="flex flex-col gap-2 pt-4">
+          <nav className="site-header__mobile-menu">
+            <div className="site-header__mobile-list">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-[var(--primary)] rounded-lg transition-colors font-medium"
+                  className="site-header__mobile-link"
                 >
                   {link.label}
                 </Link>
               ))}
 
-              <details className="px-4 py-3 rounded-lg hover:bg-gray-50">
-                <summary className="cursor-pointer text-gray-700 font-medium">
+              <details className="site-header__mobile-details">
+                <summary className="site-header__mobile-summary">
                   Products
                 </summary>
-                <div className="mt-3 space-y-4">
+                <div className="site-header__mobile-submenu">
                   {productCategories.map((category) => {
                     const brands = menuBrands?.results?.[category.code] ?? [];
                     return (
-                      <div key={category.code}>
+                      <div key={category.code} className="site-header__mobile-group">
                         <Link
                           href={`/products?type=${category.code}`}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="block text-gray-900 font-semibold"
+                          className="site-header__mobile-title"
                         >
                           {category.name}
                         </Link>
-                        <div className="mt-2 space-y-1">
+                        <div className="site-header__mobile-brands">
                           {isMenuBrandsLoading ? (
-                            <p className="text-sm text-gray-400">Loading brands...</p>
+                            <p className="site-header__mobile-muted">Loading brands...</p>
                           ) : brands.length > 0 ? (
                             brands.map((brand) => (
                               <Link
                                 key={brand}
                                 href={`/products?type=${category.code}&brand=${encodeURIComponent(brand)}`}
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="block text-sm text-gray-600"
+                                className="site-header__mobile-brand"
                               >
                                 {brand}
                               </Link>
                             ))
                           ) : (
-                            <p className="text-sm text-gray-400">No brands yet</p>
+                            <p className="site-header__mobile-muted">No brands yet</p>
                           )}
                         </div>
                       </div>

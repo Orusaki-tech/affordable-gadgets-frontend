@@ -139,32 +139,32 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   };
 
   return (
-    <div>
+    <div className="products-page">
       {promotionData ? (
-        <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-              <h1 className="section-label">{promotionData.title}</h1>
+        <div className="products-page__promo">
+          <div className="products-page__promo-header">
+            <div className="products-page__promo-meta">
+              <h1 className="products-page__title section-label">{promotionData.title}</h1>
               {promotionData.description && (
-                <p className="text-gray-600 sm:max-w-[520px] sm:truncate">
+                <p className="products-page__promo-description">
                   {promotionData.description}
                 </p>
               )}
             </div>
             <form
               onSubmit={handleSearch}
-              className="flex w-full gap-3 md:w-auto md:min-w-[320px] md:max-w-[520px]"
+              className="products-page__search"
             >
               <input
                 type="text"
                 placeholder="Search products..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="flex-1 px-4 py-2 border rounded-lg"
+                className="products-page__search-input"
               />
               <button
                 type="submit"
-                className="px-5 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)]"
+                className="products-page__search-button"
               >
                 Search
               </button>
@@ -172,31 +172,31 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
           </div>
           {/* Note: promotion_code is not in the Promotion interface, but keeping for backward compatibility */}
           {(promotionData as PublicPromotion & { promotion_code?: string }).promotion_code && (
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="products-page__promo-code">
               Promotion Code:{' '}
-              <code className="bg-white px-2 py-1 rounded">
+              <code className="products-page__promo-code-value">
                 {(promotionData as PublicPromotion & { promotion_code?: string }).promotion_code}
               </code>
             </p>
           )}
         </div>
       ) : (
-        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <h1 className="section-label">Products</h1>
+        <div className="products-page__header">
+          <h1 className="products-page__title section-label">Products</h1>
           <form
             onSubmit={handleSearch}
-            className="flex w-full gap-3 md:w-auto md:min-w-[280px] md:max-w-[440px] lg:max-w-[480px]"
+            className="products-page__search"
           >
             <input
               type="text"
               placeholder="Search products..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 px-4 py-2 border rounded-lg"
+              className="products-page__search-input"
             />
             <button
               type="submit"
-              className="px-5 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)]"
+              className="products-page__search-button"
             >
               Search
             </button>
@@ -204,9 +204,9 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
         </div>
       )}
 
-      <div className="lg:grid lg:grid-cols-[320px_1fr] lg:gap-8">
+      <div className="products-page__layout">
         {/* Filters Sidebar */}
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        <div className="products-page__filters">
           <ProductFilters
             onFiltersChange={handleFiltersChange}
             onSortChange={handleSortChange}
@@ -216,36 +216,36 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
         </div>
 
         {/* Results */}
-        <div>
+        <div className="products-page__results">
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="products-page__grid products-page__grid--loading">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-96" />
+                <div key={i} className="products-page__skeleton" />
               ))}
             </div>
           ) : error ? (
-            <div className="text-center py-12">
-              <p className="text-red-600">Error loading products. Please try again later.</p>
+            <div className="products-page__status products-page__status--error">
+              <p>Error loading products. Please try again later.</p>
             </div>
           ) : !data || filteredResults.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="products-page__status">
               {promotionId && promotionData ? (
-                <p className="text-gray-600 mb-4">No products available for this promotion.</p>
+                <p className="products-page__status-text">No products available for this promotion.</p>
               ) : (
-                <p className="text-gray-600">No products found.</p>
+                <p className="products-page__status-text">No products found.</p>
               )}
             </div>
           ) : (
             <>
-              <p className="text-gray-600 mb-4">
+              <p className="products-page__summary">
                 Showing {filteredResults.length} of {data.count} product{data.count !== 1 ? 's' : ''}
                 {promotionId && promotionData && (
-                  <span className="ml-2 text-sm text-[var(--primary)]">
+                  <span className="products-page__summary-note">
                     (filtered by promotion: {promotionData.title})
                   </span>
                 )}
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="products-page__grid">
                 {filteredResults.map((product) => (
                   <ProductCard key={product.id} product={product} {...cardOptions} />
                 ))}
@@ -253,21 +253,21 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
 
               {/* Pagination */}
               {(data.next || data.previous) && (
-                <div className="flex justify-center gap-4 mt-8">
+                <div className="products-page__pagination">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={!data.previous}
-                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="products-page__pagination-button"
                   >
                     Previous
                   </button>
-                  <span className="px-4 py-2">
+                  <span className="products-page__pagination-status">
                     Page {page} of {Math.ceil(data.count / 24)}
                   </span>
                   <button
                     onClick={() => setPage((p) => p + 1)}
                     disabled={!data.next}
-                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="products-page__pagination-button"
                   >
                     Next
                   </button>

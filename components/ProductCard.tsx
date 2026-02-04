@@ -24,19 +24,19 @@ interface ProductCardProps {
 
 function RatingStars({ rating, count }: { rating: number | null; count: number }) {
   if (!rating || count === 0) {
-    return <span className="text-xs text-gray-500">No reviews yet</span>;
+    return <span className="product-card__rating-empty">No reviews yet</span>;
   }
 
   const rounded = Math.round(rating * 10) / 10;
   const stars = Array.from({ length: 5 }, (_, i) => i + 1);
 
   return (
-    <div className="flex items-center gap-1 text-xs text-gray-600">
-      <div className="flex items-center gap-0.5 text-yellow-500">
+    <div className="product-card__rating-stars">
+      <div className="product-card__rating-icons">
         {stars.map((star) => (
           <svg
             key={star}
-            className="h-4 w-4"
+            className="product-card__rating-icon"
             viewBox="0 0 20 20"
             fill={rounded >= star ? 'currentColor' : 'none'}
             stroke="currentColor"
@@ -45,8 +45,8 @@ function RatingStars({ rating, count }: { rating: number | null; count: number }
           </svg>
         ))}
       </div>
-      <span className="font-semibold text-gray-700">{rounded}</span>
-      <span className="text-gray-500">({count})</span>
+      <span className="product-card__rating-value">{rounded}</span>
+      <span className="product-card__rating-count">({count})</span>
     </div>
   );
 }
@@ -212,20 +212,20 @@ export function ProductCard({
     return (
       <Link
         href={getProductHref(product)}
-        className="group block bg-white rounded-2xl border border-[#e8e8ed] overflow-hidden animate-fade-in h-full transition-shadow duration-300 hover:shadow-sm"
+        className="product-card product-card--featured"
       >
-        <div className="relative w-full aspect-square bg-white flex items-center justify-center overflow-hidden">
+        <div className="product-card__media product-card__media--square">
           <Image
             src={primaryImage}
             alt={product.product_name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+            className="product-card__image product-card__image--primary"
             unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
           />
         </div>
-        <div className="flex flex-col items-center text-center px-[19.2px] pt-4 pb-[19.2px]">
-          <h3 className="product-card-name text-gray-900 mb-4 line-clamp-2">
+        <div className="product-card__body product-card__body--featured">
+          <h3 className="product-card__title product-card__title--featured">
             {product.product_name}
           </h3>
           <button
@@ -235,7 +235,7 @@ export function ProductCard({
               handleAddToCart(event, 1);
             }}
             disabled={!canAddToCart}
-            className="btn-cta product-card-cta rounded-[16px] border border-[var(--primary-dark)] bg-[var(--primary-dark)] text-white px-[18.4px] pt-[7.2px] pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="product-card__cta product-card__cta--featured"
             aria-label="Buy"
           >
             {isAddingToCart ? 'Adding...' : 'Buy'}
@@ -249,20 +249,16 @@ export function ProductCard({
     <>
     <Link
       href={getProductHref(product)}
-      className={`group block bg-white overflow-hidden border border-gray-200 animate-fade-in h-full flex flex-col transition-all duration-300 ${
-        isMinimal
-          ? 'rounded-xl shadow-none hover:shadow-sm hover:border-gray-300'
-          : 'rounded-2xl shadow-sm hover:shadow-md hover:border-gray-300'
-      }`}
+      className={`product-card product-card--default ${isMinimal ? 'product-card--minimal' : 'product-card--standard'}`}
     >
       {/* Product Image */}
-      <div className={`relative w-full bg-gray-50 flex items-center justify-center overflow-hidden ${isMinimal ? 'aspect-square' : 'aspect-[4/3]'}`}>
+      <div className={`product-card__media ${isMinimal ? 'product-card__media--square' : 'product-card__media--wide'}`}>
         <Image
             src={primaryImage}
           alt={product.product_name}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className={`object-contain transition-all duration-300 ${secondaryImage ? 'group-hover:opacity-0' : ''}`}
+            className={`product-card__image product-card__image--primary ${secondaryImage ? 'product-card__image--fade' : ''}`}
           unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
         />
           {secondaryImage && (
@@ -271,35 +267,35 @@ export function ProductCard({
               alt={`${product.product_name} alternate`}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              className="object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              className="product-card__image product-card__image--secondary"
               unoptimized={secondaryImage.includes('localhost') || secondaryImage.includes('127.0.0.1') || secondaryImage.includes('placehold.co')}
             />
           )}
 
           {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
+          <div className="product-card__badges">
         {!isMinimal && hasBundle && (
-            <div className="product-card-badge bg-orange-500 text-white px-3 py-1 rounded-full shadow-lg">
+            <div className="product-card__badge product-card__badge--bundle">
             {bundlePricePreview ? `Bundle from ${formatPrice(bundlePricePreview)}` : 'Bundle available'}
           </div>
         )}
             {isOnSale && (
-              <div className="product-card-badge bg-red-500 text-white px-3 py-1 rounded-full shadow-lg">
+              <div className="product-card__badge product-card__badge--sale">
                 {discountPercent ? `Save ${discountPercent}%` : 'Sale'}
               </div>
             )}
             {!isMinimal && isNew && (
-              <div className="product-card-badge bg-[var(--primary)] text-white px-3 py-1 rounded-full shadow-lg">
+              <div className="product-card__badge product-card__badge--new">
                 New
               </div>
             )}
             {!isMinimal && isFeatured && (
-              <div className="product-card-badge bg-purple-600 text-white px-3 py-1 rounded-full shadow-lg">
+              <div className="product-card__badge product-card__badge--trending">
                 Trending
               </div>
             )}
             {!isMinimal && lowStock && (
-              <div className="product-card-badge bg-amber-500 text-white px-3 py-1 rounded-full shadow-lg">
+              <div className="product-card__badge product-card__badge--low-stock">
                 Low stock
               </div>
             )}
@@ -307,23 +303,21 @@ export function ProductCard({
 
         {/* Stock Badge */}
         {!hasStock && (
-          <div className="product-card-badge absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full shadow-lg">
+          <div className="product-card__badge product-card__badge--stock product-card__badge--out">
             Out of Stock
           </div>
         )}
 
           {/* Quick Actions */}
           {allowQuickActions && (
-            <div className="absolute right-3 bottom-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="product-card__quick-actions">
               <button
                 type="button"
                 onClick={handleWishlistToggle}
-                className={`h-9 w-9 rounded-full border shadow-sm flex items-center justify-center bg-white ${
-                  isInWishlist(product.id) ? 'text-red-500 border-red-200' : 'text-gray-500 border-gray-200'
-                }`}
+                className={`product-card__quick-action ${isInWishlist(product.id) ? 'product-card__quick-action--active' : ''}`}
                 aria-label="Toggle wishlist"
               >
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="product-card__quick-icon" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 18.343l-6.828-6.829a4 4 0 010-5.656z" />
                 </svg>
               </button>
@@ -331,10 +325,10 @@ export function ProductCard({
                 <button
                   type="button"
                   onClick={handleQuickViewOpen}
-                  className="h-9 w-9 rounded-full border border-gray-200 shadow-sm flex items-center justify-center bg-white text-gray-500"
+                  className="product-card__quick-action"
                   aria-label="Quick view"
                 >
-                  <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <svg className="product-card__quick-icon" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M10 3c-4.5 0-8.268 2.943-9.5 7 1.232 4.057 5 7 9.5 7s8.268-2.943 9.5-7C18.268 5.943 14.5 3 10 3zm0 12a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z" />
                   </svg>
                 </button>
@@ -342,10 +336,10 @@ export function ProductCard({
               <button
                 type="button"
                 onClick={handleQuickAddToggle}
-                className="h-9 w-9 rounded-full border border-gray-200 shadow-sm flex items-center justify-center bg-white text-gray-500"
+                className="product-card__quick-action"
                 aria-label="Quick add"
               >
-                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <svg className="product-card__quick-icon" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
                 </svg>
               </button>
@@ -354,20 +348,18 @@ export function ProductCard({
         
         {/* Hover Overlay */}
         {!isMinimal && (
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
+          <div className="product-card__overlay" />
         )}
       </div>
 
       {/* Product Info */}
-      <div className={`flex flex-col flex-1 ${isMinimal ? 'p-4' : 'p-4 sm:p-5'}`}>
-        <h3 className={`product-card-name line-clamp-2 transition-colors text-gray-900 ${
-          isMinimal ? 'text-[15px] leading-[22px]' : 'group-hover:text-[var(--primary)]'
-        }`}>
+      <div className={`product-card__body ${isMinimal ? 'product-card__body--minimal' : 'product-card__body--standard'}`}>
+        <h3 className={`product-card__title ${isMinimal ? 'product-card__title--minimal' : 'product-card__title--standard'}`}>
           {product.product_name}
         </h3>
         
         {(brandLine || specLine) && (
-          <p className={`product-card-spec text-gray-500 ${isMinimal ? 'mt-1' : 'mb-3'}`}>
+          <p className={`product-card__spec ${isMinimal ? 'product-card__spec--minimal' : 'product-card__spec--standard'}`}>
             {brandLine}
             {brandLine && specLine ? ' • ' : ''}
             {specLine}
@@ -375,17 +367,17 @@ export function ProductCard({
         )}
 
           {showRatings && (
-            <div className={isMinimal ? 'mt-2' : 'mb-3'}>
+            <div className={`product-card__rating ${isMinimal ? 'product-card__rating--minimal' : 'product-card__rating--standard'}`}>
               <RatingStars rating={averageRating} count={reviewCount} />
             </div>
           )}
 
           {shippingTags.length > 0 && !isMinimal && (
-            <div className="flex flex-wrap gap-1 mb-3">
+            <div className="product-card__chips">
               {shippingTags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[11px] rounded-full border border-emerald-200"
+                  className="product-card__chip product-card__chip--shipping"
                 >
                   {tag}
                 </span>
@@ -395,11 +387,11 @@ export function ProductCard({
 
         {/* Tags */}
           {rawTags.length > 0 && !isMinimal && (
-          <div className="flex flex-wrap gap-1 mb-3">
+          <div className="product-card__chips">
               {rawTags.slice(0, 2).map((tag, idx) => (
               <span
                   key={`${tag}-${idx}`}
-                className="px-2 py-0.5 bg-gray-50 text-[var(--primary)] text-[11px] rounded-full border border-gray-200"
+                className="product-card__chip product-card__chip--tag"
               >
                 {tag}
               </span>
@@ -409,18 +401,18 @@ export function ProductCard({
 
           {/* Swatches */}
           {allowSwatches && colorOptions.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-3">
+            <div className="product-card__swatches">
               {colorOptions.slice(0, 4).map((color) => (
                 <span
                   key={color.name}
-                  className="px-2 py-0.5 text-[11px] rounded-full border border-gray-200 text-gray-600 bg-gray-50"
+                  className="product-card__swatch"
                   title={color.name}
                 >
                   {color.name}
                 </span>
               ))}
               {colorOptions.length > 4 && (
-                <span className="px-2 py-0.5 text-[11px] rounded-full border border-gray-200 text-gray-500 bg-gray-50">
+                <span className="product-card__swatch product-card__swatch--more">
                   +{colorOptions.length - 4}
                 </span>
               )}
@@ -428,29 +420,29 @@ export function ProductCard({
           )}
 
         {/* Price */}
-        <div className={`${isMinimal ? 'mt-3' : 'mb-3 mt-auto'}`}>
+        <div className={`product-card__price-block ${isMinimal ? 'product-card__price-block--minimal' : 'product-card__price-block--standard'}`}>
             {hasPriceRange ? (
               showComparePrice ? (
-                <div className="flex items-center gap-2">
-                  <p className={`product-card-price text-gray-900 ${isMinimal ? 'text-[16px] leading-[22px]' : ''}`}>
+                <div className="product-card__price-row">
+                  <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
                     {formatPrice(product.min_price ?? null)}
                   </p>
-                  <p className={`product-card-msrp text-gray-400 ${isMinimal ? 'text-[12px] leading-[18px]' : ''}`}>
+                  <p className={`product-card__msrp ${isMinimal ? 'product-card__msrp--compact' : ''}`}>
                     {formatPrice(compareAtDisplay ?? null)}
                   </p>
                   {isMinimal && savings !== null && (
-                    <span className="text-[11px] leading-[16px] font-semibold text-emerald-600">
+                    <span className="product-card__savings">
                       Save {formatPrice(savings)}
                     </span>
                   )}
                 </div>
               ) : (
-            <p className={`product-card-price text-gray-900 ${isMinimal ? 'text-[16px] leading-[22px]' : ''}`}>
+            <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
             {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
             </p>
               )
           ) : (
-            <p className={`font-semibold text-gray-700 ${isMinimal ? 'text-[14px] leading-[20px]' : 'text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px]'}`}>
+            <p className={`product-card__price-request ${isMinimal ? 'product-card__price-request--compact' : ''}`}>
               Price on request
             </p>
           )}
@@ -459,19 +451,19 @@ export function ProductCard({
           {/* Quick Add */}
           {allowQuickActions && isQuickAddOpen && (
             <div
-              className="mb-3 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm"
+              className="product-card__quick-add"
               onClick={(event) => {
                 event.preventDefault();
                 event.stopPropagation();
               }}
             >
-              {unitsLoading && <div className="text-gray-500">Loading options...</div>}
+              {unitsLoading && <div className="product-card__quick-add-message">Loading options...</div>}
               {!unitsLoading && units.length === 0 && (
-                <div className="text-gray-500">No purchase options yet.</div>
+                <div className="product-card__quick-add-message">No purchase options yet.</div>
               )}
               {!unitsLoading && units.length > 0 && (
                 <>
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="product-card__quick-add-options">
                     {units.slice(0, 4).map((unit) => (
                       <button
                         key={unit.id}
@@ -481,17 +473,13 @@ export function ProductCard({
                           event.stopPropagation();
                           setSelectedUnitId(unit.id ?? null);
                         }}
-                        className={`px-3 py-1 rounded-full border text-xs ${
-                          unit.id === selectedUnitId
-                            ? 'border-[var(--primary)] bg-gray-50 text-[var(--primary-dark)]'
-                            : 'border-gray-200 bg-white text-gray-600'
-                        }`}
+                        className={`product-card__quick-add-option ${unit.id === selectedUnitId ? 'product-card__quick-add-option--active' : ''}`}
                       >
                         {unit.color_name || unit.condition || 'Option'}
                       </button>
                     ))}
                     {units.length > 4 && (
-                      <span className="px-3 py-1 rounded-full border text-xs border-gray-200 bg-white text-gray-500">
+                      <span className="product-card__quick-add-more">
                         +{units.length - 4} more
                       </span>
                     )}
@@ -500,12 +488,12 @@ export function ProductCard({
                     type="button"
                     onClick={(event) => handleAddToCart(event, 1)}
                     disabled={!selectedUnit?.id || isAddingToCart}
-                    className="btn-cta product-card-cta w-full rounded-lg bg-[var(--primary)] text-white py-2 hover:bg-[var(--primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="product-card__quick-add-button"
                   >
                     {isAddingToCart ? 'Adding...' : 'Add to cart'}
                   </button>
-                  <div className="mt-2 text-xs text-gray-500">
-                    Prefer more options? <span className="text-[var(--primary)]">View details</span>
+                  <div className="product-card__quick-add-help">
+                    Prefer more options? <span className="product-card__quick-add-link">View details</span>
                   </div>
                 </>
               )}
@@ -514,11 +502,11 @@ export function ProductCard({
 
         {/* Stock & Interest Info */}
         {!isMinimal ? (
-          <div className="flex items-center justify-between text-[12px] leading-[18px] sm:text-[13px] sm:leading-[20px] pt-3 border-t border-gray-100">
-            <span className={`font-semibold ${hasStock ? 'text-green-600' : 'text-red-600'}`}>
+          <div className="product-card__meta">
+            <span className={`product-card__stock ${hasStock ? 'product-card__stock--in' : 'product-card__stock--out'}`}>
               {hasStock ? (
-                <span className="flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <span className="product-card__stock-info">
+                  <svg className="product-card__stock-icon" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   {product.available_units_count} {product.available_units_count === 1 ? 'unit' : 'units'}
@@ -528,8 +516,8 @@ export function ProductCard({
               )}
             </span>
             {allowInterestCount && interestText && (
-              <span className="text-orange-600 font-semibold flex items-center gap-1 bg-orange-50 px-2 py-1 rounded-full">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <span className="product-card__interest">
+                <svg className="product-card__interest-icon" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
                 {interestText}
@@ -537,12 +525,12 @@ export function ProductCard({
             )}
           </div>
         ) : (
-          <div className="mt-3 text-[12px] leading-[18px] text-gray-600">
-            <span className={`font-semibold ${hasStock ? 'text-emerald-600' : 'text-red-600'}`}>
+          <div className="product-card__stock-note">
+            <span className={`product-card__stock ${hasStock ? 'product-card__stock--in' : 'product-card__stock--out'}`}>
               {hasStock ? 'In stock' : 'Out of stock'}
             </span>
             {lowStock && hasStock && (
-              <span className="ml-2 text-amber-600 font-semibold">Low stock</span>
+              <span className="product-card__low-stock">Low stock</span>
             )}
           </div>
         )}
@@ -551,70 +539,70 @@ export function ProductCard({
 
       {isQuickViewOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className="product-card__modal"
           onClick={() => setIsQuickViewOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-3xl overflow-hidden"
+            className="product-card__modal-panel"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
+            <div className="product-card__modal-header">
               <div>
-                <h4 className="text-lg font-semibold text-gray-900">{product.product_name}</h4>
-                <p className="text-sm text-gray-500">{product.brand}</p>
+                <h4 className="product-card__modal-title">{product.product_name}</h4>
+                <p className="product-card__modal-subtitle">{product.brand}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsQuickViewOpen(false)}
-                className="h-8 w-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500"
+                className="product-card__modal-close"
                 aria-label="Close"
               >
                 ×
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5">
-              <div className="relative w-full aspect-square bg-gray-50 rounded-xl overflow-hidden">
+            <div className="product-card__modal-body">
+              <div className="product-card__modal-media">
                 <Image
                   src={primaryImage}
                   alt={product.product_name}
                   fill
-                  className="object-contain"
+                  className="product-card__modal-image"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
                 />
               </div>
-              <div className="space-y-4">
+              <div className="product-card__modal-details">
                 <div>
                   {hasPriceRange ? (
                     showComparePrice ? (
-                      <div className="flex items-center gap-2">
-                        <p className="text-xl font-bold text-gray-900">
+                      <div className="product-card__modal-price">
+                        <p className="product-card__modal-price-main">
                           {formatPrice(product.min_price ?? null)}
                         </p>
-                        <p className="text-sm text-gray-400 line-through">
+                        <p className="product-card__modal-price-msrp">
                           {formatPrice(compareAtDisplay ?? null)}
                         </p>
                       </div>
                     ) : (
-                      <p className="text-xl font-bold text-gray-900">
+                      <p className="product-card__modal-price-main">
                         {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
                       </p>
                     )
                   ) : (
-                    <p className="text-lg font-semibold text-gray-700">Price on request</p>
+                    <p className="product-card__modal-price-request">Price on request</p>
                   )}
                 </div>
 
                 <RatingStars rating={averageRating} count={reviewCount} />
 
                 {showSwatches && colorOptions.length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Available colors</p>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="product-card__modal-section">
+                    <p className="product-card__modal-section-title">Available colors</p>
+                    <div className="product-card__modal-swatches">
                       {colorOptions.map((color) => (
                         <span
                           key={color.name}
-                          className="px-3 py-1 rounded-full border text-xs border-gray-200 text-gray-600 bg-gray-50"
+                          className="product-card__modal-swatch"
                         >
                           {color.name}
                         </span>
@@ -624,19 +612,15 @@ export function ProductCard({
                 )}
 
                 {units.length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Choose option</p>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="product-card__modal-section">
+                    <p className="product-card__modal-section-title">Choose option</p>
+                    <div className="product-card__modal-options">
                       {units.map((unit) => (
                         <button
                           key={unit.id}
                           type="button"
                           onClick={() => setSelectedUnitId(unit.id ?? null)}
-                          className={`px-3 py-1 rounded-full border text-xs ${
-                            unit.id === selectedUnitId
-                              ? 'border-[var(--primary)] bg-gray-50 text-[var(--primary-dark)]'
-                              : 'border-gray-200 bg-white text-gray-600'
-                          }`}
+                          className={`product-card__modal-option ${unit.id === selectedUnitId ? 'product-card__modal-option--active' : ''}`}
                         >
                           {unit.color_name || unit.condition || 'Option'}
                         </button>
@@ -645,20 +629,20 @@ export function ProductCard({
                   </div>
                 )}
 
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center border border-gray-200 rounded-lg">
+                <div className="product-card__modal-actions">
+                  <div className="product-card__qty">
                     <button
                       type="button"
                       onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                      className="px-3 py-2 text-gray-600"
+                      className="product-card__qty-btn"
                     >
                       -
                     </button>
-                    <span className="px-3 text-sm font-semibold text-gray-800">{quantity}</span>
+                    <span className="product-card__qty-value">{quantity}</span>
                     <button
                       type="button"
                       onClick={() => setQuantity((prev) => prev + 1)}
-                      className="px-3 py-2 text-gray-600"
+                      className="product-card__qty-btn"
                     >
                       +
                     </button>
@@ -667,23 +651,23 @@ export function ProductCard({
                     type="button"
                     onClick={(event) => handleAddToCart(event, quantity)}
                     disabled={!selectedUnit?.id || isAddingToCart}
-                    className="flex-1 rounded-lg bg-[var(--primary)] text-white font-semibold py-2 hover:bg-[var(--primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="product-card__modal-add"
                   >
                     {isAddingToCart ? 'Adding...' : 'Add to cart'}
                   </button>
                 </div>
 
-                <div className="flex items-center gap-3 text-sm">
+                <div className="product-card__modal-links">
                   <button
                     type="button"
                     onClick={handleWishlistToggle}
-                    className="text-gray-600 hover:text-red-500"
+                    className="product-card__modal-link"
                   >
                     {isInWishlist(product.id) ? 'Saved' : 'Save to wishlist'}
                   </button>
                   <Link
                     href={getProductHref(product)}
-                    className="text-[var(--primary)] hover:text-[var(--primary-dark)]"
+                    className="product-card__modal-link product-card__modal-link--primary"
                   >
                     View full details
                   </Link>

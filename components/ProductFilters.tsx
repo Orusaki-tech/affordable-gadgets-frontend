@@ -147,18 +147,18 @@ export function ProductFilters({
   };
 
   return (
-    <div id="product-filters" className="mb-6">
-      <div className="flex flex-wrap items-center gap-4 mb-4">
+    <div id="product-filters" className="product-filters">
+      <div className="product-filters__toolbar">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl hover:border-gray-300 shadow-sm flex items-center gap-2 text-gray-700 font-medium lg:hidden"
+          className="product-filters__toggle"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="product-filters__toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
           </svg>
           Filters
           {activeFilterCount > 0 && (
-            <span className="ml-1 rounded-full bg-[var(--primary)] text-white text-xs px-2 py-0.5">
+            <span className="product-filters__count">
               {activeFilterCount}
             </span>
           )}
@@ -167,7 +167,7 @@ export function ProductFilters({
         <select
           value={sort}
           onChange={(e) => handleSortChange(e.target.value)}
-          className="px-4 py-2.5 border border-gray-200 rounded-xl bg-white shadow-sm lg:hidden"
+          className="product-filters__sort"
         >
           {SORT_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -177,24 +177,24 @@ export function ProductFilters({
         </select>
       </div>
 
-      <div className={`bg-white border border-gray-200 p-5 rounded-2xl shadow-sm space-y-4 ${isOpen ? 'block' : 'hidden'} lg:block`}>
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-900">Filter products</h3>
+      <div className={`product-filters__panel ${isOpen ? 'product-filters__panel--open' : 'product-filters__panel--closed'}`}>
+          <div className="product-filters__panel-header">
+            <h3 className="product-filters__panel-title">Filter products</h3>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="text-sm text-gray-500 hover:text-gray-700 lg:hidden"
+              className="product-filters__panel-close"
             >
               Close
             </button>
           </div>
-          <div className="flex flex-col gap-4">
-            <div className="hidden lg:block">
-              <label className="block text-sm font-medium mb-2">Sort by</label>
+          <div className="product-filters__fields">
+            <div className="product-filters__field product-filters__field--desktop">
+              <label className="product-filters__label">Sort by</label>
               <select
                 value={sort}
                 onChange={(e) => handleSortChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white"
+                className="product-filters__input"
               >
                 {SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -204,12 +204,12 @@ export function ProductFilters({
               </select>
             </div>
             {/* Product Type */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Product Type</label>
+            <div className="product-filters__field">
+              <label className="product-filters__label">Product Type</label>
               <select
                 value={filters.type}
                 onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white"
+                className="product-filters__input"
               >
                 {PRODUCT_TYPES.map((type) => (
                   <option key={type.value || 'all'} value={type.value}>
@@ -220,20 +220,20 @@ export function ProductFilters({
             </div>
 
             {/* Brand Filter */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Brand</label>
+            <div className="product-filters__field">
+              <label className="product-filters__label">Brand</label>
               <input
                 type="text"
                 value={filters.brand}
                 onChange={(e) => handleFilterChange('brand', e.target.value)}
                 placeholder="e.g., Apple, Samsung"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                className="product-filters__input"
               />
             </div>
 
             {/* Min Price */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Budget Min (KES)</label>
+            <div className="product-filters__field">
+              <label className="product-filters__label">Budget Min (KES)</label>
               <input
                 type="number"
                 value={budgetMin}
@@ -241,13 +241,13 @@ export function ProductFilters({
                 placeholder="0"
                 min="0"
                 step="100"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                className="product-filters__input"
               />
             </div>
 
             {/* Max Price */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Budget Max (KES)</label>
+            <div className="product-filters__field">
+              <label className="product-filters__label">Budget Max (KES)</label>
               <input
                 type="number"
                 value={budgetMax}
@@ -255,16 +255,16 @@ export function ProductFilters({
                 placeholder="100000"
                 min="0"
                 step="100"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg"
+                className="product-filters__input"
               />
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="product-filters__actions">
             <button
               type="button"
               onClick={handleBudgetApply}
-              className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)]"
+              className="product-filters__action product-filters__action--primary"
             >
               Apply Budget
             </button>
@@ -272,7 +272,7 @@ export function ProductFilters({
               <button
                 type="button"
                 onClick={handleBudgetReset}
-                className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="product-filters__action product-filters__action--secondary"
               >
                 Reset Budget
               </button>
@@ -280,7 +280,7 @@ export function ProductFilters({
             {(filters.type || filters.minPrice || filters.maxPrice || filters.brand || sort) && (
               <button
                 onClick={clearFilters}
-                className="px-4 py-2 text-red-600 hover:text-red-700 font-medium"
+                className="product-filters__action product-filters__action--danger"
               >
                 Clear All
               </button>

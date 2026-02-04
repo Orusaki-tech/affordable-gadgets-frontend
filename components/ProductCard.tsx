@@ -61,8 +61,8 @@ export function ProductCard({
   showSwatches = true,
   showShippingBadges = true,
 }: ProductCardProps) {
-  const normalizedVariant =
-    variant === 'default' || variant === 'minimal' ? 'featured' : variant;
+  const normalizedVariant: 'featured' | 'minimal' =
+    variant === 'minimal' ? 'minimal' : 'featured';
   const isMinimal = normalizedVariant === 'minimal';
   const isFeaturedVariant = normalizedVariant === 'featured';
   const allowQuickActions = showQuickActions && !isMinimal && !isFeaturedVariant;

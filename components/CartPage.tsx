@@ -5,7 +5,7 @@ import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useMemo } from 'react';
-import { OpenAPI, OrdersService } from '@/lib/api/generated';
+import { OpenAPI, OrdersService, ApiService } from '@/lib/api/generated';
 import { inventoryBaseUrl, apiBaseUrl } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
 
@@ -27,6 +27,10 @@ export function CartPage() {
     delivery_time_end: '',
     delivery_notes: '',
   });
+  const deliveryStorageKey = 'affordable_gadgets_delivery_details';
+  const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
+  const [deliveryDetailsSaved, setDeliveryDetailsSaved] = useState(false);
+  const [pendingCartSync, setPendingCartSync] = useState(false);
   const [ordersPhone, setOrdersPhone] = useState('');
   const [ordersOtp, setOrdersOtp] = useState('');
   const [ordersOtpSent, setOrdersOtpSent] = useState(false);
@@ -105,7 +109,76 @@ export function CartPage() {
       .sort((a, b) => a.localeCompare(b));
   }, [deliveryRates, formData.delivery_county]);
 
-  const isWardRequired = ['nairobi', 'kiambu'].includes(formData.delivery_county.trim().toLowerCase());
+  const isWardRequiredForCounty = (county: string) =>
+    ['nairobi', 'kiambu'].includes(county.trim().toLowerCase());
+  const isWardRequired = isWardRequiredForCounty(formData.delivery_county);
+
+  const isDeliveryDetailsComplete = (data = formData) => {
+    const hasName = data.customer_name.trim().length > 0;
+    const hasPhone = data.customer_phone.trim().length > 0;
+    const hasCounty = data.delivery_county.trim().length > 0;
+    const wardRequired = isWardRequiredForCounty(data.delivery_county);
+    const hasWard = !wardRequired || data.delivery_ward.trim().length > 0;
+    return hasName && hasPhone && hasCounty && hasWard;
+  };
+
+  const buildDeliveryAddress = (data = formData) => {
+    const county = data.delivery_county.trim();
+    const ward = data.delivery_ward.trim();
+    return [county, ward].filter(Boolean).join(', ');
+  };
+
+  const buildCartDeliveryPayload = () => ({
+    customer_name: formData.customer_name.trim(),
+    customer_phone: formData.customer_phone.trim(),
+    customer_email: formData.customer_email.trim() || null,
+    delivery_address: buildDeliveryAddress() || null,
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const saved = localStorage.getItem(deliveryStorageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setFormData((prev) => ({ ...prev, ...parsed }));
+        setDeliveryDetailsSaved(isDeliveryDetailsComplete(parsed));
+      }
+    } catch (err) {
+      console.warn('Failed to load delivery details:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!cart) return;
+    setFormData((prev) => ({
+      ...prev,
+      customer_name: prev.customer_name || cart.customer_name || '',
+      customer_phone: prev.customer_phone || cart.customer_phone || '',
+      customer_email: prev.customer_email || cart.customer_email || '',
+      delivery_address: prev.delivery_address || cart.delivery_address || '',
+    }));
+  }, [cart]);
+
+  useEffect(() => {
+    if (!deliveryDetailsSaved) {
+      setIsDeliveryModalOpen(true);
+    }
+  }, [deliveryDetailsSaved]);
+
+  useEffect(() => {
+    if (!pendingCartSync || !cart?.id || !deliveryDetailsSaved) return;
+    const syncDeliveryDetails = async () => {
+      try {
+        await ApiService.apiV1PublicCartPartialUpdate(cart.id as number, buildCartDeliveryPayload());
+        await updateCart();
+        setPendingCartSync(false);
+      } catch (err) {
+        console.error('Failed to sync delivery details to cart:', err);
+      }
+    };
+    syncDeliveryDetails();
+  }, [pendingCartSync, cart?.id, deliveryDetailsSaved, formData, updateCart]);
 
   const deliveryFee = useMemo(() => {
     const county = formData.delivery_county.trim().toLowerCase();
@@ -135,9 +208,61 @@ export function CartPage() {
     return isoString;
   };
 
+  const handleSaveDeliveryDetails = async () => {
+    if (!isDeliveryDetailsComplete()) {
+      setError('Name, phone, county and ward (if required) are needed.');
+      return;
+    }
+
+    setError(null);
+    const computedAddress = buildDeliveryAddress();
+    const updatedFormData = {
+      ...formData,
+      delivery_address: computedAddress,
+    };
+    setFormData(updatedFormData);
+    const payload = {
+      customer_name: updatedFormData.customer_name,
+      customer_phone: updatedFormData.customer_phone,
+      customer_email: updatedFormData.customer_email,
+      delivery_address: updatedFormData.delivery_address,
+      delivery_county: updatedFormData.delivery_county,
+      delivery_ward: updatedFormData.delivery_ward,
+      delivery_date: updatedFormData.delivery_date,
+      delivery_time_start: updatedFormData.delivery_time_start,
+      delivery_time_end: updatedFormData.delivery_time_end,
+      delivery_notes: updatedFormData.delivery_notes,
+    };
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(deliveryStorageKey, JSON.stringify(payload));
+    }
+
+    if (cart?.id) {
+      try {
+        await ApiService.apiV1PublicCartPartialUpdate(cart.id as number, buildCartDeliveryPayload());
+        await updateCart();
+      } catch (err) {
+        console.error('Failed to save delivery details:', err);
+        setError('Failed to save delivery details. Please try again.');
+        return;
+      }
+    } else {
+      setPendingCartSync(true);
+    }
+
+    setDeliveryDetailsSaved(true);
+    setIsDeliveryModalOpen(false);
+  };
+
   const handleCheckout = async () => {
     if (!cart || !cart.items || cart.items.length === 0) {
       setError('Cart is empty');
+      return;
+    }
+    if (!deliveryDetailsSaved) {
+      setError('Please save delivery details before proceeding.');
+      setIsDeliveryModalOpen(true);
       return;
     }
     if (!formData.customer_name.trim() || !formData.customer_phone.trim()) {
@@ -298,11 +423,8 @@ export function CartPage() {
       })
     : 'Not selected';
 
-  const scrollToDeliveryDetails = () => {
-    const section = document.getElementById('delivery-details');
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const openDeliveryModal = () => {
+    setIsDeliveryModalOpen(true);
   };
 
   if (isLoading) {
@@ -415,7 +537,7 @@ export function CartPage() {
                       <div className="flex items-center justify-between">
                         <span>Delivery date: {deliveryDateLabel}</span>
                         <button
-                          onClick={scrollToDeliveryDetails}
+                          onClick={openDeliveryModal}
                           className="text-blue-600 hover:text-blue-700"
                         >
                           Choose delivery
@@ -531,7 +653,7 @@ export function CartPage() {
                     <div className="flex items-center justify-between text-sm text-gray-600 border-t pt-3">
                       <span>Delivery date: {deliveryDateLabel}</span>
                       <button
-                        onClick={scrollToDeliveryDetails}
+                        onClick={openDeliveryModal}
                         className="text-blue-600 hover:text-blue-700"
                       >
                         Choose delivery
@@ -630,12 +752,110 @@ export function CartPage() {
 
         {/* Checkout & Summary */}
         <div className="lg:col-span-1 space-y-6">
-          <div id="delivery-details" className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Delivery Details</h2>
-              <p className="text-sm text-gray-600">
-                Provide delivery details to calculate the final total.
-              </p>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-bold mb-4">Payment Summary</h2>
+            <div className="space-y-2 mb-4 text-sm text-gray-700">
+              <div className="flex justify-between">
+                <span>Items ({itemCount})</span>
+                <span>{formatPrice(totalValue)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Shipping &amp; handling</span>
+                <span>{formatPrice(deliveryFee)}</span>
+              </div>
+            </div>
+            <div className="border-t pt-4 mb-4">
+              <div className="flex justify-between text-xl font-bold">
+                <span>Order total</span>
+                <span>{formatPrice(totalWithDelivery)}</span>
+              </div>
+            </div>
+            <button
+              onClick={handleCheckout}
+              disabled={cart?.is_submitted || isSubmitting}
+              className={`w-full px-6 py-3 rounded-lg font-semibold transition-colors ${
+                cart?.is_submitted || isSubmitting
+                  ? 'bg-gray-400 text-white cursor-not-allowed'
+                  : 'bg-green-600 text-white hover:bg-green-700'
+              }`}
+            >
+              {isSubmitting ? 'Redirecting to payment...' : cart?.is_submitted ? 'Already Submitted' : 'Proceed to Payment'}
+            </button>
+            <Link
+              href="/products"
+              className="block text-center mt-4 text-blue-600 hover:text-blue-700"
+            >
+              Continue Shopping
+            </Link>
+          </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Delivery Details</h2>
+                <p className="text-sm text-gray-600">
+                  {deliveryDetailsSaved
+                    ? 'Your saved delivery details are below.'
+                    : 'No delivery details saved yet.'}
+                </p>
+              </div>
+              <button
+                onClick={openDeliveryModal}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+              >
+                {deliveryDetailsSaved ? 'Update' : 'Add'}
+              </button>
+            </div>
+            <div className="mt-4 space-y-2 text-sm text-gray-700">
+              <div>
+                <span className="font-semibold">Name:</span>{' '}
+                {formData.customer_name || 'Not set'}
+              </div>
+              <div>
+                <span className="font-semibold">Phone:</span>{' '}
+                {formData.customer_phone || 'Not set'}
+              </div>
+              <div>
+                <span className="font-semibold">Email:</span>{' '}
+                {formData.customer_email || 'Not set'}
+              </div>
+              <div>
+                <span className="font-semibold">Address:</span>{' '}
+                {formData.delivery_address || 'Not set'}
+              </div>
+              <div>
+                <span className="font-semibold">County:</span>{' '}
+                {formData.delivery_county || 'Not set'}
+              </div>
+              <div>
+                <span className="font-semibold">Ward:</span>{' '}
+                {formData.delivery_ward || 'Not set'}
+              </div>
+              <div>
+                <span className="font-semibold">Delivery date:</span> {deliveryDateLabel}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {isDeliveryModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-2xl font-bold">Delivery Details</h2>
+                <p className="text-sm text-gray-600">
+                  Please provide delivery details to continue.
+                </p>
+              </div>
+              {deliveryDetailsSaved && (
+                <button
+                  onClick={() => setIsDeliveryModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  Close
+                </button>
+              )}
             </div>
 
             <div className="space-y-3">
@@ -659,13 +879,6 @@ export function CartPage() {
                 value={formData.customer_email}
                 onChange={(e) => setFormData({ ...formData, customer_email: e.target.value })}
                 className="w-full px-3 py-2 border rounded-lg"
-              />
-              <textarea
-                placeholder="Delivery address"
-                value={formData.delivery_address}
-                onChange={(e) => setFormData({ ...formData, delivery_address: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg"
-                rows={2}
               />
               <select
                 value={formData.delivery_county}
@@ -722,46 +935,18 @@ export function CartPage() {
                 rows={2}
               />
             </div>
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold mb-4">Payment Summary</h2>
-            <div className="space-y-2 mb-4 text-sm text-gray-700">
-              <div className="flex justify-between">
-                <span>Items ({itemCount})</span>
-                <span>{formatPrice(totalValue)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping &amp; handling</span>
-                <span>{formatPrice(deliveryFee)}</span>
-              </div>
+
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                onClick={handleSaveDeliveryDetails}
+                className="px-6 py-3 rounded-lg font-semibold bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Save details
+              </button>
             </div>
-            <div className="border-t pt-4 mb-4">
-              <div className="flex justify-between text-xl font-bold">
-                <span>Order total</span>
-                <span>{formatPrice(totalWithDelivery)}</span>
-              </div>
-            </div>
-            <button
-              onClick={handleCheckout}
-              disabled={cart?.is_submitted || isSubmitting}
-              className={`w-full px-6 py-3 rounded-lg font-semibold transition-colors ${
-                cart?.is_submitted || isSubmitting
-                  ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-green-600 text-white hover:bg-green-700'
-              }`}
-            >
-              {isSubmitting ? 'Redirecting to payment...' : cart?.is_submitted ? 'Already Submitted' : 'Proceed to Payment'}
-            </button>
-            <Link
-              href="/products"
-              className="block text-center mt-4 text-blue-600 hover:text-blue-700"
-            >
-              Continue Shopping
-            </Link>
           </div>
         </div>
-      </div>
-
+      )}
     </div>
   );
 }

@@ -376,9 +376,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                       unoptimized={imageUrl.includes('localhost') || imageUrl.includes('placehold.co')}
                     />
                   ) : (
-                    <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                      <span className="text-sm text-gray-600">{review.product_name}</span>
-                    </div>
+                    <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300" />
                   )}
 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -387,20 +385,23 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                     {review.customer_username || (review.is_admin_review ? 'Admin' : 'Customer')}
                   </div>
 
-                  <div className="absolute bottom-12 sm:bottom-14 left-3 right-3 text-white">
-                    <div className="flex gap-1 text-yellow-300 text-[12px] sm:text-[13px]">
+                  <div className="absolute bottom-4 left-3 right-3 text-white">
+                    {review.comment && (
+                      <p className="text-[12px] sm:text-[13px] leading-[18px] sm:leading-[20px] line-clamp-1">
+                        "{review.comment}"
+                      </p>
+                    )}
+                    <div className="mt-2 flex gap-1 text-yellow-300 text-[12px] sm:text-[13px] mb-[7px]">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span key={star} className={star <= review.rating ? 'text-yellow-300' : 'text-white/40'}>
                           ★
                         </span>
                       ))}
                     </div>
-                  </div>
-                  {review.comment && (
-                    <p className="absolute bottom-4 left-3 right-3 text-[12px] sm:text-[13px] leading-[18px] sm:leading-[20px] line-clamp-1 text-white">
-                      "{review.comment}"
+                    <p className="text-[12px] sm:text-[13px] font-medium">
+                      {review.product_name ?? 'Product'}
                     </p>
-                  )}
+                  </div>
                 </div>
 
                 <div className="border-t border-gray-100 bg-white p-3 sm:p-4">

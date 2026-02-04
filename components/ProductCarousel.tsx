@@ -134,52 +134,6 @@ export function ProductCarousel({
 
   return (
     <div className={`relative ${className}`}>
-      {/* Navigation Buttons */}
-      {showNavigation && children.length > itemsPerSlide && (
-        <>
-          <button
-            onClick={() => scroll('left')}
-            disabled={!canScrollLeft}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-12 h-12 bg-black rounded-full shadow-lg flex items-center justify-center hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-110 active:scale-95"
-            aria-label="Previous"
-          >
-            <svg
-              className="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={() => scroll('right')}
-            disabled={!canScrollRight}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-12 h-12 bg-black rounded-full shadow-lg flex items-center justify-center hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-110 active:scale-95"
-            aria-label="Next"
-          >
-            <svg
-              className="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-        </>
-      )}
-
       {/* Carousel Container */}
       <div
         ref={scrollContainerRef}
@@ -210,33 +164,50 @@ export function ProductCarousel({
         })}
       </div>
 
-      {/* Progress Bar */}
+      {/* Progress Bar + Arrows */}
       {totalSlides > 1 && (
-        <div className="mt-3">
-          <div className="h-1.5 w-full rounded-full bg-gray-200/60">
-            <div
-              className="h-full rounded-full bg-gray-900 transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
+        <div className="samsung-progressbar">
+          <div className="samsung-progressbar-inner">
+            <div className="samsung-progressbar-bar">
+              <span
+                className="samsung-progressbar-fill"
+                style={{
+                  transform: `scaleX(${progressPercent / 100})`,
+                  transitionDuration: '300ms',
+                }}
+              />
+            </div>
+            {showNavigation && children.length > itemsPerSlide && (
+              <div className="samsung-progressbar-arrows">
+                <button
+                  onClick={() => scroll('left')}
+                  disabled={!canScrollLeft}
+                  className="samsung-progressbar-arrow"
+                  aria-label="Previous Slide"
+                  aria-disabled={!canScrollLeft}
+                >
+                  <span className="sr-only">Previous</span>
+                  <svg className="samsung-progressbar-icon" focusable="false" aria-hidden="true" viewBox="0 0 40 40">
+                    <g transform="translate(40 40) rotate(180)">
+                      <path d="M21.47,16.53A.75.75,0,0,1,22.53,15.47l4,4a.75.75,0,0,1,0,1.061l-4,4A.75.75,0,0,1,21.47,23.47l2.72-2.72H14.5a.75.75,0,0,1,0-1.5h9.689Z"></path>
+                    </g>
+                  </svg>
+                </button>
+                <button
+                  onClick={() => scroll('right')}
+                  disabled={!canScrollRight}
+                  className="samsung-progressbar-arrow"
+                  aria-label="Next Slide"
+                  aria-disabled={!canScrollRight}
+                >
+                  <span className="sr-only">Next</span>
+                  <svg className="samsung-progressbar-icon" focusable="false" aria-hidden="true" viewBox="0 0 40 40">
+                    <path d="M21.47,16.53A.75.75,0,0,1,22.53,15.47l4,4a.75.75,0,0,1,0,1.061l-4,4A.75.75,0,0,1,21.47,23.47l2.72-2.72H14.5a.75.75,0,0,1,0-1.5h9.689Z"></path>
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
-        </div>
-      )}
-
-      {/* Pagination Dots */}
-      {showPagination && totalSlides > 1 && (
-        <div className="flex justify-center gap-2 mt-6">
-          {Array.from({ length: totalSlides }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => scrollToIndex(index)}
-              className={`h-2 rounded-full transition-all ${
-                index === currentIndex
-                  ? 'w-8 bg-blue-600'
-                  : 'w-2 bg-gray-300 hover:bg-gray-400'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
         </div>
       )}
 

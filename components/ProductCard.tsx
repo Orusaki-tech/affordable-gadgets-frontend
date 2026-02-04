@@ -225,7 +225,7 @@ export function ProductCard({
           />
         </div>
         <div className="flex flex-col items-center text-center px-[19.2px] pt-4 pb-[19.2px]">
-          <h3 className="font-semibold text-[19.2px] leading-[25.536px] text-gray-900 mb-4 line-clamp-2">
+          <h3 className="product-card-name text-gray-900 mb-4 line-clamp-2">
             {product.product_name}
           </h3>
           <button
@@ -235,7 +235,7 @@ export function ProductCard({
               handleAddToCart(event, 1);
             }}
             disabled={!canAddToCart}
-            className="rounded-[16px] border border-[var(--primary-dark)] bg-[var(--primary-dark)] text-white text-[11.2px] leading-[15.2px] font-semibold px-[18.4px] pt-[7.2px] pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-cta product-card-cta rounded-[16px] border border-[var(--primary-dark)] bg-[var(--primary-dark)] text-white px-[18.4px] pt-[7.2px] pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Buy"
           >
             {isAddingToCart ? 'Adding...' : 'Buy'}
@@ -279,27 +279,27 @@ export function ProductCard({
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
         {!isMinimal && hasBundle && (
-              <div className="bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+            <div className="product-card-badge bg-orange-500 text-white px-3 py-1 rounded-full shadow-lg">
             {bundlePricePreview ? `Bundle from ${formatPrice(bundlePricePreview)}` : 'Bundle available'}
           </div>
         )}
             {isOnSale && (
-              <div className="bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+              <div className="product-card-badge bg-red-500 text-white px-3 py-1 rounded-full shadow-lg">
                 {discountPercent ? `Save ${discountPercent}%` : 'Sale'}
               </div>
             )}
             {!isMinimal && isNew && (
-              <div className="bg-[var(--primary)] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+              <div className="product-card-badge bg-[var(--primary)] text-white px-3 py-1 rounded-full shadow-lg">
                 New
               </div>
             )}
             {!isMinimal && isFeatured && (
-              <div className="bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+              <div className="product-card-badge bg-purple-600 text-white px-3 py-1 rounded-full shadow-lg">
                 Trending
               </div>
             )}
             {!isMinimal && lowStock && (
-              <div className="bg-amber-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+              <div className="product-card-badge bg-amber-500 text-white px-3 py-1 rounded-full shadow-lg">
                 Low stock
               </div>
             )}
@@ -307,7 +307,7 @@ export function ProductCard({
 
         {/* Stock Badge */}
         {!hasStock && (
-          <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+          <div className="product-card-badge absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full shadow-lg">
             Out of Stock
           </div>
         )}
@@ -360,16 +360,14 @@ export function ProductCard({
 
       {/* Product Info */}
       <div className={`flex flex-col flex-1 ${isMinimal ? 'p-4' : 'p-4 sm:p-5'}`}>
-        <h3 className={`font-semibold line-clamp-2 transition-colors text-gray-900 ${
-          isMinimal
-            ? 'text-[15px] leading-[22px]'
-            : 'text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] group-hover:text-[var(--primary)]'
+        <h3 className={`product-card-name line-clamp-2 transition-colors text-gray-900 ${
+          isMinimal ? 'text-[15px] leading-[22px]' : 'group-hover:text-[var(--primary)]'
         }`}>
           {product.product_name}
         </h3>
         
         {(brandLine || specLine) && (
-          <p className={`text-gray-500 font-medium ${isMinimal ? 'text-[12px] leading-[18px] mt-1' : 'text-[13px] leading-[18px] sm:text-[14px] sm:leading-[20px] mb-3'}`}>
+          <p className={`product-card-spec text-gray-500 ${isMinimal ? 'mt-1' : 'mb-3'}`}>
             {brandLine}
             {brandLine && specLine ? ' • ' : ''}
             {specLine}
@@ -434,10 +432,10 @@ export function ProductCard({
             {hasPriceRange ? (
               showComparePrice ? (
                 <div className="flex items-center gap-2">
-                  <p className={`font-bold text-gray-900 ${isMinimal ? 'text-[16px] leading-[22px]' : 'text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px]'}`}>
+                  <p className={`product-card-price text-gray-900 ${isMinimal ? 'text-[16px] leading-[22px]' : ''}`}>
                     {formatPrice(product.min_price ?? null)}
                   </p>
-                  <p className={`font-semibold text-gray-400 line-through ${isMinimal ? 'text-[12px] leading-[18px]' : 'text-[12px] leading-[18px] sm:text-[13px] sm:leading-[20px]'}`}>
+                  <p className={`product-card-msrp text-gray-400 ${isMinimal ? 'text-[12px] leading-[18px]' : ''}`}>
                     {formatPrice(compareAtDisplay ?? null)}
                   </p>
                   {isMinimal && savings !== null && (
@@ -447,7 +445,7 @@ export function ProductCard({
                   )}
                 </div>
               ) : (
-            <p className={`font-bold text-gray-900 ${isMinimal ? 'text-[16px] leading-[22px]' : 'text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px]'}`}>
+            <p className={`product-card-price text-gray-900 ${isMinimal ? 'text-[16px] leading-[22px]' : ''}`}>
             {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
             </p>
               )
@@ -502,7 +500,7 @@ export function ProductCard({
                     type="button"
                     onClick={(event) => handleAddToCart(event, 1)}
                     disabled={!selectedUnit?.id || isAddingToCart}
-                    className="w-full rounded-lg bg-[var(--primary)] text-white font-semibold py-2 hover:bg-[var(--primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="btn-cta product-card-cta w-full rounded-lg bg-[var(--primary)] text-white py-2 hover:bg-[var(--primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isAddingToCart ? 'Adding...' : 'Add to cart'}
                   </button>

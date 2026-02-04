@@ -179,50 +179,50 @@ export function ReviewEligibilityPanel() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div className="review-eligibility">
+      <div className="review-eligibility__panel">
+        <div className="review-eligibility__header">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">Verify your purchase</h2>
-            <p className="text-sm text-gray-500">Use the phone number from your checkout to find eligible reviews.</p>
+            <h2 className="review-eligibility__title">Verify your purchase</h2>
+            <p className="review-eligibility__subtitle">Use the phone number from your checkout to find eligible reviews.</p>
           </div>
           <button
             type="button"
             onClick={resetState}
-            className="self-start rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-600 hover:text-gray-800"
+            className="review-eligibility__reset"
           >
             Start over
           </button>
         </div>
 
         {error && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="review-eligibility__alert review-eligibility__alert--error">
             {error}
           </div>
         )}
         {message && (
-          <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          <div className="review-eligibility__alert review-eligibility__alert--success">
             {message}
           </div>
         )}
 
         {step === 'phone' && (
-          <div className="mt-5 space-y-4">
-            <label className="block text-sm font-medium text-gray-700">
+          <div className="review-eligibility__section">
+            <label className="review-eligibility__label">
               Phone number
               <input
                 type="tel"
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
                 placeholder="e.g. 0712345678"
-                className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                className="review-eligibility__input"
               />
             </label>
             <button
               type="button"
               onClick={sendOtp}
               disabled={isSendingOtp}
-              className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+              className="review-eligibility__primary"
             >
               {isSendingOtp ? 'Sending OTP...' : 'Send OTP'}
             </button>
@@ -230,29 +230,29 @@ export function ReviewEligibilityPanel() {
         )}
 
         {step === 'otp' && (
-          <div className="mt-5 space-y-4">
-            <label className="block text-sm font-medium text-gray-700">
+          <div className="review-eligibility__section">
+            <label className="review-eligibility__label">
               OTP code
               <input
                 type="text"
                 value={otp}
                 onChange={(event) => setOtp(event.target.value)}
                 placeholder="Enter the 6-digit code"
-                className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                className="review-eligibility__input"
               />
             </label>
-            <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="review-eligibility__actions">
               <button
                 type="button"
                 onClick={checkEligibility}
                 disabled={isCheckingEligibility}
-                className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+                className="review-eligibility__primary"
               >
                 {isCheckingEligibility ? 'Verifying...' : 'Verify & Continue'}
               </button>
               <button
                 type="button"
-                className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                className="review-eligibility__secondary"
                 onClick={() => setStep('phone')}
               >
                 Change phone
@@ -262,20 +262,20 @@ export function ReviewEligibilityPanel() {
         )}
 
         {step === 'form' && (
-          <div className="mt-5 space-y-6">
+          <div className="review-eligibility__section review-eligibility__section--form">
             {customer && (
-              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
-                Signed in as <span className="font-semibold">{customer.name || 'Customer'}</span> • {customer.phone}
+              <div className="review-eligibility__customer">
+                Signed in as <span className="review-eligibility__customer-name">{customer.name || 'Customer'}</span> • {customer.phone}
               </div>
             )}
 
             {eligibleItems.length === 0 ? (
-              <div className="rounded-xl border border-gray-200 bg-white px-4 py-4 text-sm text-gray-600">
+              <div className="review-eligibility__empty">
                 We could not find any paid or delivered purchases for this phone number.
               </div>
             ) : (
               <>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="review-eligibility__label">
                   Purchased product
                   <select
                     value={selectedOrderItemId ?? ''}
@@ -283,7 +283,7 @@ export function ReviewEligibilityPanel() {
                       const value = event.target.value;
                       setSelectedOrderItemId(value ? Number(value) : null);
                     }}
-                    className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                    className="review-eligibility__select"
                   >
                     <option value="" disabled>
                       Select a product
@@ -303,21 +303,21 @@ export function ReviewEligibilityPanel() {
                       { id: selectedEligibleItem.product_id, slug: selectedEligibleItem.product_slug ?? '' },
                       { fallbackId: selectedEligibleItem.product_id }
                     )}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--primary)] hover:text-[var(--primary-dark)]"
+                    className="review-eligibility__link"
                   >
                     View product details
                   </Link>
                 )}
 
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Your rating</p>
-                  <div className="mt-2 flex gap-2">
+                  <p className="review-eligibility__label review-eligibility__label--inline">Your rating</p>
+                  <div className="review-eligibility__rating">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
                         type="button"
                         onClick={() => setRating(star)}
-                        className={`text-2xl ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                        className={`review-eligibility__star ${star <= rating ? 'review-eligibility__star--active' : ''}`}
                       >
                         ★
                       </button>
@@ -325,24 +325,24 @@ export function ReviewEligibilityPanel() {
                   </div>
                 </div>
 
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="review-eligibility__label">
                   Your review
                   <textarea
                     value={comment}
                     onChange={(event) => setComment(event.target.value)}
                     rows={4}
-                    className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                    className="review-eligibility__textarea"
                     placeholder="Share what you liked about the product."
                   />
                 </label>
 
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="review-eligibility__label">
                   Add a photo (optional)
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(event) => setReviewImage(event.target.files?.[0] ?? null)}
-                    className="mt-2 block w-full text-sm text-gray-600"
+                    className="review-eligibility__file"
                   />
                 </label>
 
@@ -350,7 +350,7 @@ export function ReviewEligibilityPanel() {
                   type="button"
                   onClick={submitReview}
                   disabled={isSubmittingReview}
-                  className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="review-eligibility__primary"
                 >
                   {isSubmittingReview ? 'Submitting...' : 'Submit review'}
                 </button>

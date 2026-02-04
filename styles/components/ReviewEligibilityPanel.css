@@ -1,0 +1,226 @@
+.review-eligibility {
+  max-width: 48rem;
+  margin: 0 auto;
+  display: grid;
+  gap: 24px;
+}
+
+.review-eligibility__panel {
+  border-radius: 24px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.review-eligibility__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.review-eligibility__title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.review-eligibility__subtitle {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.review-eligibility__reset {
+  align-self: flex-start;
+  border-radius: 9999px;
+  border: 1px solid #e5e7eb;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5563;
+  background: transparent;
+  cursor: pointer;
+}
+
+.review-eligibility__reset:hover {
+  color: #1f2937;
+}
+
+.review-eligibility__alert {
+  margin-top: 16px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+.review-eligibility__alert--error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.review-eligibility__alert--success {
+  border-color: #a7f3d0;
+  background: #ecfdf3;
+  color: #047857;
+}
+
+.review-eligibility__section {
+  margin-top: 20px;
+  display: grid;
+  gap: 16px;
+}
+
+.review-eligibility__section--form {
+  gap: 24px;
+}
+
+.review-eligibility__label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.review-eligibility__label--inline {
+  margin-bottom: 8px;
+}
+
+.review-eligibility__input,
+.review-eligibility__select,
+.review-eligibility__textarea {
+  margin-top: 8px;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #111827;
+}
+
+.review-eligibility__input:focus,
+.review-eligibility__select:focus,
+.review-eligibility__textarea:focus {
+  outline: none;
+  border-color: #111827;
+}
+
+.review-eligibility__file {
+  margin-top: 8px;
+  display: block;
+  width: 100%;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.review-eligibility__primary {
+  width: 100%;
+  border-radius: 12px;
+  background: #111827;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 200ms, opacity 200ms;
+}
+
+.review-eligibility__primary:hover {
+  background: #1f2937;
+}
+
+.review-eligibility__primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.review-eligibility__secondary {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+}
+
+.review-eligibility__secondary:hover {
+  background: #f9fafb;
+}
+
+.review-eligibility__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.review-eligibility__customer {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.review-eligibility__customer-name {
+  font-weight: 600;
+}
+
+.review-eligibility__empty {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 16px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.review-eligibility__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.review-eligibility__link:hover {
+  color: var(--primary-dark);
+}
+
+.review-eligibility__rating {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.review-eligibility__star {
+  font-size: 24px;
+  color: #d1d5db;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.review-eligibility__star--active {
+  color: #facc15;
+}
+
+@media (min-width: 640px) {
+  .review-eligibility__header {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .review-eligibility__actions {
+    flex-direction: row;
+  }
+}

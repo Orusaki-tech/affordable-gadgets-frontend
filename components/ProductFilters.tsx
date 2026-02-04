@@ -158,7 +158,7 @@ export function ProductFilters({
           </svg>
           Filters
           {activeFilterCount > 0 && (
-            <span className="ml-1 rounded-full bg-blue-600 text-white text-xs px-2 py-0.5">
+            <span className="ml-1 rounded-full bg-[var(--primary)] text-white text-xs px-2 py-0.5">
               {activeFilterCount}
             </span>
           )}
@@ -264,7 +264,7 @@ export function ProductFilters({
             <button
               type="button"
               onClick={handleBudgetApply}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)]"
             >
               Apply Budget
             </button>

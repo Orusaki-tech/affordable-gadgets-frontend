@@ -51,11 +51,11 @@ export function SearchBar() {
               setIsOpen(e.target.value.length > 0);
             }}
             onFocus={() => setIsOpen(searchQuery.length > 0 && suggestions.length > 0)}
-            className="w-full pl-4 pr-12 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm hover:border-gray-400 transition-colors"
+            className="w-full pl-4 pr-12 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent bg-white shadow-sm hover:border-gray-400 transition-colors"
           />
           <button
             type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-[var(--primary)] hover:bg-gray-50 rounded-md transition-colors"
             aria-label="Search"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +76,7 @@ export function SearchBar() {
                 setIsOpen(false);
                 setSearchQuery('');
               }}
-              className="block px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100 last:border-0"
+              className="block px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
             >
               <div className="font-medium text-gray-900">{product.product_name}</div>
               <div className="text-sm text-gray-500 mt-0.5">

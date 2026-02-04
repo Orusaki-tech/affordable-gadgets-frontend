@@ -83,20 +83,20 @@ export function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium text-sm relative group"
+                className="text-gray-700 hover:text-[var(--primary)] transition-colors font-medium text-sm relative group"
               >
                 {link.label}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
               </Link>
             ))}
 
             <div className="group">
               <Link
                 href="/products"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-medium text-sm relative group"
+                className="text-gray-700 hover:text-[var(--primary)] transition-colors font-medium text-sm relative group"
               >
                 Products
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-300"></span>
               </Link>
 
               <div className="absolute left-0 right-0 top-full pt-4 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
@@ -109,7 +109,7 @@ export function Header() {
                         <div key={category.code} className="space-y-3">
                           <Link
                             href={`/products?type=${category.code}`}
-                            className="inline-flex items-center gap-2 font-semibold text-gray-900 hover:text-blue-600"
+                            className="inline-flex items-center gap-2 font-semibold text-gray-900 hover:text-[var(--primary)]"
                           >
                             {category.name}
                           </Link>
@@ -121,7 +121,7 @@ export function Header() {
                                 <Link
                                   key={brand}
                                   href={`/products?type=${category.code}&brand=${encodeURIComponent(brand)}`}
-                                  className="block text-sm text-gray-600 hover:text-blue-600"
+                                  className="block text-sm text-gray-600 hover:text-[var(--primary)]"
                                 >
                                   {brand}
                                 </Link>
@@ -129,7 +129,7 @@ export function Header() {
                             ) : (
                               <Link
                                 href={`/products?type=${category.code}`}
-                                className="inline-flex text-sm text-gray-500 hover:text-blue-600"
+                                className="inline-flex text-sm text-gray-500 hover:text-[var(--primary)]"
                               >
                                 Browse all {category.name}
                               </Link>
@@ -143,7 +143,7 @@ export function Header() {
                   <div className="mt-6 border-t border-gray-100 pt-4">
                     <Link
                       href="/products"
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      className="text-sm text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium"
                     >
                       View all products →
                     </Link>
@@ -157,7 +157,7 @@ export function Header() {
           {/* Cart Icon */}
           <Link
             href="/cart"
-            className="relative flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors shrink-0 p-2 rounded-lg hover:bg-blue-50"
+            className="relative flex items-center gap-2 text-gray-700 hover:text-[var(--primary)] transition-colors shrink-0 p-2 rounded-lg hover:bg-gray-50"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -220,13 +220,13 @@ export function Header() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+                  className="px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-[var(--primary)] rounded-lg transition-colors font-medium"
                 >
                   {link.label}
                 </Link>
               ))}
 
-              <details className="px-4 py-3 rounded-lg hover:bg-blue-50">
+              <details className="px-4 py-3 rounded-lg hover:bg-gray-50">
                 <summary className="cursor-pointer text-gray-700 font-medium">
                   Products
                 </summary>

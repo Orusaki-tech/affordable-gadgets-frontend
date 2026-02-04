@@ -129,7 +129,7 @@ function OrderDetailContent() {
           <div className="space-y-2">
             <Link
               href="/products"
-              className="block w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold"
+              className="block w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)] font-semibold"
             >
               Continue Shopping
             </Link>
@@ -156,7 +156,7 @@ function OrderDetailContent() {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'delivered':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-gray-100 text-[var(--primary-dark)]';
       case 'canceled':
         return 'bg-red-100 text-red-800';
       default:
@@ -250,7 +250,7 @@ function OrderDetailContent() {
           <div className="border-t border-gray-200 pt-6 mb-8">
             <div className="flex justify-between items-center mb-2">
               <span className="text-lg font-semibold">Total Amount:</span>
-              <span className="text-2xl font-bold text-blue-600">
+              <span className="text-2xl font-bold text-[var(--primary)]">
                 {formatPrice(Number(order.total_amount ?? 0))}
               </span>
             </div>
@@ -287,7 +287,7 @@ function OrderDetailContent() {
           <div className="flex gap-4">
             <button
               onClick={downloadReceipt}
-              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold flex items-center justify-center gap-2"
+              className="flex-1 bg-[var(--primary)] text-white px-6 py-3 rounded-lg hover:bg-[var(--primary-dark)] font-semibold flex items-center justify-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

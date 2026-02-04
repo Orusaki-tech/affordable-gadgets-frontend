@@ -235,7 +235,7 @@ export function ProductCard({
               handleAddToCart(event, 1);
             }}
             disabled={!canAddToCart}
-            className="rounded-[16px] border border-black bg-black text-white text-[11.2px] leading-[15.2px] font-semibold px-[18.4px] pt-[7.2px] pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-[16px] border border-[var(--primary-dark)] bg-[var(--primary-dark)] text-white text-[11.2px] leading-[15.2px] font-semibold px-[18.4px] pt-[7.2px] pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Buy"
           >
             {isAddingToCart ? 'Adding...' : 'Buy'}
@@ -289,7 +289,7 @@ export function ProductCard({
               </div>
             )}
             {!isMinimal && isNew && (
-              <div className="bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
+              <div className="bg-[var(--primary)] text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
                 New
               </div>
             )}
@@ -363,7 +363,7 @@ export function ProductCard({
         <h3 className={`font-semibold line-clamp-2 transition-colors text-gray-900 ${
           isMinimal
             ? 'text-[15px] leading-[22px]'
-            : 'text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] group-hover:text-blue-600'
+            : 'text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] group-hover:text-[var(--primary)]'
         }`}>
           {product.product_name}
         </h3>
@@ -401,7 +401,7 @@ export function ProductCard({
               {rawTags.slice(0, 2).map((tag, idx) => (
               <span
                   key={`${tag}-${idx}`}
-                className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[11px] rounded-full border border-blue-200"
+                className="px-2 py-0.5 bg-gray-50 text-[var(--primary)] text-[11px] rounded-full border border-gray-200"
               >
                 {tag}
               </span>
@@ -485,7 +485,7 @@ export function ProductCard({
                         }}
                         className={`px-3 py-1 rounded-full border text-xs ${
                           unit.id === selectedUnitId
-                            ? 'border-blue-500 bg-blue-50 text-blue-700'
+                            ? 'border-[var(--primary)] bg-gray-50 text-[var(--primary-dark)]'
                             : 'border-gray-200 bg-white text-gray-600'
                         }`}
                       >
@@ -502,12 +502,12 @@ export function ProductCard({
                     type="button"
                     onClick={(event) => handleAddToCart(event, 1)}
                     disabled={!selectedUnit?.id || isAddingToCart}
-                    className="w-full rounded-lg bg-blue-600 text-white font-semibold py-2 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="w-full rounded-lg bg-[var(--primary)] text-white font-semibold py-2 hover:bg-[var(--primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isAddingToCart ? 'Adding...' : 'Add to cart'}
                   </button>
                   <div className="mt-2 text-xs text-gray-500">
-                    Prefer more options? <span className="text-blue-600">View details</span>
+                    Prefer more options? <span className="text-[var(--primary)]">View details</span>
                   </div>
                 </>
               )}
@@ -636,7 +636,7 @@ export function ProductCard({
                           onClick={() => setSelectedUnitId(unit.id ?? null)}
                           className={`px-3 py-1 rounded-full border text-xs ${
                             unit.id === selectedUnitId
-                              ? 'border-blue-500 bg-blue-50 text-blue-700'
+                              ? 'border-[var(--primary)] bg-gray-50 text-[var(--primary-dark)]'
                               : 'border-gray-200 bg-white text-gray-600'
                           }`}
                         >
@@ -669,7 +669,7 @@ export function ProductCard({
                     type="button"
                     onClick={(event) => handleAddToCart(event, quantity)}
                     disabled={!selectedUnit?.id || isAddingToCart}
-                    className="flex-1 rounded-lg bg-blue-600 text-white font-semibold py-2 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex-1 rounded-lg bg-[var(--primary)] text-white font-semibold py-2 hover:bg-[var(--primary-dark)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isAddingToCart ? 'Adding...' : 'Add to cart'}
                   </button>
@@ -685,7 +685,7 @@ export function ProductCard({
                   </button>
                   <Link
                     href={getProductHref(product)}
-                    className="text-blue-600 hover:text-blue-700"
+                    className="text-[var(--primary)] hover:text-[var(--primary-dark)]"
                   >
                     View full details
                   </Link>

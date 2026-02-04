@@ -141,7 +141,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   return (
     <div>
       {promotionData ? (
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
               <h1 className="section-label">{promotionData.title}</h1>
@@ -164,7 +164,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
               />
               <button
                 type="submit"
-                className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-5 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)]"
               >
                 Search
               </button>
@@ -200,7 +200,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
             />
             <button
               type="submit"
-              className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-5 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)]"
             >
               Search
             </button>
@@ -244,7 +244,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
               <p className="text-gray-600 mb-4">
                 Showing {filteredResults.length} of {data.count} product{data.count !== 1 ? 's' : ''}
                 {promotionId && promotionData && (
-                  <span className="ml-2 text-sm text-blue-600">
+                  <span className="ml-2 text-sm text-[var(--primary)]">
                     (filtered by promotion: {promotionData.title})
                   </span>
                 )}

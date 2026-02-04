@@ -30,7 +30,7 @@ function CheckoutSuccessContent() {
           )}
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8">
           <p className="text-gray-700">
             A salesperson will contact you shortly to assist with your inquiry. You can track your
             inquiry using the reference number above.
@@ -40,7 +40,7 @@ function CheckoutSuccessContent() {
         <div className="flex gap-4 justify-center">
           <Link
             href="/products"
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-6 py-3 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)]"
           >
             Continue Shopping
           </Link>

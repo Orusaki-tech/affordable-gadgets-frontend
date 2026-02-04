@@ -360,7 +360,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
               onClose();
               router.push('/products');
             }}
-            className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold"
+            className="w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)] font-semibold"
           >
             Continue Shopping
           </button>
@@ -465,7 +465,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
             <label htmlFor="phone" className="block text-sm font-medium mb-1">
               Phone <span className="text-red-500">*</span>
               {isRecognizing && (
-                <span className="ml-2 text-sm text-blue-600">Checking...</span>
+                <span className="ml-2 text-sm text-[var(--primary)]">Checking...</span>
               )}
             </label>
             <input
@@ -529,7 +529,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
             </button>
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex-1 bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)] disabled:bg-gray-400 disabled:cursor-not-allowed"
               disabled={isSubmitting || isCartSubmitted}
             >
               {isSubmitting 

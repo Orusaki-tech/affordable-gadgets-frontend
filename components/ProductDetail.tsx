@@ -87,8 +87,8 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
       }}
       className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
         isSelected
-          ? 'border-blue-600 bg-blue-50 ring-2 ring-blue-200'
-          : 'border-gray-200 hover:border-blue-300 bg-white'
+          ? 'border-[var(--primary)] bg-gray-50 ring-2 ring-gray-200'
+          : 'border-gray-200 hover:border-[var(--primary-light)] bg-white'
       }`}
     >
       {/* Unit Info - Compact */}
@@ -103,7 +103,7 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
             <p className="text-lg font-bold text-gray-900">{formatPrice(Number(unit.selling_price))}</p>
           )}
           {isSelected && (
-            <span className="text-blue-600 font-semibold text-xs bg-blue-100 px-2 py-0.5 rounded">
+            <span className="text-[var(--primary)] font-semibold text-xs bg-gray-100 px-2 py-0.5 rounded">
               ✓ Selected
             </span>
           )}
@@ -607,7 +607,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   if (productLoading) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary)]"></div>
         <p className="mt-4 text-gray-600">Loading product details...</p>
       </div>
     );
@@ -620,7 +620,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         <p className="text-gray-600 mb-4">
           {productError instanceof Error ? productError.message : 'The product you\'re looking for doesn\'t exist or has been removed.'}
         </p>
-        <Link href="/products" className="text-blue-600 hover:text-blue-700 underline">
+        <Link href="/products" className="text-[var(--primary)] hover:text-[var(--primary-dark)] underline">
           Browse all products
         </Link>
       </div>
@@ -632,9 +632,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       {/* Breadcrumb */}
       <nav className="mb-2 text-xs text-gray-600">
         <ol className="flex items-center gap-1.5 flex-wrap">
-          <li><Link href="/" className="hover:text-blue-600 transition-colors">Home</Link></li>
+          <li><Link href="/" className="hover:text-[var(--primary)] transition-colors">Home</Link></li>
           <li className="text-gray-400">/</li>
-          <li><Link href="/products" className="hover:text-blue-600 transition-colors">Products</Link></li>
+          <li><Link href="/products" className="hover:text-[var(--primary)] transition-colors">Products</Link></li>
           <li className="text-gray-400">/</li>
           <li className="text-gray-900 font-medium truncate max-w-xs sm:max-w-none">{product.product_name}</li>
         </ol>
@@ -678,7 +678,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     }}
                   className={`relative w-16 h-16 rounded overflow-hidden border flex-shrink-0 transition-all ${
                     selectedImageIndex === index
-                      ? 'border-blue-600 ring-1 ring-blue-200'
+                      ? 'border-[var(--primary)] ring-1 ring-gray-200'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                     title={imageColor ? `Color: ${imageColor}` : undefined}
@@ -719,7 +719,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <button
               type="button"
               onClick={jumpToReviews}
-              className="mt-2 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700"
+              className="mt-2 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:text-[var(--primary-dark)]"
             >
               Leave a review
             </button>
@@ -803,7 +803,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                            selectedUnitData.condition}
               </span>
               </div>
-              <span className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded border border-blue-200 text-xs font-semibold">
+              <span className="flex items-center gap-1 px-2 py-1 bg-gray-50 text-[var(--primary-dark)] rounded border border-gray-200 text-xs font-semibold">
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"
@@ -819,7 +819,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           {/* Variant Selectors - Storage and Color Only */}
           {unitsLoading ? (
             <div className="text-center py-2 text-gray-600">
-              <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--primary)]"></div>
               <p className="mt-1 text-xs">Loading variants...</p>
             </div>
           ) : units && units.length > 0 ? (
@@ -842,8 +842,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         }}
                         className={`px-3 py-1.5 rounded font-semibold text-xs transition-all ${
                           selectedStorage === storage
-                            ? 'bg-blue-600 text-white ring-1 ring-blue-200'
-                            : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                            ? 'bg-[var(--primary)] text-white ring-1 ring-gray-200'
+                            : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-[var(--primary-light)] hover:bg-gray-50'
                         }`}
                       >
                         {storage}GB
@@ -875,8 +875,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                           disabled={!hasAvailableUnits}
                           className={`px-3 py-1.5 rounded font-semibold text-xs transition-all ${
                           selectedColor === color
-                              ? 'bg-blue-600 text-white ring-1 ring-blue-200'
-                              : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                              ? 'bg-[var(--primary)] text-white ring-1 ring-gray-200'
+                              : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-[var(--primary-light)] hover:bg-gray-50'
                           } ${!hasAvailableUnits ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         {color}
@@ -957,7 +957,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                                 </p>
                               )}
                               {itemPrice !== null && (
-                                <p className="text-xs font-bold text-blue-600 mt-0.5">
+                                <p className="text-xs font-bold text-[var(--primary)] mt-0.5">
                                   {formatPrice(itemPrice)}
                                 </p>
                               )}
@@ -1004,7 +1004,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 <span>6 months warranty</span>
               </div>
               <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
-                <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3 h-3 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
                 <span>Affordable shipping</span>
@@ -1027,7 +1027,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               <button
                 onClick={handleAddToCart}
                 disabled={!selectedUnit || isAddingToCart}
-                className="w-full bg-blue-600 text-white px-3 py-2 rounded font-bold text-sm hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-md"
+                className="w-full bg-[var(--primary)] text-white px-3 py-2 rounded font-bold text-sm hover:bg-[var(--primary-dark)] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-md"
               >
                 {isAddingToCart ? (
                   <span className="flex items-center justify-center gap-1.5">
@@ -1050,7 +1050,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           {filteredUnits.length > 0 && (
             <div className="border-t border-gray-200 pt-1">
               <details className="group">
-                <summary className="cursor-pointer text-[10px] font-semibold text-gray-700 hover:text-blue-600 transition-colors flex items-center justify-between py-0.5">
+                <summary className="cursor-pointer text-[10px] font-semibold text-gray-700 hover:text-[var(--primary)] transition-colors flex items-center justify-between py-0.5">
                   <span>View All Available Units ({filteredUnits.length})</span>
                   <svg className="w-3 h-3 transform transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -1165,7 +1165,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   )}
                   <button
                     type="button"
-                    className={`mt-1 text-[11px] font-semibold ${canAdd ? 'text-blue-600 hover:text-blue-700' : 'text-gray-400 cursor-not-allowed'}`}
+                    className={`mt-1 text-[11px] font-semibold ${canAdd ? 'text-[var(--primary)] hover:text-[var(--primary-dark)]' : 'text-gray-400 cursor-not-allowed'}`}
                     onClick={() => {
                       if (selectedVariant && canAdd) {
                         handleAddAccessoryVariantToCart(accessory, selectedVariant);
@@ -1199,7 +1199,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-3 py-1.5 font-semibold text-xs border-b-2 transition-all whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'border-blue-600 text-blue-600 bg-blue-50 rounded-t'
+                    ? 'border-[var(--primary)] text-[var(--primary)] bg-gray-50 rounded-t'
                     : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -1236,7 +1236,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   <h3 className="text-sm font-bold mb-1.5">Tags</h3>
                   <div className="flex flex-wrap gap-1.5">
                     {product.tags.map((tag: string, idx: number) => (
-                      <span key={idx} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full border border-blue-200">
+                      <span key={idx} className="px-2 py-1 bg-gray-50 text-[var(--primary-dark)] text-xs rounded-full border border-gray-200">
                         {tag}
                       </span>
                     ))}
@@ -1400,7 +1400,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       <p className="text-xs text-gray-600 mt-1">{product.brand}</p>
                     )}
                     {!product.product_video_url && (
-                      <p className="mt-2 text-[11px] text-blue-700 bg-blue-50 border border-blue-200 rounded-md px-2.5 py-1.5">
+                      <p className="mt-2 text-[11px] text-[var(--primary-dark)] bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1.5">
                         This is a placeholder video. The actual product video will be available soon.
                       </p>
                     )}

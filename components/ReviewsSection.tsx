@@ -133,7 +133,7 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
                     {review.customer_username || (review.is_admin_review ? 'Admin' : 'Anonymous')}
                   </span>
                   {review.is_admin_review && (
-                    <span className="text-[10px] sm:text-[11px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                    <span className="text-[10px] sm:text-[11px] bg-gray-100 text-[var(--primary-dark)] px-2 py-0.5 rounded">
                       Verified
                     </span>
                   )}

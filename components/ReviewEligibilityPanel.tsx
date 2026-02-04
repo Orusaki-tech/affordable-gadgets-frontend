@@ -303,7 +303,7 @@ export function ReviewEligibilityPanel() {
                       { id: selectedEligibleItem.product_id, slug: selectedEligibleItem.product_slug ?? '' },
                       { fallbackId: selectedEligibleItem.product_id }
                     )}
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--primary)] hover:text-[var(--primary-dark)]"
                   >
                     View product details
                   </Link>

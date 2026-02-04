@@ -299,7 +299,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
         </button>
         <Link
           href="/reviews/eligible"
-          className="pointer-events-auto text-xs font-semibold text-blue-600 hover:text-blue-700"
+          className="pointer-events-auto text-xs font-semibold text-[var(--primary)] hover:text-[var(--primary-dark)]"
         >
           Check eligible purchases
         </Link>
@@ -544,7 +544,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                     </div>
                   </div>
                   {selectedReview.is_admin_review && (
-                    <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                    <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-[var(--primary-dark)]">
                       Verified
                     </span>
                   )}
@@ -590,7 +590,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                         <Link
                           key={`${productId}-${index}`}
                           href={productHref}
-                          className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md"
+                          className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-gray-300 hover:shadow-md"
                           onClick={() => prefillProductCache(productId, product ?? null)}
                         >
                           <div className="flex items-center gap-3">
@@ -763,7 +763,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                           { id: selectedEligibleItem.product_id, slug: selectedEligibleItem.product_slug ?? '' },
                           { fallbackId: selectedEligibleItem.product_id }
                         )}
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--primary)] hover:text-[var(--primary-dark)]"
                       >
                         View product details
                       </Link>

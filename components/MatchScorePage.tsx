@@ -92,7 +92,7 @@ export function MatchScorePage() {
                   }}
                   className={`px-3 py-1 rounded ${
                     criteria.storage?.includes(size)
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-[var(--primary)] text-white'
                       : 'bg-gray-200 text-gray-700'
                   }`}
                 >
@@ -117,7 +117,7 @@ export function MatchScorePage() {
                   }}
                   className={`px-3 py-1 rounded ${
                     criteria.ram?.includes(size)
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-[var(--primary)] text-white'
                       : 'bg-gray-200 text-gray-700'
                   }`}
                 >
@@ -142,7 +142,7 @@ export function MatchScorePage() {
                   }}
                   className={`px-3 py-1 rounded ${
                     criteria.condition?.includes(cond)
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-[var(--primary)] text-white'
                       : 'bg-gray-200 text-gray-700'
                   }`}
                 >
@@ -169,7 +169,7 @@ export function MatchScorePage() {
 
         <button
           onClick={handleCalculate}
-          className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+          className="mt-6 px-6 py-3 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)] font-semibold"
         >
           Find Matches
         </button>
@@ -189,7 +189,7 @@ export function MatchScorePage() {
                   <div className="flex-1">
                     <Link
                       href={getProductHref(result.product)}
-                      className="text-xl font-semibold hover:text-blue-600"
+                      className="text-xl font-semibold hover:text-[var(--primary)]"
                     >
                       {result.product.product_name}
                     </Link>
@@ -203,7 +203,7 @@ export function MatchScorePage() {
                     )}
                   </div>
                   <div className="text-right">
-                    <div className="text-3xl font-bold text-blue-600">{result.score}%</div>
+                    <div className="text-3xl font-bold text-[var(--primary)]">{result.score}%</div>
                     <div className="text-sm text-gray-600">Match Score</div>
                   </div>
                 </div>

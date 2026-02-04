@@ -1,33 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  /* Apple iPhone Website Color Scheme */
-  --background: #ffffff;
-  --foreground: #1d1d1f; /* Apple's primary text color */
-  
-  /* Apple Brand Colors */
-  --primary: #0071e3; /* Apple Blue - primary links and CTAs */
-  --primary-dark: #0051a5; /* Darker blue for hover states */
-  --primary-light: #007aff; /* Lighter blue variant */
-  --secondary: #86868b; /* Apple's secondary text gray */
-  --accent: #0071e3; /* Same as primary for consistency */
-  
-  /* Apple System Colors */
-  --success: #34c759; /* Apple Green */
-  --warning: #ff9500; /* Apple Orange */
-  --danger: #ff3b30; /* Apple Red */
-  
-  /* Apple Neutral Colors - Based on their design system */
-  --gray-50: #f5f5f7; /* Apple's lightest gray background */
+  /* Brand Colors */
+  --background: #ffffff; /* White */
+  --foreground: #1d1d1f; /* Shark - primary text */
+
+  --primary: #1d1d1f; /* Shark */
+  --primary-dark: #121212; /* Cod Gray */
+  --primary-light: #3a3a3c; /* subtle lighter Shark */
+  --secondary: #6e6e73; /* neutral secondary text */
+  --accent: #1d1d1f; /* Shark for accents */
+
+  /* System Colors */
+  --success: #34c759;
+  --warning: #ff9500;
+  --danger: #ff3b30;
+
+  /* Brand Neutral Colors */
+  --gray-50: #f5f5f7; /* Athens Gray */
   --gray-100: #f5f5f7;
-  --gray-200: #e8e8ed; /* Light borders */
-  --gray-300: #d2d2d7; /* Apple's standard border color */
-  --gray-400: #a1a1a6; /* Medium gray text */
-  --gray-500: #86868b; /* Apple's secondary text */
-  --gray-600: #6e6e73; /* Darker gray text */
-  --gray-700: #424245; /* Very dark gray */
-  --gray-800: #1d1d1f; /* Apple's primary text color */
-  --gray-900: #000000; /* Pure black for emphasis */
+  --gray-200: #e8e8ed;
+  --gray-300: #d2d2d7;
+  --gray-400: #a1a1a6;
+  --gray-500: #86868b;
+  --gray-600: #6e6e73;
+  --gray-700: #424245;
+  --gray-800: #1d1d1f; /* Shark */
+  --gray-900: #121212; /* Cod Gray */
 }
 
 @theme inline {
@@ -38,20 +37,20 @@
   --color-primary-light: var(--primary-light);
   --color-secondary: var(--secondary);
   --color-accent: var(--accent);
-  
-  /* Apple Blue - mapped to Tailwind blue classes */
-  --color-blue-50: #e6f2ff;
-  --color-blue-100: #cce5ff;
-  --color-blue-200: #99cbff;
-  --color-blue-300: #66b1ff;
-  --color-blue-400: #3397ff;
-  --color-blue-500: #007aff;
-  --color-blue-600: #0071e3; /* Apple's primary blue */
-  --color-blue-700: #0051a5;
-  --color-blue-800: #003d7a;
-  --color-blue-900: #00294f;
-  
-  /* Apple Gray scale - mapped to Tailwind gray classes */
+
+  /* Brand-aligned "blue" scale to avoid legacy blue accents */
+  --color-blue-50: var(--gray-50);
+  --color-blue-100: var(--gray-100);
+  --color-blue-200: var(--gray-200);
+  --color-blue-300: var(--gray-300);
+  --color-blue-400: var(--gray-400);
+  --color-blue-500: var(--primary-light);
+  --color-blue-600: var(--primary);
+  --color-blue-700: var(--primary-dark);
+  --color-blue-800: var(--gray-800);
+  --color-blue-900: var(--gray-900);
+
+  /* Brand Gray scale */
   --color-gray-50: var(--gray-50);
   --color-gray-100: var(--gray-100);
   --color-gray-200: var(--gray-200);
@@ -62,8 +61,8 @@
   --color-gray-700: var(--gray-700);
   --color-gray-800: var(--gray-800);
   --color-gray-900: var(--gray-900);
-  
-  /* Apple System Colors */
+
+  /* System Colors */
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
@@ -76,9 +75,88 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+}
+
+/* Typography scale */
+h1 {
+  font-size: 28px;
+  line-height: 1.4;
+}
+
+h2 {
+  font-size: 22px;
+  line-height: 1.4;
+}
+
+h3 {
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+/* Section labels */
+.section-label {
+  font-size: 22px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  body {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-size: 36px;
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-size: 28px;
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: 22px;
+    line-height: 1.5;
+  }
+
+  .section-label {
+    font-size: 28px;
+    line-height: 1.5;
+  }
+}
+
+@media (min-width: 1025px) {
+  body {
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  h1 {
+    font-size: 56px;
+    line-height: 1.6;
+  }
+
+  h2 {
+    font-size: 40px;
+    line-height: 1.6;
+  }
+
+  h3 {
+    font-size: 32px;
+    line-height: 1.6;
+  }
+
+  .section-label {
+    font-size: 40px;
+    line-height: 1.6;
+  }
 }
 
 /* Smooth scrolling */
@@ -99,23 +177,7 @@ html {
 
 /* Section labels (match Samsung "Recommended for you" heading) */
 .section-label {
-  font-size: 28px;
-  line-height: 42.56px;
   font-weight: 700;
-}
-
-@media (max-width: 640px) {
-  .section-label {
-    font-size: 22px;
-    line-height: 33.25px;
-  }
-}
-
-@media (min-width: 641px) and (max-width: 1023px) {
-  .section-label {
-    font-size: 25px;
-    line-height: 37.24px;
-  }
 }
 
 /* Samsung-style carousel entrance */

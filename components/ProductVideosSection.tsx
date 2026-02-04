@@ -99,7 +99,7 @@ export function ProductVideosSection() {
     return (
       <div className="text-center py-12">
         <p className="text-gray-600 mb-4">No product videos available at the moment.</p>
-        <Link href="/products" className="text-blue-600 hover:underline">
+        <Link href="/products" className="text-[var(--primary)] hover:underline">
           View All Products
         </Link>
       </div>
@@ -148,7 +148,7 @@ export function ProductVideosSection() {
                 </p>
               )}
               {product.min_price && product.max_price && (
-                <p className="text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px] font-bold text-blue-600">
+                <p className="text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px] font-bold text-[var(--primary)]">
                   KES {product.min_price.toLocaleString()} - {product.max_price.toLocaleString()}
                 </p>
               )}

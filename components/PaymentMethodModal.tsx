@@ -116,7 +116,7 @@ export function PaymentMethodModal({
           {/* Card Payments Option */}
           <label className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
             selectedMethod === 'card' 
-              ? 'border-blue-500 bg-blue-50' 
+              ? 'border-[var(--primary)] bg-gray-50' 
               : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
           }`}>
             <input
@@ -125,17 +125,17 @@ export function PaymentMethodModal({
               value="card"
               checked={selectedMethod === 'card'}
               onChange={(e) => setSelectedMethod(e.target.value as PaymentMethod)}
-              className="mr-4 w-5 h-5 text-blue-600"
+              className="mr-4 w-5 h-5 text-[var(--primary)]"
             />
             <div className="flex items-center flex-1">
               <div className="flex items-center gap-2 mr-4">
-                <div className="w-10 h-7 bg-blue-600 rounded flex items-center justify-center shadow-sm">
+                <div className="w-10 h-7 bg-[var(--primary)] rounded flex items-center justify-center shadow-sm">
                   <span className="text-white text-[10px] font-bold">VISA</span>
                 </div>
                 <div className="w-10 h-7 bg-red-500 rounded flex items-center justify-center shadow-sm">
                   <span className="text-white text-[10px] font-bold">MC</span>
                 </div>
-                <div className="w-10 h-7 bg-blue-800 rounded flex items-center justify-center shadow-sm">
+                <div className="w-10 h-7 bg-[var(--primary-dark)] rounded flex items-center justify-center shadow-sm">
                   <span className="text-white text-[10px] font-bold">AE</span>
                 </div>
               </div>
@@ -159,7 +159,7 @@ export function PaymentMethodModal({
             />
             <div className="flex items-center flex-1">
               <div className="flex items-center gap-2 mr-4">
-                <div className="w-10 h-7 bg-blue-600 rounded flex items-center justify-center shadow-sm">
+                <div className="w-10 h-7 bg-[var(--primary)] rounded flex items-center justify-center shadow-sm">
                   <span className="text-white text-[10px] font-bold">VISA</span>
                 </div>
                 <div className="w-10 h-7 bg-orange-500 rounded flex items-center justify-center shadow-sm">
@@ -219,7 +219,7 @@ export function PaymentMethodModal({
                 <select
                   value={countryCode}
                   onChange={(e) => setCountryCode(e.target.value)}
-                  className="px-3 py-2.5 border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:border-blue-500 text-sm font-medium"
+                  className="px-3 py-2.5 border-2 border-gray-300 rounded-lg bg-white focus:outline-none focus:border-[var(--primary)] text-sm font-medium"
                 >
                   <option value="+254">+254</option>
                   <option value="+255">+255</option>
@@ -231,7 +231,7 @@ export function PaymentMethodModal({
                   value={mobileNumber}
                   onChange={(e) => setMobileNumber(formatPhoneNumber(e.target.value))}
                   placeholder="727504393"
-                  className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
+                  className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-[var(--primary)] text-sm"
                   maxLength={9}
                 />
               </div>

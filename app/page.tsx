@@ -39,12 +39,12 @@ export default function HomePage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
             <div className="text-center mb-12 lg:mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
-                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[var(--primary)] via-[var(--primary-light)] to-[var(--primary-dark)] bg-clip-text text-transparent">
                   Featured Products
                 </span>
               </h2>
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Handpicked for you</p>
-              <div className="w-32 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 mx-auto mt-6 rounded-full shadow-md"></div>
+              <div className="w-32 h-1.5 bg-gradient-to-r from-[var(--primary)] via-[var(--primary-light)] to-[var(--primary-dark)] mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
             <ProductGridClient pageSize={8} showPagination={false} cardOptions={{ variant: 'featured' }} />
           </div>
@@ -71,12 +71,12 @@ export default function HomePage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
             <div className="text-center mb-12 lg:mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
-                <span className="bg-gradient-to-r from-green-600 via-teal-600 to-blue-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[var(--primary)] via-[var(--primary-light)] to-[var(--primary-dark)] bg-clip-text text-transparent">
                   Shop by Category
                 </span>
               </h2>
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Find exactly what you're looking for</p>
-              <div className="w-32 h-1.5 bg-gradient-to-r from-green-600 via-teal-600 to-blue-600 mx-auto mt-6 rounded-full shadow-md"></div>
+              <div className="w-32 h-1.5 bg-gradient-to-r from-[var(--primary)] via-[var(--primary-light)] to-[var(--primary-dark)] mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
             <CategoriesSectionClient />
           </div>

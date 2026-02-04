@@ -449,7 +449,7 @@ export function CartPage() {
               <p className="text-gray-600 mb-6">Add some products to get started!</p>
               <Link
                 href="/products"
-                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-block px-6 py-3 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)]"
               >
                 Browse Products
               </Link>
@@ -538,7 +538,7 @@ export function CartPage() {
                         <span>Delivery date: {deliveryDateLabel}</span>
                         <button
                           onClick={openDeliveryModal}
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-[var(--primary)] hover:text-[var(--primary-dark)]"
                         >
                           Choose delivery
                         </button>
@@ -654,7 +654,7 @@ export function CartPage() {
                       <span>Delivery date: {deliveryDateLabel}</span>
                       <button
                         onClick={openDeliveryModal}
-                        className="text-blue-600 hover:text-blue-700"
+                        className="text-[var(--primary)] hover:text-[var(--primary-dark)]"
                       >
                         Choose delivery
                     </button>
@@ -697,7 +697,7 @@ export function CartPage() {
                   <button
                     onClick={fetchOrderHistory}
                     disabled={ordersLoading}
-                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg"
+                    className="w-full sm:w-auto px-4 py-2 bg-[var(--primary)] text-white rounded-lg"
                   >
                     Verify
                   </button>
@@ -725,19 +725,19 @@ export function CartPage() {
                       <div className="flex gap-3">
                         <Link
                           href={`/orders/${order.order_id}`}
-                          className="text-blue-600 hover:text-blue-700 text-sm"
+                          className="text-[var(--primary)] hover:text-[var(--primary-dark)] text-sm"
                         >
                           View order
                         </Link>
                         <button
                           onClick={() => window.open(getReceiptUrl(order.order_id), '_blank')}
-                          className="text-blue-600 hover:text-blue-700 text-sm"
+                          className="text-[var(--primary)] hover:text-[var(--primary-dark)] text-sm"
                         >
                           Download receipt
                         </button>
                         <Link
                           href="/reviews/eligible"
-                          className="text-blue-600 hover:text-blue-700 text-sm"
+                          className="text-[var(--primary)] hover:text-[var(--primary-dark)] text-sm"
                         >
                           Leave review
                         </Link>
@@ -783,7 +783,7 @@ export function CartPage() {
             </button>
             <Link
               href="/products"
-              className="block text-center mt-4 text-blue-600 hover:text-blue-700"
+              className="block text-center mt-4 text-[var(--primary)] hover:text-[var(--primary-dark)]"
             >
               Continue Shopping
             </Link>
@@ -800,7 +800,7 @@ export function CartPage() {
               </div>
               <button
                 onClick={openDeliveryModal}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+                className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg text-sm"
               >
                 {deliveryDetailsSaved ? 'Update' : 'Add'}
               </button>
@@ -939,7 +939,7 @@ export function CartPage() {
             <div className="mt-6 flex items-center justify-end gap-3">
               <button
                 onClick={handleSaveDeliveryDetails}
-                className="px-6 py-3 rounded-lg font-semibold bg-blue-600 text-white hover:bg-blue-700"
+                className="px-6 py-3 rounded-lg font-semibold bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)]"
               >
                 Save details
               </button>

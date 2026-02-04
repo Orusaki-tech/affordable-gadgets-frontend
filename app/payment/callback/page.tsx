@@ -87,9 +87,9 @@ function PaymentCallbackContent() {
         <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
           {status === 'loading' && (
             <>
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-100 mb-4">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
                 <svg
-                  className="animate-spin h-8 w-8 text-blue-600"
+                  className="animate-spin h-8 w-8 text-[var(--primary)]"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -159,7 +159,7 @@ function PaymentCallbackContent() {
               <div className="space-y-2">
                 <Link
                   href="/cart"
-                  className="block w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold"
+                  className="block w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)] font-semibold"
                 >
                   Back to Cart
                 </Link>

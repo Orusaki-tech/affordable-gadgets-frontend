@@ -105,7 +105,7 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
       {specialOffersPromotions.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-600 mb-4">No special offers available at the moment.</p>
-          <Link href="/products" className="text-blue-600 hover:underline">
+          <Link href="/products" className="text-[var(--primary)] hover:underline">
             View All Products
           </Link>
         </div>

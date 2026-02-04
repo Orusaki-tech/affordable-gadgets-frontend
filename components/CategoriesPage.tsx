@@ -102,7 +102,7 @@ function CategoryProducts({ category }: { category: Category }) {
         <h2 className="text-3xl font-bold">{category.name}</h2>
         <Link
           href={category.href}
-          className="text-blue-600 hover:text-blue-700 font-medium"
+          className="text-[var(--primary)] hover:text-[var(--primary-dark)] font-medium"
         >
           View All →
         </Link>

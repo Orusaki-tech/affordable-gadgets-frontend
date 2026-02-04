@@ -55,12 +55,12 @@ export function Header() {
             href="/" 
             className="flex items-center gap-3 shrink-0 hover:opacity-80 transition-opacity group"
           >
-            <div className="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-lg shadow-md group-hover:shadow-lg transition-shadow overflow-hidden">
+            <div className="relative w-20 h-20 flex items-center justify-center overflow-hidden">
               <Image 
                 src="/affordablelogo.png" 
                 alt={`${brandConfig.name} logo`}
-                width={48}
-                height={48}
+                width={80}
+                height={80}
                 className="object-contain w-full h-full"
                 priority
               /> 

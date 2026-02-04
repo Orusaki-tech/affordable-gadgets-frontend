@@ -428,28 +428,28 @@ export function CartPage() {
   };
 
   if (isLoading) {
-    return <div className="text-center py-12">Loading cart...</div>;
+    return <div className="cart-page__loading">Loading cart...</div>;
   }
 
   return (
-    <div>
-      <h1 className="section-label mb-8">Shopping Cart</h1>
+    <div className="cart-page">
+      <h1 className="section-label cart-page__title">Shopping Cart</h1>
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="cart-page__alert cart-page__alert--error">
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="cart-page__layout">
         {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-5">
+        <div className="cart-page__items">
           {items.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
-              <h2 className="text-2xl font-semibold mb-2">Your Cart is Empty</h2>
-              <p className="text-gray-600 mb-6">Add some products to get started!</p>
+            <div className="cart-page__empty">
+              <h2 className="cart-page__empty-title">Your Cart is Empty</h2>
+              <p className="cart-page__empty-copy">Add some products to get started!</p>
               <Link
                 href="/products"
-                className="inline-block px-6 py-3 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)]"
+                className="cart-page__empty-action"
               >
                 Browse Products
               </Link>
@@ -466,18 +466,18 @@ export function CartPage() {
             if (group.isBundle) {
               const groupId = group.key.replace('bundle-', '');
               return (
-                  <div key={group.key} className="bg-white rounded-xl shadow-sm border border-orange-100 overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-orange-100">
+                  <div key={group.key} className="cart-page__bundle">
+                  <div className="cart-page__bundle-header">
                     <div>
-                      <p className="text-sm font-bold text-orange-700">Bundle deal</p>
-                      <p className="text-xs text-gray-500">Group {groupId.slice(0, 8)}</p>
+                      <p className="cart-page__bundle-label">Bundle deal</p>
+                      <p className="cart-page__bundle-meta">Group {groupId.slice(0, 8)}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500">Bundle total</p>
-                      <p className="text-lg font-bold text-orange-700">{formatPrice(groupTotal)}</p>
+                    <div className="cart-page__bundle-total">
+                      <p className="cart-page__bundle-total-label">Bundle total</p>
+                      <p className="cart-page__bundle-total-amount">{formatPrice(groupTotal)}</p>
                     </div>
                   </div>
-                  <div className="space-y-3 p-4">
+                  <div className="cart-page__bundle-items">
                     {group.items.map((item) => {
                       const inventoryUnit = item.inventory_unit;
                       const basePrice = Number(inventoryUnit?.selling_price ?? 0);
@@ -490,19 +490,19 @@ export function CartPage() {
                           inventoryUnit?.images?.[0]?.image_url ||
                           '/affordablelogo.png';
                       return (
-                          <div key={item.id} className="flex gap-4 border border-gray-100 rounded-xl p-3">
-                            <div className="h-24 w-24 flex-shrink-0 rounded-xl border border-gray-100 overflow-hidden bg-gray-50">
+                          <div key={item.id} className="cart-page__bundle-item">
+                            <div className="cart-page__bundle-item-media">
                               <Image
                                 src={imageUrl}
                                 alt={inventoryUnit?.product_name ?? 'Product'}
                                 width={96}
                                 height={96}
-                                className="h-full w-full object-contain"
+                                className="cart-page__bundle-item-image"
                               />
                             </div>
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-sm">{inventoryUnit?.product_name ?? 'Product'}</h3>
-                            <p className="text-gray-600 text-xs">
+                          <div className="cart-page__bundle-item-body">
+                            <h3 className="cart-page__bundle-item-title">{inventoryUnit?.product_name ?? 'Product'}</h3>
+                            <p className="cart-page__bundle-item-meta">
                               {inventoryUnit?.condition ?? 'Condition N/A'}
                               {inventoryUnit?.grade && ` • Grade ${inventoryUnit.grade}`}
                               {inventoryUnit?.storage_gb && ` • ${inventoryUnit.storage_gb}GB`}
@@ -510,22 +510,22 @@ export function CartPage() {
                               {inventoryUnit?.color_name && ` • ${inventoryUnit.color_name}`}
                             </p>
                             {hasPromotion ? (
-                              <div className="mt-2">
-                                <p className="text-sm font-semibold text-red-600">
+                              <div className="cart-page__bundle-item-prices">
+                                <p className="cart-page__bundle-item-price">
                                   {formatPrice(unitPrice)} × {quantity}
                                 </p>
-                                <p className="text-xs text-gray-400 line-through">
+                                <p className="cart-page__bundle-item-price-old">
                                   {formatPrice(originalPrice)} × {quantity}
                                 </p>
                               </div>
                             ) : (
-                              <p className="text-sm font-semibold mt-2">
+                              <p className="cart-page__bundle-item-price">
                                 {formatPrice(unitPrice)} × {quantity}
                               </p>
                             )}
                           </div>
-                          <div className="flex flex-col items-end justify-between">
-                            <p className="text-base font-bold">
+                          <div className="cart-page__bundle-item-total">
+                            <p>
                               {formatPrice(unitPrice * quantity)}
                             </p>
                           </div>
@@ -533,18 +533,18 @@ export function CartPage() {
                       );
                     })}
                   </div>
-                    <div className="px-4 pb-4 text-sm text-gray-600">
-                      <div className="flex items-center justify-between">
+                    <div className="cart-page__bundle-delivery">
+                      <div className="cart-page__bundle-delivery-row">
                         <span>Delivery date: {deliveryDateLabel}</span>
                         <button
                           onClick={openDeliveryModal}
-                          className="text-[var(--primary)] hover:text-[var(--primary-dark)]"
+                          className="cart-page__link"
                         >
                           Choose delivery
                         </button>
                       </div>
                     </div>
-                  <div className="px-4 pb-4">
+                  <div className="cart-page__bundle-actions">
                     <button
                       onClick={async () => {
                         setRemovingBundleGroup(group.key);
@@ -558,7 +558,7 @@ export function CartPage() {
                         }
                       }}
                       disabled={removingBundleGroup === group.key}
-                      className="text-red-600 hover:text-red-700 text-sm hover:underline"
+                      className="cart-page__danger-link"
                     >
                       {removingBundleGroup === group.key ? 'Removing bundle...' : 'Remove bundle'}
                     </button>
@@ -581,21 +581,21 @@ export function CartPage() {
               return (
                 <div
                   key={item.id}
-                    className="flex flex-col gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-100"
+                    className="cart-page__item"
                   >
-                    <div className="flex gap-4">
-                      <div className="h-24 w-24 flex-shrink-0 rounded-xl border border-gray-100 overflow-hidden bg-gray-50">
+                    <div className="cart-page__item-row">
+                      <div className="cart-page__item-media">
                         <Image
                           src={imageUrl}
                           alt={inventoryUnit?.product_name ?? 'Product'}
                           width={96}
                           height={96}
-                          className="h-full w-full object-contain"
+                          className="cart-page__item-image"
                         />
                       </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">{inventoryUnit?.product_name ?? 'Product'}</h3>
-                    <p className="text-gray-600 text-sm">
+                  <div className="cart-page__item-body">
+                    <h3 className="cart-page__item-title">{inventoryUnit?.product_name ?? 'Product'}</h3>
+                    <p className="cart-page__item-meta">
                       {inventoryUnit?.condition ?? 'Condition N/A'}
                       {inventoryUnit?.grade && ` • Grade ${inventoryUnit.grade}`}
                       {inventoryUnit?.storage_gb && ` • ${inventoryUnit.storage_gb}GB`}
@@ -603,32 +603,32 @@ export function CartPage() {
                       {inventoryUnit?.color_name && ` • ${inventoryUnit.color_name}`}
                     </p>
                     {hasPromotion ? (
-                      <div className="mt-2">
-                        <p className="text-lg font-semibold text-red-600">
+                      <div className="cart-page__item-prices">
+                        <p className="cart-page__item-price cart-page__item-price--promo">
                           {formatPrice(unitPrice)} × {quantity}
                         </p>
-                        <p className="text-sm text-gray-400 line-through">
+                        <p className="cart-page__item-price-old">
                           {formatPrice(originalPrice)} × {quantity}
                         </p>
                       </div>
                     ) : (
-                      <p className="text-lg font-semibold mt-2">
+                      <p className="cart-page__item-price">
                         {formatPrice(unitPrice)} × {quantity}
                       </p>
                     )}
                   </div>
-                  <div className="flex flex-col items-end justify-between">
+                  <div className="cart-page__item-total">
                     {hasPromotion ? (
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-red-600">
+                      <div className="cart-page__item-total-values">
+                        <p className="cart-page__item-total-current cart-page__item-total-current--promo">
                           {formatPrice(unitPrice * quantity)}
                         </p>
-                        <p className="text-sm text-gray-400 line-through">
+                        <p className="cart-page__item-total-old">
                           {formatPrice(originalPrice * quantity)}
                         </p>
                       </div>
                     ) : (
-                      <p className="text-xl font-bold">
+                      <p className="cart-page__item-total-current">
                         {formatPrice(unitPrice * quantity)}
                       </p>
                     )}
@@ -644,17 +644,17 @@ export function CartPage() {
                           console.error('Failed to remove item:', err);
                         }
                       }}
-                      className="text-red-600 hover:text-red-700 text-sm hover:underline mt-2"
+                      className="cart-page__danger-link cart-page__item-remove"
                     >
                       Remove
                         </button>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm text-gray-600 border-t pt-3">
+                    <div className="cart-page__item-delivery">
                       <span>Delivery date: {deliveryDateLabel}</span>
                       <button
                         onClick={openDeliveryModal}
-                        className="text-[var(--primary)] hover:text-[var(--primary-dark)]"
+                        className="cart-page__link"
                       >
                         Choose delivery
                     </button>
@@ -666,24 +666,24 @@ export function CartPage() {
           )}
 
           {items.length === 0 && (
-            <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
-              <h2 className="text-2xl font-bold mb-2">Your Orders</h2>
-              <p className="text-sm text-gray-600 mb-4">
+            <div className="cart-page__orders">
+              <h2 className="cart-page__orders-title">Your Orders</h2>
+              <p className="cart-page__orders-copy">
                 Verify your phone number to see past orders and download receipts.
               </p>
-              <div className="flex flex-col gap-3 max-w-xl mx-auto">
+              <div className="cart-page__orders-form">
                 <input
                   type="tel"
                   placeholder="Phone number"
                   value={ordersPhone}
                   onChange={(e) => setOrdersPhone(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="cart-page__input"
                 />
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="cart-page__orders-actions">
                   <button
                     onClick={sendOrdersOtp}
                     disabled={ordersLoading}
-                    className="w-full sm:w-auto px-4 py-2 bg-gray-800 text-white rounded-lg"
+                    className="cart-page__btn cart-page__btn--dark"
                   >
                     {ordersOtpSent ? 'Resend OTP' : 'Send OTP'}
                   </button>
@@ -692,12 +692,12 @@ export function CartPage() {
                     placeholder="Enter OTP"
                     value={ordersOtp}
                     onChange={(e) => setOrdersOtp(e.target.value)}
-                    className="w-full sm:flex-1 px-3 py-2 border rounded-lg"
+                    className="cart-page__input cart-page__input--stretch"
                   />
                   <button
                     onClick={fetchOrderHistory}
                     disabled={ordersLoading}
-                    className="w-full sm:w-auto px-4 py-2 bg-[var(--primary)] text-white rounded-lg"
+                    className="cart-page__btn cart-page__btn--primary"
                   >
                     Verify
                   </button>
@@ -705,39 +705,39 @@ export function CartPage() {
               </div>
 
               {orderHistory.length > 0 && (
-                <div className="mt-6 space-y-4 text-left">
+                <div className="cart-page__orders-list">
                   {orderHistory.map((order) => (
-                    <div key={order.order_id} className="border rounded-lg p-4 flex flex-col gap-2">
-                      <div className="flex flex-wrap justify-between gap-2">
+                    <div key={order.order_id} className="cart-page__order-card">
+                      <div className="cart-page__order-meta">
                         <div>
-                          <p className="text-sm text-gray-500">Order ID</p>
-                          <p className="font-mono text-sm">{order.order_id}</p>
+                          <p className="cart-page__order-label">Order ID</p>
+                          <p className="cart-page__order-value cart-page__order-value--mono">{order.order_id}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500">Status</p>
-                          <p className="font-semibold">{order.status}</p>
+                          <p className="cart-page__order-label">Status</p>
+                          <p className="cart-page__order-value">{order.status}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500">Total</p>
-                          <p className="font-semibold">{formatPrice(Number(order.total_amount || 0))}</p>
+                          <p className="cart-page__order-label">Total</p>
+                          <p className="cart-page__order-value">{formatPrice(Number(order.total_amount || 0))}</p>
                         </div>
                       </div>
-                      <div className="flex gap-3">
+                      <div className="cart-page__order-actions">
                         <Link
                           href={`/orders/${order.order_id}`}
-                          className="text-[var(--primary)] hover:text-[var(--primary-dark)] text-sm"
+                          className="cart-page__link cart-page__order-link"
                         >
                           View order
                         </Link>
                         <button
                           onClick={() => window.open(getReceiptUrl(order.order_id), '_blank')}
-                          className="text-[var(--primary)] hover:text-[var(--primary-dark)] text-sm"
+                          className="cart-page__link cart-page__order-link"
                         >
                           Download receipt
                         </button>
                         <Link
                           href="/reviews/eligible"
-                          className="text-[var(--primary)] hover:text-[var(--primary-dark)] text-sm"
+                          className="cart-page__link cart-page__order-link"
                         >
                           Leave review
                         </Link>
@@ -751,21 +751,21 @@ export function CartPage() {
         </div>
 
         {/* Checkout & Summary */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 className="text-2xl font-bold mb-4">Payment Summary</h2>
-            <div className="space-y-2 mb-4 text-sm text-gray-700">
-              <div className="flex justify-between">
+        <div className="cart-page__sidebar">
+          <div className="cart-page__summary-card">
+            <h2 className="cart-page__summary-title">Payment Summary</h2>
+            <div className="cart-page__summary-items">
+              <div className="cart-page__summary-row">
                 <span>Items ({itemCount})</span>
                 <span>{formatPrice(totalValue)}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="cart-page__summary-row">
                 <span>Shipping &amp; handling</span>
                 <span>{formatPrice(deliveryFee)}</span>
               </div>
             </div>
-            <div className="border-t pt-4 mb-4">
-              <div className="flex justify-between text-xl font-bold">
+            <div className="cart-page__summary-total">
+              <div className="cart-page__summary-total-row">
                 <span>Order total</span>
                 <span>{formatPrice(totalWithDelivery)}</span>
               </div>
@@ -773,26 +773,24 @@ export function CartPage() {
             <button
               onClick={handleCheckout}
               disabled={cart?.is_submitted || isSubmitting}
-              className={`w-full px-6 py-3 rounded-lg font-semibold transition-colors ${
-                cart?.is_submitted || isSubmitting
-                  ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-green-600 text-white hover:bg-green-700'
+              className={`cart-page__checkout-button ${
+                cart?.is_submitted || isSubmitting ? 'cart-page__checkout-button--disabled' : ''
               }`}
             >
               {isSubmitting ? 'Redirecting to payment...' : cart?.is_submitted ? 'Already Submitted' : 'Proceed to Payment'}
             </button>
             <Link
               href="/products"
-              className="block text-center mt-4 text-[var(--primary)] hover:text-[var(--primary-dark)]"
+              className="cart-page__summary-link"
             >
               Continue Shopping
             </Link>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div className="flex items-start justify-between gap-4">
+          <div className="cart-page__delivery-card">
+            <div className="cart-page__delivery-header">
               <div>
-                <h2 className="text-2xl font-bold mb-2">Delivery Details</h2>
-                <p className="text-sm text-gray-600">
+                <h2 className="cart-page__delivery-title">Delivery Details</h2>
+                <p className="cart-page__delivery-copy">
                   {deliveryDetailsSaved
                     ? 'Your saved delivery details are below.'
                     : 'No delivery details saved yet.'}
@@ -800,38 +798,38 @@ export function CartPage() {
               </div>
               <button
                 onClick={openDeliveryModal}
-                className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg text-sm"
+                className="cart-page__delivery-action"
               >
                 {deliveryDetailsSaved ? 'Update' : 'Add'}
               </button>
             </div>
-            <div className="mt-4 space-y-2 text-sm text-gray-700">
+            <div className="cart-page__delivery-details">
               <div>
-                <span className="font-semibold">Name:</span>{' '}
+                <span className="cart-page__delivery-label">Name:</span>{' '}
                 {formData.customer_name || 'Not set'}
               </div>
               <div>
-                <span className="font-semibold">Phone:</span>{' '}
+                <span className="cart-page__delivery-label">Phone:</span>{' '}
                 {formData.customer_phone || 'Not set'}
               </div>
               <div>
-                <span className="font-semibold">Email:</span>{' '}
+                <span className="cart-page__delivery-label">Email:</span>{' '}
                 {formData.customer_email || 'Not set'}
               </div>
               <div>
-                <span className="font-semibold">Address:</span>{' '}
+                <span className="cart-page__delivery-label">Address:</span>{' '}
                 {formData.delivery_address || 'Not set'}
               </div>
               <div>
-                <span className="font-semibold">County:</span>{' '}
+                <span className="cart-page__delivery-label">County:</span>{' '}
                 {formData.delivery_county || 'Not set'}
               </div>
               <div>
-                <span className="font-semibold">Ward:</span>{' '}
+                <span className="cart-page__delivery-label">Ward:</span>{' '}
                 {formData.delivery_ward || 'Not set'}
               </div>
               <div>
-                <span className="font-semibold">Delivery date:</span> {deliveryDateLabel}
+                <span className="cart-page__delivery-label">Delivery date:</span> {deliveryDateLabel}
               </div>
             </div>
           </div>
@@ -839,51 +837,51 @@ export function CartPage() {
       </div>
 
       {isDeliveryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <div className="flex items-start justify-between gap-4 mb-4">
+        <div className="cart-page__modal">
+          <div className="cart-page__modal-card">
+            <div className="cart-page__modal-header">
               <div>
-                <h2 className="text-2xl font-bold">Delivery Details</h2>
-                <p className="text-sm text-gray-600">
+                <h2 className="cart-page__modal-title">Delivery Details</h2>
+                <p className="cart-page__modal-copy">
                   Please provide delivery details to continue.
                 </p>
               </div>
               {deliveryDetailsSaved && (
                 <button
                   onClick={() => setIsDeliveryModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="cart-page__modal-close"
                 >
                   Close
                 </button>
               )}
             </div>
 
-            <div className="space-y-3">
+            <div className="cart-page__modal-form">
               <input
                 type="text"
                 placeholder="Full name"
                 value={formData.customer_name}
                 onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg"
+                className="cart-page__input"
               />
               <input
                 type="tel"
                 placeholder="Phone number"
                 value={formData.customer_phone}
                 onChange={(e) => setFormData({ ...formData, customer_phone: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg"
+                className="cart-page__input"
               />
               <input
                 type="email"
                 placeholder="Email (optional)"
                 value={formData.customer_email}
                 onChange={(e) => setFormData({ ...formData, customer_email: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg"
+                className="cart-page__input"
               />
               <select
                 value={formData.delivery_county}
                 onChange={(e) => setFormData({ ...formData, delivery_county: e.target.value, delivery_ward: '' })}
-                className="w-full px-3 py-2 border rounded-lg"
+                className="cart-page__input"
               >
                 <option value="">Select county</option>
                 {counties.map((county) => (
@@ -896,7 +894,7 @@ export function CartPage() {
                 <select
                   value={formData.delivery_ward}
                   onChange={(e) => setFormData({ ...formData, delivery_ward: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="cart-page__input"
                 >
                   <option value="">Select ward</option>
                   {wards.map((ward) => (
@@ -906,40 +904,40 @@ export function CartPage() {
                   ))}
                 </select>
               )}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="cart-page__modal-grid">
                 <input
                   type="date"
                   value={formData.delivery_date}
                   onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="cart-page__input"
                 />
                 <input
                   type="time"
                   value={formData.delivery_time_start}
                   onChange={(e) => setFormData({ ...formData, delivery_time_start: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg"
+                  className="cart-page__input"
                 />
               </div>
               <input
                 type="time"
                 value={formData.delivery_time_end}
                 onChange={(e) => setFormData({ ...formData, delivery_time_end: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg"
+                className="cart-page__input"
                 placeholder="Delivery end time"
               />
               <textarea
                 placeholder="Delivery notes (optional)"
                 value={formData.delivery_notes}
                 onChange={(e) => setFormData({ ...formData, delivery_notes: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg"
+                className="cart-page__input cart-page__input--textarea"
                 rows={2}
               />
             </div>
 
-            <div className="mt-6 flex items-center justify-end gap-3">
+            <div className="cart-page__modal-actions">
               <button
                 onClick={handleSaveDeliveryDetails}
-                className="px-6 py-3 rounded-lg font-semibold bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)]"
+                className="cart-page__btn cart-page__btn--primary"
               >
                 Save details
               </button>

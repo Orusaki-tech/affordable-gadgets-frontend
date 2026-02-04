@@ -279,27 +279,27 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   };
 
   const reviewActionHeader = (
-    <div className="relative z-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+    <div className="reviews-showcase__header">
       <div>
-        <h3 className="text-xl font-semibold text-gray-900">Customer reviews</h3>
-        <p className="text-sm text-gray-500">
+        <h3 className="reviews-showcase__title">Customer reviews</h3>
+        <p className="reviews-showcase__subtitle">
           Purchased with us? Verify your phone to leave a review.
         </p>
       </div>
-      <div className="flex flex-col items-start gap-2 sm:items-end">
+      <div className="reviews-showcase__actions">
         <button
           type="button"
           onClick={openReviewModal}
           onPointerDown={openReviewModal}
           onTouchStart={openReviewModal}
           aria-haspopup="dialog"
-          className="btn-cta pointer-events-auto inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-2 text-white shadow-sm transition hover:bg-gray-800"
+          className="reviews-showcase__cta"
         >
           Leave a review
         </button>
         <Link
           href="/reviews/eligible"
-          className="pointer-events-auto text-xs font-semibold text-[var(--primary)] hover:text-[var(--primary-dark)]"
+          className="reviews-showcase__link"
         >
           Check eligible purchases
         </Link>
@@ -310,39 +310,39 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   let content: React.ReactNode;
   if (isLoading) {
     content = (
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="reviews-showcase__grid">
         {[...Array(3)].map((_, index) => (
           <div
             key={`review-skeleton-${index}`}
-            className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl bg-gray-100 animate-pulse"
+            className="reviews-showcase__skeleton"
           />
         ))}
       </div>
     );
   } else if (error) {
     content = (
-      <div className="text-center py-8 text-red-500">
+      <div className="reviews-showcase__error">
         Unable to load reviews right now. Please try again later.
       </div>
     );
   } else if (reviews.length === 0) {
     content = (
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="reviews-showcase__grid">
         {[...Array(3)].map((_, index) => (
           <div
             key={`review-empty-${index}`}
-            className="h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl border border-dashed border-gray-300 bg-white p-4 sm:p-6 text-center text-gray-500"
+            className="reviews-showcase__empty"
           >
-            <div className="text-4xl mb-4">💬</div>
-            <p className="font-semibold">Be the first to review</p>
-            <p className="text-sm mt-2">Share your experience to help others.</p>
+            <div className="reviews-showcase__empty-icon">💬</div>
+            <p className="reviews-showcase__empty-title">Be the first to review</p>
+            <p className="reviews-showcase__empty-copy">Share your experience to help others.</p>
           </div>
         ))}
       </div>
     );
   } else {
     content = (
-      <div className="relative">
+      <div className="reviews-showcase__carousel">
         <ProductCarousel
           itemsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
           showNavigation={true}
@@ -363,52 +363,59 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                 key={review.id}
                 type="button"
                 onClick={() => setSelectedReview(review)}
-                className="group relative w-full h-[320px] sm:h-[340px] lg:h-[360px] rounded-2xl overflow-hidden bg-white shadow-md ring-1 ring-black/5 text-left transition-all hover:-translate-y-0.5 hover:shadow-xl focus:outline-none grid grid-rows-[60%_40%] sm:grid-rows-[65%_35%]"
+                className="reviews-showcase__card"
               >
-                <div className="relative bg-gray-100">
+                <div className="reviews-showcase__card-media">
                   {imageUrl ? (
                     <Image
                       src={imageUrl}
                       alt={review.product_name ?? 'Product review'}
                       fill
                       sizes="(max-width: 640px) 260px, (max-width: 1024px) 280px, 300px"
-                      className="object-contain bg-gray-50"
+                      className="reviews-showcase__card-image"
                       unoptimized={imageUrl.includes('localhost') || imageUrl.includes('placehold.co')}
                     />
                   ) : (
-                    <div className="h-full w-full bg-gradient-to-br from-gray-200 to-gray-300" />
+                    <div className="reviews-showcase__card-image-placeholder" />
                   )}
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="reviews-showcase__card-overlay" />
 
-                  <div className="absolute top-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[10px] sm:text-[11px] font-semibold text-gray-900 shadow-sm">
+                  <div className="reviews-showcase__card-badge">
                     {review.customer_username || (review.is_admin_review ? 'Admin' : 'Customer')}
                   </div>
 
-                  <div className="absolute bottom-4 left-3 right-3 text-white">
+                  <div className="reviews-showcase__card-meta">
                     {review.comment && (
-                      <p className="text-[12px] sm:text-[13px] leading-[18px] sm:leading-[20px] line-clamp-1">
+                      <p className="reviews-showcase__card-comment">
                         "{review.comment}"
                       </p>
                     )}
-                    <div className="mt-2 flex gap-1 text-yellow-300 text-[12px] sm:text-[13px] mb-[3px]">
+                    <div className="reviews-showcase__card-rating">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <span key={star} className={star <= review.rating ? 'text-yellow-300' : 'text-white/40'}>
+                        <span
+                          key={star}
+                          className={
+                            star <= review.rating
+                              ? 'reviews-showcase__card-star reviews-showcase__card-star--active'
+                              : 'reviews-showcase__card-star'
+                          }
+                        >
                           ★
                         </span>
                       ))}
                     </div>
-                    <p className="text-[12px] sm:text-[13px] font-medium">
+                    <p className="reviews-showcase__card-product">
                       {review.product_name ?? 'Product'}
                     </p>
                   </div>
                 </div>
 
-                <div className="border-t border-gray-100 bg-white p-3 sm:p-4">
-                  <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-gray-500 mb-2">
+                <div className="reviews-showcase__card-footer">
+                  <p className="reviews-showcase__card-footer-title">
                     Tagged products
                   </p>
-                  <div className="flex gap-2 overflow-x-auto pb-1">
+                  <div className="reviews-showcase__tag-list">
                     {(productsForCard.length > 0 ? productsForCard : [null]).map((product, index) => {
                       const productId = product?.id ?? review.product;
                       const productImage =
@@ -418,18 +425,18 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                       return (
                         <div
                           key={`${productId}-${index}`}
-                          className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-2 py-1.5 shadow-sm"
+                          className="reviews-showcase__tag"
                         >
-                          <div className="relative h-7 w-7 overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+                          <div className="reviews-showcase__tag-media">
                             <Image
                               src={productImage}
                               alt={productName}
                               fill
-                              className="object-contain"
+                              className="reviews-showcase__tag-image"
                               sizes="28px"
                             />
                           </div>
-                          <span className="text-[10px] sm:text-[11px] font-medium text-gray-700 whitespace-nowrap">
+                          <span className="reviews-showcase__tag-name">
                             {productName}
                           </span>
                         </div>
@@ -446,13 +453,13 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   }
 
   return (
-    <div className="relative">
+    <div className="reviews-showcase">
       {reviewActionHeader}
       {content}
 
       {selectedReview && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          className="reviews-showcase__viewer"
           onClick={() => setSelectedReview(null)}
         >
           {(() => {
@@ -481,16 +488,16 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
 
             return (
           <div
-            className="relative w-full max-w-4xl max-h-[85vh] overflow-hidden rounded-3xl border border-gray-200 bg-slate-50 shadow-2xl"
+            className="reviews-showcase__viewer-card"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="relative flex items-center justify-center border-b border-gray-200 px-6 py-4">
-              <p className="text-sm font-semibold text-gray-700">
+            <div className="reviews-showcase__viewer-header">
+              <p className="reviews-showcase__viewer-title">
                 {selectedReview.product_name ?? 'Product'}
               </p>
               <button
                 type="button"
-                className="absolute right-4 top-3.5 flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm hover:bg-gray-50"
+                className="reviews-showcase__viewer-close"
                 onClick={() => setSelectedReview(null)}
                 aria-label="Close review modal"
               >
@@ -498,18 +505,18 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
               </button>
             </div>
 
-            <div className="grid max-h-[calc(85vh-56px)] grid-cols-1 md:grid-cols-[1.2fr_0.8fr] gap-0 overflow-y-auto">
-              <div className="flex items-center justify-center bg-slate-50 p-5 md:p-6">
-                <div className="w-full max-w-[420px] rounded-2xl bg-white p-3 shadow-sm">
-                  <div className="flex items-center justify-center rounded-2xl bg-gray-100 p-2">
+            <div className="reviews-showcase__viewer-content">
+              <div className="reviews-showcase__viewer-media">
+                <div className="reviews-showcase__viewer-image-frame">
+                  <div className="reviews-showcase__viewer-image-wrap">
                     {selectedReview.review_image_url || selectedReview.review_image ? (
-                      <div className="relative w-full h-[52vh] max-h-[52vh]">
+                      <div className="reviews-showcase__viewer-image">
                         <Image
                           src={selectedReview.review_image_url || selectedReview.review_image || ''}
                           alt={selectedReview.product_name ?? 'Product review'}
                           fill
                           sizes="(max-width: 768px) 90vw, 420px"
-                          className="object-contain bg-white"
+                          className="reviews-showcase__viewer-image-media"
                           unoptimized={
                             (selectedReview.review_image_url || selectedReview.review_image || '').includes('localhost') ||
                             (selectedReview.review_image_url || selectedReview.review_image || '').includes('placehold.co')
@@ -517,51 +524,58 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                         />
                       </div>
                     ) : (
-                      <div className="h-[52vh] w-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center rounded-2xl">
-                        <span className="text-sm text-gray-600">{selectedReview.product_name ?? 'Product'}</span>
+                      <div className="reviews-showcase__viewer-image-placeholder">
+                        <span className="reviews-showcase__viewer-image-placeholder-text">{selectedReview.product_name ?? 'Product'}</span>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white p-6 md:p-7">
-                <div className="flex items-start justify-between gap-4">
+              <div className="reviews-showcase__viewer-details">
+                <div className="reviews-showcase__viewer-summary">
                   <div>
-                    <p className="text-lg font-semibold text-gray-900">
+                    <p className="reviews-showcase__viewer-customer">
                       {selectedReview.customer_username || (selectedReview.is_admin_review ? 'Admin' : 'Customer')}
                     </p>
-                    <p className="text-xs text-gray-500">Reviewed {formatDate(selectedReview.date_posted)}</p>
-                    <div className="mt-2 flex items-center gap-1 text-yellow-400">
+                    <p className="reviews-showcase__viewer-date">Reviewed {formatDate(selectedReview.date_posted)}</p>
+                    <div className="reviews-showcase__viewer-rating">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <span key={star} className={star <= selectedReview.rating ? 'text-yellow-400' : 'text-gray-300'}>
+                        <span
+                          key={star}
+                          className={
+                            star <= selectedReview.rating
+                              ? 'reviews-showcase__viewer-star reviews-showcase__viewer-star--active'
+                              : 'reviews-showcase__viewer-star'
+                          }
+                        >
                           ★
                         </span>
                       ))}
-                      <span className="ml-2 text-sm font-semibold text-gray-900">
+                      <span className="reviews-showcase__viewer-rating-count">
                         {selectedReview.rating}/5
                       </span>
                     </div>
                   </div>
                   {selectedReview.is_admin_review && (
-                    <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-[var(--primary-dark)]">
+                    <span className="reviews-showcase__viewer-badge">
                       Verified
                     </span>
                   )}
                 </div>
 
                 {selectedReview.comment && (
-                  <p className="mt-4 text-sm leading-relaxed text-gray-700">"{selectedReview.comment}"</p>
+                  <p className="reviews-showcase__viewer-comment">"{selectedReview.comment}"</p>
                 )}
 
                 {(reviewVideoUrl || reviewVideoFileUrl) && (
-                  <div className="mt-6">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Review video</p>
-                    <div className="relative aspect-video w-full max-w-md max-h-64 overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                  <div className="reviews-showcase__viewer-video">
+                    <p className="reviews-showcase__viewer-video-title">Review video</p>
+                    <div className="reviews-showcase__viewer-video-frame">
                       {reviewVideoUrl ? (
                         <iframe
                           src={reviewVideoUrl}
-                          className="h-full w-full"
+                          className="reviews-showcase__viewer-video-embed"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen
                         />
@@ -569,16 +583,16 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                         <video
                           src={reviewVideoFileUrl || ''}
                           controls
-                          className="h-full w-full"
+                          className="reviews-showcase__viewer-video-embed"
                         />
                       )}
                     </div>
                   </div>
                 )}
 
-                <div className="mt-6 space-y-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Product</p>
-                  <div className="max-h-[200px] space-y-3 overflow-y-auto pr-1">
+                <div className="reviews-showcase__viewer-product">
+                  <p className="reviews-showcase__viewer-product-title">Product</p>
+                  <div className="reviews-showcase__viewer-product-list">
                     {productsForModal.map((product, index) => {
                       const productId = product?.id ?? selectedReview.product;
                       const isPrimary = productId === selectedReview.product;
@@ -590,31 +604,31 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                         <Link
                           key={`${productId}-${index}`}
                           href={productHref}
-                          className="block rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:border-gray-300 hover:shadow-md"
+                          className="reviews-showcase__viewer-product-card"
                           onClick={() => prefillProductCache(productId, product ?? null)}
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="relative h-12 w-12 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                          <div className="reviews-showcase__viewer-product-row">
+                            <div className="reviews-showcase__viewer-product-media">
                               <Image
                                 src={productImage}
                                 alt={productName}
                                 fill
-                                className="object-contain"
+                                className="reviews-showcase__viewer-product-image"
                                 sizes="48px"
                               />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-semibold text-gray-900 line-clamp-1">
+                            <div className="reviews-showcase__viewer-product-info">
+                              <p className="reviews-showcase__viewer-product-name">
                                 {productName}
                               </p>
                               {isPrimary && selectedReview.product_condition && (
-                                <p className="text-xs text-gray-500">Condition {selectedReview.product_condition}</p>
+                                <p className="reviews-showcase__viewer-product-meta">Condition {selectedReview.product_condition}</p>
                               )}
                               {isPrimary && formatPurchaseDate(selectedReview.purchase_date) && (
-                                <p className="text-xs text-gray-500">Purchased {formatPurchaseDate(selectedReview.purchase_date)}</p>
+                                <p className="reviews-showcase__viewer-product-meta">Purchased {formatPurchaseDate(selectedReview.purchase_date)}</p>
                               )}
                             </div>
-                            <span className="ml-auto inline-flex items-center rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-600">
+                            <span className="reviews-showcase__viewer-product-action">
                               View
                             </span>
                           </div>
@@ -633,21 +647,21 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
 
       {isReviewModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          className="reviews-showcase__modal"
           onClick={closeReviewModal}
         >
           <div
-            className="w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl"
+            className="reviews-showcase__modal-card"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-start justify-between gap-4 mb-4">
+            <div className="reviews-showcase__modal-header">
               <div>
-                <p className="text-lg font-semibold text-gray-900">Leave a review</p>
-                <p className="text-sm text-gray-500">Verify your purchase to continue.</p>
+                <p className="reviews-showcase__modal-title">Leave a review</p>
+                <p className="reviews-showcase__modal-subtitle">Verify your purchase to continue.</p>
               </div>
               <button
                 type="button"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-50"
+                className="reviews-showcase__modal-close"
                 onClick={closeReviewModal}
                 aria-label="Close review modal"
               >
@@ -656,33 +670,33 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
             </div>
 
             {reviewError && (
-              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="reviews-showcase__banner reviews-showcase__banner--error">
                 {reviewError}
               </div>
             )}
             {reviewMessage && (
-              <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+              <div className="reviews-showcase__banner reviews-showcase__banner--success">
                 {reviewMessage}
               </div>
             )}
 
             {reviewStep === 'phone' && (
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-700">
+              <div className="reviews-showcase__form">
+                <label className="reviews-showcase__label">
                   Phone number
                   <input
                     type="tel"
                     value={reviewPhone}
                     onChange={(event) => setReviewPhone(event.target.value)}
                     placeholder="e.g. 0712345678"
-                    className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                    className="reviews-showcase__input"
                   />
                 </label>
                 <button
                   type="button"
                   onClick={sendReviewOtp}
                   disabled={isSendingOtp}
-                  className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="reviews-showcase__button reviews-showcase__button--primary"
                 >
                   {isSendingOtp ? 'Sending OTP...' : 'Send OTP'}
                 </button>
@@ -690,29 +704,29 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
             )}
 
             {reviewStep === 'otp' && (
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-700">
+              <div className="reviews-showcase__form">
+                <label className="reviews-showcase__label">
                   OTP code
                   <input
                     type="text"
                     value={reviewOtp}
                     onChange={(event) => setReviewOtp(event.target.value)}
                     placeholder="Enter the 6-digit code"
-                    className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                    className="reviews-showcase__input"
                   />
                 </label>
-                <div className="flex flex-col gap-2 sm:flex-row">
+                <div className="reviews-showcase__actions">
                   <button
                     type="button"
                     onClick={checkReviewEligibility}
                     disabled={isCheckingEligibility}
-                    className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+                    className="reviews-showcase__button reviews-showcase__button--primary"
                   >
                     {isCheckingEligibility ? 'Verifying...' : 'Verify & Continue'}
                   </button>
                   <button
                     type="button"
-                    className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                    className="reviews-showcase__button reviews-showcase__button--secondary"
                     onClick={() => setReviewStep('phone')}
                   >
                     Change phone
@@ -722,20 +736,20 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
             )}
 
             {reviewStep === 'form' && (
-              <div className="space-y-4">
+              <div className="reviews-showcase__form">
                 {reviewCustomer && (
-                  <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+                  <div className="reviews-showcase__notice">
                     Signed in as <span className="font-semibold">{reviewCustomer.name || 'Customer'}</span> • {reviewCustomer.phone}
                   </div>
                 )}
 
                 {eligibleItems.length === 0 ? (
-                  <div className="rounded-xl border border-gray-200 bg-white px-4 py-4 text-sm text-gray-600">
+                  <div className="reviews-showcase__notice reviews-showcase__notice--empty">
                     We could not find any paid or delivered purchases for this phone number.
                   </div>
                 ) : (
                   <>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="reviews-showcase__label">
                       Purchased product
                       <select
                         value={selectedOrderItemId ?? ''}
@@ -743,7 +757,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                           const value = event.target.value;
                           setSelectedOrderItemId(value ? Number(value) : null);
                         }}
-                        className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                        className="reviews-showcase__input"
                       >
                         <option value="" disabled>
                           Select a product
@@ -763,21 +777,25 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                           { id: selectedEligibleItem.product_id, slug: selectedEligibleItem.product_slug ?? '' },
                           { fallbackId: selectedEligibleItem.product_id }
                         )}
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--primary)] hover:text-[var(--primary-dark)]"
+                        className="reviews-showcase__link-inline"
                       >
                         View product details
                       </Link>
                     )}
 
                     <div>
-                      <p className="text-sm font-medium text-gray-700">Your rating</p>
-                      <div className="mt-2 flex gap-2">
+                      <p className="reviews-showcase__label">Your rating</p>
+                      <div className="reviews-showcase__rating">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             key={star}
                             type="button"
                             onClick={() => setReviewRating(star)}
-                            className={`text-2xl ${star <= reviewRating ? 'text-yellow-400' : 'text-gray-300'}`}
+                            className={
+                              star <= reviewRating
+                                ? 'reviews-showcase__rating-star reviews-showcase__rating-star--active'
+                                : 'reviews-showcase__rating-star'
+                            }
                           >
                             ★
                           </button>
@@ -785,24 +803,24 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                       </div>
                     </div>
 
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="reviews-showcase__label">
                       Your review
                       <textarea
                         value={reviewComment}
                         onChange={(event) => setReviewComment(event.target.value)}
                         rows={4}
-                        className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 focus:border-gray-900 focus:outline-none"
+                        className="reviews-showcase__textarea"
                         placeholder="Share what you liked about the product."
                       />
                     </label>
 
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="reviews-showcase__label">
                       Add a photo (optional)
                       <input
                         type="file"
                         accept="image/*"
                         onChange={(event) => setReviewImage(event.target.files?.[0] ?? null)}
-                        className="mt-2 block w-full text-sm text-gray-600"
+                        className="reviews-showcase__file"
                       />
                     </label>
 
@@ -810,7 +828,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                       type="button"
                       onClick={submitReview}
                       disabled={isSubmittingReview}
-                      className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
+                      className="reviews-showcase__button reviews-showcase__button--primary"
                     >
                       {isSubmittingReview ? 'Submitting...' : 'Submit review'}
                     </button>

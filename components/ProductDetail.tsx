@@ -26,7 +26,7 @@ const LazyReviewsShowcase = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="text-sm text-gray-600">Loading reviews...</div>
+      <div className="product-detail__loading-inline">Loading reviews...</div>
     ),
   }
 );
@@ -36,7 +36,7 @@ const LazyComparisonPage = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="text-sm text-gray-600">Loading comparison...</div>
+      <div className="product-detail__loading-inline">Loading comparison...</div>
     ),
   }
 );
@@ -46,7 +46,7 @@ const LazyProductRecommendations = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="text-sm text-gray-600">Loading recommendations...</div>
+      <div className="product-detail__loading-inline">Loading recommendations...</div>
     ),
   }
 );
@@ -85,35 +85,33 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
         }
         onSelect(unit.id);
       }}
-      className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
-        isSelected
-          ? 'border-[var(--primary)] bg-gray-50 ring-2 ring-gray-200'
-          : 'border-gray-200 hover:border-[var(--primary-light)] bg-white'
+      className={`product-detail__unit-card ${
+        isSelected ? 'product-detail__unit-card--selected' : ''
       }`}
     >
       {/* Unit Info - Compact */}
       <div>
-        <div className="flex items-center justify-between mb-2">
+        <div className="product-detail__unit-row">
           {promotionPrice ? (
             <div>
-              <p className="text-lg font-bold text-red-600">{formatPrice(promotionPrice)}</p>
-              <p className="text-xs text-gray-400 line-through">{formatPrice(Number(unit.selling_price))}</p>
+              <p className="product-detail__unit-price product-detail__unit-price--promo">{formatPrice(promotionPrice)}</p>
+              <p className="product-detail__unit-price-old">{formatPrice(Number(unit.selling_price))}</p>
             </div>
           ) : (
-            <p className="text-lg font-bold text-gray-900">{formatPrice(Number(unit.selling_price))}</p>
+            <p className="product-detail__unit-price">{formatPrice(Number(unit.selling_price))}</p>
           )}
           {isSelected && (
-            <span className="text-[var(--primary)] font-semibold text-xs bg-gray-100 px-2 py-0.5 rounded">
+            <span className="product-detail__unit-selected">
               ✓ Selected
             </span>
           )}
         </div>
 
         {/* Specs Badges - Only Condition and Grade (differentiating factors) */}
-        <div className="flex flex-wrap gap-1.5 text-xs">
-          <span className="bg-gray-100 px-2 py-0.5 rounded">{unit.condition === 'N' ? 'New' : unit.condition === 'R' ? 'Refurbished' : unit.condition === 'P' ? 'Pre-owned' : unit.condition}</span>
+        <div className="product-detail__unit-badges">
+          <span className="product-detail__unit-badge">{unit.condition === 'N' ? 'New' : unit.condition === 'R' ? 'Refurbished' : unit.condition === 'P' ? 'Pre-owned' : unit.condition}</span>
           {typeof unit.grade === 'string' && unit.grade && (
-            <span className="bg-gray-100 px-2 py-0.5 rounded">Grade {unit.grade}</span>
+            <span className="product-detail__unit-badge">Grade {unit.grade}</span>
           )}
         </div>
       </div>
@@ -606,21 +604,21 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   if (productLoading) {
     return (
-      <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary)]"></div>
-        <p className="mt-4 text-gray-600">Loading product details...</p>
+      <div className="product-detail__loading">
+        <div className="product-detail__spinner"></div>
+        <p className="product-detail__loading-text">Loading product details...</p>
       </div>
     );
   }
 
   if (productError || !product) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold mb-4">Product Not Found</h2>
-        <p className="text-gray-600 mb-4">
+      <div className="product-detail__error">
+        <h2 className="product-detail__error-title">Product Not Found</h2>
+        <p className="product-detail__error-copy">
           {productError instanceof Error ? productError.message : 'The product you\'re looking for doesn\'t exist or has been removed.'}
         </p>
-        <Link href="/products" className="text-[var(--primary)] hover:text-[var(--primary-dark)] underline">
+        <Link href="/products" className="product-detail__error-link">
           Browse all products
         </Link>
       </div>
@@ -628,29 +626,29 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+    <div className="product-detail">
       {/* Breadcrumb */}
-      <nav className="mb-2 text-xs text-gray-600">
-        <ol className="flex items-center gap-1.5 flex-wrap">
-          <li><Link href="/" className="hover:text-[var(--primary)] transition-colors">Home</Link></li>
-          <li className="text-gray-400">/</li>
-          <li><Link href="/products" className="hover:text-[var(--primary)] transition-colors">Products</Link></li>
-          <li className="text-gray-400">/</li>
-          <li className="text-gray-900 font-medium truncate max-w-xs sm:max-w-none">{product.product_name}</li>
+      <nav className="product-detail__breadcrumb">
+        <ol className="product-detail__breadcrumb-list">
+          <li><Link href="/" className="product-detail__breadcrumb-link">Home</Link></li>
+          <li className="product-detail__breadcrumb-separator">/</li>
+          <li><Link href="/products" className="product-detail__breadcrumb-link">Products</Link></li>
+          <li className="product-detail__breadcrumb-separator">/</li>
+          <li className="product-detail__breadcrumb-current">{product.product_name}</li>
         </ol>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+      <div className="product-detail__layout">
         {/* Left Column - Images */}
-        <div className="space-y-2">
+        <div className="product-detail__gallery">
           {/* Main Image */}
-          <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 max-h-[400px]">
+          <div className="product-detail__gallery-main">
             <Image
               src={mainDisplayImage || getPlaceholderProductImage(product.product_name)}
               alt={product.product_name}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-contain bg-gray-50"
+              className="product-detail__gallery-image"
               priority
               unoptimized={!mainDisplayImage || mainDisplayImage.includes('localhost') || mainDisplayImage.includes('placehold.co')}
             />
@@ -658,7 +656,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           {/* Thumbnail Gallery */}
           {productImages.length > 1 && (
-            <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+            <div className="product-detail__thumbnails">
               {productImages.map((img, index) => {
                 // Try to find a unit with this image to get color info
                 const unitWithImage = units?.find((u: PublicInventoryUnitPublic) => 
@@ -676,10 +674,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         setSelectedColor(imageColor);
                       }
                     }}
-                  className={`relative w-16 h-16 rounded overflow-hidden border flex-shrink-0 transition-all ${
-                    selectedImageIndex === index
-                      ? 'border-[var(--primary)] ring-1 ring-gray-200'
-                      : 'border-gray-200 hover:border-gray-300'
+                  className={`product-detail__thumbnail ${
+                    selectedImageIndex === index ? 'product-detail__thumbnail--active' : ''
                   }`}
                     title={imageColor ? `Color: ${imageColor}` : undefined}
                 >
@@ -688,11 +684,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     alt={`${product.product_name} view ${index + 1}${imageColor ? ` - ${imageColor}` : ''}`}
                     fill
                     sizes="64px"
-                    className="object-contain bg-gray-50"
+                    className="product-detail__thumbnail-image"
                     unoptimized={img.includes('localhost') || img.includes('placehold.co')}
                   />
                     {imageColor && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] px-1 py-0.5 text-center truncate">
+                      <div className="product-detail__thumbnail-label">
                         {imageColor}
                       </div>
                     )}
@@ -704,22 +700,22 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         </div>
 
         {/* Right Column - Product Info */}
-        <div className="space-y-3">
+        <div className="product-detail__info">
           {/* Title & Brand */}
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-0.5 leading-tight">
+            <h1 className="product-detail__title">
               {product.product_name}
               {selectedUnitData && selectedUnitData.storage_gb && (
-                <span className="text-lg sm:text-xl text-gray-600 font-normal"> - {selectedUnitData.storage_gb}GB -</span>
+                <span className="product-detail__title-storage"> - {selectedUnitData.storage_gb}GB -</span>
               )}
             </h1>
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold">{product.brand}</span> {product.model_series && <span className="text-gray-500">• {product.model_series}</span>}
+            <p className="product-detail__brand">
+              <span className="product-detail__brand-name">{product.brand}</span> {product.model_series && <span className="product-detail__brand-series">• {product.model_series}</span>}
             </p>
             <button
               type="button"
               onClick={jumpToReviews}
-              className="mt-2 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:text-[var(--primary-dark)]"
+              className="product-detail__review-link"
             >
               Leave a review
             </button>
@@ -727,16 +723,16 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           {/* Promotion Banner */}
           {isEligibleForPromotion && promotion && (
-            <div className="p-2 bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 border border-red-300 rounded">
-              <div className="flex items-start gap-1.5">
-                <span className="text-base flex-shrink-0">🎉</span>
-                <div className="flex-1">
-                  <h3 className="font-bold text-sm text-red-700 mb-0.5">{promotion.title}</h3>
+            <div className="product-detail__promo">
+              <div className="product-detail__promo-row">
+                <span className="product-detail__promo-icon">🎉</span>
+                <div className="product-detail__promo-body">
+                  <h3 className="product-detail__promo-title">{promotion.title}</h3>
                   {promotion.discount_display && (
-                    <p className="text-red-600 font-bold text-xs mb-0.5">{promotion.discount_display}</p>
+                    <p className="product-detail__promo-discount">{promotion.discount_display}</p>
                   )}
                   {promotion.description && (
-                    <p className="text-[10px] text-gray-700 leading-tight">{promotion.description}</p>
+                    <p className="product-detail__promo-copy">{promotion.description}</p>
                   )}
                 </div>
               </div>
@@ -746,39 +742,39 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           {/* Price - Single Price Display */}
               <div>
             {selectedUnitData ? (
-              <div>
+              <div className="product-detail__price">
                 {isEligibleForPromotion && promotionUnitPrice !== null ? (
                   <div>
-                    <p className="text-2xl font-bold text-red-600 mb-0.5">
+                    <p className="product-detail__price-current product-detail__price-current--promo">
                       {formatPrice(promotionUnitPrice)}
                     </p>
-                    <p className="text-sm text-gray-400 line-through">
+                    <p className="product-detail__price-old">
                       {formatPrice(Number(selectedUnitData.selling_price))}
                     </p>
                   </div>
                 ) : (
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="product-detail__price-current">
                     {formatPrice(Number(selectedUnitData.selling_price))}
                   </p>
                 )}
               </div>
             ) : product.min_price !== null && product.max_price !== null ? (
-              <div>
+              <div className="product-detail__price">
                 {isEligibleForPromotion && promotionMinPrice !== null && promotionMaxPrice !== null ? (
                   <div>
-                    <p className="text-2xl font-bold text-red-600 mb-0.5">
+                    <p className="product-detail__price-current product-detail__price-current--promo">
                       {promotionMinPrice === promotionMaxPrice
                         ? formatPrice(promotionMinPrice)
                         : `${formatPrice(promotionMinPrice)} - ${formatPrice(promotionMaxPrice)}`}
                     </p>
-                    <p className="text-sm text-gray-400 line-through">
+                    <p className="product-detail__price-old">
                   {product.min_price === product.max_price
                     ? formatPrice(product.min_price)
                     : `${formatPrice(product.min_price)} - ${formatPrice(product.max_price)}`}
                 </p>
               </div>
                 ) : (
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="product-detail__price-current">
                     {product.min_price === product.max_price
                       ? formatPrice(product.min_price)
                       : `${formatPrice(product.min_price)} - ${formatPrice(product.max_price)}`}
@@ -790,12 +786,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           {/* Product Condition Badge */}
           {selectedUnitData && (
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <div className="flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded border border-green-200">
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <div className="product-detail__badges">
+              <div className="product-detail__badge product-detail__badge--success">
+                <svg className="product-detail__badge-icon" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-                <span className="font-semibold text-xs">
+                <span className="product-detail__badge-text">
                   Verified {selectedUnitData.condition === 'N' ? 'New' : 
                            selectedUnitData.condition === 'R' ? 'Refurbished' : 
                            selectedUnitData.condition === 'P' ? 'Pre-owned' : 
@@ -803,8 +799,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                            selectedUnitData.condition}
               </span>
               </div>
-              <span className="flex items-center gap-1 px-2 py-1 bg-gray-50 text-[var(--primary-dark)] rounded border border-gray-200 text-xs font-semibold">
-                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <span className="product-detail__badge product-detail__badge--info">
+                <svg className="product-detail__badge-icon" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fillRule="evenodd"
                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -818,21 +814,21 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           {/* Variant Selectors - Storage and Color Only */}
           {unitsLoading ? (
-            <div className="text-center py-2 text-gray-600">
-              <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-[var(--primary)]"></div>
-              <p className="mt-1 text-xs">Loading variants...</p>
+            <div className="product-detail__variants-loading">
+              <div className="product-detail__spinner product-detail__spinner--small"></div>
+              <p className="product-detail__variants-loading-text">Loading variants...</p>
             </div>
           ) : units && units.length > 0 ? (
-            <div className="space-y-2">
+            <div className="product-detail__variants">
               {/* Label above storage and color options */}
               {(uniqueStorage.length > 0 || uniqueColors.length > 0) && (
-                <p className="text-[10px] text-gray-500 mb-2">Select storage and color to see price and checkout</p>
+                <p className="product-detail__variants-note">Select storage and color to see price and checkout</p>
               )}
               {/* Storage Options */}
               {uniqueStorage.length > 0 && (
-                <div>
-                  <label className="block text-[10px] font-semibold text-gray-700 mb-1">Storage</label>
-                  <div className="flex flex-wrap gap-1.5">
+                <div className="product-detail__variant-group">
+                  <label className="product-detail__variant-label">Storage</label>
+                  <div className="product-detail__variant-options">
                     {uniqueStorage.map((storage) => (
                       <button
                         key={storage}
@@ -840,10 +836,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                           setSelectedStorage(selectedStorage === storage ? null : (storage ?? null));
                           setSelectedUnit(null);
                         }}
-                        className={`px-3 py-1.5 rounded font-semibold text-xs transition-all ${
-                          selectedStorage === storage
-                            ? 'bg-[var(--primary)] text-white ring-1 ring-gray-200'
-                            : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-[var(--primary-light)] hover:bg-gray-50'
+                        className={`product-detail__variant-option ${
+                          selectedStorage === storage ? 'product-detail__variant-option--active' : ''
                         }`}
                       >
                         {storage}GB
@@ -855,9 +849,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
               {/* Color Options */}
               {uniqueColors.length > 0 && (
-                <div>
-                  <label className="block text-[10px] font-semibold text-gray-700 mb-1">Color</label>
-                  <div className="flex flex-wrap gap-1.5">
+                <div className="product-detail__variant-group">
+                  <label className="product-detail__variant-label">Color</label>
+                  <div className="product-detail__variant-options">
                     {uniqueColors.map((color) => {
                       // Check if this color has units available with current storage filter
                       const availableForColor = units?.filter((u: PublicInventoryUnitPublic) => {
@@ -873,11 +867,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                           setSelectedUnit(null);
                         }}
                           disabled={!hasAvailableUnits}
-                          className={`px-3 py-1.5 rounded font-semibold text-xs transition-all ${
-                          selectedColor === color
-                              ? 'bg-[var(--primary)] text-white ring-1 ring-gray-200'
-                              : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-[var(--primary-light)] hover:bg-gray-50'
-                          } ${!hasAvailableUnits ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          className={`product-detail__variant-option ${
+                          selectedColor === color ? 'product-detail__variant-option--active' : ''
+                          } ${!hasAvailableUnits ? 'product-detail__variant-option--disabled' : ''}`}
                       >
                         {color}
                       </button>
@@ -891,15 +883,15 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           {/* Bundle Items - Display FIRST, before other sections */}
           {bundlesLoading ? (
-            <div className="border-t border-gray-200 pt-3">
-              <p className="text-xs text-gray-500">Loading bundle items...</p>
+            <div className="product-detail__bundles-loading">
+              <p className="product-detail__bundles-loading-text">Loading bundle items...</p>
             </div>
           ) : activeBundles.length > 0 ? (
-            <div className="space-y-3 border-t border-gray-200 pt-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-gray-900">Bundle Items</p>
+            <div className="product-detail__bundles">
+              <div className="product-detail__bundles-header">
+                <p className="product-detail__bundles-title">Bundle Items</p>
                 {bundleSuccessMessage && (
-                  <span className="text-xs text-green-700 font-semibold">{bundleSuccessMessage}</span>
+                  <span className="product-detail__bundles-status">{bundleSuccessMessage}</span>
                 )}
               </div>
               {activeBundles.map((bundle) => {
@@ -909,19 +901,19 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 );
                 if (bundleItems.length === 0) return null;
                 return (
-                  <div key={bundle.id} className="border-2 border-orange-300 bg-orange-50 rounded-lg p-3 space-y-3 shadow-sm">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1">
-                        <p className="text-sm font-bold text-orange-800">{bundle.title}</p>
-                        <p className="text-xs text-gray-700 mt-0.5">
+                  <div key={bundle.id} className="product-detail__bundle-card">
+                    <div className="product-detail__bundle-header">
+                      <div className="product-detail__bundle-info">
+                        <p className="product-detail__bundle-title">{bundle.title}</p>
+                        <p className="product-detail__bundle-copy">
                           Buy {product?.product_name} and get these items together.
                         </p>
                       </div>
-                      <div className="text-base font-bold text-red-600 whitespace-nowrap">
+                      <div className="product-detail__bundle-price">
                         {getBundleDisplayPrice(bundle)}
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="product-detail__bundle-items">
                       {bundleItems.map((item) => {
                         const itemName = item.product_name ?? 'Bundle item';
                         const itemHref = item.product_slug
@@ -934,30 +926,30 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                           : (item.min_price !== null && item.min_price !== undefined ? item.min_price : null);
                         const itemContent = (
                           <>
-                            <div className="relative w-16 h-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                            <div className="product-detail__bundle-item-media">
                               <Image
                                 src={item.primary_image || getPlaceholderProductImage(itemName)}
                                 alt={itemName}
                                 fill
-                                className="object-contain bg-gray-50"
+                                className="product-detail__bundle-item-image"
                                 sizes="64px"
                                 unoptimized={!item.primary_image || item.primary_image.includes('placehold.co')}
                               />
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-semibold text-gray-900 truncate">
+                            <div className="product-detail__bundle-item-info">
+                              <p className="product-detail__bundle-item-name">
                                 {itemName}
                               </p>
-                              <p className="text-xs text-gray-500 truncate">
+                              <p className="product-detail__bundle-item-meta">
                                 Bundle item
                               </p>
                               {typeof item.quantity === 'number' && item.quantity > 0 && (
-                                <p className="text-xs text-gray-700 mt-0.5 font-medium">
+                                <p className="product-detail__bundle-item-qty">
                                   Qty: {item.quantity}
                                 </p>
                               )}
                               {itemPrice !== null && (
-                                <p className="text-xs font-bold text-[var(--primary)] mt-0.5">
+                                <p className="product-detail__bundle-item-price">
                                   {formatPrice(itemPrice)}
                                 </p>
                               )}
@@ -967,14 +959,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         return (
                           <div
                             key={item.id}
-                            className="border border-gray-300 rounded-lg p-2.5 hover:border-orange-400 hover:bg-orange-50/50 transition-colors bg-white"
+                            className="product-detail__bundle-item-card"
                           >
                             {itemHref ? (
-                              <Link href={itemHref} className="flex items-start gap-3">
+                              <Link href={itemHref} className="product-detail__bundle-item-link">
                                 {itemContent}
                               </Link>
                             ) : (
-                              <div className="flex items-start gap-3">{itemContent}</div>
+                              <div className="product-detail__bundle-item-link">{itemContent}</div>
                             )}
                           </div>
                         );
@@ -983,7 +975,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     <button
                       onClick={() => handleAddBundleToCart(bundle.id)}
                       disabled={!selectedUnit || bundleAddingId === bundle.id}
-                      className="w-full bg-orange-600 text-white px-3 py-2 rounded font-bold text-xs hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all"
+                      className="product-detail__bundle-cta"
                     >
                       {bundleAddingId === bundle.id ? 'Adding bundle...' : 'Add bundle (all items)'}
                     </button>
@@ -994,17 +986,17 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           ) : null}
 
           {/* Comes With Section */}
-          <div className="space-y-1">
-            <p className="text-[10px] font-semibold text-gray-700">Comes with</p>
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
-                <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+          <div className="product-detail__includes">
+            <p className="product-detail__includes-title">Comes with</p>
+            <div className="product-detail__includes-list">
+              <div className="product-detail__includes-item">
+                <svg className="product-detail__includes-icon product-detail__includes-icon--success" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>6 months warranty</span>
               </div>
-              <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
-                <svg className="w-3 h-3 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="product-detail__includes-item">
+                <svg className="product-detail__includes-icon product-detail__includes-icon--primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
                 <span>Affordable shipping</span>
@@ -1014,26 +1006,28 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           {/* Add to Cart Button - Prominent */}
           {Number(product.available_units_count ?? 0) > 0 && (
-            <div className="space-y-1.5">
+            <div className="product-detail__cta">
               {showSuccessMessage && (
-                <div className="bg-green-50 border border-green-200 text-green-700 px-2 py-1 rounded flex items-center gap-1.5 text-xs">
-                  <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <div className="product-detail__cta-alert">
+                  <svg className="product-detail__cta-alert-icon" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <span className="font-semibold">Added to cart successfully!</span>
+                  <span className="product-detail__cta-alert-text">Added to cart successfully!</span>
                 </div>
               )}
 
               <button
                 onClick={handleAddToCart}
                 disabled={!selectedUnit || isAddingToCart}
-                className="w-full bg-[var(--primary)] text-white px-3 py-2 rounded font-bold text-sm hover:bg-[var(--primary-dark)] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-md"
+                className={`product-detail__cta-button ${
+                  !selectedUnit || isAddingToCart ? 'product-detail__cta-button--disabled' : ''
+                }`}
               >
                 {isAddingToCart ? (
-                  <span className="flex items-center justify-center gap-1.5">
-                    <svg className="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <span className="product-detail__cta-loading">
+                    <svg className="product-detail__cta-spinner" fill="none" viewBox="0 0 24 24">
+                      <circle className="product-detail__cta-spinner-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="product-detail__cta-spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     Adding...
                   </span>
@@ -1048,15 +1042,15 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           {/* View All Available Units - Collapsible */}
           {filteredUnits.length > 0 && (
-            <div className="border-t border-gray-200 pt-1">
-              <details className="group">
-                <summary className="cursor-pointer text-[10px] font-semibold text-gray-700 hover:text-[var(--primary)] transition-colors flex items-center justify-between py-0.5">
+            <div className="product-detail__units">
+              <details className="product-detail__units-details">
+                <summary className="product-detail__units-toggle">
                   <span>View All Available Units ({filteredUnits.length})</span>
-                  <svg className="w-3 h-3 transform transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="product-detail__units-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
-                <div className="mt-1 grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[200px] overflow-y-auto pr-1">
+                <div className="product-detail__units-list">
                   {filteredUnits.map((unit) => {
                     const unitPromotionPrice = isEligibleForPromotion && promotion && unit.selling_price
                       ? calculatePromotionPrice(Number(unit.selling_price))
@@ -1077,8 +1071,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           )}
 
           {filteredUnits.length === 0 && units && units.length > 0 && (
-            <div className="border-t border-gray-200 pt-4">
-              <p className="text-orange-600 font-medium bg-orange-50 p-4 rounded-lg border border-orange-200">
+            <div className="product-detail__units-empty">
+              <p className="product-detail__units-empty-text">
                 No units match the selected criteria. Please adjust your selection.
               </p>
             </div>
@@ -1088,12 +1082,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
       {/* Recommended Accessories */}
       {accessories && accessories.length > 0 && (
-        <div className="mt-4">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-gray-900">Recommended Accessories</h2>
-            <span className="text-[11px] text-gray-500">{accessories.length} items</span>
+        <div className="product-detail__accessories">
+          <div className="product-detail__accessories-header">
+            <h2 className="product-detail__accessories-title">Recommended Accessories</h2>
+            <span className="product-detail__accessories-count">{accessories.length} items</span>
           </div>
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+          <div className="product-detail__accessories-list">
             {accessories.map((accessory, index) => {
               const accessoryKey = accessory.id ?? index;
               const variants = accessory.accessory_color_variants ?? [];
@@ -1103,18 +1097,18 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               return (
                 <div
                   key={accessoryKey}
-                  className="min-w-[220px] border border-gray-200 rounded-lg p-2 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+                  className="product-detail__accessory-card"
                 >
                   <Link
                     href={`/products/${accessory.accessory_slug}`}
-                    className="flex items-center gap-3"
+                    className="product-detail__accessory-link"
                   >
-                    <div className="relative w-14 h-14 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                    <div className="product-detail__accessory-media">
                       <Image
                         src={accessory.accessory_primary_image || getPlaceholderProductImage(accessory.accessory_name)}
                         alt={accessory.accessory_name ?? 'Accessory'}
                         fill
-                        className="object-contain bg-gray-50"
+                        className="product-detail__accessory-image"
                         sizes="56px"
                         unoptimized={process.env.NODE_ENV === 'development'}
                         onError={(e) => {
@@ -1125,17 +1119,17 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         }}
                       />
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold text-gray-900 truncate">
+                    <div className="product-detail__accessory-info">
+                      <p className="product-detail__accessory-name">
                         {accessory.accessory_name}
                       </p>
-                      <p className="text-[11px] text-gray-500 truncate">
+                      <p className="product-detail__accessory-meta">
                         For {accessory.main_product_name}
                       </p>
                       {accessory.accessory_price_range &&
                         accessory.accessory_price_range.min !== null &&
                         accessory.accessory_price_range.max !== null && (
-                          <p className="text-[11px] text-gray-700 mt-0.5">
+                          <p className="product-detail__accessory-price">
                             {accessory.accessory_price_range.min === accessory.accessory_price_range.max
                               ? formatPrice(accessory.accessory_price_range.min)
                               : `${formatPrice(accessory.accessory_price_range.min)} - ${formatPrice(accessory.accessory_price_range.max)}`
@@ -1146,7 +1140,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   </Link>
                   {variants.length > 1 && (
                     <select
-                      className="mt-1 w-full border border-gray-200 rounded px-2 py-1 text-[11px] text-gray-700 bg-white"
+                      className="product-detail__accessory-select"
                       value={selectedVariantIndex}
                       onChange={(e) => {
                         const nextIndex = Number(e.target.value);
@@ -1165,7 +1159,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   )}
                   <button
                     type="button"
-                    className={`mt-1 text-[11px] font-semibold ${canAdd ? 'text-[var(--primary)] hover:text-[var(--primary-dark)]' : 'text-gray-400 cursor-not-allowed'}`}
+                    className={`product-detail__accessory-action ${
+                      canAdd ? '' : 'product-detail__accessory-action--disabled'
+                    }`}
                     onClick={() => {
                       if (selectedVariant && canAdd) {
                         handleAddAccessoryVariantToCart(accessory, selectedVariant);
@@ -1183,10 +1179,10 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       )}
 
       {/* Tabs Section */}
-      <div className="mt-3" id="product-reviews">
+      <div className="product-detail__tabs" id="product-reviews">
         {/* Tab Navigation */}
-        <div className="border-b border-gray-200 mb-2">
-          <nav className="flex gap-1 overflow-x-auto scrollbar-hide pb-0.5">
+        <div className="product-detail__tabs-nav">
+          <nav className="product-detail__tabs-list">
             {[
               { id: 'overview' as TabType, label: 'Overview' },
               { id: 'specs' as TabType, label: 'Specifications' },
@@ -1197,10 +1193,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-3 py-1.5 font-semibold text-xs border-b-2 transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? 'border-[var(--primary)] text-[var(--primary)] bg-gray-50 rounded-t'
-                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300 hover:bg-gray-50'
+                className={`product-detail__tab ${
+                  activeTab === tab.id ? 'product-detail__tab--active' : ''
                 }`}
               >
                 {tab.label}
@@ -1210,20 +1204,20 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         </div>
 
         {/* Tab Content */}
-        <div className="min-h-[150px]">
+        <div className="product-detail__tab-content">
           {activeTab === 'overview' && (
-            <div className="space-y-3">
+            <div className="product-detail__section">
               {/* Product Highlights */}
               {product.product_highlights && Array.isArray(product.product_highlights) && product.product_highlights.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold mb-1.5">Key Features</h3>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="product-detail__section-block">
+                  <h3 className="product-detail__section-title">Key Features</h3>
+                  <ul className="product-detail__features">
                     {product.product_highlights.map((highlight: string, idx: number) => (
-                      <li key={idx} className="flex items-start gap-2 text-xs text-gray-700">
-                        <svg className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <li key={idx} className="product-detail__feature">
+                        <svg className="product-detail__feature-icon" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        <span>{highlight}</span>
+                        <span className="product-detail__feature-text">{highlight}</span>
                       </li>
                     ))}
                   </ul>
@@ -1232,11 +1226,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
               {/* Tags */}
               {product.tags && Array.isArray(product.tags) && product.tags.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold mb-1.5">Tags</h3>
-                  <div className="flex flex-wrap gap-1.5">
+                <div className="product-detail__section-block">
+                  <h3 className="product-detail__section-title">Tags</h3>
+                  <div className="product-detail__tags">
                     {product.tags.map((tag: string, idx: number) => (
-                      <span key={idx} className="px-2 py-1 bg-gray-50 text-[var(--primary-dark)] text-xs rounded-full border border-gray-200">
+                      <span key={idx} className="product-detail__tag">
                         {tag}
                       </span>
                     ))}
@@ -1246,61 +1240,61 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
               {/* Product Description */}
               {product.product_description && (
-                <div>
-                  <h3 className="text-sm font-bold mb-1.5">Description</h3>
-                  <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">{product.product_description}</p>
+                <div className="product-detail__section-block">
+                  <h3 className="product-detail__section-title">Description</h3>
+                  <p className="product-detail__description-text">{product.product_description}</p>
                 </div>
               )}
 
               {/* Long Description */}
               {product.long_description && (
-                <div>
-                  <h3 className="text-sm font-bold mb-1.5">Detailed Description</h3>
-                  <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">{product.long_description}</p>
+                <div className="product-detail__section-block">
+                  <h3 className="product-detail__section-title">Detailed Description</h3>
+                  <p className="product-detail__description-text">{product.long_description}</p>
                 </div>
               )}
               
               {selectedUnitData && (
-                <div>
-                  <h3 className="text-sm font-bold mb-2">Selected Variant Details</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div className="product-detail__section-block">
+                  <h3 className="product-detail__section-title">Selected Variant Details</h3>
+                  <div className="product-detail__variant-details">
                     {selectedUnitData.storage_gb && (
-                      <div className="p-2 bg-gray-50 rounded">
-                        <p className="text-[10px] text-gray-600 mb-0.5">Storage</p>
-                        <p className="text-xs font-bold">{selectedUnitData.storage_gb}GB</p>
+                      <div className="product-detail__variant-card">
+                        <p className="product-detail__variant-label">Storage</p>
+                        <p className="product-detail__variant-value">{selectedUnitData.storage_gb}GB</p>
                       </div>
                     )}
                     {selectedUnitData.ram_gb && (
-                      <div className="p-2 bg-gray-50 rounded">
-                        <p className="text-[10px] text-gray-600 mb-0.5">RAM</p>
-                        <p className="text-xs font-bold">{selectedUnitData.ram_gb}GB</p>
+                      <div className="product-detail__variant-card">
+                        <p className="product-detail__variant-label">RAM</p>
+                        <p className="product-detail__variant-value">{selectedUnitData.ram_gb}GB</p>
                       </div>
                     )}
                     {selectedUnitData.battery_mah && (
-                      <div className="p-2 bg-gray-50 rounded">
-                        <p className="text-[10px] text-gray-600 mb-0.5">Battery</p>
-                        <p className="text-xs font-bold">{selectedUnitData.battery_mah}mAh</p>
+                      <div className="product-detail__variant-card">
+                        <p className="product-detail__variant-label">Battery</p>
+                        <p className="product-detail__variant-value">{selectedUnitData.battery_mah}mAh</p>
                       </div>
                     )}
                     {selectedUnitData.color_name && (
-                      <div className="p-2 bg-gray-50 rounded">
-                        <p className="text-[10px] text-gray-600 mb-0.5">Color</p>
-                        <p className="text-xs font-bold">{selectedUnitData.color_name}</p>
+                      <div className="product-detail__variant-card">
+                        <p className="product-detail__variant-label">Color</p>
+                        <p className="product-detail__variant-value">{selectedUnitData.color_name}</p>
                       </div>
                     )}
-                    <div className="p-2 bg-gray-50 rounded">
-                      <p className="text-[10px] text-gray-600 mb-0.5">Condition</p>
-                      <p className="text-xs font-bold">{selectedUnitData.condition}</p>
+                    <div className="product-detail__variant-card">
+                      <p className="product-detail__variant-label">Condition</p>
+                      <p className="product-detail__variant-value">{selectedUnitData.condition}</p>
                     </div>
                     {typeof selectedUnitData.grade === 'string' && selectedUnitData.grade && (
-                      <div className="p-2 bg-gray-50 rounded">
-                        <p className="text-[10px] text-gray-600 mb-0.5">Grade</p>
-                        <p className="text-xs font-bold">{selectedUnitData.grade}</p>
+                      <div className="product-detail__variant-card">
+                        <p className="product-detail__variant-label">Grade</p>
+                        <p className="product-detail__variant-value">{selectedUnitData.grade}</p>
                       </div>
                     )}
-                    <div className="p-2 bg-gray-50 rounded">
-                      <p className="text-[10px] text-gray-600 mb-0.5">Price</p>
-                      <p className="text-xs font-bold">{formatPrice(Number(selectedUnitData.selling_price))}</p>
+                    <div className="product-detail__variant-card">
+                      <p className="product-detail__variant-label">Price</p>
+                      <p className="product-detail__variant-value">{formatPrice(Number(selectedUnitData.selling_price))}</p>
                     </div>
                   </div>
                 </div>
@@ -1309,45 +1303,45 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           )}
 
           {activeTab === 'specs' && (
-            <div>
-              <h3 className="text-2xl font-bold mb-6">Specifications</h3>
+            <div className="product-detail__specs">
+              <h3 className="product-detail__specs-title">Specifications</h3>
               {selectedUnitData ? (
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                  <table className="w-full">
-                    <tbody className="divide-y divide-gray-200">
+                <div className="product-detail__specs-card">
+                  <table className="product-detail__specs-table">
+                    <tbody className="product-detail__specs-body">
                       {selectedUnitData.storage_gb && (
-                        <tr className="bg-gray-50">
-                          <td className="px-6 py-4 font-semibold text-gray-900">Storage</td>
-                          <td className="px-6 py-4 text-gray-700">{selectedUnitData.storage_gb}GB</td>
+                        <tr className="product-detail__specs-row product-detail__specs-row--alt">
+                          <td className="product-detail__specs-label">Storage</td>
+                          <td className="product-detail__specs-value">{selectedUnitData.storage_gb}GB</td>
                         </tr>
                       )}
                       {selectedUnitData.ram_gb && (
-                        <tr>
-                          <td className="px-6 py-4 font-semibold text-gray-900">RAM</td>
-                          <td className="px-6 py-4 text-gray-700">{selectedUnitData.ram_gb}GB</td>
+                        <tr className="product-detail__specs-row">
+                          <td className="product-detail__specs-label">RAM</td>
+                          <td className="product-detail__specs-value">{selectedUnitData.ram_gb}GB</td>
                         </tr>
                       )}
                       {selectedUnitData.battery_mah && (
-                        <tr className="bg-gray-50">
-                          <td className="px-6 py-4 font-semibold text-gray-900">Battery Capacity</td>
-                          <td className="px-6 py-4 text-gray-700">{selectedUnitData.battery_mah}mAh</td>
+                        <tr className="product-detail__specs-row product-detail__specs-row--alt">
+                          <td className="product-detail__specs-label">Battery Capacity</td>
+                          <td className="product-detail__specs-value">{selectedUnitData.battery_mah}mAh</td>
                         </tr>
                       )}
                       {processorDetails && (
-                        <tr>
-                          <td className="px-6 py-4 font-semibold text-gray-900">Processor</td>
-                          <td className="px-6 py-4 text-gray-700">{processorDetails}</td>
+                        <tr className="product-detail__specs-row">
+                          <td className="product-detail__specs-label">Processor</td>
+                          <td className="product-detail__specs-value">{processorDetails}</td>
                         </tr>
                       )}
                       {selectedUnitData.color_name && (
-                        <tr className={processorDetails ? 'bg-gray-50' : ''}>
-                          <td className="px-6 py-4 font-semibold text-gray-900">Color</td>
-                          <td className="px-6 py-4 text-gray-700">{selectedUnitData.color_name}</td>
+                        <tr className={`product-detail__specs-row ${processorDetails ? 'product-detail__specs-row--alt' : ''}`}>
+                          <td className="product-detail__specs-label">Color</td>
+                          <td className="product-detail__specs-value">{selectedUnitData.color_name}</td>
                         </tr>
                       )}
-                      <tr className={selectedUnitData.color_name && !processorDetails ? '' : selectedUnitData.color_name ? '' : 'bg-gray-50'}>
-                        <td className="px-6 py-4 font-semibold text-gray-900">Condition</td>
-                        <td className="px-6 py-4 text-gray-700">
+                      <tr className="product-detail__specs-row">
+                        <td className="product-detail__specs-label">Condition</td>
+                        <td className="product-detail__specs-value">
                           {selectedUnitData.condition === 'N' ? 'New' : 
                            selectedUnitData.condition === 'R' ? 'Refurbished' : 
                            selectedUnitData.condition === 'P' ? 'Pre-owned' : 
@@ -1355,63 +1349,61 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         </td>
                       </tr>
                       {typeof selectedUnitData.grade === 'string' && selectedUnitData.grade && (
-                        <tr className={selectedUnitData.color_name && processorDetails ? 'bg-gray-50' : !selectedUnitData.color_name ? 'bg-gray-50' : ''}>
-                          <td className="px-6 py-4 font-semibold text-gray-900">Grade</td>
-                          <td className="px-6 py-4 text-gray-700">Grade {selectedUnitData.grade}</td>
+                        <tr className="product-detail__specs-row product-detail__specs-row--alt">
+                          <td className="product-detail__specs-label">Grade</td>
+                          <td className="product-detail__specs-value">Grade {selectedUnitData.grade}</td>
                         </tr>
                       )}
                     </tbody>
                   </table>
                 </div>
               ) : (
-                <div className="bg-white border border-gray-200 rounded-lg p-6">
-                  <p className="text-gray-600 text-center">Please select a variant to view specifications</p>
+                <div className="product-detail__specs-empty">
+                  <p className="product-detail__specs-empty-text">Please select a variant to view specifications</p>
                 </div>
               )}
             </div>
           )}
 
           {activeTab === 'reviews' && typeof productId === 'number' && (
-            <div>
-              <Suspense fallback={<div className="text-sm text-gray-600">Loading reviews...</div>}>
+            <div className="product-detail__reviews">
+              <Suspense fallback={<div className="product-detail__loading-inline">Loading reviews...</div>}>
                 <LazyReviewsShowcase productId={productId} />
               </Suspense>
             </div>
           )}
 
           {activeTab === 'videos' && product && (
-            <div>
-              <h3 className="text-2xl font-bold mb-6">Product Videos</h3>
-              <div className="max-w-sm w-full">
-                <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
-                  <div className="relative aspect-video bg-gray-100">
+            <div className="product-detail__videos">
+              <h3 className="product-detail__videos-title">Product Videos</h3>
+              <div className="product-detail__video-card">
+                <div className="product-detail__video-frame">
                     <iframe
                       src={convertToYouTubeEmbed(product.product_video_url || getPlaceholderVideoUrl(product.product_name))}
-                      className="w-full h-full"
+                    className="product-detail__video-embed"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
                   </div>
-                  <div className="p-3">
-                    <p className="text-sm font-semibold text-gray-900">
+                  <div className="product-detail__video-body">
+                    <p className="product-detail__video-title">
                       {product.product_name}
                     </p>
                     {product.brand && (
-                      <p className="text-xs text-gray-600 mt-1">{product.brand}</p>
+                      <p className="product-detail__video-brand">{product.brand}</p>
                     )}
                     {!product.product_video_url && (
-                      <p className="mt-2 text-[11px] text-[var(--primary-dark)] bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1.5">
+                      <p className="product-detail__video-note">
                         This is a placeholder video. The actual product video will be available soon.
                       </p>
                     )}
                   </div>
                 </div>
-              </div>
             </div>
           )}
 
           {activeTab === 'compare' && (
-            <Suspense fallback={<div className="text-sm text-gray-600">Loading comparison...</div>}>
+            <Suspense fallback={<div className="product-detail__loading-inline">Loading comparison...</div>}>
               <LazyComparisonPage />
             </Suspense>
           )}
@@ -1420,8 +1412,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
       {/* Product Recommendations */}
       {typeof productId === 'number' && (
-        <div className="mt-16">
-          <Suspense fallback={<div className="text-sm text-gray-600">Loading recommendations...</div>}>
+        <div className="product-detail__recommendations">
+          <Suspense fallback={<div className="product-detail__loading-inline">Loading recommendations...</div>}>
             <LazyProductRecommendations productId={productId} />
           </Suspense>
         </div>

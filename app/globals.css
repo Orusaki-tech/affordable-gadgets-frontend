@@ -228,7 +228,7 @@ h3 {
 }
 
 .product-card-name {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -274,7 +274,7 @@ h3 {
   }
 
   .product-card-name {
-    font-size: 26px;
+    font-size: 20px;
   }
 
   .product-card-spec {

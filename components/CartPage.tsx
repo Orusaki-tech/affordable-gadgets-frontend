@@ -542,6 +542,90 @@ export function CartPage() {
             });
             })
           )}
+
+          {items.length === 0 && (
+            <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-10 text-center">
+              <h2 className="text-2xl font-bold mb-2">Your Orders</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Verify your phone number to see past orders and download receipts.
+              </p>
+              <div className="flex flex-col gap-3 max-w-xl mx-auto">
+                <input
+                  type="tel"
+                  placeholder="Phone number"
+                  value={ordersPhone}
+                  onChange={(e) => setOrdersPhone(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  <button
+                    onClick={sendOrdersOtp}
+                    disabled={ordersLoading}
+                    className="w-full sm:w-auto px-4 py-2 bg-gray-800 text-white rounded-lg"
+                  >
+                    {ordersOtpSent ? 'Resend OTP' : 'Send OTP'}
+                  </button>
+                  <input
+                    type="text"
+                    placeholder="Enter OTP"
+                    value={ordersOtp}
+                    onChange={(e) => setOrdersOtp(e.target.value)}
+                    className="w-full sm:flex-1 px-3 py-2 border rounded-lg"
+                  />
+                  <button
+                    onClick={fetchOrderHistory}
+                    disabled={ordersLoading}
+                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg"
+                  >
+                    Verify
+                  </button>
+                </div>
+              </div>
+
+              {orderHistory.length > 0 && (
+                <div className="mt-6 space-y-4 text-left">
+                  {orderHistory.map((order) => (
+                    <div key={order.order_id} className="border rounded-lg p-4 flex flex-col gap-2">
+                      <div className="flex flex-wrap justify-between gap-2">
+                        <div>
+                          <p className="text-sm text-gray-500">Order ID</p>
+                          <p className="font-mono text-sm">{order.order_id}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Status</p>
+                          <p className="font-semibold">{order.status}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Total</p>
+                          <p className="font-semibold">{formatPrice(Number(order.total_amount || 0))}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <Link
+                          href={`/orders/${order.order_id}`}
+                          className="text-blue-600 hover:text-blue-700 text-sm"
+                        >
+                          View order
+                        </Link>
+                        <button
+                          onClick={() => window.open(getReceiptUrl(order.order_id), '_blank')}
+                          className="text-blue-600 hover:text-blue-700 text-sm"
+                        >
+                          Download receipt
+                        </button>
+                        <Link
+                          href="/reviews/eligible"
+                          className="text-blue-600 hover:text-blue-700 text-sm"
+                        >
+                          Leave review
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Checkout & Summary */}
@@ -678,88 +762,6 @@ export function CartPage() {
         </div>
       </div>
 
-      {/* Order history section */}
-      <div className="mt-10 bg-white p-6 rounded-lg shadow-sm">
-        <h2 className="text-2xl font-bold mb-2">Your Orders</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          Verify your phone number to see past orders and download receipts.
-        </p>
-        <div className="flex flex-col gap-3 max-w-xl">
-          <input
-            type="tel"
-            placeholder="Phone number"
-            value={ordersPhone}
-            onChange={(e) => setOrdersPhone(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg"
-          />
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <button
-              onClick={sendOrdersOtp}
-              disabled={ordersLoading}
-              className="w-full sm:w-auto px-4 py-2 bg-gray-800 text-white rounded-lg"
-            >
-              {ordersOtpSent ? 'Resend OTP' : 'Send OTP'}
-            </button>
-            <input
-              type="text"
-              placeholder="Enter OTP"
-              value={ordersOtp}
-              onChange={(e) => setOrdersOtp(e.target.value)}
-              className="w-full sm:flex-1 px-3 py-2 border rounded-lg"
-            />
-            <button
-              onClick={fetchOrderHistory}
-              disabled={ordersLoading}
-              className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg"
-            >
-              Verify
-            </button>
-          </div>
-        </div>
-
-        {orderHistory.length > 0 && (
-          <div className="mt-6 space-y-4">
-            {orderHistory.map((order) => (
-              <div key={order.order_id} className="border rounded-lg p-4 flex flex-col gap-2">
-                <div className="flex flex-wrap justify-between gap-2">
-                  <div>
-                    <p className="text-sm text-gray-500">Order ID</p>
-                    <p className="font-mono text-sm">{order.order_id}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Status</p>
-                    <p className="font-semibold">{order.status}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Total</p>
-                    <p className="font-semibold">{formatPrice(Number(order.total_amount || 0))}</p>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <Link
-                    href={`/orders/${order.order_id}`}
-                    className="text-blue-600 hover:text-blue-700 text-sm"
-                  >
-                    View order
-                  </Link>
-                  <button
-                    onClick={() => window.open(getReceiptUrl(order.order_id), '_blank')}
-                    className="text-blue-600 hover:text-blue-700 text-sm"
-                  >
-                    Download receipt
-                  </button>
-                  <Link
-                    href="/reviews/eligible"
-                    className="text-blue-600 hover:text-blue-700 text-sm"
-                  >
-                    Leave review
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

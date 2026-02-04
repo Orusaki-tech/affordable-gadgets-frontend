@@ -167,7 +167,7 @@ export function ProductFilters({
         <select
           value={sort}
           onChange={(e) => handleSortChange(e.target.value)}
-          className="px-4 py-2.5 border border-gray-200 rounded-xl bg-white shadow-sm"
+          className="px-4 py-2.5 border border-gray-200 rounded-xl bg-white shadow-sm lg:hidden"
         >
           {SORT_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -175,15 +175,6 @@ export function ProductFilters({
             </option>
           ))}
         </select>
-
-        {(filters.type || filters.minPrice || filters.maxPrice || filters.brand || sort) && (
-          <button
-            onClick={clearFilters}
-            className="px-4 py-2 text-red-600 hover:text-red-700 font-medium"
-          >
-            Clear All
-          </button>
-        )}
       </div>
 
       <div className={`bg-white border border-gray-200 p-5 rounded-2xl shadow-sm space-y-4 ${isOpen ? 'block' : 'hidden'} lg:block`}>
@@ -197,7 +188,21 @@ export function ProductFilters({
               Close
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="flex flex-col gap-4">
+            <div className="hidden lg:block">
+              <label className="block text-sm font-medium mb-2">Sort by</label>
+              <select
+                value={sort}
+                onChange={(e) => handleSortChange(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white"
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
             {/* Product Type */}
             <div>
               <label className="block text-sm font-medium mb-2">Product Type</label>
@@ -270,6 +275,14 @@ export function ProductFilters({
                 className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Reset Budget
+              </button>
+            )}
+            {(filters.type || filters.minPrice || filters.maxPrice || filters.brand || sort) && (
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2 text-red-600 hover:text-red-700 font-medium"
+              >
+                Clear All
               </button>
             )}
           </div>

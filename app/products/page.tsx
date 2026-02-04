@@ -21,7 +21,7 @@ export default function ProductsListingPage() {
             ))}
           </div>
         }>
-          <ProductsPage cardOptions={{ variant: 'minimal' }} />
+          <ProductsPage />
         </Suspense>
       </main>
       <Footer />

@@ -185,7 +185,11 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
           <h1 className="section-label">Products</h1>
           <form
             onSubmit={handleSearch}
-            className="flex w-full gap-3 md:w-auto md:min-w-[320px] md:max-w-[520px]"
+            className="flex w-full gap-3 md:w-auto md:min-w-[280px] md:max-w-[440px] lg:max-w-[480px]"
+          >
+          <form
+            onSubmit={handleSearch}
+            className="flex w-full gap-3 md:w-auto md:min-w-[280px] md:max-w-[440px] lg:max-w-[480px]"
           >
             <input
               type="text"
@@ -204,7 +208,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
         </div>
       )}
 
-      <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
+      <div className="lg:grid lg:grid-cols-[320px_1fr] lg:gap-8">
         {/* Filters Sidebar */}
         <div className="lg:sticky lg:top-24 lg:self-start">
           <ProductFilters
@@ -245,7 +249,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
                   </span>
                 )}
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredResults.map((product) => (
                   <ProductCard key={product.id} product={product} {...cardOptions} />
                 ))}

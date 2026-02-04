@@ -101,7 +101,7 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
 
   return (
     <div>
-      <h2 className="text-3xl font-bold mb-6">{sectionTitle}</h2>
+      <h2 className="section-label mb-6">{sectionTitle}</h2>
       {specialOffersPromotions.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-600 mb-4">No special offers available at the moment.</p>

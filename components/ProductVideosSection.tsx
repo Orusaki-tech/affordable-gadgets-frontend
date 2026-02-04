@@ -108,7 +108,7 @@ export function ProductVideosSection() {
 
   return (
     <div ref={sectionRef}>
-      <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Product Videos</h2>
+      <h2 className="section-label mb-4 sm:mb-6">Product Videos</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {productsToShowWithId.map((product) => (
           <div
@@ -139,16 +139,16 @@ export function ProductVideosSection() {
 
             {/* Product Info */}
             <div className="p-3 sm:p-4 lg:p-5 bg-white">
-              <h3 className="font-semibold text-[15px] leading-[22px] sm:text-[16px] sm:leading-[24px] mb-2 line-clamp-2">
+              <h3 className="product-card-name mb-2 line-clamp-2">
                 {product.product_name}
               </h3>
               {product.brand && (
-                <p className="text-[13px] leading-[18px] sm:text-[14px] sm:leading-[20px] text-gray-600 mb-2">
+                <p className="product-card-spec text-gray-600 mb-2">
                   {product.brand}
                 </p>
               )}
               {product.min_price && product.max_price && (
-                <p className="text-[16px] leading-[22px] sm:text-[18px] sm:leading-[24px] font-bold text-[var(--primary)]">
+                <p className="product-card-price text-[var(--primary)]">
                   KES {product.min_price.toLocaleString()} - {product.max_price.toLocaleString()}
                 </p>
               )}

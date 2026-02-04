@@ -293,7 +293,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
           onPointerDown={openReviewModal}
           onTouchStart={openReviewModal}
           aria-haspopup="dialog"
-          className="pointer-events-auto inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-gray-800"
+          className="btn-cta pointer-events-auto inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-2 text-white shadow-sm transition hover:bg-gray-800"
         >
           Leave a review
         </button>

@@ -37,26 +37,26 @@ function VideoModal({ videoUrl, title, onClose }: VideoModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={onClose}>
-      <div className="relative w-full max-w-4xl mx-4 aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
+    <div className="stories-carousel__modal" onClick={onClose}>
+      <div className="stories-carousel__modal-panel" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all"
+          className="stories-carousel__modal-close"
           aria-label="Close video"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="stories-carousel__modal-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
         <iframe
           src={getEmbedUrl(videoUrl)}
-          className="w-full h-full"
+          className="stories-carousel__modal-embed"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           title={title}
         />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-4">
-          <h3 className="text-white font-semibold">{title}</h3>
+        <div className="stories-carousel__modal-titlebar">
+          <h3 className="stories-carousel__modal-title">{title}</h3>
         </div>
       </div>
     </div>
@@ -97,7 +97,7 @@ function StoryImage({
       loading={loading}
       fetchPriority={fetchPriority}
       decoding="async"
-      className={`block h-full w-full ${fitClassName} transition-transform duration-300${className ? ` ${className}` : ''}`}
+      className={`stories-carousel__media ${fitClassName === 'object-cover' ? 'stories-carousel__media--cover' : 'stories-carousel__media--contain'}${className ? ` ${className}` : ''}`}
     />
   );
 }
@@ -127,7 +127,7 @@ function StoryVideo({ src, poster, fit = 'contain', onRef }: StoryVideoProps) {
       playsInline
       autoPlay
       preload="metadata"
-      className={`block h-full w-full ${fitClassName}`}
+      className={`stories-carousel__media ${fitClassName === 'object-cover' ? 'stories-carousel__media--cover' : 'stories-carousel__media--contain'}`}
     />
   );
 }
@@ -346,16 +346,16 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
 
   if (showSkeleton) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+      <div className="stories-carousel__skeleton" style={{ maxHeight: 'calc(100vh - 200px)' }}>
         <div 
-          className="lg:col-span-1 bg-gray-100 animate-pulse rounded-2xl" 
+          className="stories-carousel__skeleton-banner" 
           style={{ height: 'min(50vw, calc((100vh - 200px) * 0.9))' }}
         />
-        <div className="lg:col-span-1 grid grid-cols-2 gap-4">
+        <div className="stories-carousel__skeleton-grid">
           {[...Array(4)].map((_, i) => (
             <div 
               key={i} 
-              className="bg-gray-100 animate-pulse rounded-2xl"
+              className="stories-carousel__skeleton-tile"
               style={{ height: 'min(25vw, calc((100vh - 200px) * 0.45))' }}
             />
           ))}
@@ -374,33 +374,30 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
         />
       )}
 
-      <div className="relative w-full mb-6">
+      <div className="stories-carousel">
         {/* Desktop: Large Banner + 2x2 Grid Layout - Matching Figma Design */}
-        <div className="hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+        <div className="stories-carousel__desktop">
           {/* Large Banner or Carousel - Position 1 (Left Side, 50% width, Square) */}
           {position1Items.length > 1 ? (
             // Show carousel if multiple items have position 1
-            <div className="lg:col-span-1">
+            <div className="stories-carousel__banner">
               <ProductCarousel
                 itemsPerView={{ mobile: 1, tablet: 1, desktop: 1 }}
                 showNavigation={true}
                 showPagination={true}
                 autoPlay={true}
                 autoPlayInterval={autoAdvanceDuration * 1000}
-                className="aspect-square"
+                className="stories-carousel__carousel"
               >
                 {position1Items.map((promo) => {
                   const promoImageSrc = promo.banner_image_url || promo.banner_image;
                   return (
                     <div
                       key={promo.id ?? promo.title}
-                      className="group relative w-full h-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
-                      style={{
-                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                      }}
+                      className="stories-carousel__tile stories-carousel__tile--banner"
                       onClick={() => handlePromotionClick(promo)}
                     >
-                      <div className="relative w-full h-full" ref={bannerContainerRef}>
+                      <div className="stories-carousel__media-wrap" ref={bannerContainerRef}>
                         {promoImageSrc && (
                           <StoryImage
                             src={promoImageSrc}
@@ -419,15 +416,12 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
             </div>
           ) : bannerItem ? (
             // Show single banner if one item has position 1
-            <div className="lg:col-span-1">
+            <div className="stories-carousel__banner">
               <div
-                className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
-                style={{
-                  boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                }}
+                className="stories-carousel__tile stories-carousel__tile--banner"
                 onClick={() => handlePromotionClick(bannerItem)}
               >
-                <div className="relative w-full h-full" ref={bannerContainerRef}>
+                <div className="stories-carousel__media-wrap" ref={bannerContainerRef}>
                   {bannerImageSrc && (
                     <StoryImage
                       src={bannerImageSrc}
@@ -443,16 +437,13 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
             </div>
           ) : (
           <div
-              className="lg:col-span-1 aspect-square bg-lime-100/60 rounded-2xl flex items-center justify-center mx-auto"
-            style={{
-                maxWidth: 'calc(100vh - 250px)'
-              }}
-            >
-            </div>
+            className="stories-carousel__tile stories-carousel__tile--placeholder"
+            style={{ maxWidth: 'calc(100vh - 250px)' }}
+          />
           )}
 
           {/* 2x2 Grid - Next 3 Promotions + 1 Product Video (Right Side, 50% width, Square cards) */}
-          <div className="lg:col-span-1 grid grid-cols-2 gap-4">
+          <div className="stories-carousel__grid">
             {gridItems.length > 0 ? (
               gridItems.map((item) => {
                 if (item.type === 'promotion') {
@@ -461,13 +452,10 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
-                  style={{
-                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                  }}
+                      className="stories-carousel__tile"
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                    <div className="relative w-full h-full" ref={gridItemRef}>
+                    <div className="stories-carousel__media-wrap" ref={gridItemRef}>
                       {promotionImageSrc && (
                       <StoryImage
                         src={promotionImageSrc}
@@ -487,10 +475,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
-                      style={{
-                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                      }}
+                      className="stories-carousel__tile"
                       onClick={() => {
                         if (hasInlineVideo && product.product_video_url) {
                           const video = videoRefs.current.get(item.uniqueKey);
@@ -506,7 +491,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                         handleVideoClick(product);
                       }}
                     >
-                      <div className="relative w-full h-full">
+                      <div className="stories-carousel__media-wrap">
                         {hasInlineVideo && product.product_video_url ? (
                           <StoryVideo
                             src={product.product_video_url}
@@ -540,43 +525,36 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               [...Array(4)].map((_, i) => (
                 <div
                   key={`placeholder-${i}`}
-                  className="w-full aspect-square bg-lime-100/60 rounded-2xl flex items-center justify-center"
-                  style={{
-                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                  }}
-                >
-                </div>
+                  className="stories-carousel__tile stories-carousel__tile--placeholder"
+                />
               ))
             )}
           </div>
         </div>
 
         {/* Mobile/Tablet: Vertical Stack Layout - Matching Figma Design (Banner on top, 2x2 grid below) */}
-        <div className="lg:hidden space-y-4 mb-6">
+        <div className="stories-carousel__mobile">
           {/* Large Banner or Carousel - Position 1 (Full width on mobile) */}
           {position1Items.length > 1 ? (
             // Show carousel if multiple items have position 1
-            <div className="mb-4">
+            <div className="stories-carousel__mobile-section">
               <ProductCarousel
                 itemsPerView={{ mobile: 1, tablet: 1, desktop: 1 }}
                 showNavigation={true}
                 showPagination={true}
                 autoPlay={true}
                 autoPlayInterval={autoAdvanceDuration * 1000}
-                className="aspect-square"
+                className="stories-carousel__carousel"
               >
                 {position1Items.map((promo) => {
                   const promoImageSrc = promo.banner_image_url || promo.banner_image;
                   return (
                     <div
                       key={promo.id ?? promo.title}
-                      className="group relative w-full h-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer"
-                      style={{
-                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                      }}
+                      className="stories-carousel__tile stories-carousel__tile--banner stories-carousel__tile--mobile"
                       onClick={() => handlePromotionClick(promo)}
                     >
-                      <div className="relative w-full h-full">
+                      <div className="stories-carousel__media-wrap">
                         {promoImageSrc && (
                           <StoryImage
                             src={promoImageSrc}
@@ -596,13 +574,10 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           ) : bannerItem && (
             // Show single banner if one item has position 1
             <div
-              className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4 mx-auto"
-              style={{
-                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-              }}
+              className="stories-carousel__tile stories-carousel__tile--banner stories-carousel__tile--mobile"
               onClick={() => handlePromotionClick(bannerItem)}
             >
-              <div className="relative w-full h-full">
+              <div className="stories-carousel__media-wrap">
                 {bannerImageSrc && (
                 <StoryImage
                   src={bannerImageSrc}
@@ -618,7 +593,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
           )}
 
           {/* 2x2 Grid - Next 3 Promotions + 1 Product Video (Full width on mobile) */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="stories-carousel__grid">
             {gridItems.length > 0 ? (
               gridItems.map((item) => {
                 if (item.type === 'promotion') {
@@ -627,13 +602,10 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
-                      style={{
-                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                      }}
+                      className="stories-carousel__tile stories-carousel__tile--mobile"
                       onClick={() => handlePromotionClick(promotion)}
                     >
-                      <div className="relative w-full h-full">
+                      <div className="stories-carousel__media-wrap">
                         {promotionImageSrc && (
                         <StoryImage
                           src={promotionImageSrc}
@@ -653,10 +625,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                   return (
                     <div
                       key={item.uniqueKey}
-                      className="group relative w-full aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer mb-4"
-                      style={{
-                        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-                      }}
+                      className="stories-carousel__tile stories-carousel__tile--mobile"
                       onClick={() => {
                         if (hasInlineVideo && product.product_video_url) {
                           const video = videoRefs.current.get(item.uniqueKey);
@@ -672,7 +641,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
                         handleVideoClick(product);
                       }}
                     >
-                      <div className="relative w-full h-full">
+                      <div className="stories-carousel__media-wrap">
                         {hasInlineVideo && product.product_video_url ? (
                           <StoryVideo
                             src={product.product_video_url}
@@ -706,9 +675,8 @@ export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProp
               [...Array(4)].map((_, i) => (
                 <div
                   key={`placeholder-mobile-${i}`}
-                  className="w-full aspect-square bg-lime-100/60 rounded-2xl flex items-center justify-center mb-4"
-                >
-                </div>
+                  className="stories-carousel__tile stories-carousel__tile--placeholder"
+                />
               ))
             )}
           </div>

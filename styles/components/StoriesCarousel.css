@@ -1,0 +1,199 @@
+.stories-carousel {
+  position: relative;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.stories-carousel__desktop {
+  display: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+.stories-carousel__mobile {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stories-carousel__mobile-section {
+  margin-bottom: 16px;
+}
+
+.stories-carousel__banner {
+  width: 100%;
+}
+
+.stories-carousel__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stories-carousel__carousel {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+}
+
+.stories-carousel__tile {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 200ms, transform 200ms;
+}
+
+.stories-carousel__tile:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.stories-carousel__tile--placeholder {
+  background: rgba(163, 230, 53, 0.6);
+  cursor: default;
+}
+
+.stories-carousel__tile--placeholder:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.stories-carousel__media-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.stories-carousel__media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: transform 300ms;
+}
+
+.stories-carousel__media--cover {
+  object-fit: cover;
+}
+
+.stories-carousel__media--contain {
+  object-fit: contain;
+}
+
+.stories-carousel__tile:hover .stories-carousel__media {
+  transform: scale(1.02);
+}
+
+.stories-carousel__skeleton {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.stories-carousel__skeleton-banner,
+.stories-carousel__skeleton-tile {
+  background: #f3f4f6;
+  border-radius: 16px;
+  animation: stories-carousel-pulse 1.6s ease-in-out infinite;
+}
+
+.stories-carousel__skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stories-carousel__modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(6px);
+  padding: 16px;
+}
+
+.stories-carousel__modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 64rem;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.stories-carousel__modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: background 200ms;
+}
+
+.stories-carousel__modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.stories-carousel__modal-close-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.stories-carousel__modal-embed {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.stories-carousel__modal-titlebar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 16px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+}
+
+.stories-carousel__modal-title {
+  color: #fff;
+  font-weight: 600;
+}
+
+@media (min-width: 1024px) {
+  .stories-carousel__desktop {
+    display: grid;
+  }
+
+  .stories-carousel__mobile {
+    display: none;
+  }
+
+  .stories-carousel__skeleton {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@keyframes stories-carousel-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

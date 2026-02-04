@@ -1,1 +1,258 @@
-/* TODO: migrate component styles here. */
+.checkout-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 16px;
+}
+
+.checkout-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 50;
+}
+
+.checkout-modal__panel {
+  position: relative;
+  background: #fff;
+  border-radius: 16px;
+  max-width: 28rem;
+  width: 100%;
+  padding: 24px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid #f3f4f6;
+  text-align: left;
+}
+
+.checkout-modal__panel--success {
+  text-align: center;
+}
+
+.checkout-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: #9ca3af;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 200ms;
+}
+
+.checkout-modal__close:hover {
+  color: #4b5563;
+}
+
+.checkout-modal__close-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.checkout-modal__logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.checkout-modal__logo--small {
+  margin-bottom: 24px;
+}
+
+.checkout-modal__logo-image {
+  object-fit: contain;
+  height: 48px;
+  width: auto;
+}
+
+.checkout-modal__heading {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.checkout-modal__section {
+  margin-bottom: 24px;
+}
+
+.checkout-modal__icon {
+  margin: 0 auto 16px;
+  width: 64px;
+  height: 64px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkout-modal__icon--success {
+  background: #dcfce7;
+}
+
+.checkout-modal__icon-svg {
+  width: 32px;
+  height: 32px;
+}
+
+.checkout-modal__icon-svg--success {
+  color: #16a34a;
+}
+
+.checkout-modal__title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.checkout-modal__title--success {
+  color: #16a34a;
+}
+
+.checkout-modal__text {
+  font-size: 16px;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.checkout-modal__meta {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.checkout-modal__meta-value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 600;
+}
+
+.checkout-modal__primary {
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 200ms, opacity 200ms;
+}
+
+.checkout-modal__primary:hover {
+  background: var(--primary-dark);
+}
+
+.checkout-modal__primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #9ca3af;
+}
+
+.checkout-modal__secondary {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 200ms;
+}
+
+.checkout-modal__secondary:hover {
+  background: #f9fafb;
+}
+
+.checkout-modal__mode {
+  margin-bottom: 24px;
+}
+
+.checkout-modal__mode-options {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.checkout-modal__mode-option {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkout-modal__radio {
+  margin-right: 8px;
+}
+
+.checkout-modal__mode-label {
+  font-weight: 600;
+}
+
+.checkout-modal__mode-text {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.checkout-modal__form {
+  display: grid;
+  gap: 16px;
+}
+
+.checkout-modal__field {
+  display: grid;
+  gap: 4px;
+}
+
+.checkout-modal__label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.checkout-modal__required {
+  color: #ef4444;
+}
+
+.checkout-modal__status {
+  margin-left: 8px;
+  font-size: 14px;
+  color: var(--primary);
+}
+
+.checkout-modal__input,
+.checkout-modal__textarea {
+  width: 100%;
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.checkout-modal__summary {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 16px;
+}
+
+.checkout-modal__summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.checkout-modal__alert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 12px 16px;
+  border-radius: 10px;
+}
+
+.checkout-modal__actions {
+  display: flex;
+  gap: 16px;
+}

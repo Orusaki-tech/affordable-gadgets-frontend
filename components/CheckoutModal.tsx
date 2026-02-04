@@ -300,32 +300,32 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
   // Success view
   if (isSuccess) {
     return (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="relative bg-white rounded-2xl max-w-md w-full p-6 text-center max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
+      <div className="checkout-modal">
+        <div className="checkout-modal__panel checkout-modal__panel--success">
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            className="checkout-modal__close"
             aria-label="Close checkout"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="checkout-modal__close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-          <div className="mb-6">
-            <div className="flex justify-center mb-4">
+          <div className="checkout-modal__section">
+            <div className="checkout-modal__logo">
               <Image 
                 src="/affordablelogo.png" 
                 alt={`${brandConfig.name} logo`}
                 width={100}
                 height={100}
-                className="object-contain h-16 w-auto"
+                className="checkout-modal__logo-image"
                 priority
               />
             </div>
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+            <div className="checkout-modal__icon checkout-modal__icon--success">
               <svg
-                className="h-8 w-8 text-green-600"
+                className="checkout-modal__icon-svg checkout-modal__icon-svg--success"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -338,20 +338,20 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold mb-2 text-green-600">Thank You!</h2>
-            <p className="text-lg text-gray-700 mb-2">
+            <h2 className="checkout-modal__title checkout-modal__title--success">Thank You!</h2>
+            <p className="checkout-modal__text">
               {paymentMode === 'pay_now' 
                 ? 'Your order has been created successfully.'
                 : 'Your inquiry has been submitted successfully.'}
             </p>
             {paymentMode === 'quote' && (
-              <p className="text-gray-600 mb-4">
+              <p className="checkout-modal__text">
                 A salesperson will contact you shortly.
               </p>
             )}
             {leadReference && (
-              <p className="text-sm text-gray-500 mb-4">
-                Reference: <span className="font-mono font-semibold">{leadReference}</span>
+              <p className="checkout-modal__meta">
+                Reference: <span className="checkout-modal__meta-value">{leadReference}</span>
               </p>
             )}
           </div>
@@ -360,7 +360,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
               onClose();
               router.push('/products');
             }}
-            className="w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)] font-semibold"
+            className="checkout-modal__primary"
           >
             Continue Shopping
           </button>
@@ -373,7 +373,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
   if (showPaymentMethodModal) {
     return (
       <>
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"></div>
+        <div className="checkout-modal__backdrop"></div>
         <PaymentMethodModal
           onClose={() => {
             setShowPaymentMethodModal(false);
@@ -389,67 +389,67 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="relative bg-white rounded-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100">
+    <div className="checkout-modal">
+      <div className="checkout-modal__panel">
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="checkout-modal__close"
           aria-label="Close checkout"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="checkout-modal__close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <div className="flex items-center justify-center mb-6">
+        <div className="checkout-modal__logo checkout-modal__logo--small">
           <Image 
             src="/affordablegadgetslogo.png" 
             alt={`${brandConfig.name} logo`}
             width={100}
             height={100}
-            className="object-contain h-12 w-auto"
+            className="checkout-modal__logo-image"
             priority
           />
         </div>
-        <h2 className="text-2xl font-bold mb-4 text-center">Checkout</h2>
+        <h2 className="checkout-modal__heading">Checkout</h2>
         
         {/* Payment Mode Selection */}
-        <div className="mb-6">
-          <div className="flex gap-4 mb-4">
-            <label className="flex items-center cursor-pointer">
+        <div className="checkout-modal__mode">
+          <div className="checkout-modal__mode-options">
+            <label className="checkout-modal__mode-option">
               <input
                 type="radio"
                 name="paymentMode"
                 value="pay_now"
                 checked={paymentMode === 'pay_now'}
                 onChange={(e) => setPaymentMode(e.target.value as 'pay_now' | 'quote')}
-                className="mr-2"
+                className="checkout-modal__radio"
               />
-              <span className="font-semibold">Pay Now</span>
+              <span className="checkout-modal__mode-label">Pay Now</span>
             </label>
-            <label className="flex items-center cursor-pointer">
+            <label className="checkout-modal__mode-option">
               <input
                 type="radio"
                 name="paymentMode"
                 value="quote"
                 checked={paymentMode === 'quote'}
                 onChange={(e) => setPaymentMode(e.target.value as 'pay_now' | 'quote')}
-                className="mr-2"
+                className="checkout-modal__radio"
               />
-              <span className="font-semibold">Request Quote</span>
+              <span className="checkout-modal__mode-label">Request Quote</span>
             </label>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="checkout-modal__mode-text">
             {paymentMode === 'pay_now' 
               ? 'Complete your payment securely with Pesapal (M-Pesa, Cards, etc.)'
               : 'A salesperson will contact you shortly with a quote'}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium mb-1">
-              Name <span className="text-red-500">*</span>
+        <form onSubmit={handleSubmit} className="checkout-modal__form">
+          <div className="checkout-modal__field">
+            <label htmlFor="name" className="checkout-modal__label">
+              Name <span className="checkout-modal__required">*</span>
             </label>
             <input
               id="name"
@@ -457,15 +457,15 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
               required
               value={formData.customer_name}
               onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg"
+              className="checkout-modal__input"
             />
           </div>
 
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium mb-1">
-              Phone <span className="text-red-500">*</span>
+          <div className="checkout-modal__field">
+            <label htmlFor="phone" className="checkout-modal__label">
+              Phone <span className="checkout-modal__required">*</span>
               {isRecognizing && (
-                <span className="ml-2 text-sm text-[var(--primary)]">Checking...</span>
+                <span className="checkout-modal__status">Checking...</span>
               )}
             </label>
             <input
@@ -474,13 +474,13 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
               required
               value={formData.customer_phone}
               onChange={(e) => setFormData({ ...formData, customer_phone: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg"
+              className="checkout-modal__input"
               placeholder="Enter your phone number"
             />
           </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-1">
+          <div className="checkout-modal__field">
+            <label htmlFor="email" className="checkout-modal__label">
               Email (Optional)
             </label>
             <input
@@ -488,48 +488,48 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
               type="email"
               value={formData.customer_email}
               onChange={(e) => setFormData({ ...formData, customer_email: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg"
+              className="checkout-modal__input"
             />
           </div>
 
-          <div>
-            <label htmlFor="address" className="block text-sm font-medium mb-1">
+          <div className="checkout-modal__field">
+            <label htmlFor="address" className="checkout-modal__label">
               Delivery Address (Optional)
             </label>
             <textarea
               id="address"
               value={formData.delivery_address}
               onChange={(e) => setFormData({ ...formData, delivery_address: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg"
+              className="checkout-modal__textarea"
               rows={3}
             />
           </div>
 
-          <div className="border-t pt-4">
-            <div className="flex justify-between text-lg font-semibold mb-4">
+          <div className="checkout-modal__summary">
+            <div className="checkout-modal__summary-row">
               <span>Total</span>
               <span>{formatPrice(totalValue)}</span>
             </div>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="checkout-modal__alert">
               {error}
             </div>
           )}
 
-          <div className="flex gap-4">
+          <div className="checkout-modal__actions">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50"
+              className="checkout-modal__secondary"
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)] disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="checkout-modal__primary"
               disabled={isSubmitting || isCartSubmitted}
             >
               {isSubmitting 

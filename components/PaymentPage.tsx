@@ -139,12 +139,12 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
   if (paymentStatus) {
     if (paymentStatus.status === OrderStatusEnum.PAID || paymentStatus.status === OrderStatusEnum.DELIVERED) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
-            <div className="mb-6">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+        <div className="payment-page">
+          <div className="payment-page__card">
+            <div className="payment-page__section">
+              <div className="payment-page__icon payment-page__icon--success">
                 <svg
-                  className="h-8 w-8 text-green-600"
+                  className="payment-page__icon-svg payment-page__icon-svg--success"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -157,14 +157,14 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                   />
                 </svg>
               </div>
-              <h2 className="product-card-name mb-2 text-green-600">Payment Successful!</h2>
-              <p className="text-gray-600 mb-4">
+              <h2 className="payment-page__title payment-page__title--success">Payment Successful!</h2>
+              <p className="payment-page__text">
                 Your payment has been confirmed. Your order is being processed.
               </p>
               {(paymentStatus as { payment_reference?: string }).payment_reference && (
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="payment-page__meta">
                   Reference:{' '}
-                  <span className="font-mono font-semibold">
+                  <span className="payment-page__meta-value">
                     {(paymentStatus as { payment_reference?: string }).payment_reference}
                   </span>
                 </p>
@@ -172,7 +172,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
             </div>
             <Link
               href="/products"
-              className="btn-cta block w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)]"
+              className="payment-page__primary"
             >
               Continue Shopping
             </Link>
@@ -183,22 +183,22 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
 
     if (paymentStatus.status === OrderStatusEnum.CANCELED) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
-            <div className="mb-6">
-              <div className="flex justify-center mb-4">
+        <div className="payment-page">
+          <div className="payment-page__card">
+            <div className="payment-page__section">
+              <div className="payment-page__logo">
                 <Image 
                   src="/affordablelogo.png" 
                   alt={`${brandConfig.name} logo`}
                   width={100}
                   height={100}
-                  className="object-contain h-16 w-auto"
+                  className="payment-page__logo-image"
                   priority
                 />
               </div>
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+              <div className="payment-page__icon payment-page__icon--error">
                 <svg
-                  className="h-8 w-8 text-red-600"
+                  className="payment-page__icon-svg payment-page__icon-svg--error"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -211,22 +211,22 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                   />
                 </svg>
               </div>
-              <h2 className="product-card-name mb-2 text-red-600">Payment Failed</h2>
-              <p className="text-gray-600 mb-4">
+              <h2 className="payment-page__title payment-page__title--error">Payment Failed</h2>
+              <p className="payment-page__text">
                 {(paymentStatus as { message?: string }).message ||
                   'Your payment could not be processed. Please try again.'}
               </p>
             </div>
-            <div className="space-y-2">
+            <div className="payment-page__actions">
               <button
                 onClick={() => window.location.reload()}
-                className="btn-cta w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)]"
+                className="payment-page__primary"
               >
                 Try Again
               </button>
               <Link
                 href="/cart"
-                className="block w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 font-semibold"
+                className="payment-page__secondary"
               >
                 Back to Cart
               </Link>
@@ -240,28 +240,28 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
   // Loading/Redirecting state
   if (isLoading || redirectUrl) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
-          <div className="mb-6">
-            <div className="flex justify-center mb-4">
+      <div className="payment-page">
+        <div className="payment-page__card">
+          <div className="payment-page__section">
+            <div className="payment-page__logo">
               <Image 
                 src="/affordablelogo.png" 
                 alt={`${brandConfig.name} logo`}
                 width={100}
                 height={100}
-                className="object-contain h-16 w-auto"
+                className="payment-page__logo-image"
                 priority
               />
             </div>
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
+            <div className="payment-page__icon payment-page__icon--neutral">
               <svg
-                className="animate-spin h-8 w-8 text-[var(--primary)]"
+                className="payment-page__spinner"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
               >
                 <circle
-                  className="opacity-25"
+                  className="payment-page__spinner-track"
                   cx="12"
                   cy="12"
                   r="10"
@@ -269,17 +269,17 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                   strokeWidth="4"
                 ></circle>
                 <path
-                  className="opacity-75"
+                  className="payment-page__spinner-fill"
                   fill="currentColor"
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
             </div>
-            <h2 className="product-card-name mb-2">Redirecting to Payment</h2>
-            <p className="text-gray-600 mb-4">
+            <h2 className="payment-page__title">Redirecting to Payment</h2>
+            <p className="payment-page__text">
               {redirectUrl ? 'Please wait while we redirect you to Pesapal...' : 'Initializing payment...'}
             </p>
-            <div className="text-sm text-gray-500">
+            <div className="payment-page__meta">
               <p>Order: {orderId}</p>
               <p>Amount: {formatPrice(totalAmount)}</p>
             </div>
@@ -292,28 +292,28 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
   // Processing payment state (when polling)
   if (isPolling && !paymentStatus) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
-          <div className="mb-6">
-            <div className="flex justify-center mb-4">
+      <div className="payment-page">
+        <div className="payment-page__card">
+          <div className="payment-page__section">
+            <div className="payment-page__logo">
               <Image 
                 src="/affordablelogo.png" 
                 alt={`${brandConfig.name} logo`}
                 width={100}
                 height={100}
-                className="object-contain h-16 w-auto"
+                className="payment-page__logo-image"
                 priority
               />
             </div>
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100 mb-4">
+            <div className="payment-page__icon payment-page__icon--neutral">
               <svg
-                className="animate-spin h-8 w-8 text-[var(--primary)]"
+                className="payment-page__spinner"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
               >
                 <circle
-                  className="opacity-25"
+                  className="payment-page__spinner-track"
                   cx="12"
                   cy="12"
                   r="10"
@@ -321,15 +321,15 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                   strokeWidth="4"
                 ></circle>
                 <path
-                  className="opacity-75"
+                  className="payment-page__spinner-fill"
                   fill="currentColor"
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 ></path>
               </svg>
             </div>
-            <h2 className="product-card-name mb-2">Processing Payment</h2>
-            <p className="text-gray-600 mb-4">Payment is being processed...</p>
-            <div className="text-sm text-gray-500">
+            <h2 className="payment-page__title">Processing Payment</h2>
+            <p className="payment-page__text">Payment is being processed...</p>
+            <div className="payment-page__meta">
               <p>Order: {orderId}</p>
               <p>Amount: {formatPrice(totalAmount)}</p>
             </div>
@@ -342,22 +342,22 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
-          <div className="mb-6">
-            <div className="flex justify-center mb-4">
+      <div className="payment-page">
+        <div className="payment-page__card">
+          <div className="payment-page__section">
+            <div className="payment-page__logo">
               <Image 
                 src="/affordablelogo.png" 
                 alt={`${brandConfig.name} logo`}
                 width={100}
                 height={100}
-                className="object-contain h-16 w-auto"
+                className="payment-page__logo-image"
                 priority
               />
             </div>
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+            <div className="payment-page__icon payment-page__icon--error">
               <svg
-                className="h-8 w-8 text-red-600"
+                className="payment-page__icon-svg payment-page__icon-svg--error"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -370,19 +370,19 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
                 />
               </svg>
             </div>
-            <h2 className="product-card-name mb-2 text-red-600">Payment Error</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <h2 className="payment-page__title payment-page__title--error">Payment Error</h2>
+            <p className="payment-page__text">{error}</p>
           </div>
-          <div className="space-y-2">
+          <div className="payment-page__actions">
             <button
               onClick={() => window.location.reload()}
-              className="btn-cta w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)]"
+              className="payment-page__primary"
             >
               Try Again
             </button>
             <Link
               href="/cart"
-              className="block w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 font-semibold"
+              className="payment-page__secondary"
             >
               Back to Cart
             </Link>

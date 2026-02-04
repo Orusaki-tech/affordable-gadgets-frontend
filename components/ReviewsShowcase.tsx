@@ -391,7 +391,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                         "{review.comment}"
                       </p>
                     )}
-                    <div className="mt-2 flex gap-1 text-yellow-300 text-[12px] sm:text-[13px] mb-[7px]">
+                    <div className="mt-2 flex gap-1 text-yellow-300 text-[12px] sm:text-[13px] mb-[3px]">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <span key={star} className={star <= review.rating ? 'text-yellow-300' : 'text-white/40'}>
                           ★

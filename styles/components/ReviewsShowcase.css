@@ -40,10 +40,10 @@
 .reviews-showcase__cta {
   border-radius: 999px;
   background: var(--gray-900);
-  color: #fff;
+  color: var(--ui-white);
   padding: 8px 20px;
   font-weight: 700;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 2px var(--ui-black-12);
   border: none;
 }
 
@@ -100,7 +100,7 @@
 .reviews-showcase__error {
   text-align: center;
   padding: 32px 0;
-  color: #dc2626;
+  color: var(--ui-red-600);
   font-weight: 600;
 }
 
@@ -108,7 +108,7 @@
   height: 320px;
   border-radius: 16px;
   border: 1px dashed var(--gray-300);
-  background: #fff;
+  background: var(--ui-white);
   padding: 16px;
   text-align: center;
   color: var(--gray-500);
@@ -154,9 +154,9 @@
   height: 320px;
   border-radius: 16px;
   overflow: hidden;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--ui-white);
+  box-shadow: 0 4px 12px var(--ui-black-12);
+  border: 1px solid var(--ui-black-05);
   text-align: left;
   display: grid;
   grid-template-rows: 60% 40%;
@@ -165,7 +165,7 @@
 
 .reviews-showcase__card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 10px 18px var(--ui-black-14);
 }
 
 @media (min-width: 640px) {
@@ -200,20 +200,20 @@
 .reviews-showcase__card-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.65) 100%);
+  background: linear-gradient(180deg, var(--ui-black-0) 0%, var(--ui-black-65) 100%);
 }
 
 .reviews-showcase__card-badge {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--ui-white-95);
   color: var(--gray-900);
   padding: 4px 10px;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 2px var(--ui-black-12);
 }
 
 .reviews-showcase__card-meta {
@@ -221,7 +221,7 @@
   bottom: 16px;
   left: 12px;
   right: 12px;
-  color: #fff;
+  color: var(--ui-white);
 }
 
 .reviews-showcase__card-comment {
@@ -241,12 +241,12 @@
 }
 
 .reviews-showcase__card-star {
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--ui-white-40);
   font-size: 12px;
 }
 
 .reviews-showcase__card-star--active {
-  color: #facc15;
+  color: var(--ui-yellow-400);
 }
 
 .reviews-showcase__card-product {
@@ -256,7 +256,7 @@
 
 .reviews-showcase__card-footer {
   border-top: 1px solid var(--gray-100);
-  background: #fff;
+  background: var(--ui-white);
   padding: 12px;
 }
 
@@ -282,9 +282,9 @@
   gap: 8px;
   border-radius: 10px;
   border: 1px solid var(--gray-200);
-  background: #fff;
+  background: var(--ui-white);
   padding: 6px 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px var(--ui-black-08);
 }
 
 .reviews-showcase__tag-media {
@@ -315,7 +315,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--ui-black-60);
   padding: 16px;
 }
 
@@ -326,8 +326,8 @@
   overflow: hidden;
   border-radius: 24px;
   border: 1px solid var(--gray-200);
-  background: #f8fafc;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  background: var(--ui-slate-50);
+  box-shadow: 0 20px 50px var(--ui-black-25);
 }
 
 .reviews-showcase__viewer-header {
@@ -353,7 +353,7 @@
   height: 36px;
   border-radius: 999px;
   border: 1px solid var(--gray-200);
-  background: #fff;
+  background: var(--ui-white);
   color: var(--gray-500);
   display: flex;
   align-items: center;
@@ -378,7 +378,7 @@
 }
 
 .reviews-showcase__viewer-media {
-  background: #f8fafc;
+  background: var(--ui-slate-50);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -389,9 +389,9 @@
   width: 100%;
   max-width: 420px;
   border-radius: 16px;
-  background: #fff;
+  background: var(--ui-white);
   padding: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px var(--ui-black-08);
 }
 
 .reviews-showcase__viewer-image-wrap {
@@ -412,7 +412,7 @@
 
 .reviews-showcase__viewer-image-media {
   object-fit: contain;
-  background: #fff;
+  background: var(--ui-white);
 }
 
 .reviews-showcase__viewer-image-placeholder {
@@ -431,7 +431,7 @@
 }
 
 .reviews-showcase__viewer-details {
-  background: #fff;
+  background: var(--ui-white);
   padding: 24px;
 }
 
@@ -465,7 +465,7 @@
 }
 
 .reviews-showcase__viewer-star--active {
-  color: #facc15;
+  color: var(--ui-yellow-400);
 }
 
 .reviews-showcase__viewer-rating-count {
@@ -551,15 +551,15 @@
   display: block;
   border-radius: 12px;
   border: 1px solid var(--gray-200);
-  background: #fff;
+  background: var(--ui-white);
   padding: 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 2px var(--ui-black-08);
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 .reviews-showcase__viewer-product-card:hover {
   border-color: var(--gray-300);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 16px var(--ui-black-08);
 }
 
 .reviews-showcase__viewer-product-row {
@@ -618,7 +618,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--ui-black-60);
   padding: 16px;
 }
 
@@ -628,9 +628,9 @@
   max-height: 85vh;
   overflow-y: auto;
   border-radius: 24px;
-  background: #fff;
+  background: var(--ui-white);
   padding: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 50px var(--ui-black-20);
 }
 
 .reviews-showcase__modal-header {
@@ -657,7 +657,7 @@
   height: 36px;
   border-radius: 999px;
   border: 1px solid var(--gray-200);
-  background: #fff;
+  background: var(--ui-white);
   color: var(--gray-500);
   display: flex;
   align-items: center;
@@ -676,15 +676,15 @@
 }
 
 .reviews-showcase__banner--error {
-  border: 1px solid #fecaca;
-  background: #fef2f2;
-  color: #b91c1c;
+  border: 1px solid var(--ui-red-200);
+  background: var(--ui-red-50);
+  color: var(--ui-red-700);
 }
 
 .reviews-showcase__banner--success {
-  border: 1px solid #bbf7d0;
-  background: #ecfdf3;
-  color: #15803d;
+  border: 1px solid var(--ui-green-200);
+  background: var(--ui-emerald-50);
+  color: var(--ui-green-700);
 }
 
 .reviews-showcase__form {
@@ -744,7 +744,7 @@
 
 .reviews-showcase__button--primary {
   background: var(--gray-900);
-  color: #fff;
+  color: var(--ui-white);
 }
 
 .reviews-showcase__button--primary:hover {
@@ -753,7 +753,7 @@
 
 .reviews-showcase__button--secondary {
   border: 1px solid var(--gray-200);
-  background: #fff;
+  background: var(--ui-white);
   color: var(--gray-700);
 }
 
@@ -771,7 +771,7 @@
 }
 
 .reviews-showcase__notice--empty {
-  background: #fff;
+  background: var(--ui-white);
   color: var(--gray-600);
 }
 
@@ -799,7 +799,7 @@
 }
 
 .reviews-showcase__rating-star--active {
-  color: #facc15;
+  color: var(--ui-yellow-400);
 }
 
 @keyframes pulse {

@@ -15,17 +15,17 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--ui-white);
+  border: 1px solid var(--ui-gray-200);
   border-radius: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  color: #374151;
+  box-shadow: 0 1px 2px var(--ui-black-05);
+  color: var(--ui-gray-700);
   font-weight: 500;
   cursor: pointer;
 }
 
 .product-filters__toggle:hover {
-  border-color: #d1d5db;
+  border-color: var(--ui-gray-300);
 }
 
 .product-filters__toggle-icon {
@@ -37,25 +37,25 @@
   margin-left: 4px;
   border-radius: 9999px;
   background: var(--primary);
-  color: #fff;
+  color: var(--ui-white);
   font-size: 12px;
   padding: 2px 8px;
 }
 
 .product-filters__sort {
   padding: 10px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--ui-gray-200);
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background: var(--ui-white);
+  box-shadow: 0 1px 2px var(--ui-black-05);
 }
 
 .product-filters__panel {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--ui-white);
+  border: 1px solid var(--ui-gray-200);
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px var(--ui-black-05);
   display: none;
 }
 
@@ -73,19 +73,19 @@
 .product-filters__panel-title {
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: var(--ui-gray-900);
 }
 
 .product-filters__panel-close {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--ui-gray-500);
   background: transparent;
   border: none;
   cursor: pointer;
 }
 
 .product-filters__panel-close:hover {
-  color: #374151;
+  color: var(--ui-gray-700);
 }
 
 .product-filters__fields {
@@ -113,9 +113,9 @@
 .product-filters__input {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--ui-gray-200);
   border-radius: 10px;
-  background: #fff;
+  background: var(--ui-white);
 }
 
 .product-filters__actions {
@@ -135,7 +135,7 @@
 
 .product-filters__action--primary {
   background: var(--primary);
-  color: #fff;
+  color: var(--ui-white);
 }
 
 .product-filters__action--primary:hover {
@@ -143,23 +143,23 @@
 }
 
 .product-filters__action--secondary {
-  background: #fff;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background: var(--ui-white);
+  color: var(--ui-gray-700);
+  border: 1px solid var(--ui-gray-300);
 }
 
 .product-filters__action--secondary:hover {
-  background: #f9fafb;
+  background: var(--ui-gray-50);
 }
 
 .product-filters__action--danger {
   background: transparent;
-  color: #dc2626;
+  color: var(--ui-red-600);
   font-weight: 500;
 }
 
 .product-filters__action--danger:hover {
-  color: #b91c1c;
+  color: var(--ui-red-700);
 }
 
 @media (min-width: 1024px) {

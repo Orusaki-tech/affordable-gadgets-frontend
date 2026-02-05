@@ -21,7 +21,7 @@
 
 .special-offers-carousel__card {
   border-radius: 16px;
-  background: rgba(163, 230, 53, 0.6);
+  background: var(--ui-lime-400-60);
   aspect-ratio: 1 / 1;
 }
 
@@ -29,17 +29,17 @@
   position: relative;
   display: block;
   border-radius: 16px;
-  background: rgba(163, 230, 53, 0.8);
+  background: var(--ui-lime-400-80);
   padding: 24px;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px var(--ui-black-05);
   transition: box-shadow 200ms;
   cursor: pointer;
   aspect-ratio: 1 / 1;
 }
 
 .special-offers-carousel__promo:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 16px var(--ui-black-12);
 }
 
 .special-offers-carousel__promo-media {

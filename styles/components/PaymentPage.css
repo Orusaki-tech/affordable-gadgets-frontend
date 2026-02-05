@@ -3,14 +3,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f9fafb;
+  background: var(--ui-gray-50);
   padding: 16px;
 }
 
 .payment-page__card {
-  background: #fff;
+  background: var(--ui-white);
   border-radius: 12px;
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 16px 32px var(--ui-black-12);
   max-width: 28rem;
   width: 100%;
   padding: 32px;
@@ -44,15 +44,15 @@
 }
 
 .payment-page__icon--success {
-  background: #dcfce7;
+  background: var(--ui-green-100);
 }
 
 .payment-page__icon--error {
-  background: #fee2e2;
+  background: var(--ui-red-100);
 }
 
 .payment-page__icon--neutral {
-  background: #f3f4f6;
+  background: var(--ui-gray-100);
 }
 
 .payment-page__icon-svg {
@@ -61,36 +61,36 @@
 }
 
 .payment-page__icon-svg--success {
-  color: #16a34a;
+  color: var(--ui-green-600);
 }
 
 .payment-page__icon-svg--error {
-  color: #dc2626;
+  color: var(--ui-red-600);
 }
 
 .payment-page__title {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: #111827;
+  color: var(--ui-gray-900);
 }
 
 .payment-page__title--success {
-  color: #16a34a;
+  color: var(--ui-green-600);
 }
 
 .payment-page__title--error {
-  color: #dc2626;
+  color: var(--ui-red-600);
 }
 
 .payment-page__text {
-  color: #4b5563;
+  color: var(--ui-gray-600);
   margin-bottom: 16px;
 }
 
 .payment-page__meta {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--ui-gray-500);
 }
 
 .payment-page__meta-value {
@@ -107,7 +107,7 @@
   display: block;
   width: 100%;
   background: var(--primary);
-  color: #fff;
+  color: var(--ui-white);
   border-radius: 10px;
   padding: 10px 16px;
   border: none;
@@ -124,8 +124,8 @@
 .payment-page__secondary {
   display: block;
   width: 100%;
-  background: #e5e7eb;
-  color: #1f2937;
+  background: var(--ui-gray-200);
+  color: var(--ui-gray-800);
   border-radius: 10px;
   padding: 10px 16px;
   font-weight: 600;
@@ -134,7 +134,7 @@
 }
 
 .payment-page__secondary:hover {
-  background: #d1d5db;
+  background: var(--ui-gray-300);
 }
 
 .payment-page__spinner {

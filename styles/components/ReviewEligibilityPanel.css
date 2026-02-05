@@ -7,10 +7,10 @@
 
 .review-eligibility__panel {
   border-radius: 24px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
+  border: 1px solid var(--ui-gray-200);
+  background: var(--ui-white);
   padding: 24px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px var(--ui-black-05);
 }
 
 .review-eligibility__header {
@@ -24,28 +24,28 @@
 .review-eligibility__title {
   font-size: 24px;
   font-weight: 600;
-  color: #111827;
+  color: var(--ui-gray-900);
 }
 
 .review-eligibility__subtitle {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--ui-gray-500);
 }
 
 .review-eligibility__reset {
   align-self: flex-start;
   border-radius: 9999px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--ui-gray-200);
   padding: 4px 12px;
   font-size: 12px;
   font-weight: 600;
-  color: #4b5563;
+  color: var(--ui-gray-600);
   background: transparent;
   cursor: pointer;
 }
 
 .review-eligibility__reset:hover {
-  color: #1f2937;
+  color: var(--ui-gray-800);
 }
 
 .review-eligibility__alert {
@@ -57,15 +57,15 @@
 }
 
 .review-eligibility__alert--error {
-  border-color: #fecaca;
-  background: #fef2f2;
-  color: #b91c1c;
+  border-color: var(--ui-red-200);
+  background: var(--ui-red-50);
+  color: var(--ui-red-700);
 }
 
 .review-eligibility__alert--success {
-  border-color: #a7f3d0;
-  background: #ecfdf3;
-  color: #047857;
+  border-color: var(--ui-emerald-200);
+  background: var(--ui-emerald-50);
+  color: var(--ui-emerald-700);
 }
 
 .review-eligibility__section {
@@ -82,7 +82,7 @@
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: var(--ui-gray-700);
 }
 
 .review-eligibility__label--inline {
@@ -95,17 +95,17 @@
   margin-top: 8px;
   width: 100%;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--ui-gray-200);
   padding: 10px 16px;
   font-size: 14px;
-  color: #111827;
+  color: var(--ui-gray-900);
 }
 
 .review-eligibility__input:focus,
 .review-eligibility__select:focus,
 .review-eligibility__textarea:focus {
   outline: none;
-  border-color: #111827;
+  border-color: var(--ui-gray-900);
 }
 
 .review-eligibility__file {
@@ -113,24 +113,24 @@
   display: block;
   width: 100%;
   font-size: 14px;
-  color: #4b5563;
+  color: var(--ui-gray-600);
 }
 
 .review-eligibility__primary {
   width: 100%;
   border-radius: 12px;
-  background: #111827;
+  background: var(--ui-gray-900);
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 600;
-  color: #fff;
+  color: var(--ui-white);
   border: none;
   cursor: pointer;
   transition: background 200ms, opacity 200ms;
 }
 
 .review-eligibility__primary:hover {
-  background: #1f2937;
+  background: var(--ui-gray-800);
 }
 
 .review-eligibility__primary:disabled {
@@ -141,17 +141,17 @@
 .review-eligibility__secondary {
   width: 100%;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--ui-gray-200);
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
-  background: #fff;
+  color: var(--ui-gray-700);
+  background: var(--ui-white);
   cursor: pointer;
 }
 
 .review-eligibility__secondary:hover {
-  background: #f9fafb;
+  background: var(--ui-gray-50);
 }
 
 .review-eligibility__actions {
@@ -162,11 +162,11 @@
 
 .review-eligibility__customer {
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border: 1px solid var(--ui-gray-200);
+  background: var(--ui-gray-50);
   padding: 12px 16px;
   font-size: 14px;
-  color: #374151;
+  color: var(--ui-gray-700);
 }
 
 .review-eligibility__customer-name {
@@ -175,11 +175,11 @@
 
 .review-eligibility__empty {
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
+  border: 1px solid var(--ui-gray-200);
+  background: var(--ui-white);
   padding: 16px;
   font-size: 14px;
-  color: #4b5563;
+  color: var(--ui-gray-600);
 }
 
 .review-eligibility__link {
@@ -204,14 +204,14 @@
 
 .review-eligibility__star {
   font-size: 24px;
-  color: #d1d5db;
+  color: var(--ui-gray-300);
   background: transparent;
   border: none;
   cursor: pointer;
 }
 
 .review-eligibility__star--active {
-  color: #facc15;
+  color: var(--ui-yellow-400);
 }
 
 @media (min-width: 640px) {

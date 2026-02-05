@@ -7,7 +7,7 @@
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  color: #1f2937;
+  color: var(--ui-gray-800);
   margin-bottom: 16px;
   text-align: center;
 }
@@ -34,17 +34,17 @@
   gap: 8px;
   min-width: 88px;
   padding: 16px 12px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  color: #374151;
+  background: var(--ui-white);
+  border: 1px solid var(--ui-gray-200);
+  color: var(--ui-gray-700);
   border-radius: 8px;
   transition: color 200ms, border-color 200ms;
   text-decoration: none;
 }
 
 .quick-access__item:hover {
-  border-color: #d1d5db;
-  color: #111827;
+  border-color: var(--ui-gray-300);
+  color: var(--ui-gray-900);
 }
 
 .quick-access__icon {

@@ -26,6 +26,105 @@
   --gray-800: #1d1d1f;
   --gray-900: #121212;
 
+  /* Component Palette (shared) */
+  --ui-black: #000;
+  --ui-white: #fff;
+  --ui-slate-50: #f8fafc;
+  --ui-slate-950: #030712;
+  --ui-gray-50: #f9fafb;
+  --ui-gray-100: #f3f4f6;
+  --ui-gray-150: #e8e8ed;
+  --ui-gray-200: #e5e7eb;
+  --ui-gray-300: #d1d5db;
+  --ui-gray-400: #9ca3af;
+  --ui-gray-500: #6b7280;
+  --ui-gray-600: #4b5563;
+  --ui-gray-700: #374151;
+  --ui-gray-800: #1f2937;
+  --ui-gray-900: #111827;
+
+  --ui-blue-50: #eff6ff;
+  --ui-blue-600: #2563eb;
+
+  --ui-green-50: #f0fdf4;
+  --ui-green-100: #dcfce7;
+  --ui-green-200: #bbf7d0;
+  --ui-green-500: #22c55e;
+  --ui-green-600: #16a34a;
+  --ui-green-700: #15803d;
+
+  --ui-emerald-50: #ecfdf3;
+  --ui-emerald-200: #a7f3d0;
+  --ui-emerald-600: #059669;
+  --ui-emerald-700: #047857;
+
+  --ui-yellow-100: #fef9c3;
+  --ui-yellow-400: #facc15;
+
+  --ui-amber-500: #f59e0b;
+  --ui-amber-600: #d97706;
+  --ui-amber-900: #6b3410;
+
+  --ui-orange-50: #fff7ed;
+  --ui-orange-100: #ffedd5;
+  --ui-orange-200: #fed7aa;
+  --ui-orange-300: #fdba74;
+  --ui-orange-400: #fb923c;
+  --ui-orange-500: #f97316;
+  --ui-orange-600: #ea580c;
+  --ui-orange-700: #c2410c;
+  --ui-orange-800: #9a3412;
+
+  --ui-red-50: #fef2f2;
+  --ui-red-100: #fee2e2;
+  --ui-red-200: #fecaca;
+  --ui-red-300: #fca5a5;
+  --ui-red-500: #ef4444;
+  --ui-red-600: #dc2626;
+  --ui-red-700: #b91c1c;
+
+  --ui-purple-600: #9333ea;
+  --ui-brown-700: #8b4513;
+
+  --ui-shadow-05: rgba(0, 0, 0, 0.05);
+  --ui-shadow-08: rgba(0, 0, 0, 0.08);
+  --ui-shadow-12: rgba(0, 0, 0, 0.12);
+  --ui-shadow-20: rgba(0, 0, 0, 0.2);
+  --ui-overlay-0: rgba(0, 0, 0, 0);
+  --ui-overlay-05: rgba(0, 0, 0, 0.05);
+  --ui-overlay-50: rgba(0, 0, 0, 0.5);
+
+  /* Component Opacity Tokens */
+  --ui-black-0: rgba(0, 0, 0, 0);
+  --ui-black-05: rgba(0, 0, 0, 0.05);
+  --ui-black-08: rgba(0, 0, 0, 0.08);
+  --ui-black-10: rgba(0, 0, 0, 0.1);
+  --ui-black-12: rgba(0, 0, 0, 0.12);
+  --ui-black-14: rgba(0, 0, 0, 0.14);
+  --ui-black-15: rgba(0, 0, 0, 0.15);
+  --ui-black-16: rgba(0, 0, 0, 0.16);
+  --ui-black-18: rgba(0, 0, 0, 0.18);
+  --ui-black-20: rgba(0, 0, 0, 0.2);
+  --ui-black-25: rgba(0, 0, 0, 0.25);
+  --ui-black-30: rgba(0, 0, 0, 0.3);
+  --ui-black-40: rgba(0, 0, 0, 0.4);
+  --ui-black-50: rgba(0, 0, 0, 0.5);
+  --ui-black-60: rgba(0, 0, 0, 0.6);
+  --ui-black-65: rgba(0, 0, 0, 0.65);
+  --ui-black-80: rgba(0, 0, 0, 0.8);
+  --ui-black-95: rgba(0, 0, 0, 0.95);
+
+  --ui-white-10: rgba(255, 255, 255, 0.1);
+  --ui-white-20: rgba(255, 255, 255, 0.2);
+  --ui-white-40: rgba(255, 255, 255, 0.4);
+  --ui-white-95: rgba(255, 255, 255, 0.95);
+  --ui-white-98: rgba(255, 255, 255, 0.98);
+
+  --ui-orange-100-50: rgba(255, 237, 213, 0.5);
+  --ui-lime-400-60: rgba(163, 230, 53, 0.6);
+  --ui-lime-400-80: rgba(163, 230, 53, 0.8);
+  --ui-ink-35: rgba(29, 29, 31, 0.35);
+
   /* Global Typography Scale */
   --h1-lh: 1.15;
   --body-lh: 1.5;

@@ -43,7 +43,7 @@
 }
 
 .product-videos__skeleton {
-  background: #e5e7eb;
+  background: var(--ui-gray-200);
   border-radius: 12px;
   height: 320px;
   animation: product-videos-pulse 1.6s ease-in-out infinite;
@@ -55,7 +55,7 @@
 }
 
 .product-videos__empty-text {
-  color: #4b5563;
+  color: var(--ui-gray-600);
   margin-bottom: 16px;
 }
 
@@ -72,7 +72,7 @@
   position: relative;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px var(--ui-black-08);
   transition: box-shadow 200ms;
   cursor: pointer;
   height: 320px;
@@ -81,12 +81,12 @@
 }
 
 .product-videos__card:hover {
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 18px var(--ui-black-12);
 }
 
 .product-videos__media {
   position: relative;
-  background: #f3f4f6;
+  background: var(--ui-gray-100);
 }
 
 .product-videos__media-image {
@@ -99,16 +99,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--ui-black-30);
   transition: background 200ms;
 }
 
 .product-videos__card:hover .product-videos__overlay {
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--ui-black-40);
 }
 
 .product-videos__overlay-button {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--ui-white-20);
   backdrop-filter: blur(6px);
   border-radius: 9999px;
   padding: 16px;
@@ -122,12 +122,12 @@
 .product-videos__overlay-icon {
   width: 48px;
   height: 48px;
-  color: #fff;
+  color: var(--ui-white);
 }
 
 .product-videos__info {
   padding: 12px;
-  background: #fff;
+  background: var(--ui-white);
 }
 
 .product-videos__name {
@@ -135,7 +135,7 @@
 }
 
 .product-videos__brand {
-  color: #4b5563;
+  color: var(--ui-gray-600);
   margin-bottom: 8px;
 }
 
@@ -147,7 +147,7 @@
   position: absolute;
   inset: 0;
   z-index: 10;
-  background: rgba(0, 0, 0, 0.95);
+  background: var(--ui-black-95);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -165,7 +165,7 @@
   position: absolute;
   top: -40px;
   right: 0;
-  color: #fff;
+  color: var(--ui-white);
   font-size: 24px;
   font-weight: 700;
   border: none;
@@ -175,7 +175,7 @@
 }
 
 .product-videos__player-close:hover {
-  color: #d1d5db;
+  color: var(--ui-gray-300);
 }
 
 .product-videos__player-embed {

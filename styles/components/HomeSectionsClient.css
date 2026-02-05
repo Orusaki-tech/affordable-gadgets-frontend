@@ -22,13 +22,13 @@
 }
 
 .home-sections__skeleton {
-  background: #e5e7eb;
+  background: var(--ui-gray-200);
   border-radius: 16px;
   animation: home-sections-pulse 1.6s ease-in-out infinite;
 }
 
 .home-sections__skeleton--offer {
-  background: rgba(163, 230, 53, 0.6);
+  background: var(--ui-lime-400-60);
   aspect-ratio: 1 / 1;
   border-radius: 16px;
 }
@@ -41,19 +41,19 @@
 .home-sections__skeleton--review {
   height: 14rem;
   border-radius: 16px;
-  background: #f3f4f6;
+  background: var(--ui-gray-100);
 }
 
 .home-sections__skeleton--category {
   height: 10rem;
   border-radius: 16px;
-  background: #f3f4f6;
+  background: var(--ui-gray-100);
 }
 
 .home-sections__skeleton--recent {
   height: 12rem;
   border-radius: 12px;
-  background: #f3f4f6;
+  background: var(--ui-gray-100);
 }
 
 @media (min-width: 640px) {

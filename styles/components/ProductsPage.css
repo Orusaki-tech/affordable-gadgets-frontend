@@ -5,8 +5,8 @@
 .products-page__promo {
   margin-bottom: 24px;
   padding: 16px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--ui-gray-50);
+  border: 1px solid var(--ui-gray-200);
   border-radius: 12px;
 }
 
@@ -23,18 +23,18 @@
 }
 
 .products-page__promo-description {
-  color: #4b5563;
+  color: var(--ui-gray-600);
   max-width: 520px;
 }
 
 .products-page__promo-code {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--ui-gray-500);
   margin-top: 8px;
 }
 
 .products-page__promo-code-value {
-  background: #fff;
+  background: var(--ui-white);
   padding: 4px 8px;
   border-radius: 6px;
 }
@@ -59,14 +59,14 @@
 .products-page__search-input {
   flex: 1;
   padding: 8px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--ui-gray-200);
   border-radius: 10px;
 }
 
 .products-page__search-button {
   padding: 8px 20px;
   background: var(--primary);
-  color: #fff;
+  color: var(--ui-white);
   border-radius: 10px;
   border: none;
   cursor: pointer;
@@ -100,7 +100,7 @@
 }
 
 .products-page__skeleton {
-  background: #e5e7eb;
+  background: var(--ui-gray-200);
   border-radius: 12px;
   height: 24rem;
   animation: products-page-pulse 1.6s ease-in-out infinite;
@@ -112,15 +112,15 @@
 }
 
 .products-page__status--error {
-  color: #dc2626;
+  color: var(--ui-red-600);
 }
 
 .products-page__status-text {
-  color: #4b5563;
+  color: var(--ui-gray-600);
 }
 
 .products-page__summary {
-  color: #4b5563;
+  color: var(--ui-gray-600);
   margin-bottom: 16px;
 }
 
@@ -139,7 +139,7 @@
 
 .products-page__pagination-button {
   padding: 8px 16px;
-  background: #e5e7eb;
+  background: var(--ui-gray-200);
   border-radius: 8px;
   border: none;
   cursor: pointer;
@@ -147,7 +147,7 @@
 }
 
 .products-page__pagination-button:hover {
-  background: #d1d5db;
+  background: var(--ui-gray-300);
 }
 
 .products-page__pagination-button:disabled {

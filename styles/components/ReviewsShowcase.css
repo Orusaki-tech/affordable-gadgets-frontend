@@ -31,12 +31,6 @@
   gap: 8px;
 }
 
-@media (min-width: 640px) {
-  .reviews-showcase__actions {
-    align-items: flex-end;
-  }
-}
-
 .reviews-showcase__cta {
   border-radius: 999px;
   background: var(--gray-900);
@@ -229,6 +223,7 @@
   line-height: 18px;
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

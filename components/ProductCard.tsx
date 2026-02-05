@@ -225,9 +225,9 @@ export function ProductCard({
           />
         </div>
         <div className="product-card__body product-card__body--featured">
-          <h3 className="product-card__title product-card__title--featured">
+          <p className="product-card__title product-card__title--featured">
             {product.product_name}
-          </h3>
+          </p>
           <button
             type="button"
             onClick={(event) => {

@@ -723,7 +723,7 @@
 }
 
 @media (min-width: 640px) {
-  .reviews-showcase__actions {
+  .reviews-showcase__form .reviews-showcase__actions {
     flex-direction: row;
   }
 }

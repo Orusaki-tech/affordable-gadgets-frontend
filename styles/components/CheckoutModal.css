@@ -244,6 +244,33 @@
   margin-bottom: 16px;
 }
 
+.checkout-modal__auth {
+  display: grid;
+  gap: 16px;
+}
+
+.checkout-modal__auth-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.checkout-modal__auth-form {
+  display: grid;
+  gap: 12px;
+  border-top: 1px solid var(--ui-gray-100);
+  padding-top: 12px;
+}
+
+.checkout-modal__link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+  padding: 0;
+}
+
 .checkout-modal__alert {
   background: var(--ui-red-50);
   border: 1px solid var(--ui-red-200);

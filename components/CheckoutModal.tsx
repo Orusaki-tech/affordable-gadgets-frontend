@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { useCart } from '@/lib/hooks/useCart';
 import { formatPrice } from '@/lib/utils/format';
 import { useRouter } from 'next/navigation';
-import { ApiService, OpenAPI, OrdersService, OrderRequest, Order, InitiatePaymentRequestRequest } from '@/lib/api/generated';
-import { inventoryBaseUrl } from '@/lib/api/openapi';
+import { ApiService, OpenAPI, OrdersService, OrderRequest, Order, InitiatePaymentRequestRequest, LoginService, RegisterService } from '@/lib/api/generated';
+import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
 import { PaymentMethodModal } from './PaymentMethodModal';
 import { brandConfig } from '@/lib/config/brand';
 
@@ -26,6 +26,18 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
+  const [allowGuestCheckout, setAllowGuestCheckout] = useState(false);
+  const [authForm, setAuthForm] = useState({
+    username_or_email: '',
+    username: '',
+    email: '',
+    password: '',
+  });
   const [isRecognizing, setIsRecognizing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [leadReference, setLeadReference] = useState<string | null>(null);
@@ -73,12 +85,56 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
     return () => clearTimeout(timeoutId);
   }, [formData.customer_phone]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsAuthenticated(!!localStorage.getItem('auth_token'));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (paymentMode !== 'pay_now') {
+      setShowAuthGate(false);
+      setAuthMode(null);
+      setAllowGuestCheckout(false);
+      setAuthError(null);
+    }
+  }, [paymentMode]);
+
+  const openLogin = () => {
+    setAuthError(null);
+    setAuthMode('login');
+    setAuthForm((prev) => ({
+      ...prev,
+      username_or_email: prev.username_or_email || formData.customer_email || '',
+    }));
+  };
+
+  const openRegister = () => {
+    setAuthError(null);
+    setAuthMode('register');
+    setAuthForm((prev) => ({
+      ...prev,
+      email: prev.email || formData.customer_email || '',
+      username: prev.username || (formData.customer_email ? formData.customer_email.split('@')[0] : ''),
+    }));
+  };
+
+  const handleAuthBack = () => {
+    setShowAuthGate(false);
+    setAuthMode(null);
+    setAuthError(null);
+  };
+
+  const performCheckout = async () => {
     
     // Prevent submission if cart is already submitted
     if (isCartSubmitted) {
       setError('This cart has already been submitted. Please start a new order.');
+      return;
+    }
+
+    if (paymentMode === 'pay_now' && !isAuthenticated && !allowGuestCheckout) {
+      setShowAuthGate(true);
       return;
     }
     
@@ -134,7 +190,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
           let errorMessage = 'Failed to create order. ';
           
           if (orderError?.message?.includes('Authentication') || orderError?.message?.includes('logged in')) {
-            errorMessage += 'Please log in to complete payment, or use "Request Quote" to proceed without login.';
+            errorMessage += 'Please sign in, create an account, or continue as guest to proceed.';
           } else {
             errorMessage += orderError?.message || 'Please try again or use "Request Quote" instead.';
           }
@@ -216,6 +272,70 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
       
       setError(errorMessage);
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await performCheckout();
+  };
+
+  const handleGuestProceed = async () => {
+    setAllowGuestCheckout(true);
+    setShowAuthGate(false);
+    setAuthMode(null);
+    setAuthError(null);
+    await performCheckout();
+  };
+
+  const handleLogin = async () => {
+    setIsAuthSubmitting(true);
+    setAuthError(null);
+    try {
+      const res = await LoginService.loginCreate({
+        username_or_email: authForm.username_or_email,
+        password: authForm.password,
+      });
+      const token = (res as { token?: string })?.token;
+      if (token) {
+        setAuthToken(token);
+        setIsAuthenticated(true);
+      }
+      setShowAuthGate(false);
+      setAuthMode(null);
+      setAllowGuestCheckout(false);
+      await performCheckout();
+    } catch (err) {
+      setAuthError('Login failed. Please check your credentials.');
+    } finally {
+      setIsAuthSubmitting(false);
+    }
+  };
+
+  const handleRegister = async () => {
+    setIsAuthSubmitting(true);
+    setAuthError(null);
+    try {
+      const res = await RegisterService.registerCreate({
+        username: authForm.username,
+        email: authForm.email,
+        password: authForm.password,
+        phone_number: formData.customer_phone || undefined,
+        address: formData.delivery_address || undefined,
+      });
+      const token = (res as { token?: string })?.token;
+      if (token) {
+        setAuthToken(token);
+        setIsAuthenticated(true);
+      }
+      setShowAuthGate(false);
+      setAuthMode(null);
+      setAllowGuestCheckout(false);
+      await performCheckout();
+    } catch (err) {
+      setAuthError('Registration failed. Please review details and try again.');
+    } finally {
+      setIsAuthSubmitting(false);
     }
   };
 
@@ -446,7 +566,84 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="checkout-modal__form">
+        {showAuthGate ? (
+          <div className="checkout-modal__auth">
+            <p className="checkout-modal__text">
+              To continue with payment, sign in or create an account. You can also proceed without an account.
+            </p>
+
+            <div className="checkout-modal__auth-actions">
+              <button type="button" className="checkout-modal__secondary" onClick={openLogin}>
+                Sign in
+              </button>
+              <button type="button" className="checkout-modal__secondary" onClick={openRegister}>
+                Create account
+              </button>
+            </div>
+
+            <button type="button" className="checkout-modal__primary" onClick={handleGuestProceed} disabled={isAuthSubmitting}>
+              Continue as guest
+            </button>
+
+            {authMode === 'login' && (
+              <div className="checkout-modal__auth-form">
+                <input
+                  type="text"
+                  placeholder="Email or Username"
+                  value={authForm.username_or_email}
+                  onChange={(e) => setAuthForm({ ...authForm, username_or_email: e.target.value })}
+                  className="checkout-modal__input"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={authForm.password}
+                  onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                  className="checkout-modal__input"
+                />
+                <button type="button" className="checkout-modal__primary" onClick={handleLogin} disabled={isAuthSubmitting}>
+                  {isAuthSubmitting ? 'Signing in...' : 'Sign in'}
+                </button>
+              </div>
+            )}
+
+            {authMode === 'register' && (
+              <div className="checkout-modal__auth-form">
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={authForm.username}
+                  onChange={(e) => setAuthForm({ ...authForm, username: e.target.value })}
+                  className="checkout-modal__input"
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={authForm.email}
+                  onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
+                  className="checkout-modal__input"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={authForm.password}
+                  onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                  className="checkout-modal__input"
+                />
+                <button type="button" className="checkout-modal__primary" onClick={handleRegister} disabled={isAuthSubmitting}>
+                  {isAuthSubmitting ? 'Creating account...' : 'Create account'}
+                </button>
+              </div>
+            )}
+
+            {authError && <div className="checkout-modal__alert">{authError}</div>}
+
+            <button type="button" className="checkout-modal__link" onClick={handleAuthBack}>
+              Back to checkout
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="checkout-modal__form">
           <div className="checkout-modal__field">
             <label htmlFor="name" className="checkout-modal__label">
               Name <span className="checkout-modal__required">*</span>
@@ -541,7 +738,8 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
                     : 'Request Quote'}
             </button>
           </div>
-        </form>
+          </form>
+        )}
       </div>
     </div>
   );

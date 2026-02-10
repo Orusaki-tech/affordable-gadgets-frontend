@@ -223,6 +223,48 @@
   transition: color 200ms, background 200ms;
 }
 
+.site-header__account {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ui-gray-700);
+  padding: 8px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: color 200ms, background 200ms;
+}
+
+.site-header__account:hover {
+  color: var(--primary);
+  background: var(--ui-gray-50);
+}
+
+.site-header__account-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.site-header__account-label {
+  display: none;
+  font-weight: 500;
+}
+
+.site-header__account-status {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: var(--ui-gray-300);
+  border: 2px solid var(--ui-white);
+}
+
+.site-header__account-status--on {
+  background: var(--ui-green-500);
+}
+
 .site-header__cart:hover {
   color: var(--primary);
   background: var(--ui-gray-50);
@@ -365,6 +407,10 @@
   }
 
   .site-header__cart-label {
+    display: inline;
+  }
+
+  .site-header__account-label {
     display: inline;
   }
 }

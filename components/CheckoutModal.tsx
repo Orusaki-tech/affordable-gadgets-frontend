@@ -13,9 +13,15 @@ import { brandConfig } from '@/lib/config/brand';
 interface CheckoutModalProps {
   onClose: () => void;
   totalValue: number;
+  initialFormData?: {
+    customer_name?: string;
+    customer_phone?: string;
+    customer_email?: string;
+    delivery_address?: string;
+  };
 }
 
-export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
+export function CheckoutModal({ onClose, totalValue, initialFormData }: CheckoutModalProps) {
   const { checkout, cart } = useCart();
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -93,6 +99,16 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
       setIsAuthenticated(!!localStorage.getItem('auth_token'));
     }
   }, []);
+
+  useEffect(() => {
+    if (!initialFormData) return;
+    setFormData((prev) => ({
+      ...prev,
+      ...Object.fromEntries(
+        Object.entries(initialFormData).filter(([, value]) => value && String(value).trim() !== '')
+      ),
+    }));
+  }, [initialFormData]);
 
   useEffect(() => {
     if (paymentMode !== 'pay_now') {

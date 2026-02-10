@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
@@ -11,6 +11,7 @@ import { SearchBar } from './SearchBar';
 export function Header() {
   const { itemCount } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -45,6 +46,26 @@ export function Header() {
     staleTime: 1000 * 60 * 60 * 12, // 12 hours
     gcTime: 1000 * 60 * 60 * 24, // 24 hours
   });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const readAuth = () => {
+      setIsLoggedIn(!!localStorage.getItem('auth_token'));
+    };
+    readAuth();
+    const handleAuthChange = () => readAuth();
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === 'auth_token') {
+        setIsLoggedIn(!!event.newValue);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('auth-token-changed', handleAuthChange);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('auth-token-changed', handleAuthChange);
+    };
+  }, []);
 
   return (
     <header className="site-header">
@@ -153,6 +174,30 @@ export function Header() {
               </div>
             </div>
           </nav>
+
+          {/* Account Icon */}
+          <Link
+            href="/cart"
+            className="site-header__account"
+            aria-label={isLoggedIn ? 'Account (logged in)' : 'Login or create account'}
+          >
+            <svg className="site-header__account-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15.232 5.232a3 3 0 11-4.464 4.064 3 3 0 014.464-4.064zM4 19a8 8 0 0116 0"
+              />
+            </svg>
+            <span className="site-header__account-label">
+              {isLoggedIn ? 'Logged in' : 'Login / Create'}
+            </span>
+            <span
+              className={`site-header__account-status ${
+                isLoggedIn ? 'site-header__account-status--on' : ''
+              }`}
+            />
+          </Link>
 
           {/* Cart Icon */}
           <Link

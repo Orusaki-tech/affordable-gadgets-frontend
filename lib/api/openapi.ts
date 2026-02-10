@@ -27,11 +27,13 @@ OpenAPI.HEADERS = async () => {
 export const setAuthToken = (token: string) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem('auth_token', token);
+    window.dispatchEvent(new Event('auth-token-changed'));
   }
 };
 
 export const clearAuthToken = () => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('auth_token');
+    window.dispatchEvent(new Event('auth-token-changed'));
   }
 };

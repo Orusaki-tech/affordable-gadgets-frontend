@@ -5,14 +5,14 @@ import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useMemo } from 'react';
-import { OpenAPI, OrdersService, ApiService } from '@/lib/api/generated';
-import { inventoryBaseUrl, apiBaseUrl } from '@/lib/api/openapi';
+import { ApiService } from '@/lib/api/generated';
+import { apiBaseUrl } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
+import { CheckoutModal } from './CheckoutModal';
 
 export function CartPage() {
   const { cart, isLoading, removeFromCart, totalValue, itemCount, updateCart } = useCart();
   const [removingBundleGroup, setRemovingBundleGroup] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deliveryRates, setDeliveryRates] = useState<Array<{ county: string; ward?: string | null; price: number }>>([]);
   const [formData, setFormData] = useState({
@@ -36,6 +36,7 @@ export function CartPage() {
   const [ordersOtpSent, setOrdersOtpSent] = useState(false);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   // Periodically check if cart still exists (in case it was cleared after payment)
   useEffect(() => {
@@ -255,96 +256,13 @@ export function CartPage() {
     setIsDeliveryModalOpen(false);
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (!cart || !cart.items || cart.items.length === 0) {
       setError('Cart is empty');
       return;
     }
-    if (!deliveryDetailsSaved) {
-      setError('Please save delivery details before proceeding.');
-      setIsDeliveryModalOpen(true);
-      return;
-    }
-    if (!formData.customer_name.trim() || !formData.customer_phone.trim()) {
-      setError('Name and phone are required');
-      return;
-    }
-    if (!formData.delivery_county.trim()) {
-      setError('Please select a delivery county');
-      return;
-    }
-    if (isWardRequired && !formData.delivery_ward.trim()) {
-      setError('Please select a delivery ward');
-      return;
-    }
-
     setError(null);
-    setIsSubmitting(true);
-
-    try {
-      const orderItems = cart.items.map((item) => {
-        const unitId = item.inventory_unit?.id;
-        if (!unitId) {
-          throw new Error(`Missing inventory_unit.id for cart item ${item.id ?? 'unknown'}`);
-        }
-        return {
-          inventory_unit_id: unitId,
-          quantity: item.quantity ?? 1,
-        };
-      });
-
-      const deliveryWindowStart = buildDeliveryDateTime(
-        formData.delivery_date,
-        formData.delivery_time_start
-      );
-      const deliveryWindowEnd = buildDeliveryDateTime(
-        formData.delivery_date,
-        formData.delivery_time_end
-      );
-
-      const previousBase = OpenAPI.BASE;
-      OpenAPI.BASE = inventoryBaseUrl;
-      const orderPayload = {
-        order_items: orderItems,
-        customer_name: formData.customer_name.trim(),
-        customer_phone: formData.customer_phone.trim(),
-        customer_email: formData.customer_email.trim() || undefined,
-        delivery_address: formData.delivery_address.trim() || undefined,
-        delivery_county: formData.delivery_county.trim(),
-        delivery_ward: formData.delivery_ward.trim() || undefined,
-        delivery_window_start: deliveryWindowStart,
-        delivery_window_end: deliveryWindowEnd,
-        delivery_notes: formData.delivery_notes.trim() || undefined,
-        order_source: 'ONLINE',
-      } as any;
-      const order = await OrdersService.ordersCreate(orderPayload);
-
-      const callbackUrl = `${window.location.origin}/payment/callback`;
-      const cancellationUrl = `${window.location.origin}/payment/cancelled`;
-      const paymentResult = await OrdersService.ordersInitiatePaymentCreate(order.order_id ?? '', {
-        callback_url: callbackUrl,
-        cancellation_url: cancellationUrl,
-        customer: {
-          email: formData.customer_email.trim() || undefined,
-          phone_number: formData.customer_phone.trim(),
-          first_name: formData.customer_name.trim().split(' ')[0] || formData.customer_name.trim(),
-          last_name: formData.customer_name.trim().split(' ').slice(1).join(' ') || '',
-        },
-      });
-      OpenAPI.BASE = previousBase;
-
-      if ((paymentResult as any)?.redirect_url) {
-        window.location.href = (paymentResult as any).redirect_url;
-        return;
-      }
-
-      setError('Payment initiation failed. Please try again.');
-    } catch (err: any) {
-      console.error('Checkout error:', err);
-      setError(err?.message || 'Failed to checkout. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    setIsCheckoutOpen(true);
   };
 
   const sendOrdersOtp = async () => {
@@ -772,12 +690,12 @@ export function CartPage() {
             </div>
             <button
               onClick={handleCheckout}
-              disabled={cart?.is_submitted || isSubmitting}
+              disabled={cart?.is_submitted}
               className={`cart-page__checkout-button ${
-                cart?.is_submitted || isSubmitting ? 'cart-page__checkout-button--disabled' : ''
+                cart?.is_submitted ? 'cart-page__checkout-button--disabled' : ''
               }`}
             >
-              {isSubmitting ? 'Redirecting to payment...' : cart?.is_submitted ? 'Already Submitted' : 'Proceed to Payment'}
+              {cart?.is_submitted ? 'Already Submitted' : 'Proceed to Payment'}
             </button>
             <Link
               href="/products"
@@ -944,6 +862,18 @@ export function CartPage() {
             </div>
           </div>
         </div>
+      )}
+      {isCheckoutOpen && (
+        <CheckoutModal
+          onClose={() => setIsCheckoutOpen(false)}
+          totalValue={totalWithDelivery}
+          initialFormData={{
+            customer_name: formData.customer_name,
+            customer_phone: formData.customer_phone,
+            customer_email: formData.customer_email,
+            delivery_address: formData.delivery_address,
+          }}
+        />
       )}
     </div>
   );

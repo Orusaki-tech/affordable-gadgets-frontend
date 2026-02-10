@@ -30,8 +30,11 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
   const [showAuthGate, setShowAuthGate] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authFieldErrors, setAuthFieldErrors] = useState<Record<string, string>>({});
   const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
   const [allowGuestCheckout, setAllowGuestCheckout] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [authForm, setAuthForm] = useState({
     username_or_email: '',
     username: '',
@@ -102,6 +105,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
 
   const openLogin = () => {
     setAuthError(null);
+    setAuthFieldErrors({});
     setAuthMode('login');
     setAuthForm((prev) => ({
       ...prev,
@@ -111,6 +115,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
 
   const openRegister = () => {
     setAuthError(null);
+    setAuthFieldErrors({});
     setAuthMode('register');
     setAuthForm((prev) => ({
       ...prev,
@@ -123,6 +128,48 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
     setShowAuthGate(false);
     setAuthMode(null);
     setAuthError(null);
+    setAuthFieldErrors({});
+  };
+
+  const validateAuthForm = (mode: 'login' | 'register') => {
+    const errors: Record<string, string> = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (mode === 'login') {
+      if (!authForm.username_or_email.trim()) {
+        errors.username_or_email = 'Email or username is required.';
+      }
+      if (!authForm.password.trim()) {
+        errors.password = 'Password is required.';
+      }
+    } else {
+      if (!authForm.username.trim()) {
+        errors.username = 'Username is required.';
+      }
+      if (!authForm.email.trim() || !emailRegex.test(authForm.email)) {
+        errors.email = 'Valid email is required.';
+      }
+      if (!authForm.password.trim() || authForm.password.length < 8) {
+        errors.password = 'Password must be at least 8 characters.';
+      }
+    }
+
+    setAuthFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const isLoginReady = () => {
+    return !!authForm.username_or_email.trim() && !!authForm.password.trim();
+  };
+
+  const isRegisterReady = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return (
+      !!authForm.username.trim() &&
+      !!authForm.email.trim() &&
+      emailRegex.test(authForm.email) &&
+      authForm.password.length >= 8
+    );
   };
 
   const performCheckout = async () => {
@@ -289,6 +336,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
   };
 
   const handleLogin = async () => {
+    if (!validateAuthForm('login')) return;
     setIsAuthSubmitting(true);
     setAuthError(null);
     try {
@@ -313,6 +361,7 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
   };
 
   const handleRegister = async () => {
+    if (!validateAuthForm('register')) return;
     setIsAuthSubmitting(true);
     setAuthError(null);
     try {
@@ -594,15 +643,40 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
                   onChange={(e) => setAuthForm({ ...authForm, username_or_email: e.target.value })}
                   className="checkout-modal__input"
                 />
+                {authFieldErrors.username_or_email && (
+                  <span className="checkout-modal__error">{authFieldErrors.username_or_email}</span>
+                )}
                 <input
-                  type="password"
+                  type={showLoginPassword ? 'text' : 'password'}
                   placeholder="Password"
                   value={authForm.password}
                   onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
                   className="checkout-modal__input"
                 />
-                <button type="button" className="checkout-modal__primary" onClick={handleLogin} disabled={isAuthSubmitting}>
-                  {isAuthSubmitting ? 'Signing in...' : 'Sign in'}
+                <button
+                  type="button"
+                  className="checkout-modal__ghost"
+                  onClick={() => setShowLoginPassword((prev) => !prev)}
+                >
+                  {showLoginPassword ? 'Hide password' : 'Show password'}
+                </button>
+                {authFieldErrors.password && (
+                  <span className="checkout-modal__error">{authFieldErrors.password}</span>
+                )}
+                <button
+                  type="button"
+                  className="checkout-modal__primary"
+                  onClick={handleLogin}
+                  disabled={isAuthSubmitting || !isLoginReady()}
+                >
+                  {isAuthSubmitting ? (
+                    <>
+                      <span className="checkout-modal__spinner" />
+                      Signing in...
+                    </>
+                  ) : (
+                    'Sign in'
+                  )}
                 </button>
               </div>
             )}
@@ -616,6 +690,9 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
                   onChange={(e) => setAuthForm({ ...authForm, username: e.target.value })}
                   className="checkout-modal__input"
                 />
+                {authFieldErrors.username && (
+                  <span className="checkout-modal__error">{authFieldErrors.username}</span>
+                )}
                 <input
                   type="email"
                   placeholder="Email"
@@ -623,15 +700,40 @@ export function CheckoutModal({ onClose, totalValue }: CheckoutModalProps) {
                   onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
                   className="checkout-modal__input"
                 />
+                {authFieldErrors.email && (
+                  <span className="checkout-modal__error">{authFieldErrors.email}</span>
+                )}
                 <input
-                  type="password"
+                  type={showRegisterPassword ? 'text' : 'password'}
                   placeholder="Password"
                   value={authForm.password}
                   onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
                   className="checkout-modal__input"
                 />
-                <button type="button" className="checkout-modal__primary" onClick={handleRegister} disabled={isAuthSubmitting}>
-                  {isAuthSubmitting ? 'Creating account...' : 'Create account'}
+                <button
+                  type="button"
+                  className="checkout-modal__ghost"
+                  onClick={() => setShowRegisterPassword((prev) => !prev)}
+                >
+                  {showRegisterPassword ? 'Hide password' : 'Show password'}
+                </button>
+                {authFieldErrors.password && (
+                  <span className="checkout-modal__error">{authFieldErrors.password}</span>
+                )}
+                <button
+                  type="button"
+                  className="checkout-modal__primary"
+                  onClick={handleRegister}
+                  disabled={isAuthSubmitting || !isRegisterReady()}
+                >
+                  {isAuthSubmitting ? (
+                    <>
+                      <span className="checkout-modal__spinner" />
+                      Creating account...
+                    </>
+                  ) : (
+                    'Create account'
+                  )}
                 </button>
               </div>
             )}

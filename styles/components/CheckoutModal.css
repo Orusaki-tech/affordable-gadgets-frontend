@@ -271,6 +271,39 @@
   padding: 0;
 }
 
+.checkout-modal__ghost {
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  text-align: left;
+}
+
+.checkout-modal__error {
+  color: var(--ui-red-600);
+  font-size: 12px;
+}
+
+.checkout-modal__spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--ui-white);
+  border-top-color: transparent;
+  border-radius: 9999px;
+  display: inline-block;
+  margin-right: 8px;
+  animation: checkout-spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes checkout-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .checkout-modal__alert {
   background: var(--ui-red-50);
   border: 1px solid var(--ui-red-200);

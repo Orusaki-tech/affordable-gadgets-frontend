@@ -284,7 +284,8 @@
 
 .site-header__account-label {
   display: none;
-  font-weight: 200;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .site-header__account-status {
@@ -331,6 +332,7 @@
 
 .site-header__cart-label {
   display: none;
+  font-size: 14px;
   font-weight: 500;
 }
 

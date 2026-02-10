@@ -5,14 +5,15 @@ import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useMemo } from 'react';
-import { ApiService } from '@/lib/api/generated';
-import { apiBaseUrl } from '@/lib/api/openapi';
+import { ApiService, OpenAPI, OrdersService } from '@/lib/api/generated';
+import { apiBaseUrl, inventoryBaseUrl } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
-import { CheckoutModal } from './CheckoutModal';
+import { AuthChoiceModal } from './AuthChoiceModal';
 
 export function CartPage() {
   const { cart, isLoading, removeFromCart, totalValue, itemCount, updateCart } = useCart();
   const [removingBundleGroup, setRemovingBundleGroup] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deliveryRates, setDeliveryRates] = useState<Array<{ county: string; ward?: string | null; price: number }>>([]);
   const [formData, setFormData] = useState({
@@ -36,7 +37,9 @@ export function CartPage() {
   const [ordersOtpSent, setOrdersOtpSent] = useState(false);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [orderHistory, setOrderHistory] = useState<any[]>([]);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [shouldStartPayment, setShouldStartPayment] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Periodically check if cart still exists (in case it was cleared after payment)
   useEffect(() => {
@@ -71,6 +74,47 @@ export function CartPage() {
 
     fetchDeliveryRates();
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const readAuth = () => {
+      setIsLoggedIn(!!localStorage.getItem('auth_token'));
+    };
+    readAuth();
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === 'auth_token') {
+        setIsLoggedIn(!!event.newValue);
+      }
+    };
+    const handleAuthChange = () => readAuth();
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('auth-token-changed', handleAuthChange);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('auth-token-changed', handleAuthChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const fetchOrders = async () => {
+      setOrdersLoading(true);
+      setError(null);
+      try {
+        const previousBase = OpenAPI.BASE;
+        OpenAPI.BASE = inventoryBaseUrl;
+        const response = await OrdersService.ordersList();
+        OpenAPI.BASE = previousBase;
+        setOrderHistory(response?.results ?? []);
+      } catch (err: any) {
+        console.error('Failed to fetch orders:', err);
+        setError(err?.message || 'Failed to load orders.');
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+    fetchOrders();
+  }, [isLoggedIn]);
 
   const items = cart?.items ?? [];
   const groupedItems = useMemo(() => {
@@ -162,12 +206,6 @@ export function CartPage() {
   }, [cart]);
 
   useEffect(() => {
-    if (!deliveryDetailsSaved) {
-      setIsDeliveryModalOpen(true);
-    }
-  }, [deliveryDetailsSaved]);
-
-  useEffect(() => {
     if (!pendingCartSync || !cart?.id || !deliveryDetailsSaved) return;
     const syncDeliveryDetails = async () => {
       try {
@@ -254,6 +292,104 @@ export function CartPage() {
 
     setDeliveryDetailsSaved(true);
     setIsDeliveryModalOpen(false);
+
+    const shouldProceed = shouldStartPayment;
+    setShouldStartPayment(false);
+    if (shouldProceed) {
+      await startPayment();
+    }
+  };
+
+  const startPayment = async () => {
+    if (!cart || !cart.items || cart.items.length === 0) {
+      setError('Cart is empty');
+      return;
+    }
+    if (!deliveryDetailsSaved) {
+      setError('Please save delivery details before proceeding.');
+      setIsDeliveryModalOpen(true);
+      return;
+    }
+    if (!formData.customer_name.trim() || !formData.customer_phone.trim()) {
+      setError('Name and phone are required');
+      return;
+    }
+    if (!formData.delivery_county.trim()) {
+      setError('Please select a delivery county');
+      return;
+    }
+    if (isWardRequired && !formData.delivery_ward.trim()) {
+      setError('Please select a delivery ward');
+      return;
+    }
+
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const orderItems = cart.items.map((item) => {
+        const unitId = item.inventory_unit?.id;
+        if (!unitId) {
+          throw new Error(`Missing inventory_unit.id for cart item ${item.id ?? 'unknown'}`);
+        }
+        return {
+          inventory_unit_id: unitId,
+          quantity: item.quantity ?? 1,
+        };
+      });
+
+      const deliveryWindowStart = buildDeliveryDateTime(
+        formData.delivery_date,
+        formData.delivery_time_start
+      );
+      const deliveryWindowEnd = buildDeliveryDateTime(
+        formData.delivery_date,
+        formData.delivery_time_end
+      );
+
+      const previousBase = OpenAPI.BASE;
+      OpenAPI.BASE = inventoryBaseUrl;
+      const orderPayload = {
+        order_items: orderItems,
+        customer_name: formData.customer_name.trim(),
+        customer_phone: formData.customer_phone.trim(),
+        customer_email: formData.customer_email.trim() || undefined,
+        delivery_address: formData.delivery_address.trim() || undefined,
+        delivery_county: formData.delivery_county.trim(),
+        delivery_ward: formData.delivery_ward.trim() || undefined,
+        delivery_window_start: deliveryWindowStart,
+        delivery_window_end: deliveryWindowEnd,
+        delivery_notes: formData.delivery_notes.trim() || undefined,
+        order_source: 'ONLINE',
+      } as any;
+      const order = await OrdersService.ordersCreate(orderPayload);
+
+      const callbackUrl = `${window.location.origin}/payment/callback`;
+      const cancellationUrl = `${window.location.origin}/payment/cancelled`;
+      const paymentResult = await OrdersService.ordersInitiatePaymentCreate(order.order_id ?? '', {
+        callback_url: callbackUrl,
+        cancellation_url: cancellationUrl,
+        customer: {
+          email: formData.customer_email.trim() || undefined,
+          phone_number: formData.customer_phone.trim(),
+          first_name: formData.customer_name.trim().split(' ')[0] || formData.customer_name.trim(),
+          last_name: formData.customer_name.trim().split(' ').slice(1).join(' ') || '',
+        },
+      });
+      OpenAPI.BASE = previousBase;
+
+      if ((paymentResult as any)?.redirect_url) {
+        window.location.href = (paymentResult as any).redirect_url;
+        return;
+      }
+
+      setError('Payment initiation failed. Please try again.');
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      setError(err?.message || 'Failed to checkout. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCheckout = () => {
@@ -262,7 +398,31 @@ export function CartPage() {
       return;
     }
     setError(null);
-    setIsCheckoutOpen(true);
+    if (isLoggedIn) {
+      if (deliveryDetailsSaved) {
+        startPayment();
+        return;
+      }
+      setShouldStartPayment(true);
+      setIsDeliveryModalOpen(true);
+      return;
+    }
+    setIsAuthModalOpen(true);
+  };
+
+  const handleGuestProceed = () => {
+    setShouldStartPayment(true);
+    setIsDeliveryModalOpen(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setIsLoggedIn(true);
+    if (deliveryDetailsSaved) {
+      startPayment();
+      return;
+    }
+    setShouldStartPayment(true);
+    setIsDeliveryModalOpen(true);
   };
 
   const sendOrdersOtp = async () => {
@@ -586,83 +746,141 @@ export function CartPage() {
           {items.length === 0 && (
             <div className="cart-page__orders">
               <h2 className="cart-page__orders-title">Your Orders</h2>
-              <p className="cart-page__orders-copy">
-                Verify your phone number to see past orders and download receipts.
-              </p>
-              <div className="cart-page__orders-form">
-                <input
-                  type="tel"
-                  placeholder="Phone number"
-                  value={ordersPhone}
-                  onChange={(e) => setOrdersPhone(e.target.value)}
-                  className="cart-page__input"
-                />
-                <div className="cart-page__orders-actions">
-                  <button
-                    onClick={sendOrdersOtp}
-                    disabled={ordersLoading}
-                    className="cart-page__btn cart-page__btn--dark"
-                  >
-                    {ordersOtpSent ? 'Resend OTP' : 'Send OTP'}
-                  </button>
-                  <input
-                    type="text"
-                    placeholder="Enter OTP"
-                    value={ordersOtp}
-                    onChange={(e) => setOrdersOtp(e.target.value)}
-                    className="cart-page__input cart-page__input--stretch"
-                  />
-                  <button
-                    onClick={fetchOrderHistory}
-                    disabled={ordersLoading}
-                    className="cart-page__btn cart-page__btn--primary"
-                  >
-                    Verify
-                  </button>
-                </div>
-              </div>
-
-              {orderHistory.length > 0 && (
-                <div className="cart-page__orders-list">
-                  {orderHistory.map((order) => (
-                    <div key={order.order_id} className="cart-page__order-card">
-                      <div className="cart-page__order-meta">
-                        <div>
-                          <p className="cart-page__order-label">Order ID</p>
-                          <p className="cart-page__order-value cart-page__order-value--mono">{order.order_id}</p>
+              {isLoggedIn ? (
+                <>
+                  <p className="cart-page__orders-copy">
+                    You are signed in. Your recent orders are listed below.
+                  </p>
+                  {ordersLoading && (
+                    <p className="cart-page__orders-copy">Loading your orders...</p>
+                  )}
+                  {!ordersLoading && orderHistory.length === 0 && (
+                    <p className="cart-page__orders-copy">No orders found yet.</p>
+                  )}
+                  {orderHistory.length > 0 && (
+                    <div className="cart-page__orders-list">
+                      {orderHistory.map((order) => (
+                        <div key={order.order_id} className="cart-page__order-card">
+                          <div className="cart-page__order-meta">
+                            <div>
+                              <p className="cart-page__order-label">Order ID</p>
+                              <p className="cart-page__order-value cart-page__order-value--mono">{order.order_id}</p>
+                            </div>
+                            <div>
+                              <p className="cart-page__order-label">Status</p>
+                              <p className="cart-page__order-value">{order.status}</p>
+                            </div>
+                            <div>
+                              <p className="cart-page__order-label">Total</p>
+                              <p className="cart-page__order-value">{formatPrice(Number(order.total_amount || 0))}</p>
+                            </div>
+                          </div>
+                          <div className="cart-page__order-actions">
+                            <Link
+                              href={`/orders/${order.order_id}`}
+                              className="cart-page__link cart-page__order-link"
+                            >
+                              View order
+                            </Link>
+                            <button
+                              onClick={() => window.open(getReceiptUrl(order.order_id), '_blank')}
+                              className="cart-page__link cart-page__order-link"
+                            >
+                              Download receipt
+                            </button>
+                            <Link
+                              href="/reviews/eligible"
+                              className="cart-page__link cart-page__order-link"
+                            >
+                              Leave review
+                            </Link>
+                          </div>
                         </div>
-                        <div>
-                          <p className="cart-page__order-label">Status</p>
-                          <p className="cart-page__order-value">{order.status}</p>
-                        </div>
-                        <div>
-                          <p className="cart-page__order-label">Total</p>
-                          <p className="cart-page__order-value">{formatPrice(Number(order.total_amount || 0))}</p>
-                        </div>
-                      </div>
-                      <div className="cart-page__order-actions">
-                        <Link
-                          href={`/orders/${order.order_id}`}
-                          className="cart-page__link cart-page__order-link"
-                        >
-                          View order
-                        </Link>
-                        <button
-                          onClick={() => window.open(getReceiptUrl(order.order_id), '_blank')}
-                          className="cart-page__link cart-page__order-link"
-                        >
-                          Download receipt
-                        </button>
-                        <Link
-                          href="/reviews/eligible"
-                          className="cart-page__link cart-page__order-link"
-                        >
-                          Leave review
-                        </Link>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="cart-page__orders-copy">
+                    Verify your phone number to see past orders and download receipts.
+                  </p>
+                  <div className="cart-page__orders-form">
+                    <input
+                      type="tel"
+                      placeholder="Phone number"
+                      value={ordersPhone}
+                      onChange={(e) => setOrdersPhone(e.target.value)}
+                      className="cart-page__input"
+                    />
+                    <div className="cart-page__orders-actions">
+                      <button
+                        onClick={sendOrdersOtp}
+                        disabled={ordersLoading}
+                        className="cart-page__btn cart-page__btn--dark"
+                      >
+                        {ordersOtpSent ? 'Resend OTP' : 'Send OTP'}
+                      </button>
+                      <input
+                        type="text"
+                        placeholder="Enter OTP"
+                        value={ordersOtp}
+                        onChange={(e) => setOrdersOtp(e.target.value)}
+                        className="cart-page__input cart-page__input--stretch"
+                      />
+                      <button
+                        onClick={fetchOrderHistory}
+                        disabled={ordersLoading}
+                        className="cart-page__btn cart-page__btn--primary"
+                      >
+                        Verify
+                      </button>
+                    </div>
+                  </div>
+
+                  {orderHistory.length > 0 && (
+                    <div className="cart-page__orders-list">
+                      {orderHistory.map((order) => (
+                        <div key={order.order_id} className="cart-page__order-card">
+                          <div className="cart-page__order-meta">
+                            <div>
+                              <p className="cart-page__order-label">Order ID</p>
+                              <p className="cart-page__order-value cart-page__order-value--mono">{order.order_id}</p>
+                            </div>
+                            <div>
+                              <p className="cart-page__order-label">Status</p>
+                              <p className="cart-page__order-value">{order.status}</p>
+                            </div>
+                            <div>
+                              <p className="cart-page__order-label">Total</p>
+                              <p className="cart-page__order-value">{formatPrice(Number(order.total_amount || 0))}</p>
+                            </div>
+                          </div>
+                          <div className="cart-page__order-actions">
+                            <Link
+                              href={`/orders/${order.order_id}`}
+                              className="cart-page__link cart-page__order-link"
+                            >
+                              View order
+                            </Link>
+                            <button
+                              onClick={() => window.open(getReceiptUrl(order.order_id), '_blank')}
+                              className="cart-page__link cart-page__order-link"
+                            >
+                              Download receipt
+                            </button>
+                            <Link
+                              href="/reviews/eligible"
+                              className="cart-page__link cart-page__order-link"
+                            >
+                              Leave review
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -690,12 +908,16 @@ export function CartPage() {
             </div>
             <button
               onClick={handleCheckout}
-              disabled={cart?.is_submitted}
+              disabled={cart?.is_submitted || isSubmitting}
               className={`cart-page__checkout-button ${
-                cart?.is_submitted ? 'cart-page__checkout-button--disabled' : ''
+                cart?.is_submitted || isSubmitting ? 'cart-page__checkout-button--disabled' : ''
               }`}
             >
-              {cart?.is_submitted ? 'Already Submitted' : 'Proceed to Payment'}
+              {isSubmitting
+                ? 'Processing...'
+                : cart?.is_submitted
+                  ? 'Already Submitted'
+                  : 'Proceed to Payment'}
             </button>
             <Link
               href="/products"
@@ -766,7 +988,10 @@ export function CartPage() {
               </div>
               {deliveryDetailsSaved && (
                 <button
-                  onClick={() => setIsDeliveryModalOpen(false)}
+                  onClick={() => {
+                    setIsDeliveryModalOpen(false);
+                    setShouldStartPayment(false);
+                  }}
                   className="cart-page__modal-close"
                 >
                   Close
@@ -863,16 +1088,12 @@ export function CartPage() {
           </div>
         </div>
       )}
-      {isCheckoutOpen && (
-        <CheckoutModal
-          onClose={() => setIsCheckoutOpen(false)}
-          totalValue={totalWithDelivery}
-          initialFormData={{
-            customer_name: formData.customer_name,
-            customer_phone: formData.customer_phone,
-            customer_email: formData.customer_email,
-            delivery_address: formData.delivery_address,
-          }}
+      {isAuthModalOpen && (
+        <AuthChoiceModal
+          onClose={() => setIsAuthModalOpen(false)}
+          onGuestProceed={handleGuestProceed}
+          onAuthSuccess={handleAuthSuccess}
+          initialEmail={formData.customer_email}
         />
       )}
     </div>

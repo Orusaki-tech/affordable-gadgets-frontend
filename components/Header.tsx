@@ -7,11 +7,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { brandConfig } from '@/lib/config/brand';
 import { SearchBar } from './SearchBar';
+import { clearAuthToken } from '@/lib/api/openapi';
 
 export function Header() {
   const { itemCount } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -176,28 +178,62 @@ export function Header() {
           </nav>
 
           {/* Account Icon */}
-          <Link
-            href="/cart"
-            className="site-header__account"
-            aria-label={isLoggedIn ? 'Account (logged in)' : 'Login or create account'}
-          >
-            <svg className="site-header__account-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15.232 5.232a3 3 0 11-4.464 4.064 3 3 0 014.464-4.064zM4 19a8 8 0 0116 0"
-              />
-            </svg>
-            <span className="site-header__account-label">
-              {isLoggedIn ? 'Logged in' : 'Login / Create'}
-            </span>
-            <span
-              className={`site-header__account-status ${
-                isLoggedIn ? 'site-header__account-status--on' : ''
-              }`}
-            />
-          </Link>
+          {isLoggedIn ? (
+            <div className="site-header__account-menu">
+              <button
+                type="button"
+                className="site-header__account"
+                aria-label="Account menu"
+                onClick={() => setIsAccountMenuOpen((prev) => !prev)}
+              >
+                <svg className="site-header__account-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15.232 5.232a3 3 0 11-4.464 4.064 3 3 0 014.464-4.064zM4 19a8 8 0 0116 0"
+                  />
+                </svg>
+                <span className="site-header__account-label">Logged in</span>
+                <span className="site-header__account-status site-header__account-status--on" />
+              </button>
+              {isAccountMenuOpen && (
+                <div className="site-header__account-dropdown">
+                  <Link href="/cart" className="site-header__account-item">
+                    My Orders
+                  </Link>
+                  <button
+                    type="button"
+                    className="site-header__account-item"
+                    onClick={() => {
+                      clearAuthToken();
+                      setIsLoggedIn(false);
+                      setIsAccountMenuOpen(false);
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              href="/cart"
+              className="site-header__account"
+              aria-label="Login or create account"
+            >
+              <svg className="site-header__account-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15.232 5.232a3 3 0 11-4.464 4.064 3 3 0 014.464-4.064zM4 19a8 8 0 0116 0"
+                />
+              </svg>
+              <span className="site-header__account-label">Login / Create</span>
+              <span className="site-header__account-status" />
+            </Link>
+          )}
 
           {/* Cart Icon */}
           <Link

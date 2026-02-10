@@ -3,17 +3,21 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { brandConfig } from '@/lib/config/brand';
 import { SearchBar } from './SearchBar';
 import { clearAuthToken } from '@/lib/api/openapi';
+import { AuthChoiceModal } from './AuthChoiceModal';
 
 export function Header() {
   const { itemCount } = useCart();
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -217,10 +221,11 @@ export function Header() {
               )}
             </div>
           ) : (
-            <Link
-              href="/cart"
+            <button
+              type="button"
               className="site-header__account"
               aria-label="Login or create account"
+              onClick={() => setIsAuthModalOpen(true)}
             >
               <svg className="site-header__account-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -232,7 +237,7 @@ export function Header() {
               </svg>
               <span className="site-header__account-label">Login / Create</span>
               <span className="site-header__account-status" />
-            </Link>
+            </button>
           )}
 
           {/* Cart Icon */}
@@ -291,6 +296,20 @@ export function Header() {
         <div className="site-header__search site-header__search--mobile">
           <SearchBar />
         </div>
+
+        {isAuthModalOpen && (
+          <AuthChoiceModal
+            onClose={() => setIsAuthModalOpen(false)}
+            onGuestProceed={() => {
+              setIsAuthModalOpen(false);
+              router.push('/cart');
+            }}
+            onAuthSuccess={() => {
+              setIsLoggedIn(true);
+              setIsAuthModalOpen(false);
+            }}
+          />
+        )}
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (

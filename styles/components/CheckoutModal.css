@@ -312,6 +312,12 @@
   border-radius: 10px;
 }
 
+.checkout-modal__alert--success {
+  background: var(--ui-green-50);
+  border-color: var(--ui-green-200);
+  color: var(--ui-green-700);
+}
+
 .checkout-modal__actions {
   display: flex;
   gap: 16px;

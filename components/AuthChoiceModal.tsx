@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { LoginService, RegisterService } from '@/lib/api/generated';
-import { setAuthToken } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
 
 interface AuthChoiceModalProps {
@@ -16,6 +15,7 @@ interface AuthChoiceModalProps {
 export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initialEmail }: AuthChoiceModalProps) {
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authNotice, setAuthNotice] = useState<string | null>(null);
   const [authFieldErrors, setAuthFieldErrors] = useState<Record<string, string>>({});
   const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
@@ -39,12 +39,14 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
 
   const openLogin = () => {
     setAuthError(null);
+    setAuthNotice(null);
     setAuthFieldErrors({});
     setAuthMode('login');
   };
 
   const openRegister = () => {
     setAuthError(null);
+    setAuthNotice(null);
     setAuthFieldErrors({});
     setAuthMode('register');
   };
@@ -94,6 +96,7 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
     if (!validateAuthForm('login')) return;
     setIsAuthSubmitting(true);
     setAuthError(null);
+    setAuthNotice(null);
     try {
       const res = await LoginService.loginCreate({
         username_or_email: authForm.username_or_email,
@@ -116,18 +119,16 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
     if (!validateAuthForm('register')) return;
     setIsAuthSubmitting(true);
     setAuthError(null);
+    setAuthNotice(null);
     try {
-      const res = await RegisterService.registerCreate({
+      await RegisterService.registerCreate({
         username: authForm.username,
         email: authForm.email,
         password: authForm.password,
       });
-      const token = (res as { token?: string })?.token;
-      if (token) {
-        setAuthToken(token);
-      }
-      onAuthSuccess();
-      onClose();
+      setAuthNotice('Verification email sent. Please verify your email, then sign in to continue.');
+      setAuthMode('login');
+      setAuthForm((prev) => ({ ...prev, password: '' }));
     } catch (err) {
       setAuthError('Registration failed. Please review details and try again.');
     } finally {
@@ -286,6 +287,7 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
             </div>
           )}
 
+          {authNotice && <div className="checkout-modal__alert checkout-modal__alert--success">{authNotice}</div>}
           {authError && <div className="checkout-modal__alert">{authError}</div>}
         </div>
       </div>

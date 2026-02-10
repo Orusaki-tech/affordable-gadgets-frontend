@@ -96,6 +96,15 @@ export function CartPage() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const guestFlag = localStorage.getItem('guest_checkout');
+    if (!guestFlag) return;
+    localStorage.removeItem('guest_checkout');
+    setShouldStartPayment(true);
+    setIsDeliveryModalOpen(true);
+  }, []);
+
+  useEffect(() => {
     if (!isLoggedIn) return;
     const fetchOrders = async () => {
       setOrdersLoading(true);

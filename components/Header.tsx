@@ -181,13 +181,34 @@ export function Header() {
             </div>
           </nav>
 
-          {/* Account Icon */}
+          {/* Cart Icon */}
+          <Link
+            href="/cart"
+            className="site-header__cart"
+          >
+            <svg className="site-header__cart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+            {itemCount > 0 && (
+              <span className="site-header__cart-badge">
+                {itemCount}
+              </span>
+            )}
+            <span className="site-header__cart-label">Cart</span>
+          </Link>
+
+          {/* Account Icon (last icon in the header) */}
           {isLoggedIn ? (
             <div className="site-header__account-menu">
               <button
                 type="button"
                 className="site-header__account"
-                aria-label="Account menu"
+                aria-label="Account menu (logged in)"
                 onClick={() => setIsAccountMenuOpen((prev) => !prev)}
               >
                 <svg className="site-header__account-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,10 +216,9 @@ export function Header() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M15.232 5.232a3 3 0 11-4.464 4.064 3 3 0 014.464-4.064zM4 19a8 8 0 0116 0"
+                    d="M9 12l2 2 4-4M12 22a10 10 0 100-20 10 10 0 000 20z"
                   />
                 </svg>
-                <span className="site-header__account-label">Logged in</span>
                 <span className="site-header__account-status site-header__account-status--on" />
               </button>
               {isAccountMenuOpen && (
@@ -235,31 +255,9 @@ export function Header() {
                   d="M15.232 5.232a3 3 0 11-4.464 4.064 3 3 0 014.464-4.064zM4 19a8 8 0 0116 0"
                 />
               </svg>
-              <span className="site-header__account-label">Login / Create</span>
               <span className="site-header__account-status" />
             </button>
           )}
-
-          {/* Cart Icon */}
-          <Link
-            href="/cart"
-            className="site-header__cart"
-          >
-            <svg className="site-header__cart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            {itemCount > 0 && (
-              <span className="site-header__cart-badge">
-                {itemCount}
-              </span>
-            )}
-            <span className="site-header__cart-label">Cart</span>
-          </Link>
 
           {/* Mobile Menu Button */}
           <button

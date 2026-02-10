@@ -318,6 +318,10 @@
   color: var(--ui-green-700);
 }
 
+.checkout-modal__resend {
+  margin-top: 8px;
+}
+
 .checkout-modal__actions {
   display: flex;
   gap: 16px;

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { LoginService, RegisterService } from '@/lib/api/generated';
 import { brandConfig } from '@/lib/config/brand';
+import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
 
 interface AuthChoiceModalProps {
   onClose: () => void;
@@ -16,6 +17,7 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authNotice, setAuthNotice] = useState<string | null>(null);
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null);
   const [authFieldErrors, setAuthFieldErrors] = useState<Record<string, string>>({});
   const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
@@ -40,6 +42,7 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
   const openLogin = () => {
     setAuthError(null);
     setAuthNotice(null);
+    setPendingVerificationEmail(null);
     setAuthFieldErrors({});
     setAuthMode('login');
   };
@@ -47,6 +50,7 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
   const openRegister = () => {
     setAuthError(null);
     setAuthNotice(null);
+    setPendingVerificationEmail(null);
     setAuthFieldErrors({});
     setAuthMode('register');
   };
@@ -102,6 +106,7 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
         username_or_email: authForm.username_or_email,
         password: authForm.password,
       });
+      setPendingVerificationEmail(null);
       const token = (res as { token?: string })?.token;
       if (token) {
         setAuthToken(token);
@@ -109,7 +114,16 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
       onAuthSuccess();
       onClose();
     } catch (err) {
-      setAuthError('Login failed. Please check your credentials.');
+      const message =
+        (err as { body?: { detail?: string; error?: string } })?.body?.detail ||
+        (err as { body?: { detail?: string; error?: string } })?.body?.error ||
+        'Login failed. Please check your credentials.';
+      if (String(message).toLowerCase().includes('verify your email')) {
+        setAuthNotice('Please verify your email before logging in.');
+        setPendingVerificationEmail(authForm.username_or_email.includes('@') ? authForm.username_or_email : null);
+      } else {
+        setAuthError(message);
+      }
     } finally {
       setIsAuthSubmitting(false);
     }
@@ -127,10 +141,37 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
         password: authForm.password,
       });
       setAuthNotice('Verification email sent. Please verify your email, then sign in to continue.');
+      setPendingVerificationEmail(authForm.email);
       setAuthMode('login');
       setAuthForm((prev) => ({ ...prev, password: '' }));
     } catch (err) {
       setAuthError('Registration failed. Please review details and try again.');
+    } finally {
+      setIsAuthSubmitting(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!pendingVerificationEmail) return;
+    setAuthError(null);
+    setAuthNotice(null);
+    setIsAuthSubmitting(true);
+    try {
+      const response = await fetch(`${inventoryBaseUrl}/verify-email/resend/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Brand-Code': brandConfig.code,
+        },
+        body: JSON.stringify({ email: pendingVerificationEmail }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to resend verification email.');
+      }
+      setAuthNotice(data?.message || 'Verification email sent.');
+    } catch (err: any) {
+      setAuthError(err?.message || 'Failed to resend verification email.');
     } finally {
       setIsAuthSubmitting(false);
     }
@@ -287,7 +328,23 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
             </div>
           )}
 
-          {authNotice && <div className="checkout-modal__alert checkout-modal__alert--success">{authNotice}</div>}
+          {authNotice && (
+            <div className="checkout-modal__alert checkout-modal__alert--success">
+              {authNotice}
+              {pendingVerificationEmail && (
+                <div className="checkout-modal__resend">
+                  <button
+                    type="button"
+                    className="checkout-modal__link"
+                    onClick={handleResendVerification}
+                    disabled={isAuthSubmitting}
+                  >
+                    Resend verification email
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           {authError && <div className="checkout-modal__alert">{authError}</div>}
         </div>
       </div>

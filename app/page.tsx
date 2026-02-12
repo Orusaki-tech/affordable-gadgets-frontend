@@ -37,7 +37,7 @@ export default function HomePage() {
         {/* Featured Products */}
         <section id="featured-products" className="bg-gradient-to-b from-gray-50 to-white scroll-mt-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
-            <div className="text-left mb-5 lg:mb-8">
+            <div className="text-left mb-5 lg:mb-5">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
                 <span className="bg-gradient-to-r from-[var(--primary)] via-[var(--primary-light)] to-[var(--primary-dark)] bg-clip-text text-transparent">
                   Featured Products

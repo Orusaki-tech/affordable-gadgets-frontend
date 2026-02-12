@@ -196,13 +196,13 @@ body {
 }
 
 h1 {
-  font-size: 36px;
+  font-size: 28px;
   line-height: var(--h1-lh);
   letter-spacing: var(--tracking-tight);
 }
 
 h2 {
-  font-size: 28px;
+  font-size: 23px;
   line-height: 1.2;
 }
 
@@ -219,17 +219,17 @@ h3 {
   }
 
   h1 {
-    font-size: 52px;
+    font-size: 36px;
     line-height: var(--h1-lh);
   }
 
   h2 {
-    font-size: 36px;
+    font-size: 28px;
     line-height: 1.2;
   }
 
   h3 {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 1.2;
   }
 }

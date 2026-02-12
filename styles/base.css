@@ -242,12 +242,12 @@ h3 {
   }
 
   h1 {
-    font-size: 68px;
+    font-size: 44px;
     line-height: var(--h1-lh);
   }
 
   h2 {
-    font-size: 44px;
+    font-size: 36px;
     line-height: 1.2;
   }
 
@@ -265,12 +265,12 @@ h3 {
   }
 
   h1 {
-    font-size: 80px;
+    font-size: 56px;
     line-height: var(--h1-lh);
   }
 
   h2 {
-    font-size: 56px;
+    font-size: 44px;
     line-height: 1.2;
   }
 

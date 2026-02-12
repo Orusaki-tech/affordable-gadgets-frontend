@@ -28,7 +28,7 @@ export default function HomePage() {
                 </span>
               </h2>
               <p className="text-gray-600 text-lg sm:text-xl">Don't miss out on these amazing deals</p>
-              <div className="w-32 h-1.5 bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 mx-auto mt-6 rounded-full shadow-md"></div>
+
             </div>
             <SpecialOffersServer pageSize={12} />
           </div>
@@ -44,7 +44,6 @@ export default function HomePage() {
                 </span>
               </h2>
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Handpicked for you</p>
-              <div className="w-32 h-1.5 bg-gradient-to-r from-[var(--primary)] via-[var(--primary-light)] to-[var(--primary-dark)] mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
             <ProductGridClient pageSize={8} showPagination={false} cardOptions={{ variant: 'featured' }} />
           </div>
@@ -60,7 +59,6 @@ export default function HomePage() {
                 </span>
               </h2>
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Real reviews from real customers</p>
-              <div className="w-32 h-1.5 bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
             <ReviewsShowcaseClient />
           </div>
@@ -76,7 +74,6 @@ export default function HomePage() {
                 </span>
               </h2>
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Find exactly what you're looking for</p>
-              <div className="w-32 h-1.5 bg-gradient-to-r from-[var(--primary)] via-[var(--primary-light)] to-[var(--primary-dark)] mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
             <CategoriesSectionClient />
           </div>
@@ -92,7 +89,6 @@ export default function HomePage() {
                 </span>
               </h2>
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Continue browsing where you left off</p>
-              <div className="w-32 h-1.5 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 mx-auto mt-6 rounded-full shadow-md"></div>
             </div>
             <RecentlyViewedClient />
           </div>

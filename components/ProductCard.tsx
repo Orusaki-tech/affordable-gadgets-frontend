@@ -228,6 +228,27 @@ export function ProductCard({
           <p className="product-card__title product-card__title--featured">
             {product.product_name}
           </p>
+          {/* Price */}
+          {hasPriceRange ? (
+            showComparePrice ? (
+              <div className="product-card__price-row">
+                <p className="product-card__price">
+                  {formatPrice(product.min_price ?? null)}
+                </p>
+                <p className="product-card__msrp">
+                  {formatPrice(compareAtDisplay ?? null)}
+                </p>
+              </div>
+            ) : (
+              <p className="product-card__price">
+                {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
+              </p>
+            )
+          ) : (
+            <p className="product-card__price-request">
+              Price on request
+            </p>
+          )}
           <button
             type="button"
             onClick={(event) => {

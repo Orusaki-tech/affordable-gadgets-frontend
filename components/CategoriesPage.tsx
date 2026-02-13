@@ -47,7 +47,7 @@ export function CategoriesPage() {
               <Link
                 key={category.code}
                 href={category.href}
-                
+                className="categories-page__card"
               >
                 {/* 1. Use 'fill' or 'contain' style to let the CSS handle the size */}
                 <Image 
@@ -55,7 +55,7 @@ export function CategoriesPage() {
                   alt={category.name} 
                   width={300} 
                   height={300} 
-                  className="categories-page__card"
+                  className="categories-page__card-image"
                 />
                 
                 {/* 2. The Title (Now follows the image in the flex flow) */}

@@ -21,33 +21,21 @@
 }
 
 .categories-page__card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;      /* Centers image and text horizontally */
-  justify-content: center;  /* Centers content vertically */
-  background-color: #f5f5f7; /* Back Market's light gray background */
-  border-radius: 16px;      /* Softer, rounder corners */
-  text-decoration: none;
-  color: #000000;
-  overflow: hidden;
-  aspect-ratio: 1 / 1;      /* Keeps the grid uniform and square */
-  padding: 24px 16px;       /* Internal spacing for the "box" look */
-  transition: transform 0.2s ease-in-out;
-  position: relative; 
-  height: auto;
-}
-
-/* 2. The Image: Force it to cover the entire card area */
-.categories-page__card img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover; /* Ensures ASTER/PALSAR previews aren't distorted */
   display: block;
+  background: var(--ui-white);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px var(--ui-black-05);
+  transition: box-shadow 200ms;
+  overflow: hidden;
+  padding: 0px;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  max-height: 230px;
 }
 
 .categories-page__card:hover {
-  transform: translateY(-4px);
-  box-shadow: none;         /* Removing the heavy black box-shadow */
+  box-shadow: 0 6px 16px var(--ui-black-12);
 }
 
 .categories-page__card-icon {
@@ -56,42 +44,10 @@
 }
 
 .categories-page__card-title {
-  position: absolute;
-  bottom: 2px; /* Your specific requirement */
-  left: 0;
-  right: 0;
-  margin: 0;
-  padding: 8px;
-  background: rgba(0, 0, 0, 0.6); /* Semi-transparent for legibility */
-  backdrop-filter: blur(4px); /* Modern frosted glass effect */
-  color: #ffffff;
-  font-size: 18px; /* Slightly smaller to fit overlays better */
+  font-size: 20px;
   font-weight: 600;
-  text-align: center;
-  z-index: 2;
-  
-  /* Transition for hover effect */
-  opacity: 0;
-  transform: translateY(5px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-
-/* 4. Hover State: Show Title */
-.categories-page__card:hover .categories-page__card-title {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-
-.categories-page__card:hover {
-  box-shadow: 0 6px 16px var(--ui-black-12);
-}
-
-/* 5. Hide Description & Icons as requested */
-.categories-page__card-description,
-.categories-page__card-icon {
-  display: none;
+  margin-bottom: 0px;
+  padding: 1px;
 }
 
 .categories-page__card-description {

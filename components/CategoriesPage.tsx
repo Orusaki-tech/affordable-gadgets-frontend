@@ -48,7 +48,7 @@ export function CategoriesPage() {
             href={category.href}
             className="categories-page__card"
           >
-            <image className="categories-page__card-icon">{category.icon}</image>
+            <image className="categories-page__card-icon" href={category.icon}></image>
             <h2 className="categories-page__card-title">{category.name}</h2>
             <p className="categories-page__card-description">{category.description}</p>
           </Link>

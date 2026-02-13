@@ -229,26 +229,22 @@ export function ProductCard({
             {product.product_name}
           </p>
           {/* Price */}
-          {hasPriceRange ? (
-            showComparePrice ? (
-              <div className="product-card__price-row">
-                <p className="product-card__price">
+          <p className="product-card__price product-card__price--featured">
+            {hasPriceRange ? (
+              showComparePrice ? (
+                <>
                   {formatPrice(product.min_price ?? null)}
-                </p>
-                <p className="product-card__msrp">
-                  {formatPrice(compareAtDisplay ?? null)}
-                </p>
-              </div>
+                  <span className="product-card__msrp product-card__msrp--featured">
+                    {formatPrice(compareAtDisplay ?? null)}
+                  </span>
+                </>
+              ) : (
+                formatPriceRange(product.min_price ?? null, product.max_price ?? null)
+              )
             ) : (
-              <p className="product-card__price">
-                {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
-              </p>
-            )
-          ) : (
-            <p className="product-card__price-request">
-              Price on request
-            </p>
-          )}
+              'Price on request'
+            )}
+          </p>
           <button
             type="button"
             onClick={(event) => {
@@ -257,9 +253,9 @@ export function ProductCard({
             }}
             disabled={!canAddToCart}
             className="product-card__cta product-card__cta--featured"
-            aria-label="Buy"
+            aria-label="Add to cart"
           >
-            {isAddingToCart ? 'Adding...' : 'Buy'}
+            {isAddingToCart ? 'Adding...' : 'Add to cart'}
           </button>
         </div>
       </Link>

@@ -487,6 +487,18 @@
   line-height: 20px;
 }
 
+/* Featured variant price styling */
+.product-card__price--featured {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.product-card__msrp--featured {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+}
+
 .product-card__quick-add {
   margin-bottom: 12px;
   border-radius: 10px;
@@ -636,6 +648,17 @@
 }
 
 .product-card--featured:hover .product-card__cta {
+  opacity: 1;
+}
+
+/* Featured variant button - always visible */
+.product-card__cta--featured {
+  opacity: 1 !important;
+  width: 100%;
+  margin-top: auto;
+}
+
+.product-card--featured:hover .product-card__cta--featured {
   opacity: 1;
 }
 

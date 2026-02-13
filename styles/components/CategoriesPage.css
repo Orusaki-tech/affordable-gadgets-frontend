@@ -19,37 +19,38 @@
   gap: 24px;
   margin-bottom: 48px;
 }
-
+/* 1. The Card: A Flex column that stacks children naturally */
 .categories-page__card {
   display: flex;
-  flex-direction: column;   /* This stacks image on top, text on bottom */
-  align-items: center;      /* Centers everything horizontally */
-  background-color: #f5f5f7; /* The light gray background from Back Market */
+  flex-direction: column;
+  align-items: center;      /* Centers image and text horizontally */
+  justify-content: center;  /* Centers the pair vertically within the box */
+  background-color: #f5f5f7; /* Exact light gray from Back Market */
   border-radius: 16px;
   text-decoration: none;
   color: #000000;
   overflow: hidden;
-  aspect-ratio: 1 / 1;      /* Keeps the cards square */
-  padding: 24px 16px;       /* Adds breathing room inside the card */
-  transition: transform 0.2s ease;
+  aspect-ratio: 1 / 1;      /* Keeps the tiles square */
+  padding: 24px 16px;       /* Breathing room inside the card */
+  transition: transform 0.2s ease-in-out;
 }
 
 .categories-page__card:hover {
-  transform: translateY(-4px); /* Simple lift effect */
+  transform: translateY(-4px); /* Simple lift effect on hover */
 }
 
-/* --- THE IMAGE --- */
+/* 2. The Image: Contained and Floating */
 .categories-page__card img {
   width: auto !important;
   height: auto !important;
-  max-width: 80% !important;  /* Keeps the image from touching the edges */
-  max-height: 70% !important; /* Leaves space for the text below */
-  object-fit: contain;        /* Ensures your ASTER/PALSAR images aren't cropped */
+  max-width: 80% !important;  /* Prevents image from touching edges */
+  max-height: 65% !important; /* Leaves room for the title below */
+  object-fit: contain;        /* Keeps the full image visible */
   display: block;
-  margin-bottom: 12px;        /* The gap between image and text */
+  margin-bottom: 12px;        /* Spacing between image and text */
 }
 
-/* --- THE TEXT BELOW --- */
+/* 3. The Title: Simple, Bold, and Below */
 .categories-page__card-title {
   font-size: 16px;
   font-weight: 700;
@@ -58,7 +59,6 @@
   margin: 0;
   padding: 0;
 }
-
 
 .categories-page__sections {
   display: grid;

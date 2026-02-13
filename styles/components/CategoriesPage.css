@@ -47,6 +47,7 @@
 
 .categories-page__card:hover {
   transform: translateY(-4px);
+  box-shadow: none;         /* Removing the heavy black box-shadow */
 }
 
 .categories-page__card-icon {

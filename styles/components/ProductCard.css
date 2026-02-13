@@ -166,6 +166,11 @@
   object-fit: cover;
   width: 100%;
   height: 100%;
+  transition: transform 400ms ease-out;
+}
+
+.product-card--featured:hover .product-card__image--featured {
+  transform: scale(1.1);
 }
 
 .product-card__media--wide {
@@ -222,16 +227,22 @@
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+.product-card__footer-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  margin-right: 8px;
+}
+
 .product-card__name--featured {
   font-size: 10px;
   font-weight: 700;
   color: var(--ui-gray-900);
-  margin: 0;
-  flex: 1;
+  margin: 0 0 4px 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-right: 8px;
 }
 
 .product-card__cart-icon--featured {
@@ -262,32 +273,6 @@
   height: 16px;
 }
 
-.product-card__overlay--featured {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0);
-  opacity: 0;
-  transition: opacity 300ms, background 300ms;
-  z-index: 1;
-}
-
-.product-card--featured:hover .product-card__overlay--featured {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.product-card__body--featured {
-  align-items: center;
-  text-align: center;
-  padding: 16px 19px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
 
 .product-card__body--minimal {
   padding: 16px;
@@ -583,21 +568,24 @@
 
 /* Featured variant price styling */
 .product-card__price--featured {
-  text-align: center;
-  margin-bottom: 0;
-  color: var(--ui-white);
-  font-weight: 700;
+  text-align: left;
+  margin: 0;
+  color: var(--ui-gray-900);
+  font-weight: 600;
+  font-size: 12px;
 }
 
 .product-card__price-row--featured {
-  justify-content: center;
-  margin-bottom: 0;
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
 }
 
 .product-card__msrp--featured {
-  font-size: 14px;
-  color: var(--ui-gray-300);
+  font-size: 10px;
+  color: var(--ui-gray-500);
+  text-decoration: line-through;
 }
 
 .product-card__quick-add {

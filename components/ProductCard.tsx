@@ -223,31 +223,10 @@ export function ProductCard({
             className="product-card__image product-card__image--primary product-card__image--featured"
             unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
           />
-          {/* Always visible product name and cart icon */}
+          {/* Always visible product name, price and cart icon */}
           <div className="product-card__footer product-card__footer--featured">
-            <p className="product-card__name product-card__name--featured">
-              {product.product_name}
-            </p>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (!selectedUnit?.id) return;
-                handleAddToCart(event, 1);
-              }}
-              disabled={!canAddToCart || isAddingToCart}
-              className="product-card__cart-icon product-card__cart-icon--featured"
-              aria-label="Add to cart"
-            >
-              <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-              </svg>
-            </button>
-          </div>
-          <div className="product-card__overlay product-card__overlay--featured">
-            <div className="product-card__body product-card__body--featured">
-              <p className="product-card__title product-card__title--featured">
+            <div className="product-card__footer-content">
+              <p className="product-card__name product-card__name--featured">
                 {product.product_name}
               </p>
               {/* Price */}
@@ -271,19 +250,23 @@ export function ProductCard({
                   Price on request
                 </p>
               )}
-              <button
-                type="button"
-                onClick={(event) => {
-                  if (!selectedUnit?.id) return;
-                  handleAddToCart(event, 1);
-                }}
-                disabled={!canAddToCart}
-                className="product-card__cta product-card__cta--featured"
-                aria-label="Add to cart"
-              >
-                {isAddingToCart ? 'Adding...' : 'Add to cart'}
-              </button>
             </div>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!selectedUnit?.id) return;
+                handleAddToCart(event, 1);
+              }}
+              disabled={!canAddToCart || isAddingToCart}
+              className="product-card__cart-icon product-card__cart-icon--featured"
+              aria-label="Add to cart"
+            >
+              <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+              </svg>
+            </button>
           </div>
         </div>
       </Link>

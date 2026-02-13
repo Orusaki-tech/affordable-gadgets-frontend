@@ -40,7 +40,7 @@
 }
 
 /* 2. The Image: Contained and Floating */
-.categories-page__card img {
+.categories-page__card-image{
   width: auto !important;
   height: auto !important;
   max-width: 80% !important;  /* Prevents image from touching edges */

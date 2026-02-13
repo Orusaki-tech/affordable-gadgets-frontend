@@ -229,22 +229,26 @@ export function ProductCard({
             {product.product_name}
           </p>
           {/* Price */}
-          <p className="product-card__price product-card__price--featured">
-            {hasPriceRange ? (
-              showComparePrice ? (
-                <>
+          {hasPriceRange ? (
+            showComparePrice ? (
+              <div className="product-card__price-row product-card__price-row--featured">
+                <p className="product-card__price product-card__price--featured">
                   {formatPrice(product.min_price ?? null)}
-                  <span className="product-card__msrp product-card__msrp--featured">
-                    {formatPrice(compareAtDisplay ?? null)}
-                  </span>
-                </>
-              ) : (
-                formatPriceRange(product.min_price ?? null, product.max_price ?? null)
-              )
+                </p>
+                <p className="product-card__msrp product-card__msrp--featured">
+                  {formatPrice(compareAtDisplay ?? null)}
+                </p>
+              </div>
             ) : (
-              'Price on request'
-            )}
-          </p>
+              <p className="product-card__price product-card__price--featured">
+                {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
+              </p>
+            )
+          ) : (
+            <p className="product-card__price product-card__price--featured">
+              Price on request
+            </p>
+          )}
           <button
             type="button"
             onClick={(event) => {

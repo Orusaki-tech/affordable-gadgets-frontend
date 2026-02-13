@@ -236,7 +236,7 @@
 }
 
 .product-card__name--featured {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--ui-gray-900);
   margin: 0 0 4px 0;

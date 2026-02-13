@@ -1,4 +1,3 @@
-/* --- Global & Typography --- */
 .section-label {
   font-size: 25px;
   line-height: 1.2;
@@ -8,105 +7,179 @@
 
 .categories-page {
   width: 100%;
-  padding: 20px;
 }
 
 .categories-page__title {
   margin-bottom: 32px;
 }
 
-/* --- The Grid --- */
 .categories-page__grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px; /* Tighter gap matching the screenshot */
+  gap: 24px;
   margin-bottom: 48px;
 }
 
-/* --- The Card Component --- */
 .categories-page__card {
-  position: relative;
   display: flex;
   flex-direction: column;
-  background: #f5f5f7; /* Back Market's signature light gray */
-  border-radius: 16px; /* Smooth rounded corners */
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  overflow: hidden;
+  align-items: center;      /* Centers image and text horizontally */
+  justify-content: center;  /* Centers content vertically */
+  background-color: #f5f5f7; /* Back Market's light gray background */
+  border-radius: 16px;      /* Softer, rounder corners */
   text-decoration: none;
   color: #000000;
-  aspect-ratio: 4 / 3; /* Matches the visual proportion of the app cards */
+  overflow: hidden;
+  aspect-ratio: 1 / 1;      /* Keeps the grid uniform and square */
+  padding: 24px 16px;       /* Internal spacing for the "box" look */
+  transition: transform 0.2s ease-in-out;
+  position: relative; 
+  height: auto;
+}
+
+/* 2. The Image: Force it to cover the entire card area */
+.categories-page__card img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 85% !important;  /* Ensures images don't touch edges */
+  max-height: 70% !important; /* Leaves space for the title below */
+  object-fit: contain;        /* Essential for ASTER/PALSAR icons */
+  display: block;
+  margin-bottom: 12px;        /* The natural gap (Back Market's gap-8) */
 }
 
 .categories-page__card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* --- Image Handling --- */
-.categories-page__card img {
-  width: 100% !important;
-  height: 80% !important; /* Leaves room for the centered title below */
-  object-fit: contain; /* Keeps the product (Phone/Dataset) fully visible */
-  padding: 24px 24px 0 24px; /* Internal breathing room for the image */
-  display: block;
+.categories-page__card-icon {
+  font-size: 3.75rem;
+  margin-bottom: 16px;
 }
 
-/* --- Title (Hover to reveal, Center Aligned) --- */
 .categories-page__card-title {
-  position: absolute;
-  bottom: 12px; /* Positioned near the bottom */
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  padding: 0 10px;
+  /* Resetting from absolute/hidden to standard text flow */
+  position: static; 
+  opacity: 1;                 /* Always visible */
+  transform: none;            /* No movement animation */
+  background: transparent;    /* Remove background/blur */
+  backdrop-filter: none;
   
-  /* Text Styling */
+  /* Typography */
+  font-size: 16px;            /* Matches Back Market 'body-1-bold' */
+  font-weight: 700;
   color: #000000;
-  font-size: 16px;
-  font-weight: 600;
-  text-align: center; /* Strictly center aligned */
-  z-index: 2;
-  
-  /* Hover State: Hidden by default */
-  opacity: 0;
-  transform: translateY(5px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  text-align: center;
+  margin: 0;
+  padding: 0;
 }
 
-/* Reveal Title on Hover */
+
+/* 4. Hover State: Show Title */
 .categories-page__card:hover .categories-page__card-title {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* --- Hidden Elements --- */
+
+.categories-page__card:hover {
+  box-shadow: 0 6px 16px var(--ui-black-12);
+}
+
+/* 5. Hide Description & Icons as requested */
 .categories-page__card-description,
 .categories-page__card-icon {
   display: none;
 }
 
-/* --- Responsive Breakpoints --- */
+
+.categories-page__sections {
+  display: grid;
+  gap: 48px;
+}
+
+.categories-page__section {
+  width: 100%;
+}
+
+.categories-page__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.categories-page__section-heading {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.categories-page__section-title {
+  margin: 0;
+}
+
+.categories-page__section-link {
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.categories-page__section-link:hover {
+  color: var(--primary-dark);
+}
+
+.categories-page__products {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.categories-page__skeleton {
+  background: var(--ui-gray-200);
+  border-radius: 12px;
+  height: 24rem;
+  animation: categories-page-pulse 1.6s ease-in-out infinite;
+}
+
 @media (min-width: 640px) {
-  .categories-page__grid {
-    grid-template-columns: repeat(2, 1fr);
+  .categories-page__grid,
+  .categories-page__products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (min-width: 1024px) {
-  .categories-page__grid {
-    grid-template-columns: repeat(4, 1fr);
+  .categories-page__grid,
+  .categories-page__products {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
-/* Label Sizing */
 @media (min-width: 768px) and (max-width: 1024px) {
-  .section-label { font-size: 28px; }
+  .section-label {
+    font-size: 28px;
+  }
 }
 
 @media (min-width: 1025px) and (max-width: 1440px) {
-  .section-label { font-size: 32px; }
+  .section-label {
+    font-size: 32px;
+  }
 }
 
 @media (min-width: 1441px) {
-  .section-label { font-size: 64px; }
+  .section-label {
+    font-size: 64px;
+  }
+}
+
+@keyframes categories-page-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }

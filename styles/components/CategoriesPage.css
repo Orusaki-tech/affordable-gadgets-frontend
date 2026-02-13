@@ -8,6 +8,7 @@
 
 .categories-page {
   width: 100%;
+  padding: 20px;
 }
 
 .categories-page__title {
@@ -15,70 +16,60 @@
 }
 
 /* --- The Grid --- */
-.categories-page__grid,
-.categories-page__products {
+.categories-page__grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 16px; /* Tighter gap matching the screenshot */
   margin-bottom: 48px;
 }
 
 /* --- The Card Component --- */
 .categories-page__card {
-  position: relative; 
-  display: block;
-  background: var(--ui-white);
-  border-radius: 12px;
-  box-shadow: 0 1px 2px var(--ui-black-05);
-  transition: box-shadow 300ms ease, transform 300ms ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f7; /* Back Market's signature light gray */
+  border-radius: 16px; /* Smooth rounded corners */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   overflow: hidden;
-  padding: 0;
   text-decoration: none;
-  color: inherit;
-  
-  /* Use aspect-ratio for a perfect square; height 230px acts as the floor */
-  aspect-ratio: 1 / 1;
-  min-height: 230px; 
+  color: #000000;
+  aspect-ratio: 4 / 3; /* Matches the visual proportion of the app cards */
 }
 
-/* Hover effect for the card container */
 .categories-page__card:hover {
-  box-shadow: 0 6px 16px var(--ui-black-12);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* --- Image Handling --- */
 .categories-page__card img {
   width: 100% !important;
-  height: 100% !important;
-  object-fit: cover; /* Ensures geospatial data isn't distorted */
+  height: 80% !important; /* Leaves room for the centered title below */
+  object-fit: contain; /* Keeps the product (Phone/Dataset) fully visible */
+  padding: 24px 24px 0 24px; /* Internal breathing room for the image */
   display: block;
-  transition: transform 0.5s ease;
 }
 
-/* Subtle zoom effect on the dataset image when hovering */
-.categories-page__card:hover img {
-  transform: scale(1.05);
-}
-
-/* --- Title Overlay (Hover Only) --- */
+/* --- Title (Hover to reveal, Center Aligned) --- */
 .categories-page__card-title {
   position: absolute;
-  bottom: 2px; /* Fixed 2px from bottom */
+  bottom: 12px; /* Positioned near the bottom */
   left: 0;
   right: 0;
-  margin: 0;
-  padding: 12px 8px;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 70%, transparent 100%);
-  backdrop-filter: blur(4px);
-  color: #ffffff;
-  font-size: 18px;
+  margin: 0 auto;
+  padding: 0 10px;
+  
+  /* Text Styling */
+  color: #000000;
+  font-size: 16px;
   font-weight: 600;
-  text-align: center;
+  text-align: center; /* Strictly center aligned */
   z-index: 2;
   
-  /* Initial state: Hidden and slightly shifted down */
+  /* Hover State: Hidden by default */
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(5px);
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -88,76 +79,26 @@
   transform: translateY(0);
 }
 
-/* --- Hidden Elements (Per Request) --- */
+/* --- Hidden Elements --- */
 .categories-page__card-description,
 .categories-page__card-icon {
   display: none;
 }
 
-/* --- Page Sections --- */
-.categories-page__sections {
-  display: grid;
-  gap: 48px;
-}
-
-.categories-page__section {
-  width: 100%;
-}
-
-.categories-page__section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
-.categories-page__section-heading {
-  font-size: 30px;
-  font-weight: 700;
-  margin-bottom: 24px;
-}
-
-.categories-page__section-title {
-  margin: 0;
-}
-
-.categories-page__section-link {
-  color: var(--primary);
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.categories-page__section-link:hover {
-  color: var(--primary-dark);
-}
-
-/* --- Loading State --- */
-.categories-page__skeleton {
-  background: var(--ui-gray-200);
-  border-radius: 12px;
-  height: 24rem;
-  animation: categories-page-pulse 1.6s ease-in-out infinite;
-}
-
 /* --- Responsive Breakpoints --- */
-
-/* Tablet / Large Phone */
 @media (min-width: 640px) {
-  .categories-page__grid,
-  .categories-page__products {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .categories-page__grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Desktop */
 @media (min-width: 1024px) {
-  .categories-page__grid,
-  .categories-page__products {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .categories-page__grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
-/* Dynamic Font Sizing for Labels */
+/* Label Sizing */
 @media (min-width: 768px) and (max-width: 1024px) {
   .section-label { font-size: 28px; }
 }
@@ -168,10 +109,4 @@
 
 @media (min-width: 1441px) {
   .section-label { font-size: 64px; }
-}
-
-/* Animations */
-@keyframes categories-page-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
 }

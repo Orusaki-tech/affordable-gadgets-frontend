@@ -14,48 +14,51 @@
 }
 
 .categories-page__grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   gap: 24px;
   margin-bottom: 48px;
 }
-/* 1. The Card: A Flex column that stacks children naturally */
+
 .categories-page__card {
   display: flex;
   flex-direction: column;
-  align-items: center;      /* Centers image and text horizontally */
-  gap: 16px;                /* Replicates Back Market's 'gap-8' (usually 16-24px) */
-  background-color: #f5f5f7; /* The exact light gray from the screenshot */
-  border-radius: 16px;      /* Replicates 'rounded-lg' for the card */
-  padding: 24px 16px;
+  gap: 12px; /* Space between the box and the text */
   text-decoration: none;
-  transition: transform 0.2s ease-in-out;
-  aspect-ratio: 1 / 1;      /* Keeps the card square */
-  cursor: pointer;
+  color: #333;
+  width: 100%;
 }
 
-.categories-page__card:hover {
-  transform: translateY(-4px); /* Subtle lift on hover */
+.categories-page__card-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Makes it a square like the screenshot */
+  background-color: #E2F36E; /* That specific lime/yellow color */
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end; /* Aligns phone to the bottom of the box */
+  justify-content: center;
 }
 
-/* 2. The Image */
-.categories-page__card-image {
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 75%;          /* Leaves room for the title below */
-  object-fit: fill;      /* Essential so products aren't cropped */
-  border-radius: 8px;       /* The 'rounded-lg' specifically on the image */
-  display: block;
+.categories-page__card-icon {
+  width: 90%; /* Slight padding so phone doesn't touch the sides */
+  height: 90%;
+  object-fit: contain; /* Keeps the phone's aspect ratio perfect */
+  object-position: bottom; /* Ensures the phone sits on the bottom edge */
 }
 
-/* 3. The Title (The <span> tag) */
 .categories-page__card-title {
-  color: #000000;           /* text-action-default-hi */
-  font-size: 16px;          /* body-1 */
-  font-weight: 700;         /* body-1-bold */
-  text-align: center;
   margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  padding-left: 4px; /* Matches the alignment in the screenshot */
+}
+
+/* Hover Effect */
+.categories-page__card:hover .categories-page__card-image-wrapper {
+  filter: brightness(0.95);
 }
 
 .categories-page__sections {

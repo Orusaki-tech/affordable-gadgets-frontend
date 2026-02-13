@@ -3,14 +3,13 @@
 import Link from 'next/link';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from './ProductCard';
-import Image from 'next/image'
 
 const categories = [
   {
     name: 'Phones',
     code: 'PH',
     description: 'Latest smartphones from top brands',
-    icon: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1770976074/cats_ff5nh0.webp',
+    icon: '📱',
     href: '/products?type=PH',
   },
   {
@@ -41,21 +40,23 @@ export function CategoriesPage() {
     <div className="categories-page">
       <h1 className="categories-page__title section-label">Shop by Category</h1>
 
-          <div className="categories-page__grid">
-            {categories.map((category) => (
-              <>
-              <Link
-                key={category.code}
-                href={category.href}
-                className="categories-page__card"
-              >
-                <Image src={category.icon} alt={category.name} width={300} height={300} className="categories-page__card-image" />
-              </Link>
-              <h2 className="categories-page__card-title">{category.name}</h2>
-              </>
-            ))}
+      {/* Category Cards */}
+      <div className="categories-page__grid">
+        {categories.map((category) => (
+        <Link key={category.code} href={category.href} className="categories-page__card">
+          {/* Wrap the image in its own container for the background color */}
+          <div className="categories-page__card-image-wrapper">
+            <img 
+              src={category.icon} 
+              alt={category.name} 
+              className="categories-page__card-icon" 
+            />
           </div>
-     
+          {/* Title sits below the image wrapper */}
+          <p className="categories-page__card-title">{category.name}</p>
+        </Link>
+        ))}
+      </div>
 
       {/* Featured Products by Category */}
       <div className="categories-page__sections">

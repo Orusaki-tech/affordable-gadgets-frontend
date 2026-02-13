@@ -41,31 +41,20 @@ export function CategoriesPage() {
     <div className="categories-page">
       <h1 className="categories-page__title section-label">Shop by Category</h1>
 
-          {/* Category Cards */}
           <div className="categories-page__grid">
             {categories.map((category) => (
+              <>
               <Link
                 key={category.code}
                 href={category.href}
                 className="categories-page__card"
               >
-                {/* 1. Use 'fill' or 'contain' style to let the CSS handle the size */}
-                <Image 
-                  src={category.icon} 
-                  alt={category.name} 
-                  width={300} 
-                  height={300} 
-                  className="categories-page__card-image"
-                />
-                
-                {/* 2. The Title (Now follows the image in the flex flow) */}
-                <h2 className="categories-page__card-title">{category.name}</h2>
-                
-                {/* Description is removed to match the Back Market UI */}
+                <Image src={category.icon} alt={category.name} width={300} height={300} className="categories-page__card-image" />
               </Link>
+              <h2 className="categories-page__card-title">{category.name}</h2>
+              </>
             ))}
           </div>
-
      
 
       {/* Featured Products by Category */}

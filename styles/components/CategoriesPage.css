@@ -39,7 +39,7 @@
 }
 
 /* 2. The Image */
-.categories-page__card img {
+.categories-page__card-image {
   width: auto;
   height: auto;
   max-width: 100%;

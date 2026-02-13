@@ -101,10 +101,21 @@ export function useProductUnits(
     queryKey: ['product', productId, 'units'],
     queryFn: async () => {
       const response = await ApiService.apiV1PublicProductsUnitsList(productId);
+      let units: PublicInventoryUnitPublic[] = [];
       if (Array.isArray(response)) {
-        return response;
+        units = response;
+      } else {
+        units = response?.results ?? [];
       }
-      return response?.results ?? [];
+      // Debug: Log units with storage_gb to help diagnose issues
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[useProductUnits] Product ${productId} units:`, units.map(u => ({
+          id: u.id,
+          storage_gb: u.storage_gb,
+          selling_price: u.selling_price
+        })));
+      }
+      return units;
     },
     enabled: (options?.enabled ?? true) && productId > 0,
     staleTime: 10000, // 10 seconds (more frequent updates for stock)

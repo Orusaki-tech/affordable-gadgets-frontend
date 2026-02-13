@@ -115,6 +115,15 @@ export function ProductCard({
   const storageOptions = useMemo(() => {
     const storageMap = new Map<number, { storage: number; price: number; unitId: number }>();
     
+    // Debug logging in development
+    if (process.env.NODE_ENV === 'development' && units.length > 0) {
+      console.log('[ProductCard] Units received:', units.map(u => ({
+        id: u.id,
+        storage_gb: u.storage_gb,
+        selling_price: u.selling_price
+      })));
+    }
+    
     units.forEach((unit) => {
       const storage = unit.storage_gb;
       if (storage !== null && storage !== undefined) {
@@ -131,7 +140,14 @@ export function ProductCard({
       }
     });
     
-    return Array.from(storageMap.values()).sort((a, b) => a.storage - b.storage);
+    const options = Array.from(storageMap.values()).sort((a, b) => a.storage - b.storage);
+    
+    // Debug logging in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[ProductCard] Storage options calculated:', options);
+    }
+    
+    return options;
   }, [units]);
 
   const [selectedStorage, setSelectedStorage] = useState<number | null>(null);
@@ -271,7 +287,7 @@ export function ProductCard({
                 {product.product_name}
               </p>
               {/* Storage Options */}
-              {storageOptions.length > 1 && (
+              {storageOptions.length > 0 && (
                 <div className="product-card__storage-options">
                   {storageOptions.map((option) => (
                     <button

@@ -31,6 +31,7 @@
   text-align: center;
   text-decoration: none;
   color: inherit;
+  max-height: 230px;
 }
 
 .categories-page__card:hover {
@@ -43,14 +44,16 @@
 }
 
 .categories-page__card-title {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 0px;
+  padding: 1px;
 }
 
 .categories-page__card-description {
   color: var(--ui-gray-600);
-  font-size: 14px;
+  font-size: 12px;
+  margin-bottom: 3px;
 }
 
 .categories-page__sections {

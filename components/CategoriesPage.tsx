@@ -9,7 +9,7 @@ const categories = [
     name: 'Phones',
     code: 'PH',
     description: 'Latest smartphones from top brands',
-    icon: '📱',
+    icon: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1770976074/cats_ff5nh0.webp',
     href: '/products?type=PH',
   },
   {
@@ -48,12 +48,14 @@ export function CategoriesPage() {
             href={category.href}
             className="categories-page__card"
           >
-            <div className="categories-page__card-icon">{category.icon}</div>
+            <image className="categories-page__card-icon">{category.icon}</image>
             <h2 className="categories-page__card-title">{category.name}</h2>
             <p className="categories-page__card-description">{category.description}</p>
           </Link>
         ))}
       </div>
+
+     
 
       {/* Featured Products by Category */}
       <div className="categories-page__sections">

@@ -9,7 +9,7 @@ const categories = [
     name: 'Phones',
     code: 'PH',
     description: 'Latest smartphones from top brands',
-    icon: '📱',
+    icon: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1770976074/cats_ff5nh0.webp',
     href: '/products?type=PH',
   },
   {

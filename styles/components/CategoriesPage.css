@@ -43,10 +43,11 @@
 }
 
 .categories-page__card-icon {
-  width: 90%; /* Slight padding so phone doesn't touch the sides */
+  object-fit: cover;
+  object-position: bottom;
+  width: 90%;
   height: 90%;
-  object-fit: contain; /* Keeps the phone's aspect ratio perfect */
-  object-position: bottom; /* Ensures the phone sits on the bottom edge */
+  border-radius: 16px;
 }
 
 .categories-page__card-title {

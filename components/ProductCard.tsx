@@ -214,53 +214,55 @@ export function ProductCard({
         href={getProductHref(product)}
         className="product-card product-card--featured"
       >
-        <div className="product-card__media product-card__media--square">
+        <div className="product-card__media product-card__media--square product-card__media--featured">
           <Image
             src={primaryImage}
             alt={product.product_name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="product-card__image product-card__image--primary"
+            className="product-card__image product-card__image--primary product-card__image--featured"
             unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
           />
-        </div>
-        <div className="product-card__body product-card__body--featured">
-          <p className="product-card__title product-card__title--featured">
-            {product.product_name}
-          </p>
-          {/* Price */}
-          {hasPriceRange ? (
-            showComparePrice ? (
-              <div className="product-card__price-row product-card__price-row--featured">
-                <p className="product-card__price product-card__price--featured">
-                  {formatPrice(product.min_price ?? null)}
-                </p>
-                <p className="product-card__msrp product-card__msrp--featured">
-                  {formatPrice(compareAtDisplay ?? null)}
-                </p>
-              </div>
-            ) : (
-              <p className="product-card__price product-card__price--featured">
-                {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
+          <div className="product-card__overlay product-card__overlay--featured">
+            <div className="product-card__body product-card__body--featured">
+              <p className="product-card__title product-card__title--featured">
+                {product.product_name}
               </p>
-            )
-          ) : (
-            <p className="product-card__price product-card__price--featured">
-              Price on request
-            </p>
-          )}
-          <button
-            type="button"
-            onClick={(event) => {
-              if (!selectedUnit?.id) return;
-              handleAddToCart(event, 1);
-            }}
-            disabled={!canAddToCart}
-            className="product-card__cta product-card__cta--featured"
-            aria-label="Add to cart"
-          >
-            {isAddingToCart ? 'Adding...' : 'Add to cart'}
-          </button>
+              {/* Price */}
+              {hasPriceRange ? (
+                showComparePrice ? (
+                  <div className="product-card__price-row product-card__price-row--featured">
+                    <p className="product-card__price product-card__price--featured">
+                      {formatPrice(product.min_price ?? null)}
+                    </p>
+                    <p className="product-card__msrp product-card__msrp--featured">
+                      {formatPrice(compareAtDisplay ?? null)}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="product-card__price product-card__price--featured">
+                    {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
+                  </p>
+                )
+              ) : (
+                <p className="product-card__price product-card__price--featured">
+                  Price on request
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={(event) => {
+                  if (!selectedUnit?.id) return;
+                  handleAddToCart(event, 1);
+                }}
+                disabled={!canAddToCart}
+                className="product-card__cta product-card__cta--featured"
+                aria-label="Add to cart"
+              >
+                {isAddingToCart ? 'Adding...' : 'Add to cart'}
+              </button>
+            </div>
+          </div>
         </div>
       </Link>
     );

@@ -49,7 +49,7 @@ export function CategoriesPage() {
             href={category.href}
             className="categories-page__card"
           >
-           <Image src={category.icon} width={500} height={500} alt="Picture of the author"/>
+           <Image src="/profile.png" width={500} height={500} className='categories-page__card-icon' alt="smartphone picture"/>
             <h2 className="categories-page__card-title">{category.name}</h2>
             <p className="categories-page__card-description">{category.description}</p>
           </Link>

@@ -21,40 +21,44 @@
 }
 
 .categories-page__card {
-  display: block;
-  background: var(--ui-white);
-  border-radius: 12px;
-  box-shadow: 0 1px 2px var(--ui-black-05);
-  transition: box-shadow 200ms;
-  overflow: hidden;
-  padding: 0px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;   /* This stacks image on top, text on bottom */
+  align-items: center;      /* Centers everything horizontally */
+  background-color: #f5f5f7; /* The light gray background from Back Market */
+  border-radius: 16px;
   text-decoration: none;
-  color: inherit;
-  max-height: 230px;
+  color: #000000;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;      /* Keeps the cards square */
+  padding: 24px 16px;       /* Adds breathing room inside the card */
+  transition: transform 0.2s ease;
 }
 
 .categories-page__card:hover {
-  box-shadow: 0 6px 16px var(--ui-black-12);
+  transform: translateY(-4px); /* Simple lift effect */
 }
 
-.categories-page__card-icon {
-  font-size: 3.75rem;
-  margin-bottom: 16px;
+/* --- THE IMAGE --- */
+.categories-page__card img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 80% !important;  /* Keeps the image from touching the edges */
+  max-height: 70% !important; /* Leaves space for the text below */
+  object-fit: contain;        /* Ensures your ASTER/PALSAR images aren't cropped */
+  display: block;
+  margin-bottom: 12px;        /* The gap between image and text */
 }
 
+/* --- THE TEXT BELOW --- */
 .categories-page__card-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 0px;
-  padding: 1px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #000000;
+  text-align: center;
+  margin: 0;
+  padding: 0;
 }
 
-.categories-page__card-description {
-  color: var(--ui-gray-600);
-  font-size: 12px;
-  margin-bottom: 3px;
-}
 
 .categories-page__sections {
   display: grid;

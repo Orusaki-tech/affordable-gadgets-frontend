@@ -1,3 +1,4 @@
+/* --- Global & Typography --- */
 .section-label {
   font-size: 25px;
   line-height: 1.2;
@@ -13,49 +14,87 @@
   margin-bottom: 32px;
 }
 
-.categories-page__grid {
+/* --- The Grid --- */
+.categories-page__grid,
+.categories-page__products {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
   margin-bottom: 48px;
 }
 
+/* --- The Card Component --- */
 .categories-page__card {
+  position: relative; 
   display: block;
   background: var(--ui-white);
   border-radius: 12px;
   box-shadow: 0 1px 2px var(--ui-black-05);
-  transition: box-shadow 200ms;
+  transition: box-shadow 300ms ease, transform 300ms ease;
   overflow: hidden;
-  padding: 0px;
-  text-align: center;
+  padding: 0;
   text-decoration: none;
   color: inherit;
-  max-height: 230px;
+  
+  /* Use aspect-ratio for a perfect square; height 230px acts as the floor */
+  aspect-ratio: 1 / 1;
+  min-height: 230px; 
 }
 
+/* Hover effect for the card container */
 .categories-page__card:hover {
   box-shadow: 0 6px 16px var(--ui-black-12);
 }
 
-.categories-page__card-icon {
-  font-size: 3.75rem;
-  margin-bottom: 16px;
+/* --- Image Handling --- */
+.categories-page__card img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover; /* Ensures geospatial data isn't distorted */
+  display: block;
+  transition: transform 0.5s ease;
 }
 
+/* Subtle zoom effect on the dataset image when hovering */
+.categories-page__card:hover img {
+  transform: scale(1.05);
+}
+
+/* --- Title Overlay (Hover Only) --- */
 .categories-page__card-title {
-  font-size: 20px;
+  position: absolute;
+  bottom: 2px; /* Fixed 2px from bottom */
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 12px 8px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 70%, transparent 100%);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  font-size: 18px;
   font-weight: 600;
-  margin-bottom: 0px;
-  padding: 1px;
+  text-align: center;
+  z-index: 2;
+  
+  /* Initial state: Hidden and slightly shifted down */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.categories-page__card-description {
-  color: var(--ui-gray-600);
-  font-size: 12px;
-  margin-bottom: 3px;
+/* Reveal Title on Hover */
+.categories-page__card:hover .categories-page__card-title {
+  opacity: 1;
+  transform: translateY(0);
 }
 
+/* --- Hidden Elements (Per Request) --- */
+.categories-page__card-description,
+.categories-page__card-icon {
+  display: none;
+}
+
+/* --- Page Sections --- */
 .categories-page__sections {
   display: grid;
   gap: 48px;
@@ -92,12 +131,7 @@
   color: var(--primary-dark);
 }
 
-.categories-page__products {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-}
-
+/* --- Loading State --- */
 .categories-page__skeleton {
   background: var(--ui-gray-200);
   border-radius: 12px;
@@ -105,6 +139,9 @@
   animation: categories-page-pulse 1.6s ease-in-out infinite;
 }
 
+/* --- Responsive Breakpoints --- */
+
+/* Tablet / Large Phone */
 @media (min-width: 640px) {
   .categories-page__grid,
   .categories-page__products {
@@ -112,6 +149,7 @@
   }
 }
 
+/* Desktop */
 @media (min-width: 1024px) {
   .categories-page__grid,
   .categories-page__products {
@@ -119,30 +157,21 @@
   }
 }
 
+/* Dynamic Font Sizing for Labels */
 @media (min-width: 768px) and (max-width: 1024px) {
-  .section-label {
-    font-size: 28px;
-  }
+  .section-label { font-size: 28px; }
 }
 
 @media (min-width: 1025px) and (max-width: 1440px) {
-  .section-label {
-    font-size: 32px;
-  }
+  .section-label { font-size: 32px; }
 }
 
 @media (min-width: 1441px) {
-  .section-label {
-    font-size: 64px;
-  }
+  .section-label { font-size: 64px; }
 }
 
+/* Animations */
 @keyframes categories-page-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }

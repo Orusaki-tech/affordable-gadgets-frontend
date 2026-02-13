@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from './ProductCard';
+import Image from 'next/image'
 
 const categories = [
   {
@@ -48,7 +49,7 @@ export function CategoriesPage() {
             href={category.href}
             className="categories-page__card"
           >
-            <image className="categories-page__card-icon" href={category.icon}></image>
+           <Image src={category.icon} width={500} height={500} alt="Picture of the author"/>
             <h2 className="categories-page__card-title">{category.name}</h2>
             <p className="categories-page__card-description">{category.description}</p>
           </Link>

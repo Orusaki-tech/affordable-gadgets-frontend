@@ -218,13 +218,14 @@
   left: 0;
   right: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(4px);
   z-index: 2;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
+  gap: 12px;
 }
 
 .product-card__footer-content {
@@ -232,17 +233,61 @@
   flex-direction: column;
   flex: 1;
   min-width: 0;
-  margin-right: 8px;
 }
 
 .product-card__name--featured {
   font-size: 12px;
   font-weight: 700;
   color: var(--ui-gray-900);
-  margin: 0 0 4px 0;
+  margin: 0 0 8px 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.product-card__storage-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 0;
+}
+
+.product-card__storage-option {
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  border: 1px solid var(--ui-gray-300);
+  border-radius: 4px;
+  background: var(--ui-white);
+  color: var(--ui-gray-700);
+  cursor: pointer;
+  transition: all 200ms;
+  white-space: nowrap;
+}
+
+.product-card__storage-option:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--ui-gray-50);
+}
+
+.product-card__storage-option--active {
+  border-color: var(--primary-dark);
+  background: var(--primary-dark);
+  color: var(--ui-white);
+}
+
+.product-card__storage-option--active:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.product-card__footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .product-card__cart-icon--featured {
@@ -568,24 +613,12 @@
 
 /* Featured variant price styling */
 .product-card__price--featured {
-  text-align: left;
+  text-align: right;
   margin: 0;
   color: var(--ui-gray-900);
-  font-weight: 600;
-  font-size: 12px;
-}
-
-.product-card__price-row--featured {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-}
-
-.product-card__msrp--featured {
-  font-size: 10px;
-  color: var(--ui-gray-500);
-  text-decoration: line-through;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .product-card__quick-add {

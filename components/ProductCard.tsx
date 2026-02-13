@@ -111,6 +111,31 @@ export function ProductCard({
     return colors;
   }, [units]);
 
+  // Group units by storage and find lowest price for each storage option
+  const storageOptions = useMemo(() => {
+    const storageMap = new Map<number, { storage: number; price: number; unitId: number }>();
+    
+    units.forEach((unit) => {
+      const storage = unit.storage_gb;
+      if (storage !== null && storage !== undefined) {
+        const price = parseFloat(unit.selling_price || '0');
+        const existing = storageMap.get(storage);
+        
+        if (!existing || price < existing.price) {
+          storageMap.set(storage, {
+            storage,
+            price,
+            unitId: unit.id ?? 0,
+          });
+        }
+      }
+    });
+    
+    return Array.from(storageMap.values()).sort((a, b) => a.storage - b.storage);
+  }, [units]);
+
+  const [selectedStorage, setSelectedStorage] = useState<number | null>(null);
+
   const secondaryImage = useMemo(() => {
     const primaryImage = product.primary_image;
     const unitImages = units.flatMap((unit) => (unit.images ?? []) as InventoryUnitImage[]);
@@ -129,11 +154,27 @@ export function ProductCard({
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
+  // Auto-select first storage option on load
   useEffect(() => {
-    if (!selectedUnitId && units.length > 0) {
+    if (storageOptions.length > 1 && selectedStorage === null) {
+      const firstStorage = storageOptions[0];
+      setSelectedStorage(firstStorage.storage);
+      setSelectedUnitId(firstStorage.unitId);
+    } else if (storageOptions.length <= 1 && !selectedUnitId && units.length > 0) {
+      // If no storage options or only one, select first available unit
       setSelectedUnitId(units[0]?.id ?? null);
     }
-  }, [selectedUnitId, units]);
+  }, [storageOptions, selectedStorage, selectedUnitId, units]);
+
+  // Update selected unit when storage changes
+  useEffect(() => {
+    if (selectedStorage !== null && storageOptions.length > 1) {
+      const storageOption = storageOptions.find((opt) => opt.storage === selectedStorage);
+      if (storageOption) {
+        setSelectedUnitId(storageOption.unitId);
+      }
+    }
+  }, [selectedStorage, storageOptions]);
 
   const selectedUnit = units.find((unit) => unit.id === selectedUnitId);
 
@@ -223,50 +264,68 @@ export function ProductCard({
             className="product-card__image product-card__image--primary product-card__image--featured"
             unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
           />
-          {/* Always visible product name, price and cart icon */}
+          {/* Always visible product name, storage options, price and cart icon */}
           <div className="product-card__footer product-card__footer--featured">
             <div className="product-card__footer-content">
               <p className="product-card__name product-card__name--featured">
                 {product.product_name}
               </p>
-              {/* Price */}
-              {hasPriceRange ? (
-                showComparePrice ? (
-                  <div className="product-card__price-row product-card__price-row--featured">
-                    <p className="product-card__price product-card__price--featured">
-                      {formatPrice(product.min_price ?? null)}
-                    </p>
-                    <p className="product-card__msrp product-card__msrp--featured">
-                      {formatPrice(compareAtDisplay ?? null)}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="product-card__price product-card__price--featured">
-                    {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
-                  </p>
-                )
+              {/* Storage Options */}
+              {storageOptions.length > 1 && (
+                <div className="product-card__storage-options">
+                  {storageOptions.map((option) => (
+                    <button
+                      key={option.storage}
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setSelectedStorage(option.storage);
+                      }}
+                      className={`product-card__storage-option ${
+                        selectedStorage === option.storage
+                          ? 'product-card__storage-option--active'
+                          : ''
+                      }`}
+                    >
+                      {option.storage}GB
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="product-card__footer-right">
+              {/* Price - above cart icon */}
+              {selectedUnit && selectedUnit.selling_price ? (
+                <p className="product-card__price product-card__price--featured">
+                  {formatPrice(parseFloat(selectedUnit.selling_price))}
+                </p>
+              ) : hasPriceRange ? (
+                <p className="product-card__price product-card__price--featured">
+                  {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
+                </p>
               ) : (
                 <p className="product-card__price product-card__price--featured">
                   Price on request
                 </p>
               )}
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (!selectedUnit?.id) return;
+                  handleAddToCart(event, 1);
+                }}
+                disabled={!canAddToCart || isAddingToCart}
+                className="product-card__cart-icon product-card__cart-icon--featured"
+                aria-label="Add to cart"
+              >
+                <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                </svg>
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (!selectedUnit?.id) return;
-                handleAddToCart(event, 1);
-              }}
-              disabled={!canAddToCart || isAddingToCart}
-              className="product-card__cart-icon product-card__cart-icon--featured"
-              aria-label="Add to cart"
-            >
-              <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-              </svg>
-            </button>
           </div>
         </div>
       </Link>

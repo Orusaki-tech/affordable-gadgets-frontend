@@ -112,17 +112,17 @@
   grid-template-rows: 1fr auto;
   overflow: hidden;
   position: relative;
-  width: min(370px, calc(100vw - 32px));
-  height: min(370px, calc(100vw - 32px));
+  width: min(330px, calc(100vw - 32px));
+  height: min(330px, calc(100vw - 32px));
   flex-shrink: 0;
 }
 
-/* Desktop: fixed 370×370 card, 283×283 image area */
+/* Desktop: fixed 330×330 card, 250×250 image area */
 @media (min-width: 640px) {
   .product-card--featured {
-    width: 370px;
-    height: 370px;
-    grid-template-rows: 283px auto;
+    width: 330px;
+    height: 330px;
+    grid-template-rows: 250px auto;
   }
 }
 
@@ -183,8 +183,8 @@
 
 @media (min-width: 640px) {
   .product-card__media--featured {
-    width: 283px;
-    height: 283px;
+    width: 250px;
+    height: 250px;
     justify-self: center;
   }
 }

@@ -302,6 +302,14 @@
   border-color: var(--primary);
 }
 
+.product-card__storage-single {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--ui-gray-700);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .product-card__footer-right {
   display: flex;
   flex-direction: column;
@@ -339,6 +347,10 @@
   
   .product-card__storage-option {
     padding: 4px 8px;
+    font-size: 10px;
+  }
+  
+  .product-card__storage-single {
     font-size: 10px;
   }
 }

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { PublicProduct, InventoryUnitImage } from '@/lib/api/generated';
 import { formatPrice, formatPriceRange } from '@/lib/utils/format';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
@@ -151,6 +151,8 @@ export function ProductCard({
   }, [units]);
 
   const [selectedStorage, setSelectedStorage] = useState<number | null>(null);
+  const [showSingleStorageOnly, setShowSingleStorageOnly] = useState(false);
+  const featuredNameRef = useRef<HTMLParagraphElement | null>(null);
 
   const secondaryImage = useMemo(() => {
     const primaryImage = product.primary_image;
@@ -191,6 +193,20 @@ export function ProductCard({
       }
     }
   }, [selectedStorage, storageOptions]);
+
+  // When featured card name wraps to multiple lines, show only one storage option
+  useLayoutEffect(() => {
+    if (!isFeaturedVariant || !featuredNameRef.current) return;
+    const el = featuredNameRef.current;
+    const check = () => {
+      const rects = el.getClientRects();
+      setShowSingleStorageOnly(rects.length > 1);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [isFeaturedVariant, product.product_name, storageOptions.length]);
 
   const selectedUnit = units.find((unit) => unit.id === selectedUnitId);
 
@@ -281,66 +297,154 @@ export function ProductCard({
             unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
           />
         </div>
-        {/* Footer as direct grid child so it stays at bottom (grid-row: 2) */}
+        {/* Footer: row1 = name + storage, row2 = price + cart; 8px padding; expanded on hover */}
         <div className="product-card__footer product-card__footer--featured">
-          <div className="product-card__footer-top">
-            <p className="product-card__name product-card__name--featured">
+          <div className="product-card__footer-default">
+            <p
+              ref={featuredNameRef}
+              className="product-card__name product-card__name--featured"
+            >
               {product.product_name}
             </p>
-            <div className="product-card__footer-right">
-              {selectedUnit && selectedUnit.selling_price ? (
-                <p className="product-card__price product-card__price--featured">
-                  {formatPrice(parseFloat(selectedUnit.selling_price))}
-                </p>
-              ) : hasPriceRange ? (
-                <p className="product-card__price product-card__price--featured">
-                  {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
-                </p>
-              ) : (
-                <p className="product-card__price product-card__price--featured">
-                  Price on request
-                </p>
-              )}
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  if (!selectedUnit?.id) return;
-                  handleAddToCart(event, 1);
-                }}
-                disabled={!canAddToCart || isAddingToCart}
-                className="product-card__cart-icon product-card__cart-icon--featured"
-                aria-label="Add to cart"
-              >
-                <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          {storageOptions.length > 1 && (
-            <div className="product-card__storage-options">
-              {storageOptions.map((option) => (
+            {storageOptions.length >= 1 && (
+              <div className="product-card__footer-right product-card__footer-right--featured">
+                <div className="product-card__storage-options product-card__storage-options--featured">
+                  {showSingleStorageOnly ? (
+                    storageOptions.length > 0 && (
+                      <span className="product-card__storage-single">
+                        {storageOptions[0].storage}GB
+                      </span>
+                    )
+                  ) : storageOptions.length > 1 ? (
+                    storageOptions.map((option) => (
+                      <button
+                        key={option.storage}
+                        type="button"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          setSelectedStorage(option.storage);
+                        }}
+                        className={`product-card__storage-option ${
+                          selectedStorage === option.storage
+                            ? 'product-card__storage-option--active'
+                            : ''
+                        }`}
+                      >
+                        {option.storage}GB
+                      </button>
+                    ))
+                  ) : (
+                    <span className="product-card__storage-single">
+                      {storageOptions[0].storage}GB
+                    </span>
+                  )}
+                </div>
                 <button
-                  key={option.storage}
                   type="button"
                   onClick={(event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    setSelectedStorage(option.storage);
+                    if (!selectedUnit?.id) return;
+                    handleAddToCart(event, 1);
                   }}
-                  className={`product-card__storage-option ${
-                    selectedStorage === option.storage
-                      ? 'product-card__storage-option--active'
-                      : ''
-                  }`}
+                  disabled={!canAddToCart || isAddingToCart}
+                  className="product-card__cart-icon product-card__cart-icon--featured"
+                  aria-label="Add to cart"
                 >
-                  {option.storage}GB
+                  <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                  </svg>
                 </button>
-              ))}
+              </div>
+            )}
+            {storageOptions.length < 1 && (
+              <div className="product-card__footer-right product-card__footer-right--featured">
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (!selectedUnit?.id) return;
+                    handleAddToCart(event, 1);
+                  }}
+                  disabled={!canAddToCart || isAddingToCart}
+                  className="product-card__cart-icon product-card__cart-icon--featured"
+                  aria-label="Add to cart"
+                >
+                  <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                  </svg>
+                </button>
+              </div>
+            )}
+            <p className="product-card__price product-card__price--featured product-card__price--featured-row">
+              {selectedUnit && selectedUnit.selling_price ? (
+                formatPrice(parseFloat(selectedUnit.selling_price))
+              ) : hasPriceRange ? (
+                formatPriceRange(product.min_price ?? null, product.max_price ?? null)
+              ) : (
+                'Price on request'
+              )}
+            </p>
+          </div>
+          <div className="product-card__footer-expanded">
+            {showRatings && (
+              <div className="product-card__footer-rating">
+                <RatingStars rating={averageRating} count={reviewCount} />
+              </div>
+            )}
+            <p className="product-card__footer-from-price">
+              From {selectedUnit && selectedUnit.selling_price
+                ? formatPrice(parseFloat(selectedUnit.selling_price))
+                : hasPriceRange
+                  ? formatPrice(product.min_price ?? null)
+                  : 'Price on request'}
+            </p>
+            {storageOptions.length > 1 && (
+              <div className="product-card__storage-options product-card__storage-options--expanded">
+                {storageOptions.map((option) => (
+                  <button
+                    key={option.storage}
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setSelectedStorage(option.storage);
+                    }}
+                    className={`product-card__storage-option ${
+                      selectedStorage === option.storage
+                        ? 'product-card__storage-option--active'
+                        : ''
+                    }`}
+                  >
+                    {option.storage}GB
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!selectedUnit?.id) return;
+                handleAddToCart(event, 1);
+              }}
+              disabled={!canAddToCart || isAddingToCart}
+              className="product-card__cta product-card__cta--featured-full"
+            >
+              <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+              </svg>
+              Add to Cart
+            </button>
+            <div className="product-card__payment-methods">
+              <span className="product-card__payment-label">VISA</span>
+              <span className="product-card__payment-label">M-Pesa</span>
+              <span className="product-card__payment-label">PayPal</span>
             </div>
-          )}
+          </div>
         </div>
       </Link>
     );

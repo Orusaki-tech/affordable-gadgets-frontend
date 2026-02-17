@@ -237,14 +237,6 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
             </div>
           ) : (
             <>
-              <p className="products-page__summary">
-                Showing {filteredResults.length} of {data.count} product{data.count !== 1 ? 's' : ''}
-                {promotionId && promotionData && (
-                  <span className="products-page__summary-note">
-                    (filtered by promotion: {promotionData.title})
-                  </span>
-                )}
-              </p>
               <div className="products-page__grid">
                 {filteredResults.map((product) => (
                   <ProductCard key={product.id} product={product} {...cardOptions} />

@@ -176,8 +176,8 @@
 @media (min-width: 1024px) {
   .products-page__layout {
     display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 32px;
+    grid-template-columns: 240px 1fr;
+    gap: 10px;
   }
 
   .products-page__filters {

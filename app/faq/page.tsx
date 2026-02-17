@@ -1,10 +1,10 @@
-import { Header } from '@/components/Header';
+import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 
 export default function FaqPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Header />
+      <HeaderWithAnnouncement />
       <main className="flex-1 container mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold mb-4">FAQs</h1>
         <div className="space-y-4 text-gray-700">

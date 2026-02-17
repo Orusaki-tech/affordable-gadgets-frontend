@@ -1,7 +1,7 @@
 'use client';
 
 import { PaymentPage } from '@/components/PaymentPage';
-import { Header } from '@/components/Header';
+import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { use } from 'react';
 
@@ -23,7 +23,7 @@ export default function PaymentRoute({ params, searchParams }: PaymentPageProps)
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <HeaderWithAnnouncement />
       <main className="flex-1">
         <PaymentPage 
           orderId={orderId} 

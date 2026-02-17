@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Header } from '@/components/Header';
+import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import Link from 'next/link';
 
@@ -61,7 +61,7 @@ function PaymentCancelledContent() {
 export default function PaymentCancelledPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <HeaderWithAnnouncement />
       <Suspense fallback={
         <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">

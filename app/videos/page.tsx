@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Header } from '@/components/Header';
+import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { StoriesCarousel } from '@/components/StoriesCarousel';
 import { ProductVideosSection } from '@/components/ProductVideosSection';
@@ -9,7 +9,7 @@ import { ReviewsShowcase } from '@/components/ReviewsShowcase';
 export default function VideosPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <HeaderWithAnnouncement />
       
       <main className="flex-1">
         {/* Stories Carousel */}

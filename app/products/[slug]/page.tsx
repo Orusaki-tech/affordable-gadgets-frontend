@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { ProductDetail } from '@/components/ProductDetail';
-import { Header } from '@/components/Header';
+import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { ApiService } from '@/lib/api/generated';
 import { brandConfig } from '@/lib/config/brand';
@@ -101,7 +101,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
+      <HeaderWithAnnouncement />
       <main className="flex-1 py-8">
         <Suspense fallback={
           <div className="container mx-auto px-4">

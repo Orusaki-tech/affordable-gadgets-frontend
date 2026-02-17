@@ -1,4 +1,4 @@
-import { Header } from '@/components/Header';
+import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { StoriesCarousel } from '@/components/StoriesCarousel';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -8,7 +8,7 @@ import { ReviewsShowcase } from '@/components/ReviewsShowcase';
 export default function ReviewsPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <HeaderWithAnnouncement />
       
       <main className="flex-1">
         {/* Stories Carousel */}

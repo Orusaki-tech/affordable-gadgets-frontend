@@ -1,4 +1,4 @@
-import { Header } from '@/components/Header';
+import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { HeroPromotions } from '@/components/HeroPromotions';
 import { SpecialOffersServer } from '@/components/SpecialOffersServer';
@@ -15,7 +15,7 @@ export const revalidate = 0;
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 via-white to-gray-50">
-      <Header />
+      <HeaderWithAnnouncement />
       
       <main className="flex-1">
         {/* Promotions */}

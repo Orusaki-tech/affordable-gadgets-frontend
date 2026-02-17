@@ -1,12 +1,12 @@
 import { Suspense } from 'react';
-import { Header } from '@/components/Header';
+import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { VerifyEmailClient } from './verify-email-client';
 
 export default function VerifyEmailPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
+      <HeaderWithAnnouncement />
       <main className="flex-1 container mx-auto px-4 py-16">
         <Suspense
           fallback={

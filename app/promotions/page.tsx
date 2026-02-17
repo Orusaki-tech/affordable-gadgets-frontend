@@ -1,4 +1,4 @@
-import { Header } from '@/components/Header';
+import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { StoriesCarousel } from '@/components/StoriesCarousel';
 import { ProductGrid } from '@/components/ProductGrid';
@@ -19,7 +19,7 @@ export default async function PromotionsPage({ searchParams }: PromotionsPagePro
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <HeaderWithAnnouncement />
       <main className="flex-1">
         {/* Stories Carousel */}
         <section className="container mx-auto px-4 py-6">

@@ -1,8 +1,9 @@
 /* Announcement bar – sits above site header. Aligns with header: delivery above logo, trade in above cart/menu. */
 
+/* Match collection header banner placeholder color (gray) */
 .announcement-bar {
-  background-color: var(--primary-dark);
-  color: var(--ui-white);
+  background-color: var(--gray-200);
+  color: var(--foreground);
   width: 100%;
   min-height: 40px;
   box-sizing: border-box;
@@ -23,6 +24,19 @@
   gap: 16px;
 }
 
+/* Left: margin from container edge (country wide delivery icon) */
+.announcement-bar__bar > .announcement-bar__item:first-child {
+  margin-left: 50px;
+}
+
+/* Right: margin from container edge (trade in) */
+.announcement-bar__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 50px;
+}
+
 .announcement-bar__item {
   display: inline-flex;
   align-items: center;
@@ -34,7 +48,7 @@
 
 .announcement-bar__item-icon {
   flex-shrink: 0;
-  color: var(--ui-emerald-200);
+  color: var(--ui-emerald-600);
 }
 
 .announcement-bar__item-text {
@@ -52,19 +66,14 @@
 }
 
 .announcement-bar__item--link .announcement-bar__item-icon {
-  color: var(--ui-emerald-200);
+  color: var(--ui-emerald-600);
 }
 
-.announcement-bar__right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
 .announcement-bar__close {
   background: none;
   border: none;
-  color: var(--ui-gray-400);
+  color: var(--ui-gray-500);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -75,8 +84,8 @@
 }
 
 .announcement-bar__close:hover {
-  color: var(--ui-white);
-  background-color: var(--ui-black-20);
+  color: var(--foreground);
+  background-color: var(--ui-black-10);
 }
 
 .announcement-bar__close:focus-visible {

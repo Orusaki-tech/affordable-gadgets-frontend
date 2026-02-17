@@ -8,6 +8,7 @@ import {
   CategoriesSectionClient,
   RecentlyViewedClient,
 } from '@/components/HomeSectionsClient';
+import { CollectionHeaderBanner } from '@/components/CollectionHeaderBanner';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -36,6 +37,11 @@ export default function HomePage() {
             <SpecialOffersServer pageSize={12} />
           </div>
         </section>
+
+        {/* Collection header banner – static image above Featured Products. Add image at public/images/banners/featured-banner.jpg and set src to show it. */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-5">
+          <CollectionHeaderBanner alt="Featured products" />
+        </div>
 
         {/* Featured Products */}
         <section id="featured-products" className="bg-gradient-to-b from-gray-50 to-white scroll-mt-20">

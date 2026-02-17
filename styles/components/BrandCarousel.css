@@ -1,8 +1,12 @@
 /* Brand carousel – 120×70px logos, continuous scroll (last item followed by first). */
-
+/* Viewport width = one full set (5 items) so no item is ever cut off at the edges. */
+/* One set = 5×120px + 4×16px gap = 664px */
 .brand-carousel {
   overflow: hidden;
   width: 100%;
+  max-width: 664px; /* exactly one set: 5 items + 4 gaps */
+  margin-left: auto;
+  margin-right: auto;
   height: 86px; /* 70px items + padding; keeps section visible */
 }
 

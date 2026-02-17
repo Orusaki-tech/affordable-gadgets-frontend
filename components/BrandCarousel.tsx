@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 /**
  * Edit this list before pushing: set href and optionally image (path to logo).
- * Each item is a 70×120px rectangle in the carousel.
+ * Each item is a 120×70px rectangle in the carousel.
  * Order: last item is followed by the first (seamless loop).
  */
 const BRAND_ITEMS: { href: string; image?: string; label?: string }[] = [
@@ -31,15 +31,15 @@ export function BrandCarousel() {
             key={index}
             href={item.href}
             className="brand-carousel__item"
-            style={{ width: 70, height: 120, minWidth: 70, minHeight: 120 }}
+            style={{ width: 120, height: 70, minWidth: 120, minHeight: 70 }}
             aria-label={item.label ?? `Brand ${index + 1}`}
           >
             {item.image ? (
               <img
                 src={item.image}
                 alt=""
-                width={70}
-                height={120}
+                width={120}
+                height={70}
                 className="brand-carousel__image"
               />
             ) : (

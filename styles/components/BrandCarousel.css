@@ -1,9 +1,9 @@
-/* Brand carousel – 70×120px logos, continuous scroll (last item followed by first). */
+/* Brand carousel – 120×70px logos, continuous scroll (last item followed by first). */
 
 .brand-carousel {
   overflow: hidden;
   width: 100%;
-  height: 136px; /* 120px items + padding; keeps section visible */
+  height: 86px; /* 70px items + padding; keeps section visible */
 }
 
 .brand-carousel__track {
@@ -12,7 +12,7 @@
   align-items: center;
   gap: 16px;
   width: max-content;
-  height: 120px;
+  height: 70px;
   animation: brand-carousel-scroll 30s linear infinite;
 }
 
@@ -22,10 +22,10 @@
 
 .brand-carousel__item {
   flex-shrink: 0 !important;
-  width: 70px !important;
-  min-width: 70px !important;
-  height: 120px !important;
-  min-height: 120px !important;
+  width: 120px !important;
+  min-width: 120px !important;
+  height: 70px !important;
+  min-height: 70px !important;
   display: flex !important;
   align-items: center;
   justify-content: center;

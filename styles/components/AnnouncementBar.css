@@ -1,34 +1,35 @@
-/* Announcement bar – sits above site header. Uses design tokens from base.css */
+/* Announcement bar – sits above site header. Aligns with header: delivery above logo, trade in above cart/menu. */
 
 .announcement-bar {
   background-color: var(--primary-dark);
   color: var(--ui-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
-  position: relative;
   width: 100%;
   min-height: 40px;
   box-sizing: border-box;
 }
 
-.announcement-bar__content {
+/* Same container as site-header for vertical alignment */
+.announcement-bar__container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  width: 100%;
+}
+
+.announcement-bar__bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0.02em;
-  padding-inline-end: 40px;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .announcement-bar__item {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 .announcement-bar__item-icon {
@@ -54,18 +55,13 @@
   color: var(--ui-emerald-200);
 }
 
-.announcement-bar__divider {
-  width: 1px;
-  height: 14px;
-  background-color: var(--ui-white-40);
-  flex-shrink: 0;
+.announcement-bar__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .announcement-bar__close {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
   background: none;
   border: none;
   color: var(--ui-gray-400);
@@ -96,18 +92,16 @@
 }
 
 @media (max-width: 640px) {
-  .announcement-bar__content {
+  .announcement-bar__container {
+    padding: 8px 16px;
+  }
+
+  .announcement-bar__item {
     font-size: 12px;
-    gap: 10px 16px;
-    padding-inline-end: 36px;
   }
 
   .announcement-bar__item-icon {
     width: 14px;
     height: 14px;
-  }
-
-  .announcement-bar__divider {
-    height: 12px;
   }
 }

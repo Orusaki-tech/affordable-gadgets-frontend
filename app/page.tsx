@@ -75,7 +75,7 @@ export default function HomePage() {
         </section>
 
         {/* Brand carousel – above Shop by Category (120×70px, last item followed by first) */}
-        <section id="brands" className="bg-white scroll-mt-20" style={{ minHeight: '120px' }}>
+        <section id="brands" className="bg-gray-800 scroll-mt-20" style={{ minHeight: '120px' }}>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <BrandCarousel />
           </div>

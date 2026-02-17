@@ -8,23 +8,29 @@ const normalizeApiBaseUrl = (url: string | undefined): string => {
   if (!url || url.trim() === '') {
     return 'http://localhost:8000';
   }
-  
+
   let normalized = url.trim();
-  
+
   // Remove trailing slashes
   normalized = normalized.replace(/\/+$/, '');
-  
+
   // Fix protocol-relative URLs (starting with //)
+  // Use http for localhost/127.0.0.1 so Django dev server (HTTP-only) works
   if (normalized.startsWith('//')) {
-    normalized = 'https:' + normalized;
+    const hostPart = normalized.slice(2);
+    const isLocal =
+      hostPart.startsWith('localhost') ||
+      hostPart.startsWith('127.0.0.1') ||
+      /^\[::1\]/.test(hostPart);
+    normalized = isLocal ? 'http:' + normalized : 'https:' + normalized;
   }
-  
+
   // If it's a relative URL (starts with / but not http), it's invalid for API calls
   // Return default in this case
   if (normalized.startsWith('/') && !normalized.startsWith('http')) {
     return 'http://localhost:8000';
   }
-  
+
   return normalized;
 };
 

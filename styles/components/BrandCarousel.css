@@ -1,0 +1,67 @@
+/* Brand carousel – 50×100px logos, continuous left-to-right scroll. */
+
+.brand-carousel {
+  overflow: hidden;
+  width: 100%;
+  height: 116px; /* 100px items + padding; keeps section visible */
+}
+
+.brand-carousel__track {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: max-content;
+  height: 100px;
+  animation: brand-carousel-scroll 30s linear infinite;
+}
+
+.brand-carousel__track:hover {
+  animation-play-state: paused;
+}
+
+.brand-carousel__item {
+  flex-shrink: 0 !important;
+  width: 50px !important;
+  min-width: 50px !important;
+  height: 100px !important;
+  min-height: 100px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: var(--ui-gray-200);
+  border: 1px solid var(--ui-gray-300);
+  border-radius: 6px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  box-sizing: border-box;
+}
+
+.brand-carousel__item:hover {
+  background: var(--ui-gray-200);
+  transform: scale(1.05);
+}
+
+.brand-carousel__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.brand-carousel__placeholder {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-500);
+}
+
+@keyframes brand-carousel-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

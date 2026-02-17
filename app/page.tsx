@@ -9,6 +9,7 @@ import {
   RecentlyViewedClient,
 } from '@/components/HomeSectionsClient';
 import { CollectionHeaderBanner } from '@/components/CollectionHeaderBanner';
+import { BrandCarousel } from '@/components/BrandCarousel';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -70,6 +71,13 @@ export default function HomePage() {
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Real reviews from real customers</p>
             </div>
             <ReviewsShowcaseClient />
+          </div>
+        </section>
+
+        {/* Brand carousel – above Shop by Category (50×100px rectangles) */}
+        <section id="brands" className="bg-white scroll-mt-20" style={{ minHeight: '120px' }}>
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <BrandCarousel />
           </div>
         </section>
 

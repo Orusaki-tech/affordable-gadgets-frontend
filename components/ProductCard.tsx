@@ -402,6 +402,11 @@ export function ProductCard({
                 {cartIconSvg}
               </button>
             </div>
+            <div className="product-card__payment-methods product-card__payment-methods--overlay">
+              <span className="product-card__payment-label">VISA</span>
+              <span className="product-card__payment-label">M-Pesa</span>
+              <span className="product-card__payment-label">PayPal</span>
+            </div>
           </div>
         </div>
       </Link>

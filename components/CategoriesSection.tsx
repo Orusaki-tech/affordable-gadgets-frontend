@@ -16,7 +16,7 @@ const categories = [
     image: '/categories/laptops.jpg',
   },
   {
-    name: 'Tablets',
+    name: 'Tablets/Ipads',
     href: '/products?type=TB',
     description: 'Portable tablets',
     image: '/categories/tablets.jpg',

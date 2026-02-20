@@ -266,7 +266,7 @@ export function ProductCard({
   const productTypeLabels: Record<string, string> = {
     PH: 'Phone',
     LT: 'Laptop',
-    TB: 'Tablet',
+    TB: 'Tablets/Ipads',
     AC: 'Accessory',
   };
   const productTypeLabel = product.product_type ? productTypeLabels[product.product_type] : null;

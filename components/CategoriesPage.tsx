@@ -20,7 +20,7 @@ const categories = [
     href: '/products?type=LT',
   },
   {
-    name: 'Tablets',
+    name: 'Tablets/Ipads',
     code: 'TB',
     description: 'Portable tablets for productivity',
     icon: '📱',

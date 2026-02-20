@@ -5,7 +5,7 @@ import Link from 'next/link';
 const categories = [
   { name: 'Phones', href: '/products?type=PH', icon: '📱' },
   { name: 'Laptops', href: '/products?type=LT', icon: '💻' },
-  { name: 'Tablets', href: '/products?type=TB', icon: '📱' },
+  { name: 'Tablets/Ipads', href: '/products?type=TB', icon: '📱' },
   { name: 'Accessories', href: '/products?type=AC', icon: '🎧' },
 ];
 

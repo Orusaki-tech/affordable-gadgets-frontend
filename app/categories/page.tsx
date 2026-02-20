@@ -5,7 +5,7 @@ import { CategoriesPage } from '@/components/CategoriesPage';
 
 export const metadata: Metadata = {
   title: 'Categories',
-  description: 'Browse products by category - Phones, Laptops, Tablets, and Accessories',
+  description: 'Browse products by category - Phones, Laptops, Tablets/Ipads, and Accessories',
 };
 
 export default function Categories() {

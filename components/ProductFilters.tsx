@@ -29,7 +29,7 @@ const PRODUCT_TYPES = [
   { value: '', label: 'All Types' },
   { value: 'PH', label: 'Phones' },
   { value: 'LT', label: 'Laptops' },
-  { value: 'TB', label: 'Tablets' },
+  { value: 'TB', label: 'Tablets/Ipads' },
   { value: 'AC', label: 'Accessories' },
 ];
 

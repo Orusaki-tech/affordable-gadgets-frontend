@@ -104,7 +104,7 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
       : undefined,
     category: product.product_type === 'PH' ? 'Mobile Phones' 
       : product.product_type === 'LT' ? 'Laptops'
-      : product.product_type === 'TB' ? 'Tablets'
+      : product.product_type === 'TB' ? 'Tablets/Ipads'
       : product.product_type === 'AC' ? 'Accessories'
       : 'Electronics',
     productID: product.id?.toString(),

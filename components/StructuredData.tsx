@@ -96,7 +96,7 @@ export function StructuredData({ type = 'Organization', breadcrumbs }: Structure
         },
         {
           '@type': 'OfferCatalog',
-          name: 'Tablets',
+          name: 'Tablets/Ipads',
           url: `${brandConfig.siteUrl}/products?type=TB`,
         },
         {

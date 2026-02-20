@@ -27,7 +27,7 @@ export function Header() {
   const productCategories = [
     { name: 'Phones', code: 'PH' },
     { name: 'Laptops', code: 'LT' },
-    { name: 'Tablets', code: 'TB' },
+    { name: 'Tablets/Ipads', code: 'TB' },
     { name: 'Accessories', code: 'AC' },
   ];
 

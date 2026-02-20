@@ -82,9 +82,11 @@ function CategoryProducts({ category }: { category: Category }) {
     (product) => product.product_type === category.code
   );
 
+  const sectionId = category.name.toLowerCase().replace(/\s*\/\s*/g, '-');
+
   if (isLoading) {
     return (
-      <div className="categories-page__section">
+      <div id={sectionId} className="categories-page__section">
         <h2 className="categories-page__section-heading">{category.name}</h2>
         <div className="categories-page__products">
           {[...Array(4)].map((_, i) => (
@@ -100,7 +102,7 @@ function CategoryProducts({ category }: { category: Category }) {
   }
 
   return (
-    <div className="categories-page__section">
+    <div id={sectionId} className="categories-page__section">
       <div className="categories-page__section-header">
         <h2 className="categories-page__section-title section-label">{category.name}</h2>
         <Link

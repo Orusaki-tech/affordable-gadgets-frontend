@@ -57,11 +57,10 @@ export function CategoriesSection() {
               </span>
             </div>
             <div className="categories-section__content">
-              <h3 className="categories-section__title product-card-name">
+              <h3 className="categories-section__title">
                 {category.name}
               </h3>
-              <p className="categories-section__description product-card-spec">{category.description}</p>
-              <div className="categories-section__cta btn-cta product-card-cta">
+              <div className="categories-section__cta">
                 <span>Explore</span>
                 <svg className="categories-section__cta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

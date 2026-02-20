@@ -2,18 +2,18 @@
 
 /* Match collection header banner placeholder color (gray) */
 .announcement-bar {
-  background-color: var(--gray-200);
-  color: var(--foreground);
-  width: 100%;
-  min-height: 40px;
+  background-color: #121113;
+  color: #cdcdff;
   box-sizing: border-box;
+  width: 100%;
+  min-height: 20px;
 }
 
 /* Same container as site-header for vertical alignment */
 .announcement-bar__container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 8px 16px;
+  padding: 3px 16px;
   width: 100%;
 }
 
@@ -41,7 +41,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 10px;
   font-weight: 400;
   letter-spacing: 0.02em;
 }
@@ -102,11 +102,11 @@
 
 @media (max-width: 640px) {
   .announcement-bar__container {
-    padding: 8px 16px;
+    padding: 3px 16px;
   }
 
   .announcement-bar__item {
-    font-size: 12px;
+    font-size: 10px;
   }
 
   .announcement-bar__item-icon {

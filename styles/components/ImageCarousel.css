@@ -1,0 +1,43 @@
+.image-carousel {
+  width: 100%;
+}
+
+/* Match customer reviews card size: 320px / 340px / 360px height, 16px radius */
+.image-carousel__card {
+  width: 100%;
+  height: 320px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--ui-white);
+  box-shadow: 0 4px 12px var(--ui-black-12);
+  border: 1px solid var(--ui-black-05);
+  opacity: 0.6;
+  cursor: default;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .image-carousel__card {
+    height: 340px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .image-carousel__card {
+    height: 360px;
+  }
+}
+
+.image-carousel__card-media {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-carousel__card-icon {
+  font-size: 3rem;
+  opacity: 0.5;
+}

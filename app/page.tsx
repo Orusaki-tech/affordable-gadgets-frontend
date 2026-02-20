@@ -8,6 +8,7 @@ import {
   CategoriesSectionClient,
   RecentlyViewedClient,
 } from '@/components/HomeSectionsClient';
+import { ImageCarousel } from '@/components/ImageCarousel';
 import { CollectionHeaderBanner } from '@/components/CollectionHeaderBanner';
 import { BrandCarousel } from '@/components/BrandCarousel';
 
@@ -93,6 +94,21 @@ export default function HomePage() {
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Find exactly what you're looking for</p>
             </div>
             <CategoriesSectionClient />
+          </div>
+        </section>
+
+        {/* Image carousel – placeholder cards, not clickable */}
+        <section id="image-carousel" className="bg-gradient-to-b from-gray-50 to-white scroll-mt-20">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+            <div className="text-left mb-6 lg:mb-8">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 ">
+                <span className="bg-gradient-to-r from-teal-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent">
+                  Browse
+                </span>
+              </h2>
+              <p className="text-gray-600 text-lg sm:text-xl mb-2">Explore our collection</p>
+            </div>
+            <ImageCarousel />
           </div>
         </section>
 

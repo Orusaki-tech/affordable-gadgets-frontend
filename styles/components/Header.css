@@ -170,6 +170,9 @@
 
 .site-header__dropdown-list {
   display: grid;
+  grid-template-rows: repeat(6, auto);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(100px, auto);
   gap: 8px;
 }
 
@@ -422,6 +425,9 @@
 .site-header__mobile-brands {
   margin-top: 8px;
   display: grid;
+  grid-template-rows: repeat(6, auto);
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(100px, auto);
   gap: 4px;
 }
 

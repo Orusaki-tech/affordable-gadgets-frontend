@@ -534,6 +534,22 @@
   }
 }
 
+/* Buy button in featured footer bar (default); cart icon appears on card hover in overlay */
+.product-card__buy-btn--featured {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  background: transparent;
+  border: 1px solid var(--primary-dark);
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: background 200ms, color 200ms, border-color 200ms;
+}
+
 .product-card__cart-icon--featured {
   background: transparent;
   border: none;
@@ -545,6 +561,11 @@
   color: var(--primary-dark);
   transition: transform 200ms, color 200ms;
   flex-shrink: 0;
+}
+
+/* Cart icon only on hover: hidden in footer bar, shown in overlay when card is hovered */
+.product-card__footer-bar .product-card__cart-icon--bar-hover {
+  display: none;
 }
 
 .product-card__cart-icon--featured:hover {

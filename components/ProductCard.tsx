@@ -320,6 +320,9 @@ export function ProductCard({
             >
               {product.product_name}
             </p>
+            <span className="product-card__buy-btn product-card__buy-btn--featured">
+              Buy
+            </span>
             <button
               type="button"
               onClick={(event) => {
@@ -329,7 +332,7 @@ export function ProductCard({
                 handleAddToCart(event, 1);
               }}
               disabled={!canAddToCart || isAddingToCart}
-              className="product-card__cart-icon product-card__cart-icon--featured"
+              className="product-card__cart-icon product-card__cart-icon--featured product-card__cart-icon--bar-hover"
               aria-label="Add to cart"
             >
               {cartIconSvg}

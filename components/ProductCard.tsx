@@ -150,6 +150,15 @@ export function ProductCard({
     return options;
   }, [units]);
 
+  const ramOptions = useMemo(() => {
+    const set = new Set<number>();
+    units.forEach((unit) => {
+      const ram = (unit as { ram_gb?: number | null }).ram_gb;
+      if (ram != null) set.add(ram);
+    });
+    return Array.from(set).sort((a, b) => a - b);
+  }, [units]);
+
   const [selectedStorage, setSelectedStorage] = useState<number | null>(null);
   const [showSingleStorageOnly, setShowSingleStorageOnly] = useState(false);
   const featuredNameRef = useRef<HTMLParagraphElement | null>(null);
@@ -282,6 +291,11 @@ export function ProductCard({
 
   if (isFeaturedVariant) {
     const canAddToCart = Boolean(selectedUnit?.id) && !isAddingToCart && !unitsLoading;
+    const cartIconSvg = (
+      <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+      </svg>
+    );
     return (
       <Link
         href={getProductHref(product)}
@@ -297,132 +311,15 @@ export function ProductCard({
             unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
           />
         </div>
-        {/* Footer: row1 = name + storage, row2 = price + cart; 8px padding; expanded on hover */}
+        {/* Footer: default = bar (name + cart icon); hover = full overlay with storage, RAM, price range, reviews, cart icon */}
         <div className="product-card__footer product-card__footer--featured">
-          <div className="product-card__footer-default">
+          <div className="product-card__footer-bar">
             <p
               ref={featuredNameRef}
               className="product-card__name product-card__name--featured"
             >
               {product.product_name}
             </p>
-            {storageOptions.length >= 1 && (
-              <div className="product-card__footer-right product-card__footer-right--featured">
-                <div className="product-card__storage-options product-card__storage-options--featured">
-                  {showSingleStorageOnly ? (
-                    storageOptions.length > 0 && (
-                      <span className="product-card__storage-single">
-                        {storageOptions[0].storage}GB
-                      </span>
-                    )
-                  ) : storageOptions.length > 1 ? (
-                    storageOptions.map((option) => (
-                      <button
-                        key={option.storage}
-                        type="button"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          setSelectedStorage(option.storage);
-                        }}
-                        className={`product-card__storage-option ${
-                          selectedStorage === option.storage
-                            ? 'product-card__storage-option--active'
-                            : ''
-                        }`}
-                      >
-                        {option.storage}GB
-                      </button>
-                    ))
-                  ) : (
-                    <span className="product-card__storage-single">
-                      {storageOptions[0].storage}GB
-                    </span>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (!selectedUnit?.id) return;
-                    handleAddToCart(event, 1);
-                  }}
-                  disabled={!canAddToCart || isAddingToCart}
-                  className="product-card__cart-icon product-card__cart-icon--featured"
-                  aria-label="Add to cart"
-                >
-                  <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                  </svg>
-                </button>
-              </div>
-            )}
-            {storageOptions.length < 1 && (
-              <div className="product-card__footer-right product-card__footer-right--featured">
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (!selectedUnit?.id) return;
-                    handleAddToCart(event, 1);
-                  }}
-                  disabled={!canAddToCart || isAddingToCart}
-                  className="product-card__cart-icon product-card__cart-icon--featured"
-                  aria-label="Add to cart"
-                >
-                  <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-                  </svg>
-                </button>
-              </div>
-            )}
-            <p className="product-card__price product-card__price--featured product-card__price--featured-row">
-              {selectedUnit && selectedUnit.selling_price ? (
-                formatPrice(parseFloat(selectedUnit.selling_price))
-              ) : hasPriceRange ? (
-                formatPriceRange(product.min_price ?? null, product.max_price ?? null)
-              ) : (
-                'Price on request'
-              )}
-            </p>
-          </div>
-          <div className="product-card__footer-expanded">
-            {showRatings && (
-              <div className="product-card__footer-rating">
-                <RatingStars rating={averageRating} count={reviewCount} />
-              </div>
-            )}
-            <p className="product-card__footer-from-price">
-              From {selectedUnit && selectedUnit.selling_price
-                ? formatPrice(parseFloat(selectedUnit.selling_price))
-                : hasPriceRange
-                  ? formatPrice(product.min_price ?? null)
-                  : 'Price on request'}
-            </p>
-            {storageOptions.length > 1 && (
-              <div className="product-card__storage-options product-card__storage-options--expanded">
-                {storageOptions.map((option) => (
-                  <button
-                    key={option.storage}
-                    type="button"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      setSelectedStorage(option.storage);
-                    }}
-                    className={`product-card__storage-option ${
-                      selectedStorage === option.storage
-                        ? 'product-card__storage-option--active'
-                        : ''
-                    }`}
-                  >
-                    {option.storage}GB
-                  </button>
-                ))}
-              </div>
-            )}
             <button
               type="button"
               onClick={(event) => {
@@ -432,17 +329,78 @@ export function ProductCard({
                 handleAddToCart(event, 1);
               }}
               disabled={!canAddToCart || isAddingToCart}
-              className="product-card__cta product-card__cta--featured-full"
+              className="product-card__cart-icon product-card__cart-icon--featured"
+              aria-label="Add to cart"
             >
-              <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-              </svg>
-              Add to Cart
+              {cartIconSvg}
             </button>
-            <div className="product-card__payment-methods">
-              <span className="product-card__payment-label">VISA</span>
-              <span className="product-card__payment-label">M-Pesa</span>
-              <span className="product-card__payment-label">PayPal</span>
+          </div>
+          <div className="product-card__footer-overlay">
+            {storageOptions.length > 0 && (
+              <div className="product-card__overlay-row">
+                <span className="product-card__overlay-label">Storage</span>
+                <div className="product-card__storage-options product-card__storage-options--expanded">
+                  {storageOptions.map((option) => (
+                    <button
+                      key={option.storage}
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setSelectedStorage(option.storage);
+                      }}
+                      className={`product-card__storage-option ${
+                        selectedStorage === option.storage
+                          ? 'product-card__storage-option--active'
+                          : ''
+                      }`}
+                    >
+                      {option.storage}GB
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {ramOptions.length > 0 && (
+              <div className="product-card__overlay-row">
+                <span className="product-card__overlay-label">RAM</span>
+                <div className="product-card__ram-options">
+                  {ramOptions.map((ram) => (
+                    <span key={ram} className="product-card__ram-chip">{ram}GB</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="product-card__overlay-row">
+              <span className="product-card__overlay-label">Price</span>
+              <span className="product-card__overlay-price">
+                {hasPriceRange
+                  ? formatPriceRange(product.min_price ?? null, product.max_price ?? null)
+                  : selectedUnit?.selling_price
+                    ? formatPrice(parseFloat(selectedUnit.selling_price))
+                    : 'Price on request'}
+              </span>
+            </div>
+            {showRatings && (
+              <div className="product-card__overlay-row product-card__footer-rating">
+                <RatingStars rating={averageRating} count={reviewCount} />
+              </div>
+            )}
+            <div className="product-card__overlay-actions">
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (!selectedUnit?.id) return;
+                  handleAddToCart(event, 1);
+                }}
+                disabled={!canAddToCart || isAddingToCart}
+                className="product-card__cart-icon product-card__cart-icon--featured product-card__cart-icon--overlay"
+                aria-label="Add to cart"
+              >
+                {cartIconSvg}
+              </button>
             </div>
           </div>
         </div>

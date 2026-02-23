@@ -702,7 +702,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         {/* Right Column - Product Info */}
         <div className="product-detail__info">
           {/* Title & Brand */}
-          <div>
+          <div className="product-detail__info-header">
             <h1 className="product-detail__title">
               {product.product_name}
               {selectedUnitData && selectedUnitData.storage_gb && (
@@ -740,7 +740,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           )}
 
           {/* Price - Single Price Display */}
-              <div>
+              <div className="product-detail__info-price-block">
             {selectedUnitData ? (
               <div className="product-detail__price">
                 {isEligibleForPromotion && promotionUnitPrice !== null ? (

@@ -8,7 +8,8 @@ import { formatPrice, formatPriceRange } from '@/lib/utils/format';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { setProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
-import { useProductUnits } from '@/lib/hooks/useProducts';
+import { useProductUnits, prefetchProductDetail } from '@/lib/hooks/useProducts';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
 
@@ -91,10 +92,13 @@ export function ProductCard({
     : [];
   const lowStock = hasStock && availableCount > 0 && availableCount <= 3;
 
+  const queryClient = useQueryClient();
   const shouldLoadUnits = allowSwatches || allowQuickActions || allowQuickView || isFeaturedVariant;
   const { data: units = [], isLoading: unitsLoading } = useProductUnits(product.id ?? 0, {
     enabled: shouldLoadUnits,
   });
+
+  const handlePrefetch = () => prefetchProductDetail(queryClient, product);
 
   const reviewCount = Number(product.review_count ?? 0);
   const averageRating = product.average_rating ?? null;
@@ -302,6 +306,8 @@ export function ProductCard({
         href={getProductHref(product)}
         className="product-card product-card--featured"
         onClick={() => setProductDetailPlaceholder(product)}
+        onMouseEnter={handlePrefetch}
+        onFocus={handlePrefetch}
       >
         <div className="product-card__media product-card__media--square product-card__media--featured">
           <Image
@@ -424,6 +430,8 @@ export function ProductCard({
       href={getProductHref(product)}
       className={`product-card product-card--default ${isMinimal ? 'product-card--minimal' : 'product-card--standard'}`}
       onClick={() => setProductDetailPlaceholder(product)}
+      onMouseEnter={handlePrefetch}
+      onFocus={handlePrefetch}
     >
       {/* Product Image */}
       <div className={`product-card__media ${isMinimal ? 'product-card__media--square' : 'product-card__media--wide'}`}>
@@ -843,6 +851,8 @@ export function ProductCard({
                     href={getProductHref(product)}
                     className="product-card__modal-link product-card__modal-link--primary"
                     onClick={() => setProductDetailPlaceholder(product)}
+                    onMouseEnter={handlePrefetch}
+                    onFocus={handlePrefetch}
                   >
                     View full details
                   </Link>

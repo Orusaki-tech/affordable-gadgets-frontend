@@ -3,7 +3,7 @@
  */
 'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 import {
   ApiService,
@@ -11,6 +11,9 @@ import {
   PublicInventoryUnitPublic,
   PaginatedPublicProductList,
 } from '@/lib/api/generated';
+
+/** Number of items to fetch for the first request (visible above the fold). Next page is prefetched after this loads. */
+export const PRODUCTS_VISIBLE_PAGE_SIZE = 12;
 
 /** Find a product in cached list pages (by id or slug) for instant detail placeholder. */
 function getProductFromListCache(
@@ -30,7 +33,7 @@ function getProductFromListCache(
   return undefined;
 }
 
-export function useProducts(params?: {
+export type ProductsQueryParams = {
   page?: number;
   page_size?: number;
   type?: string;
@@ -39,38 +42,49 @@ export function useProducts(params?: {
   min_price?: number;
   max_price?: number;
   ordering?: string;
-  promotion?: number; // Promotion ID to filter products
+  promotion?: number;
   enabled?: boolean;
-}) {
+};
+
+/** Used by useProducts and by prefetch so next-page prefetch uses the same API call. */
+export function productsQueryFn({
+  queryKey,
+}: {
+  queryKey: readonly unknown[];
+}): Promise<PaginatedPublicProductList> {
+  const params = (queryKey[1] ?? {}) as ProductsQueryParams;
+  const {
+    page,
+    page_size,
+    type,
+    search,
+    brand_filter,
+    min_price,
+    max_price,
+    ordering,
+    promotion,
+  } = params;
+  return ApiService.apiV1PublicProductsList(
+    brand_filter,
+    max_price,
+    min_price,
+    ordering,
+    page,
+    page_size,
+    promotion,
+    search,
+    undefined,
+    type
+  );
+}
+
+export function useProducts(params?: ProductsQueryParams) {
   return useQuery<PaginatedPublicProductList>({
     queryKey: ['products', params],
-    queryFn: () => {
-      const {
-        page,
-        page_size,
-        type,
-        search,
-        brand_filter,
-        min_price,
-        max_price,
-        ordering,
-        promotion,
-      } = params || {};
-      return ApiService.apiV1PublicProductsList(
-        brand_filter,
-        max_price,
-        min_price,
-        ordering,
-        page,
-        page_size,
-        promotion,
-        search,
-        undefined,
-        type
-      );
-    },
+    queryFn: productsQueryFn,
     enabled: params?.enabled ?? true,
     staleTime: 30000, // 30 seconds
+    placeholderData: keepPreviousData, // Keep showing list when refetching (e.g. back from detail)
   });
 }
 
@@ -145,5 +159,45 @@ export function useProductUnits(
     enabled: (options?.enabled ?? true) && productId > 0,
     staleTime: 10000, // 10 seconds (more frequent updates for stock)
   });
+}
+
+/** Prefetch product detail and units (e.g. on card hover) so the detail page is ready on click. */
+export function prefetchProductDetail(queryClient: QueryClient, product: PublicProduct): void {
+  const id = product.id;
+  const slug = (product as PublicProduct & { slug?: string }).slug;
+  if (id != null) {
+    queryClient.prefetchQuery({
+      queryKey: ['product', id],
+      queryFn: () => ApiService.apiV1PublicProductsRetrieve(id),
+      staleTime: 30000,
+    });
+    queryClient.prefetchQuery({
+      queryKey: ['product', id, 'units'],
+      queryFn: async () => {
+        const response = await ApiService.apiV1PublicProductsUnitsList(id);
+        return Array.isArray(response) ? response : response?.results ?? [];
+      },
+      staleTime: 10000,
+    });
+  }
+  if (slug?.trim()) {
+    queryClient.prefetchQuery({
+      queryKey: ['product', 'slug', slug],
+      queryFn: () =>
+        ApiService.apiV1PublicProductsList(
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          slug,
+          undefined
+        ).then((res) => (res.results.length > 0 ? res.results[0] : Promise.reject(new Error(`Product "${slug}" not found.`)))),
+      staleTime: 30000,
+    });
+  }
 }
 

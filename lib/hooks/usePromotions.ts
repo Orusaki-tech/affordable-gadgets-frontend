@@ -4,7 +4,17 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import { ApiService, PublicPromotion, PaginatedPublicPromotionList } from '@/lib/api/generated';
+
+/** Prefetch a single promotion (e.g. when promotionId is in URL so detail page has it in cache). */
+export function prefetchPromotion(queryClient: QueryClient, id: number): void {
+  if (!id) return;
+  queryClient.prefetchQuery({
+    queryKey: ['promotion', id],
+    queryFn: () => ApiService.apiV1PublicPromotionsRetrieve(id),
+  });
+}
 
 export function usePromotions(params?: {
   page?: number;

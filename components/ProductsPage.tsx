@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useProducts } from '@/lib/hooks/useProducts';
-import { usePromotion } from '@/lib/hooks/usePromotions';
+import { useQueryClient } from '@tanstack/react-query';
+import { useProducts, PRODUCTS_VISIBLE_PAGE_SIZE, productsQueryFn, prefetchProductDetail } from '@/lib/hooks/useProducts';
+import { useDebouncedValue } from '@/lib/hooks/useDebouncedValue';
+import { usePromotion, prefetchPromotion } from '@/lib/hooks/usePromotions';
 import { PublicPromotion } from '@/lib/api/generated';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, FilterState } from './ProductFilters';
@@ -42,6 +44,10 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [sort, setSort] = useState('');
   const [autoOpenFilters, setAutoOpenFilters] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Debounce search so we don't refetch on every keystroke (only after user pauses)
+  const debouncedSearch = useDebouncedValue(search, 400);
 
   // Fetch promotion details if promotion ID is in URL
   const { data: promotionData } = usePromotion(promotionId ? parseInt(promotionId) : 0);
@@ -103,18 +109,56 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     router.replace(nextUrl, { scroll: false });
   };
 
-  // Use backend filter for promotion - this ensures proper pagination and filtering
+  // First request fetches only visible count; next page is prefetched after this succeeds
   const { data, isLoading, error } = useProducts({
     page,
-    page_size: 24,
+    page_size: PRODUCTS_VISIBLE_PAGE_SIZE,
     type: filters.type || undefined,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     brand_filter: filters.brand || undefined,
     min_price: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
     max_price: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
     ordering: sort || undefined,
     promotion: promotionId ? parseInt(promotionId) : undefined, // Backend will filter by promotion
   });
+
+  // Prefetch promotion when in URL so product detail page has it in cache when user clicks through
+  useEffect(() => {
+    if (!promotionId) return;
+    const id = parseInt(promotionId, 10);
+    if (!Number.isNaN(id)) prefetchPromotion(queryClient, id);
+  }, [promotionId, queryClient]);
+
+  // Prefetch next page and first few product details when current page has loaded
+  useEffect(() => {
+    if (!data?.results?.length || !data?.count) return;
+    const totalPages = Math.ceil(data.count / PRODUCTS_VISIBLE_PAGE_SIZE);
+    const nextPage = page + 1;
+    if (nextPage <= totalPages) {
+      queryClient.prefetchQuery({
+        queryKey: [
+          'products',
+          {
+            page: nextPage,
+            page_size: PRODUCTS_VISIBLE_PAGE_SIZE,
+            type: filters.type || undefined,
+            search: debouncedSearch || undefined,
+            brand_filter: filters.brand || undefined,
+            min_price: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
+            max_price: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
+            ordering: sort || undefined,
+            promotion: promotionId ? parseInt(promotionId) : undefined,
+          },
+        ],
+        queryFn: productsQueryFn,
+        staleTime: 30000,
+      });
+    }
+    // Prefetch detail + units for first 4 visible products so first-row clicks are instant
+    const firstFew = data.results.slice(0, 4);
+    firstFew.forEach((product) => prefetchProductDetail(queryClient, product));
+  }, [data?.count, data?.results, page, filters, debouncedSearch, sort, promotionId, queryClient]);
+
   const filteredResults = useMemo(() => {
     if (!data?.results) return [];
     if (!filters.type) return data.results;
@@ -219,7 +263,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
         <div className="products-page__results">
           {isLoading ? (
             <div className="products-page__grid products-page__grid--loading">
-              {[...Array(8)].map((_, i) => (
+              {[...Array(PRODUCTS_VISIBLE_PAGE_SIZE)].map((_, i) => (
                 <div key={i} className="products-page__skeleton" />
               ))}
             </div>
@@ -254,7 +298,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
                     Previous
                   </button>
                   <span className="products-page__pagination-status">
-                    Page {page} of {Math.ceil(data.count / 24)}
+                    Page {page} of {Math.ceil(data.count / PRODUCTS_VISIBLE_PAGE_SIZE)}
                   </span>
                   <button
                     onClick={() => setPage((p) => p + 1)}

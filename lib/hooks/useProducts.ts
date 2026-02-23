@@ -3,13 +3,32 @@
  */
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { QueryClient } from '@tanstack/react-query';
 import {
   ApiService,
   PublicProduct,
   PublicInventoryUnitPublic,
   PaginatedPublicProductList,
 } from '@/lib/api/generated';
+
+/** Find a product in cached list pages (by id or slug) for instant detail placeholder. */
+function getProductFromListCache(
+  queryClient: QueryClient,
+  opts: { id?: number; slug?: string }
+): PublicProduct | undefined {
+  const entries = queryClient.getQueriesData<PaginatedPublicProductList>({ queryKey: ['products'] });
+  for (const [, data] of entries) {
+    if (!data?.results?.length) continue;
+    const match = data.results.find(
+      (p) =>
+        (opts.id != null && p.id === opts.id) ||
+        (opts.slug != null && (p as PublicProduct & { slug?: string }).slug === opts.slug)
+    );
+    if (match) return match as PublicProduct;
+  }
+  return undefined;
+}
 
 export function useProducts(params?: {
   page?: number;
@@ -55,16 +74,20 @@ export function useProducts(params?: {
   });
 }
 
-export function useProduct(id: number) {
+export function useProduct(id: number, options?: { placeholderFromList?: PublicProduct }) {
+  const queryClient = useQueryClient();
   return useQuery<PublicProduct>({
     queryKey: ['product', id],
     queryFn: () => ApiService.apiV1PublicProductsRetrieve(id),
     enabled: !!id,
     staleTime: 30000, // Keep cached products fresh for short navigations
+    placeholderData: () =>
+      options?.placeholderFromList ?? getProductFromListCache(queryClient, { id }),
   });
 }
 
-export function useProductBySlug(slug: string) {
+export function useProductBySlug(slug: string, options?: { placeholderFromList?: PublicProduct }) {
+  const queryClient = useQueryClient();
   return useQuery<PublicProduct>({
     queryKey: ['product', 'slug', slug],
     queryFn: () =>
@@ -88,6 +111,8 @@ export function useProductBySlug(slug: string) {
     enabled: !!slug,
     retry: 1, // Only retry once
     retryOnMount: false, // Don't retry on mount if it failed
+    placeholderData: () =>
+      options?.placeholderFromList ?? getProductFromListCache(queryClient, { slug }),
   });
 }
 

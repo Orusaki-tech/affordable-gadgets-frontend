@@ -5,7 +5,7 @@ import { usePromotion } from '@/lib/hooks/usePromotions';
 import { useBundles } from '@/lib/hooks/useBundles';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
-import { PricingModeEnum, PublicBundle, PublicBundleItem, PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
+import { PricingModeEnum, PublicBundle, PublicBundleItem, PublicProduct, PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo } from 'react';
@@ -14,6 +14,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getPlaceholderProductImage, getPlaceholderUnitImage, getPlaceholderVideoUrl, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
+import { getAndClearProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
 
 interface ProductDetailProps {
   slug: string;
@@ -123,15 +124,23 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const searchParams = useSearchParams();
   const promotionId = searchParams.get('promotion');
 
+  const [placeholderFromList] = useState<PublicProduct | undefined>(() =>
+    typeof window !== 'undefined' ? getAndClearProductDetailPlaceholder(slug) : undefined
+  );
+
   const isNumericSlug = /^\d+$/.test(slug);
   const productIdFromSlug = isNumericSlug ? Number(slug) : 0;
-  const { data: productBySlug, isLoading: productBySlugLoading, error: productBySlugError } = useProductBySlug(
-    isNumericSlug ? '' : slug
+  const { data: productBySlug, isLoading: productBySlugLoading, error: productBySlugError, isPlaceholderData: isProductBySlugPlaceholder } = useProductBySlug(
+    isNumericSlug ? '' : slug,
+    { placeholderFromList }
   );
-  const { data: productById, isLoading: productByIdLoading, error: productByIdError } = useProduct(productIdFromSlug);
+  const { data: productById, isLoading: productByIdLoading, error: productByIdError, isPlaceholderData: isProductByIdPlaceholder } = useProduct(productIdFromSlug, {
+    placeholderFromList,
+  });
   const product = isNumericSlug ? productById : productBySlug;
   const productLoading = isNumericSlug ? productByIdLoading : productBySlugLoading;
   const productError = product ? undefined : (isNumericSlug ? productByIdError : productBySlugError);
+  const isProductPlaceholder = isNumericSlug ? isProductByIdPlaceholder : isProductBySlugPlaceholder;
   const { data: units, isLoading: unitsLoading } = useProductUnits(product?.id || 0);
   const { data: accessories } = useProductAccessories(product?.id || 0);
   const { data: promotion } = usePromotion(promotionId ? parseInt(promotionId) : 0);
@@ -602,7 +611,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     return calculatePromotionPrice(Number(selectedUnitData.selling_price));
   }, [isEligibleForPromotion, selectedUnitData, calculatePromotionPrice]);
 
-  if (productLoading) {
+  if (!product && productLoading) {
     return (
       <div className="product-detail__loading">
         <div className="product-detail__spinner"></div>
@@ -1207,6 +1216,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         <div className="product-detail__tab-content">
           {activeTab === 'overview' && (
             <div className="product-detail__section">
+              {isProductPlaceholder && (
+                <div className="product-detail__loading-inline" aria-live="polite">
+                  Loading full details…
+                </div>
+              )}
               {/* Product Highlights */}
               {product.product_highlights && Array.isArray(product.product_highlights) && product.product_highlights.length > 0 && (
                 <div className="product-detail__section-block">

@@ -7,6 +7,7 @@ import { PublicProduct, InventoryUnitImage } from '@/lib/api/generated';
 import { formatPrice, formatPriceRange } from '@/lib/utils/format';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 import { getProductHref } from '@/lib/utils/productRoutes';
+import { setProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
 import { useProductUnits } from '@/lib/hooks/useProducts';
 import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
@@ -300,6 +301,7 @@ export function ProductCard({
       <Link
         href={getProductHref(product)}
         className="product-card product-card--featured"
+        onClick={() => setProductDetailPlaceholder(product)}
       >
         <div className="product-card__media product-card__media--square product-card__media--featured">
           <Image
@@ -421,6 +423,7 @@ export function ProductCard({
     <Link
       href={getProductHref(product)}
       className={`product-card product-card--default ${isMinimal ? 'product-card--minimal' : 'product-card--standard'}`}
+      onClick={() => setProductDetailPlaceholder(product)}
     >
       {/* Product Image */}
       <div className={`product-card__media ${isMinimal ? 'product-card__media--square' : 'product-card__media--wide'}`}>
@@ -839,6 +842,7 @@ export function ProductCard({
                   <Link
                     href={getProductHref(product)}
                     className="product-card__modal-link product-card__modal-link--primary"
+                    onClick={() => setProductDetailPlaceholder(product)}
                   >
                     View full details
                   </Link>

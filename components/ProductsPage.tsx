@@ -288,7 +288,10 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
               </div>
 
               {/* Pagination */}
-              {(data.next || data.previous) && (
+              {(data.next || data.previous) && (() => {
+                const totalPages = Math.max(1, Math.ceil(data.count / PRODUCTS_VISIBLE_PAGE_SIZE));
+                const displayPage = Math.min(page, totalPages);
+                return (
                 <div className="products-page__pagination">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -298,7 +301,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
                     Previous
                   </button>
                   <span className="products-page__pagination-status">
-                    Page {page} of {Math.max(1, Math.ceil(data.count / PRODUCTS_VISIBLE_PAGE_SIZE))}
+                    Page {displayPage} of {totalPages}
                   </span>
                   <button
                     onClick={() => setPage((p) => p + 1)}
@@ -308,7 +311,8 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
                     Next
                   </button>
                 </div>
-              )}
+                );
+              })()}
             </>
           )}
         </div>

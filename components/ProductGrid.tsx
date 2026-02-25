@@ -89,7 +89,10 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
       </ProductCarousel>
 
       {/* Pagination */}
-      {showPagination && (data.next || data.previous) && (
+      {showPagination && (data.next || data.previous) && (() => {
+        const totalPages = Math.max(1, Math.ceil(data.count / pageSize));
+        const displayPage = Math.min(page, totalPages);
+        return (
         <div className="product-grid__pagination">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -99,7 +102,7 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
             Previous
           </button>
           <span className="product-grid__pagination-status">
-            Page {page} of {Math.max(1, Math.ceil(data.count / pageSize))}
+            Page {displayPage} of {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
@@ -109,7 +112,8 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
             Next
           </button>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

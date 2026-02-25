@@ -99,7 +99,7 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
             Previous
           </button>
           <span className="product-grid__pagination-status">
-            Page {page} of {Math.ceil(data.count / pageSize)}
+            Page {page} of {Math.max(1, Math.ceil(data.count / pageSize))}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}

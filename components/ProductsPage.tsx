@@ -298,7 +298,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
                     Previous
                   </button>
                   <span className="products-page__pagination-status">
-                    Page {page} of {Math.ceil(data.count / PRODUCTS_VISIBLE_PAGE_SIZE)}
+                    Page {page} of {Math.max(1, Math.ceil(data.count / PRODUCTS_VISIBLE_PAGE_SIZE))}
                   </span>
                   <button
                     onClick={() => setPage((p) => p + 1)}

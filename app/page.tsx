@@ -56,7 +56,7 @@ export default function HomePage() {
               </h2>
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Handpicked for you</p>
             </div>
-            <ProductGridClient pageSize={8} showPagination={false} cardOptions={{ variant: 'featured' }} />
+            <ProductGridClient featuredOnly pageSize={5} showPagination={false} cardOptions={{ variant: 'featured' }} />
           </div>
         </section>
 

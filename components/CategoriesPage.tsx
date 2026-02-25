@@ -43,7 +43,7 @@ export function CategoriesPage() {
       {/* Category Cards */}
       <div className="categories-page__grid">
         {categories.map((category) => (
-        <Link key={category.code} href={category.href} className="categories-page__card">
+        <Link key={category.code} href={category.href} className="categories-page__card" prefetch={false}>
           {/* Wrap the image in its own container for the background color */}
           <div className="categories-page__card-image-wrapper">
             <img 
@@ -108,6 +108,7 @@ function CategoryProducts({ category }: { category: Category }) {
         <Link
           href={category.href}
           className="categories-page__section-link"
+          prefetch={false}
         >
           View All →
         </Link>

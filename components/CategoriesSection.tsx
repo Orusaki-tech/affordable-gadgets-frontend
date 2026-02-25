@@ -46,6 +46,7 @@ export function CategoriesSection() {
             key={category.name}
             href={category.href}
             className="categories-section__card"
+            prefetch={false}
           >
             <div
               className="categories-section__media"

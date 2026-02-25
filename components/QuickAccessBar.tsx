@@ -21,6 +21,7 @@ export function QuickAccessBar() {
             key={category.name}
             href={category.href}
             className="quick-access__item"
+            prefetch={false}
           >
             <div className="quick-access__icon">
               {category.icon}

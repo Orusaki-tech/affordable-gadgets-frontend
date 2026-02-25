@@ -1,6 +1,6 @@
 'use client';
 
-import { useProducts } from '@/lib/hooks/useProducts';
+import { useProducts, useFeaturedProducts } from '@/lib/hooks/useProducts';
 import { getApiErrorInfo } from '@/lib/utils/apiError';
 import { ProductCard } from './ProductCard';
 import { ProductCarousel } from './ProductCarousel';
@@ -20,16 +20,21 @@ interface ProductGridProps {
   pageSize?: number;
   showPagination?: boolean;
   cardOptions?: ProductCardOptions;
+  /** When true, fetches only 5 products tagged "Featured" for fast homepage load. */
+  featuredOnly?: boolean;
 }
 
-export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions }: ProductGridProps = {}) {
+export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions, featuredOnly = false }: ProductGridProps = {}) {
   const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useProducts({ page, page_size: pageSize });
+  const productsQuery = useProducts({ page, page_size: pageSize, enabled: !featuredOnly });
+  const featuredQuery = useFeaturedProducts();
+  const { data, isLoading, error } = featuredOnly ? featuredQuery : productsQuery;
 
   if (isLoading) {
+    const skeletonCount = featuredOnly ? 5 : 8;
     return (
       <div className="product-grid product-grid__list product-grid__list--loading">
-        {[...Array(8)].map((_, i) => (
+        {[...Array(skeletonCount)].map((_, i) => (
           <div key={i} className="product-grid__skeleton" />
         ))}
       </div>
@@ -56,10 +61,10 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions 
   }
 
   if (!data || data.results.length === 0) {
-    // Show placeholder products
+    const placeholderCount = featuredOnly ? 5 : 8;
     return (
       <div className="product-grid product-grid__list product-grid__list--placeholder">
-        {[...Array(8)].map((_, i) => (
+        {[...Array(placeholderCount)].map((_, i) => (
           <div key={i} className="product-grid__placeholder-card">
             <div className="product-grid__placeholder-media">
               <span className="product-grid__placeholder-icon">📱</span>

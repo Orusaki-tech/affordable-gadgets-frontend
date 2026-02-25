@@ -7,6 +7,7 @@ import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-quer
 import type { QueryClient } from '@tanstack/react-query';
 import {
   ApiService,
+  OpenAPI,
   PublicProduct,
   PublicInventoryUnitPublic,
   PaginatedPublicProductList,
@@ -14,6 +15,39 @@ import {
 
 /** Number of items to fetch for the first request (visible above the fold). Next page is prefetched after this loads. */
 export const PRODUCTS_VISIBLE_PAGE_SIZE = 12;
+
+/** Number of featured products to load on the homepage for fast first paint (under 3s). */
+export const FEATURED_PRODUCTS_PAGE_SIZE = 5;
+
+/** Fetches only products tagged "Featured" (page_size=5). Uses same list API with featured=1 for fast homepage load. */
+export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductList> {
+  const base = OpenAPI.BASE.replace(/\/+$/, '');
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    ...(typeof OpenAPI.HEADERS === 'function'
+      ? await OpenAPI.HEADERS({} as never)
+      : (OpenAPI.HEADERS ?? {})),
+  };
+  const url = `${base}/api/v1/public/products/?featured=1&page_size=${FEATURED_PRODUCTS_PAGE_SIZE}&page=1`;
+  const res = await fetch(url, {
+    credentials: OpenAPI.CREDENTIALS,
+    headers,
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || `Featured products request failed: ${res.status}`);
+  }
+  return res.json();
+}
+
+/** Hook for homepage featured section: returns only 5 products tagged "Featured" for fast load. */
+export function useFeaturedProducts() {
+  return useQuery<PaginatedPublicProductList>({
+    queryKey: ['products', 'featured'],
+    queryFn: fetchFeaturedProducts,
+    staleTime: 30000,
+  });
+}
 
 /** Find a product in cached list pages (by id or slug) for instant detail placeholder. */
 function getProductFromListCache(

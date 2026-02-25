@@ -138,6 +138,7 @@ export function Header() {
                           <Link
                             href={`/products?type=${category.code}`}
                             className="site-header__dropdown-title"
+                            prefetch={false}
                           >
                             {category.name}
                           </Link>
@@ -150,6 +151,7 @@ export function Header() {
                                   key={brand}
                                   href={`/products?type=${category.code}&brand=${encodeURIComponent(brand)}`}
                                   className="site-header__dropdown-link"
+                                  prefetch={false}
                                 >
                                   {brand}
                                 </Link>
@@ -158,6 +160,7 @@ export function Header() {
                               <Link
                                 href={`/products?type=${category.code}`}
                                 className="site-header__dropdown-link site-header__dropdown-link--muted"
+                                prefetch={false}
                               >
                                 Browse all {category.name}
                               </Link>
@@ -172,6 +175,7 @@ export function Header() {
                     <Link
                       href="/products"
                       className="site-header__dropdown-cta"
+                      prefetch={false}
                     >
                       View all products →
                     </Link>
@@ -341,6 +345,7 @@ export function Header() {
                           href={`/products?type=${category.code}`}
                           onClick={() => setIsMobileMenuOpen(false)}
                           className="site-header__mobile-title"
+                          prefetch={false}
                         >
                           {category.name}
                         </Link>
@@ -354,6 +359,7 @@ export function Header() {
                                 href={`/products?type=${category.code}&brand=${encodeURIComponent(brand)}`}
                                 onClick={() => setIsMobileMenuOpen(false)}
                                 className="site-header__mobile-brand"
+                                prefetch={false}
                               >
                                 {brand}
                               </Link>

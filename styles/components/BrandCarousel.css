@@ -1,13 +1,26 @@
-/* Brand carousel – 120×70px logos, continuous scroll (last item followed by first). */
-/* Viewport width = one full set (5 items) so no item is ever cut off at the edges. */
-/* One set = 5×120px + 4×16px gap = 664px */
+/* Brand carousel – doubled width 240×120px items; progress bar + arrows below (samsung-progressbar). */
 .brand-carousel {
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
-  max-width: 664px; /* exactly one set: 5 items + 4 gaps */
+  max-width: 900px;
   margin-left: auto;
   margin-right: auto;
-  height: 86px; /* 70px items + padding; keeps section visible */
+}
+
+.brand-carousel__scroll {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.brand-carousel__scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .brand-carousel__track {
@@ -16,35 +29,33 @@
   align-items: center;
   gap: 16px;
   width: max-content;
-  height: 70px;
-  animation: brand-carousel-scroll 30s linear infinite;
+  height: 120px;
+  padding: 0 2px;
 }
 
-.brand-carousel__track:hover {
-  animation-play-state: paused;
-}
-
+/* Brand-slider style: 240×120px (doubled width), 10px radius, #fff, flex center, 0.3s linear */
 .brand-carousel__item {
   flex-shrink: 0 !important;
-  width: 120px !important;
-  min-width: 120px !important;
-  height: 70px !important;
-  min-height: 70px !important;
+  width: 240px !important;
+  min-width: 240px !important;
+  height: 120px !important;
+  min-height: 120px !important;
   display: flex !important;
   align-items: center;
   justify-content: center;
-  background: var(--ui-gray-200);
-  border: 1px solid var(--ui-gray-300);
-  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #fff;
+  border-radius: 10px;
+  padding: 0 10px;
   overflow: hidden;
   text-decoration: none;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: 0.3s linear;
   box-sizing: border-box;
 }
 
 .brand-carousel__item:hover {
-  background: var(--ui-gray-200);
-  transform: scale(1.05);
+  background: #fff;
+  transform: scale(1.02);
 }
 
 .brand-carousel__image {
@@ -59,13 +70,4 @@
   font-size: 1rem;
   font-weight: 700;
   color: var(--gray-500);
-}
-
-@keyframes brand-carousel-scroll {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
 }

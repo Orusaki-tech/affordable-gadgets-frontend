@@ -38,6 +38,7 @@ export function Header() {
       const response = await fetch(
         `${brandConfig.apiBaseUrl}/api/v1/public/products/brands/`,
         {
+          credentials: 'omit',
           headers: {
             'X-Brand-Code': brandConfig.code,
           },

@@ -30,7 +30,7 @@ export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductLis
   };
   const url = `${base}/api/v1/public/products/?featured=1&page_size=${FEATURED_PRODUCTS_PAGE_SIZE}&page=1`;
   const res = await fetch(url, {
-    credentials: OpenAPI.CREDENTIALS,
+    credentials: 'omit',
     headers,
   });
   if (!res.ok) {
@@ -234,4 +234,3 @@ export function prefetchProductDetail(queryClient: QueryClient, product: PublicP
     });
   }
 }
-

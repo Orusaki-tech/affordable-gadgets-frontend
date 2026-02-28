@@ -7,8 +7,10 @@ export const apiBaseUrl = normalizedBaseUrl;
 export const inventoryBaseUrl = `${normalizedBaseUrl}/api/inventory`;
 
 OpenAPI.BASE = normalizedBaseUrl;
-OpenAPI.WITH_CREDENTIALS = true;
-OpenAPI.CREDENTIALS = 'include';
+// Use 'omit' so CORS works when backend/ngrok returns Access-Control-Allow-Origin: *
+// (browsers reject * when credentials are 'include'). Auth uses Authorization header, not cookies.
+OpenAPI.WITH_CREDENTIALS = false;
+OpenAPI.CREDENTIALS = 'omit';
 OpenAPI.HEADERS = async () => {
   const headers: Record<string, string> = {
     'X-Brand-Code': brandConfig.code,

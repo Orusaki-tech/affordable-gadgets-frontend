@@ -41,6 +41,7 @@ export function Header() {
           credentials: 'omit',
           headers: {
             'X-Brand-Code': brandConfig.code,
+            'ngrok-skip-browser-warning': '1',
           },
         }
       );

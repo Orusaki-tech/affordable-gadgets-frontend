@@ -14,6 +14,8 @@ OpenAPI.CREDENTIALS = 'omit';
 OpenAPI.HEADERS = async () => {
   const headers: Record<string, string> = {
     'X-Brand-Code': brandConfig.code,
+    // Skip ngrok free-tier interstitial so API responses are JSON, not HTML
+    'ngrok-skip-browser-warning': '1',
   };
 
   if (typeof window !== 'undefined') {

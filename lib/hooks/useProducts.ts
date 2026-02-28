@@ -24,6 +24,7 @@ export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductLis
   const base = OpenAPI.BASE.replace(/\/+$/, '');
   const headers: Record<string, string> = {
     Accept: 'application/json',
+    'ngrok-skip-browser-warning': '1',
     ...(typeof OpenAPI.HEADERS === 'function'
       ? await OpenAPI.HEADERS({} as never)
       : (OpenAPI.HEADERS ?? {})),
@@ -36,6 +37,10 @@ export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductLis
   if (!res.ok) {
     const text = await res.text();
     throw new Error(text || `Featured products request failed: ${res.status}`);
+  }
+  const contentType = res.headers.get('content-type') || '';
+  if (contentType.includes('text/html')) {
+    throw new Error('API returned HTML instead of JSON. If using ngrok, ensure requests include the ngrok-skip-browser-warning header.');
   }
   return res.json();
 }

@@ -663,8 +663,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             />
           </div>
 
-          {/* Thumbnail Gallery */}
-          {productImages.length > 1 && (
+          {/* Thumbnail Gallery - show when we have at least one image (single image still shows as thumbnail) */}
+          {productImages.length > 0 && (
             <div className="product-detail__thumbnails">
               {productImages.map((img, index) => {
                 // Try to find a unit with this image to get color info

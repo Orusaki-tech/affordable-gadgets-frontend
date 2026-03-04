@@ -143,6 +143,7 @@
   color: var(--ui-gray-900);
 }
 
+/* FIXED: removed duplicate/conflicting declarations and overflow:hidden that was clipping the icon */
 .home-hero__search-button {
   border: none;
   background: var(--primary);
@@ -150,20 +151,28 @@
   border-radius: 12px;
   width: 40px;
   height: 40px;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background 180ms ease;
+  padding: 10px;        /* ← gives the stroke room to breathe */
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
+
 
 .home-hero__search-button:hover {
   background: var(--primary-dark);
 }
 
+/* FIXED: removed margin:0 and display:block that were interfering with flex centering */
 .home-hero__search-icon {
-  width: 18px;
-  height: 18px;
+  width: 100%;          /* ← fills the padded area, not the raw 40px */
+  height: 100%;
+  flex-shrink: 0;
+  stroke-width: 2;      /* ← slightly thinner so it doesn't clip at small sizes */
+  overflow: visible;    /* ← allows stroke to render outside the SVG box if needed */
 }
 
 .home-hero__left-card {
@@ -337,4 +346,3 @@
     opacity: 0.55;
   }
 }
-

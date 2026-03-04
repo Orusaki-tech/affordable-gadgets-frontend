@@ -1,19 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { brandConfig } from '@/lib/config/brand';
-import { SearchBar } from './SearchBar';
 import { clearAuthToken } from '@/lib/api/openapi';
 import { AuthChoiceModal } from './AuthChoiceModal';
 
 export function Header() {
   const { itemCount } = useCart();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
@@ -76,6 +77,17 @@ export function Header() {
     };
   }, []);
 
+  const focusProductsSearchHref = useMemo(() => {
+    const isOnProducts = pathname === '/products';
+    if (!isOnProducts) {
+      return '/products?focusSearch=1';
+    }
+    const params = new URLSearchParams(searchParams?.toString?.() ?? '');
+    params.set('focusSearch', '1');
+    const qs = params.toString();
+    return `/products${qs ? `?${qs}` : ''}`;
+  }, [pathname, searchParams]);
+
   return (
     <header className="site-header">
       <div className="site-header__container">
@@ -102,10 +114,17 @@ export function Header() {
             </span>
           </Link>
 
-          {/* Search Bar - Desktop */}
-          <div className="site-header__search site-header__search--desktop">
-            <SearchBar />
-          </div>
+          {/* Search (icon) */}
+          <Link
+            href={focusProductsSearchHref}
+            className="site-header__icon-button site-header__icon-button--search"
+            aria-label="Search products"
+            title="Search"
+          >
+            <svg className="site-header__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="site-header__nav">
@@ -295,11 +314,6 @@ export function Header() {
               )}
             </svg>
           </button>
-        </div>
-
-        {/* Mobile Search */}
-        <div className="site-header__search site-header__search--mobile">
-          <SearchBar />
         </div>
 
         {isAuthModalOpen && (

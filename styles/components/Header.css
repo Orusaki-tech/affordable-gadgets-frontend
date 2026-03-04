@@ -68,6 +68,27 @@
   margin: 0 24px;
 }
 
+.site-header__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 10px;
+  color: var(--ui-gray-700);
+  text-decoration: none;
+  transition: color 200ms, background 200ms;
+}
+
+.site-header__icon-button:hover {
+  color: var(--primary);
+  background: var(--ui-gray-50);
+}
+
+.site-header__icon {
+  width: 24px;
+  height: 24px;
+}
+
 .site-header__nav {
   display: none;
   align-items: center;

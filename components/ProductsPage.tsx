@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProducts, PRODUCTS_VISIBLE_PAGE_SIZE, productsQueryFn, prefetchProductDetail } from '@/lib/hooks/useProducts';
@@ -10,7 +10,6 @@ import { PublicPromotion } from '@/lib/api/generated';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, FilterState } from './ProductFilters';
 import { getProductHref } from '@/lib/utils/productRoutes';
-import Link from 'next/link';
 
 type ProductCardOptions = {
   variant?: 'default' | 'minimal' | 'featured';
@@ -30,6 +29,8 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const promotionId = searchParams.get('promotion');
+  const focusSearch = searchParams.get('focusSearch');
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const initialFilters = useMemo<FilterState>(
@@ -76,6 +77,21 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   useEffect(() => {
     setSearch(searchParams.get('search') || '');
   }, [searchParams]);
+
+  useEffect(() => {
+    if (!focusSearch) return;
+    const raf = window.requestAnimationFrame(() => {
+      const el = searchInputRef.current;
+      if (!el) return;
+      el.focus();
+      try {
+        el.select();
+      } catch {
+        // ignore selection issues (e.g. mobile)
+      }
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [focusSearch]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -204,6 +220,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
                 placeholder="Search products..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                ref={searchInputRef}
                 className="products-page__search-input"
               />
               <button
@@ -236,6 +253,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
               placeholder="Search products..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              ref={searchInputRef}
               className="products-page__search-input"
             />
             <button

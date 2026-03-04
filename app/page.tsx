@@ -1,6 +1,6 @@
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
-import { HeroPromotions } from '@/components/HeroPromotions';
+import { HomeHero } from '@/components/HomeHero';
 import { SpecialOffersServer } from '@/components/SpecialOffersServer';
 import {
   ProductGridClient,
@@ -21,12 +21,11 @@ export default function HomePage() {
       <HeaderWithAnnouncement />
       
       <main className="flex-1">
+        <HomeHero />
+
         {/* Promotions */}
         <section id="promotions" className="bg-white scroll-mt-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-[30px] pb-12 sm:pb-12 lg:pb-16">
-            <div className="mb-10 lg:mb-12">
-              <HeroPromotions />
-            </div>
             <div className=" mb-10 lg:mb-12">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
                 <span className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 bg-clip-text text-transparent">

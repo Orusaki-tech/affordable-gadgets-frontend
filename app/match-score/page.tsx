@@ -1,7 +1,10 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import { MatchScorePage } from '@/components/MatchScorePage';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Find Your Perfect Match',
@@ -11,7 +14,16 @@ export const metadata: Metadata = {
 export default function MatchScore() {
   return (
     <div className="min-h-screen flex flex-col">
-      <HeaderWithAnnouncement />
+      <Suspense
+        fallback={
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
+        }
+      >
+        <HeaderWithAnnouncement />
+      </Suspense>
+
       <main className="flex-1 container mx-auto px-4 py-8">
         <MatchScorePage />
       </main>

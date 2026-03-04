@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { StoriesCarousel } from '@/components/StoriesCarousel';
@@ -5,10 +6,20 @@ import { ProductGrid } from '@/components/ProductGrid';
 import { SpecialOffers } from '@/components/SpecialOffers';
 import { ReviewsShowcase } from '@/components/ReviewsShowcase';
 
+export const dynamic = 'force-dynamic';
+
 export default function ReviewsPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <HeaderWithAnnouncement />
+      <Suspense
+        fallback={
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
+        }
+      >
+        <HeaderWithAnnouncement />
+      </Suspense>
       
       <main className="flex-1">
         {/* Stories Carousel */}
@@ -29,7 +40,7 @@ export default function ReviewsPage() {
         {/* Featured Products */}
         <section className="container mx-auto px-4 py-8">
           <h2 className="text-3xl font-bold mb-6">Featured Products</h2>
-        <ProductGrid pageSize={8} showPagination={false} />
+          <ProductGrid pageSize={8} showPagination={false} />
         </section>
       </main>
 

@@ -11,6 +11,7 @@ import {
 import { ImageCarousel } from '@/components/ImageCarousel';
 import { CollectionHeaderBanner } from '@/components/CollectionHeaderBanner';
 import { BrandCarousel } from '@/components/BrandCarousel';
+import { Suspense } from 'react';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -18,8 +19,15 @@ export const revalidate = 0;
 export default function HomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 via-white to-gray-50">
-      <HeaderWithAnnouncement />
-      
+     <Suspense
+        fallback={
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
+        }
+      >
+        <HeaderWithAnnouncement />
+      </Suspense>
       <main className="flex-1">
         <HomeHero />
 

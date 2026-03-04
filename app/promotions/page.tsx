@@ -4,6 +4,7 @@ import { StoriesCarousel } from '@/components/StoriesCarousel';
 import { ProductGrid } from '@/components/ProductGrid';
 import { SpecialOffersServer } from '@/components/SpecialOffersServer';
 import { ReviewsShowcase } from '@/components/ReviewsShowcase';
+import { Suspense } from 'react';
 
 type PromotionsPageProps = {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -19,7 +20,15 @@ export default async function PromotionsPage({ searchParams }: PromotionsPagePro
 
   return (
     <div className="min-h-screen flex flex-col">
-      <HeaderWithAnnouncement />
+      <Suspense
+        fallback={
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
+        }
+      >
+        <HeaderWithAnnouncement />
+      </Suspense>
       <main className="flex-1">
         {/* Stories Carousel */}
         <section className="container mx-auto px-4 py-6">

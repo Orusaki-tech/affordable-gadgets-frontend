@@ -101,7 +101,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
   
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <HeaderWithAnnouncement />
+      <Suspense
+        fallback={
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
+        }
+      >
+        <HeaderWithAnnouncement />
+      </Suspense>
       <main className="flex-1 py-8">
         <Suspense fallback={
           <div className="container mx-auto px-4">

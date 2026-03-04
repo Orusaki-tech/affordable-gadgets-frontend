@@ -1,10 +1,21 @@
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
+import { Suspense } from 'react';
+
+export const dynamic = 'force-dynamic';
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <HeaderWithAnnouncement />
+      <Suspense
+        fallback={
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
+        }
+      >
+        <HeaderWithAnnouncement />
+      </Suspense>
       <main className="flex-1 container mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold mb-4">Terms of Service</h1>
         <p className="text-gray-700 mb-3">

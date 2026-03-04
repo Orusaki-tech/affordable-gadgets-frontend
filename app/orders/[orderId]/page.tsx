@@ -310,7 +310,15 @@ function OrderDetailContent() {
 export default function OrderDetailPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <HeaderWithAnnouncement />
+      <Suspense
+        fallback={
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
+        }
+      >
+        <HeaderWithAnnouncement />
+      </Suspense>
       <Suspense fallback={
         <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
           <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-8">

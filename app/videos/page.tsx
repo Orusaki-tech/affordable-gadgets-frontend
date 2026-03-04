@@ -6,10 +6,20 @@ import { ProductVideosSection } from '@/components/ProductVideosSection';
 import { SpecialOffers } from '@/components/SpecialOffers';
 import { ReviewsShowcase } from '@/components/ReviewsShowcase';
 
+export const dynamic = 'force-dynamic';
+
 export default function VideosPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <HeaderWithAnnouncement />
+      <Suspense
+        fallback={
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
+        }
+      >
+        <HeaderWithAnnouncement />
+      </Suspense>
       
       <main className="flex-1">
         {/* Stories Carousel */}

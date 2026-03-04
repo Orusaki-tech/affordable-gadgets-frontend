@@ -3,7 +3,7 @@
 import { PaymentPage } from '@/components/PaymentPage';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
-import { use } from 'react';
+import { Suspense, use } from 'react';
 
 interface PaymentPageProps {
   params: Promise<{ orderId: string }>;
@@ -23,7 +23,15 @@ export default function PaymentRoute({ params, searchParams }: PaymentPageProps)
 
   return (
     <div className="min-h-screen flex flex-col">
-      <HeaderWithAnnouncement />
+      <Suspense
+        fallback={
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
+        }
+      >
+        <HeaderWithAnnouncement />
+      </Suspense>
       <main className="flex-1">
         <PaymentPage 
           orderId={orderId} 

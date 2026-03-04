@@ -9,6 +9,7 @@ import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { useDebouncedValue } from '@/lib/hooks/useDebouncedValue';
 import { ProductCard } from '@/components/ProductCard';
+import { ProductCarousel } from '@/components/ProductCarousel';
 import { getCloudinarySizedImageUrl } from '@/lib/utils/cloudinary';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
@@ -89,59 +90,71 @@ export function HomeHero() {
       <div className="home-hero__container">
         <div className="home-hero__promo-row" aria-label="Promotions">
           {promosLoading && promotions.length === 0 ? (
-            <>
-              {Array.from({ length: 6 }).map((_, i) => (
+            <div className="home-hero__promo-skeleton-track">
+              {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="home-hero__promo-skeleton" />
               ))}
-            </>
+            </div>
           ) : promotions.length > 0 ? (
-            promotions.map((promotion) => {
-              const id = typeof promotion.id === 'number' ? promotion.id : null;
-              const isActive = id !== null && id === activePromotionId;
-              const thumbSrc = promotion.banner_image_url || promotion.banner_image || null;
-              return (
-                <button
-                  key={id ?? promotion.title}
-                  type="button"
-                  className={`home-hero__promo-card ${isActive ? 'home-hero__promo-card--active' : ''}`}
-                  onMouseEnter={() => {
-                    if (id !== null) setActivePromotionId(id);
-                  }}
-                  onFocus={() => {
-                    if (id !== null) setActivePromotionId(id);
-                  }}
-                  onClick={() => {
-                    if (id !== null) setActivePromotionId(id);
-                  }}
-                  aria-pressed={isActive}
-                >
-                  <div className="home-hero__promo-media">
-                    {thumbSrc ? (
-                      <Image
-                        src={getCloudinarySizedImageUrl(thumbSrc, PROMO_THUMB_SIZE, 'contain')}
-                        alt={promotion.title}
-                        width={PROMO_THUMB_SIZE}
-                        height={PROMO_THUMB_SIZE}
-                        className="home-hero__promo-image"
-                        unoptimized={thumbSrc.includes('localhost') || thumbSrc.includes('127.0.0.1') || thumbSrc.includes('placehold.co')}
-                      />
-                    ) : (
-                      <div className="home-hero__promo-image home-hero__promo-image--placeholder" />
-                    )}
-                  </div>
-                  <div className="home-hero__promo-info">
-                    <p className="home-hero__promo-title">{promotion.title}</p>
-                    {promotion.discount_display ? (
-                      <p className="home-hero__promo-subtitle">{promotion.discount_display}</p>
-                    ) : promotion.description ? (
-                      <p className="home-hero__promo-subtitle">{promotion.description}</p>
-                    ) : (
-                      <p className="home-hero__promo-subtitle">View offer</p>
-                    )}
-                  </div>
-                </button>
-              );
-            })
+            <ProductCarousel
+              itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
+              showNavigation
+              showPagination={false}
+              autoPlay={false}
+              className="home-hero__promo-carousel"
+            >
+              {promotions.map((promotion) => {
+                const id = typeof promotion.id === 'number' ? promotion.id : null;
+                const isActive = id !== null && id === activePromotionId;
+                const thumbSrc = promotion.banner_image_url || promotion.banner_image || null;
+                return (
+                  <button
+                    key={id ?? promotion.title}
+                    type="button"
+                    className={`home-hero__promo-card ${isActive ? 'home-hero__promo-card--active' : ''}`}
+                    onMouseEnter={() => {
+                      if (id !== null) setActivePromotionId(id);
+                    }}
+                    onFocus={() => {
+                      if (id !== null) setActivePromotionId(id);
+                    }}
+                    onClick={() => {
+                      if (id !== null) setActivePromotionId(id);
+                    }}
+                    aria-pressed={isActive}
+                  >
+                    <div className="home-hero__promo-media">
+                      {thumbSrc ? (
+                        <Image
+                          src={getCloudinarySizedImageUrl(thumbSrc, PROMO_THUMB_SIZE, 'contain')}
+                          alt={promotion.title}
+                          width={PROMO_THUMB_SIZE}
+                          height={PROMO_THUMB_SIZE}
+                          className="home-hero__promo-image"
+                          unoptimized={
+                            thumbSrc.includes('localhost') ||
+                            thumbSrc.includes('127.0.0.1') ||
+                            thumbSrc.includes('placehold.co')
+                          }
+                        />
+                      ) : (
+                        <div className="home-hero__promo-image home-hero__promo-image--placeholder" />
+                      )}
+                    </div>
+                    <div className="home-hero__promo-info">
+                      <p className="home-hero__promo-title">{promotion.title}</p>
+                      {promotion.discount_display ? (
+                        <p className="home-hero__promo-subtitle">{promotion.discount_display}</p>
+                      ) : promotion.description ? (
+                        <p className="home-hero__promo-subtitle">{promotion.description}</p>
+                      ) : (
+                        <p className="home-hero__promo-subtitle">View offer</p>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </ProductCarousel>
           ) : (
             <div className="home-hero__promo-empty">No promotions available right now.</div>
           )}

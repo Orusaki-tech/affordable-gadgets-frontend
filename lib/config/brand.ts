@@ -36,27 +36,28 @@ const normalizeApiBaseUrl = (url: string | undefined): string => {
 
 // Helper function to normalize site URL (must have protocol for Next.js metadata)
 const normalizeSiteUrl = (url: string | undefined): string => {
-  const defaultUrl = 'https://www.affordablegadgets.co.ke';
-  
+  const defaultUrl = 'https://www.affordable-gadgetske.com';
+
+  // If nothing is provided, use our canonical production domain
   if (!url || url.trim() === '') {
     return defaultUrl;
   }
-  
+
   let normalized = url.trim();
-  
+
   // Remove trailing slashes
   normalized = normalized.replace(/\/+$/, '');
-  
+
   // Fix protocol-relative URLs (starting with //)
   if (normalized.startsWith('//')) {
     normalized = 'https:' + normalized;
   }
-  
+
   // If URL doesn't start with http:// or https://, add https://
   if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
     normalized = 'https://' + normalized;
   }
-  
+
   return normalized;
 };
 
@@ -64,7 +65,8 @@ export const brandConfig = {
   code: process.env.NEXT_PUBLIC_BRAND_CODE || 'AFFORDABLE_GADGETS',
   name: process.env.NEXT_PUBLIC_BRAND_NAME || 'Affordable Gadgets Ke',
   apiBaseUrl: normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL),
-  siteUrl: normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL),
+  // Prefer an explicit public site URL; fall back to our canonical domain
+  siteUrl: normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.affordable-gadgetske.com'),
   // Business information for LocalBusiness schema
   business: {
     name: 'Affordable Gadgets Ke',

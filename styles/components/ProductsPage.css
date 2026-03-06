@@ -182,7 +182,7 @@
 
   .products-page__filters {
     position: sticky;
-    top: 96px;
+    top: 86px;
     align-self: flex-start;
     margin-bottom: 0;
   }

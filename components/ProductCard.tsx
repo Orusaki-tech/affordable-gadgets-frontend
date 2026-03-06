@@ -165,6 +165,8 @@ export function ProductCard({
   }, [units]);
 
   const [selectedStorage, setSelectedStorage] = useState<number | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedRam, setSelectedRam] = useState<number | null>(null);
   const [showSingleStorageOnly, setShowSingleStorageOnly] = useState(false);
   const featuredNameRef = useRef<HTMLParagraphElement | null>(null);
 
@@ -223,6 +225,41 @@ export function ProductCard({
   }, [isFeaturedVariant, product.product_name, storageOptions.length]);
 
   const selectedUnit = units.find((unit) => unit.id === selectedUnitId);
+
+  const filteredUnits = useMemo(() => {
+    if (units.length === 0) return [];
+    return units.filter((unit) => {
+      const normalizedColor = unit.color_name?.trim().toLowerCase() || null;
+      const colorMatch =
+        !selectedColor || normalizedColor === selectedColor.trim().toLowerCase();
+      const storageMatch =
+        selectedStorage === null || unit.storage_gb === selectedStorage;
+      const ram = (unit as { ram_gb?: number | null }).ram_gb;
+      const ramMatch = selectedRam === null || ram === selectedRam;
+      return colorMatch && storageMatch && ramMatch;
+    });
+  }, [units, selectedColor, selectedStorage, selectedRam]);
+
+  const hasAnyVariantFilter = selectedColor !== null || selectedStorage !== null || selectedRam !== null;
+
+  const activeUnits = useMemo(() => {
+    if (filteredUnits.length > 0) return filteredUnits;
+    if (!hasAnyVariantFilter) return units;
+    return [];
+  }, [filteredUnits, units, hasAnyVariantFilter]);
+
+  const effectiveCartUnit = useMemo(() => {
+    if (activeUnits.length === 0) return null;
+    return activeUnits.reduce((best, u) => {
+      const p = parseFloat(String(u.selling_price ?? '0'));
+      const bestP = parseFloat(String(best.selling_price ?? '0'));
+      return p > bestP ? u : best;
+    }, activeUnits[0]);
+  }, [activeUnits]);
+
+  useEffect(() => {
+    setSelectedUnitId(effectiveCartUnit?.id ?? null);
+  }, [effectiveCartUnit]);
 
   const handleQuickAddToggle = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -294,13 +331,31 @@ export function ProductCard({
       ? compareAtDisplay - product.min_price
       : null;
 
+  const activeUnitsMaxPrice = useMemo(() => {
+    if (activeUnits.length === 0) return null;
+    const prices = activeUnits.map((u) => parseFloat(String(u.selling_price ?? '0')));
+    return Math.max(...prices);
+  }, [activeUnits]);
+
+  const showSinglePrice = hasAnyVariantFilter && activeUnits.length > 0;
+  const resolvedPriceText = showSinglePrice && activeUnitsMaxPrice !== null
+    ? formatPrice(activeUnitsMaxPrice)
+    : hasPriceRange
+      ? formatPriceRange(product.min_price ?? null, product.max_price ?? null)
+      : 'Price on request';
+
+  /** Show add-to-cart button (icon + price) on hover when at least one variant can be added; button shows single/max price */
+  const showAddToCartSingleButton = activeUnits.length >= 1 && activeUnitsMaxPrice != null;
+  const addToCartButtonPriceText = activeUnitsMaxPrice != null ? formatPrice(activeUnitsMaxPrice) : resolvedPriceText;
+
+  const cartIconSvg = (
+    <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
+      <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+    </svg>
+  );
+
   if (isFeaturedVariant) {
     const canAddToCart = Boolean(selectedUnit?.id) && !isAddingToCart && !unitsLoading;
-    const cartIconSvg = (
-      <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-      </svg>
-    );
     return (
       <Link
         href={getProductHref(product)}
@@ -328,9 +383,7 @@ export function ProductCard({
             >
               {product.product_name}
             </p>
-            <span className="product-card__buy-btn product-card__buy-btn--featured">
-              Buy
-            </span>
+            <span className="product-card__buy-btn product-card__buy-btn--featured">Buy</span>
             <button
               type="button"
               onClick={(event) => {
@@ -347,18 +400,53 @@ export function ProductCard({
             </button>
           </div>
           <div className="product-card__footer-overlay">
-            {storageOptions.length > 0 && (
-              <div className="product-card__overlay-row">
-                <span className="product-card__overlay-label">Storage</span>
-                <div className="product-card__storage-options product-card__storage-options--expanded">
-                  {storageOptions.map((option) => (
+            <div className="product-card__overlay-row">
+              <span className="product-card__overlay-label">Color</span>
+              <div className="product-card__overlay-swatches">
+                {colorOptions.length > 0 ? (
+                  colorOptions.map((color) => {
+                    const normalized = color.name.trim().toLowerCase();
+                    const isActive =
+                      !!selectedColor &&
+                      selectedColor.trim().toLowerCase() === normalized;
+                    return (
+                      <button
+                        key={color.name}
+                        type="button"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          setSelectedColor((prev) =>
+                            prev && prev.trim().toLowerCase() === normalized ? null : color.name
+                          );
+                        }}
+                        className={`product-card__overlay-swatch ${
+                          isActive ? 'product-card__overlay-swatch--active' : ''
+                        }`}
+                      >
+                        {color.name}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <span className="product-card__overlay-empty">No colors</span>
+                )}
+              </div>
+            </div>
+            <div className="product-card__overlay-row">
+              <span className="product-card__overlay-label">Storage</span>
+              <div className="product-card__storage-options product-card__storage-options--expanded">
+                {storageOptions.length > 0 ? (
+                  storageOptions.map((option) => (
                     <button
                       key={option.storage}
                       type="button"
                       onClick={(event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        setSelectedStorage(option.storage);
+                        setSelectedStorage((prev) =>
+                          prev === option.storage ? null : option.storage
+                        );
                       }}
                       className={`product-card__storage-option ${
                         selectedStorage === option.storage
@@ -368,29 +456,45 @@ export function ProductCard({
                     >
                       {option.storage}GB
                     </button>
-                  ))}
-                </div>
+                  ))
+                ) : (
+                  <span className="product-card__overlay-empty">No storage</span>
+                )}
               </div>
-            )}
-            {ramOptions.length > 0 && (
-              <div className="product-card__overlay-row">
-                <span className="product-card__overlay-label">RAM</span>
-                <div className="product-card__ram-options">
-                  {ramOptions.map((ram) => (
-                    <span key={ram} className="product-card__ram-chip">{ram}GB</span>
-                  ))}
-                </div>
+            </div>
+            <div className="product-card__overlay-row">
+              <span className="product-card__overlay-label">RAM</span>
+              <div className="product-card__ram-options">
+                {ramOptions.length > 0 ? (
+                  ramOptions.map((ram) => (
+                    <button
+                      key={ram}
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setSelectedRam((prev) => (prev === ram ? null : ram));
+                      }}
+                      className={`product-card__ram-chip ${
+                        selectedRam === ram ? 'product-card__ram-chip--active' : ''
+                      }`}
+                    >
+                      {ram}GB
+                    </button>
+                  ))
+                ) : (
+                  <span className="product-card__overlay-empty">No RAM</span>
+                )}
               </div>
-            )}
+            </div>
             <div className="product-card__overlay-row">
               <span className="product-card__overlay-label">Price</span>
               <span className="product-card__overlay-price">
-                {hasPriceRange
-                  ? formatPriceRange(product.min_price ?? null, product.max_price ?? null)
-                  : selectedUnit?.selling_price
-                    ? formatPrice(parseFloat(selectedUnit.selling_price))
-                    : 'Price on request'}
+                {resolvedPriceText}
               </span>
+              {hasAnyVariantFilter && activeUnits.length === 0 && (
+                <span className="product-card__overlay-price-hint">No variant for this selection</span>
+              )}
             </div>
             {showRatings && (
               <div className="product-card__overlay-row product-card__footer-rating">
@@ -398,25 +502,23 @@ export function ProductCard({
               </div>
             )}
             <div className="product-card__overlay-actions">
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  if (!selectedUnit?.id) return;
-                  handleAddToCart(event, 1);
-                }}
-                disabled={!canAddToCart || isAddingToCart}
-                className="product-card__cart-icon product-card__cart-icon--featured product-card__cart-icon--overlay"
-                aria-label="Add to cart"
-              >
-                {cartIconSvg}
-              </button>
-            </div>
-            <div className="product-card__payment-methods product-card__payment-methods--overlay">
-              <span className="product-card__payment-label">VISA</span>
-              <span className="product-card__payment-label">M-Pesa</span>
-              <span className="product-card__payment-label">PayPal</span>
+              {showAddToCartSingleButton && (
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (!selectedUnit?.id) return;
+                    handleAddToCart(event, 1);
+                  }}
+                  disabled={!canAddToCart || isAddingToCart}
+                  className="product-card__add-to-cart-btn product-card__add-to-cart-btn--overlay-single"
+                  aria-label="Add to cart"
+                >
+                  <span className="product-card__add-to-cart-btn-icon">{cartIconSvg}</span>
+                  <span className="product-card__add-to-cart-btn-price">{addToCartButtonPriceText}</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -532,6 +634,27 @@ export function ProductCard({
         {!isMinimal && (
           <div className="product-card__overlay" />
         )}
+
+        {/* Hover-only add-to-cart (icon + price) when one variant left — same behaviour as featured */}
+        {!isMinimal && showAddToCartSingleButton && (
+          <div className="product-card__hover-add">
+            <button
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!selectedUnit?.id) return;
+                handleAddToCart(event, 1);
+              }}
+              disabled={!selectedUnit?.id || isAddingToCart}
+              className="product-card__add-to-cart-btn product-card__add-to-cart-btn--overlay-single"
+              aria-label="Add to cart"
+            >
+              <span className="product-card__add-to-cart-btn-icon">{cartIconSvg}</span>
+              <span className="product-card__add-to-cart-btn-price">{addToCartButtonPriceText}</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Product Info */}
@@ -581,48 +704,148 @@ export function ProductCard({
           </div>
         )}
 
-          {/* Swatches */}
-          {allowSwatches && colorOptions.length > 0 && (
-            <div className="product-card__swatches">
-              {colorOptions.slice(0, 4).map((color) => (
-                <span
-                  key={color.name}
-                  className="product-card__swatch"
-                  title={color.name}
-                >
-                  {color.name}
-                </span>
-              ))}
-              {colorOptions.length > 4 && (
-                <span className="product-card__swatch product-card__swatch--more">
-                  +{colorOptions.length - 4}
-                </span>
-              )}
+          {/* Color — always reserve space; show swatches or "No colors" */}
+          {!isMinimal && (
+            <div className="product-card__overlay-row">
+              <span className="product-card__overlay-label">Color</span>
+              <div className="product-card__swatches">
+                {allowSwatches && colorOptions.length > 0 ? (
+                  <>
+                    {colorOptions.slice(0, 4).map((color) => {
+                      const normalized = color.name.trim().toLowerCase();
+                      const isActive =
+                        !!selectedColor &&
+                        selectedColor.trim().toLowerCase() === normalized;
+                      return (
+                        <button
+                          key={color.name}
+                          type="button"
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            setSelectedColor((prev) =>
+                              prev && prev.trim().toLowerCase() === normalized ? null : color.name
+                            );
+                          }}
+                          className={`product-card__swatch ${
+                            isActive ? 'product-card__swatch--active' : ''
+                          }`}
+                          title={color.name}
+                        >
+                          {color.name}
+                        </button>
+                      );
+                    })}
+                    {colorOptions.length > 4 && (
+                      <span className="product-card__swatch product-card__swatch--more">
+                        +{colorOptions.length - 4}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="product-card__overlay-empty">No colors</span>
+                )}
+              </div>
             </div>
           )}
 
-        {/* Price */}
+          {/* Storage — always reserve space for non-minimal cards */}
+          {!isMinimal && (
+            <div className="product-card__overlay-row">
+              <span className="product-card__overlay-label">Storage</span>
+              <div className="product-card__storage-options">
+                {storageOptions.length > 0 ? (
+                  storageOptions.map((option) => (
+                    <button
+                      key={option.storage}
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setSelectedStorage((prev) =>
+                          prev === option.storage ? null : option.storage
+                        );
+                      }}
+                      className={`product-card__storage-option ${
+                        selectedStorage === option.storage
+                          ? 'product-card__storage-option--active'
+                          : ''
+                      }`}
+                    >
+                      {option.storage}GB
+                    </button>
+                  ))
+                ) : (
+                  <span className="product-card__overlay-empty">No storage</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* RAM — always reserve space for non-minimal cards */}
+          {!isMinimal && (
+            <div className="product-card__overlay-row">
+              <span className="product-card__overlay-label">RAM</span>
+              <div className="product-card__ram-options">
+                {ramOptions.length > 0 ? (
+                  ramOptions.map((ram) => (
+                    <button
+                      key={ram}
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setSelectedRam((prev) => (prev === ram ? null : ram));
+                      }}
+                      className={`product-card__ram-chip ${
+                        selectedRam === ram ? 'product-card__ram-chip--active' : ''
+                      }`}
+                    >
+                      {ram}GB
+                    </button>
+                  ))
+                ) : (
+                  <span className="product-card__overlay-empty">No RAM</span>
+                )}
+              </div>
+            </div>
+          )}
+
+        {/* Price — always reflects current variant filters (color / storage / RAM) */}
         <div className={`product-card__price-block ${isMinimal ? 'product-card__price-block--minimal' : 'product-card__price-block--standard'}`}>
-            {hasPriceRange ? (
-              showComparePrice ? (
-                <div className="product-card__price-row">
-                  <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
-                    {formatPrice(product.min_price ?? null)}
-                  </p>
-                  <p className={`product-card__msrp ${isMinimal ? 'product-card__msrp--compact' : ''}`}>
-                    {formatPrice(compareAtDisplay ?? null)}
-                  </p>
-                  {isMinimal && savings !== null && (
-                    <span className="product-card__savings">
-                      Save {formatPrice(savings)}
-                    </span>
-                  )}
-                </div>
-              ) : (
+          {activeUnitsMaxPrice !== null ? (
             <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
-            {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
+              {resolvedPriceText}
             </p>
-              )
+          ) : hasAnyVariantFilter && activeUnits.length === 0 ? (
+            <>
+              <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
+                {hasPriceRange
+                  ? formatPriceRange(product.min_price ?? null, product.max_price ?? null)
+                  : 'Price on request'}
+              </p>
+              <p className="product-card__price-hint">No variant for this selection</p>
+            </>
+          ) : hasPriceRange ? (
+            showComparePrice ? (
+              <div className="product-card__price-row">
+                <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
+                  {formatPrice(product.min_price ?? null)}
+                </p>
+                <p className={`product-card__msrp ${isMinimal ? 'product-card__msrp--compact' : ''}`}>
+                  {formatPrice(compareAtDisplay ?? null)}
+                </p>
+                {isMinimal && savings !== null && (
+                  <span className="product-card__savings">
+                    Save {formatPrice(savings)}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
+                {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
+              </p>
+            )
           ) : (
             <p className={`product-card__price-request ${isMinimal ? 'product-card__price-request--compact' : ''}`}>
               Price on request
@@ -646,7 +869,7 @@ export function ProductCard({
               {!unitsLoading && units.length > 0 && (
                 <>
                   <div className="product-card__quick-add-options">
-                    {units.slice(0, 4).map((unit) => (
+                    {activeUnits.slice(0, 4).map((unit) => (
                       <button
                         key={unit.id}
                         type="button"

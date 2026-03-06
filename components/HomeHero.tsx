@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
@@ -16,6 +16,8 @@ import { getProductHref } from '@/lib/utils/productRoutes';
 const PROMOTIONS_PAGE_SIZE = 50;
 const PROMO_THUMB_SIZE = 320;
 const HERO_BANNER_SIZE = 1400;
+/** Number of placeholder/skeleton cards when there are no hero promotions (keep 4 visible to match itemsPerView). */
+const HERO_PLACEHOLDER_COUNT = 4;
 
 function normalizeLocations(value: unknown): string[] {
   if (Array.isArray(value)) {
@@ -107,124 +109,128 @@ export function HomeHero() {
   const activeBannerSrc =
     activePromotion?.banner_image_url || activePromotion?.banner_image || null;
 
+  const carouselContent: ReactNode[] = promosLoading && promotions.length === 0
+    ? Array.from({ length: HERO_PLACEHOLDER_COUNT }).map((_, i) => (
+        <div key={i} className="home-hero__promo-skeleton" />
+      ))
+    : promotions.length > 0
+      ? promotions.map((promotion) => {
+          const id = typeof promotion.id === 'number' ? promotion.id : null;
+          const isActive = id !== null && id === activePromotionId;
+          const thumbSrc = promotion.banner_image_url || promotion.banner_image || null;
+          return (
+            <button
+              key={id ?? promotion.title}
+              type="button"
+              className={`home-hero__promo-card ${isActive ? 'home-hero__promo-card--active' : ''}`}
+              onMouseEnter={() => { if (id !== null) setActivePromotionId(id); }}
+              onFocus={() => { if (id !== null) setActivePromotionId(id); }}
+              onClick={() => { if (id !== null) setActivePromotionId(id); }}
+              aria-pressed={isActive}
+            >
+              <div className="home-hero__promo-media">
+                {thumbSrc ? (
+                  <Image
+                    src={getCloudinarySizedImageUrl(thumbSrc, PROMO_THUMB_SIZE, 'contain')}
+                    alt={promotion.title}
+                    width={PROMO_THUMB_SIZE}
+                    height={PROMO_THUMB_SIZE}
+                    className="home-hero__promo-image"
+                    unoptimized={thumbSrc.includes('localhost') || thumbSrc.includes('127.0.0.1') || thumbSrc.includes('placehold.co')}
+                  />
+                ) : (
+                  <div className="home-hero__promo-image home-hero__promo-image--placeholder" />
+                )}
+              </div>
+              <div className="home-hero__promo-info">
+                <p className="home-hero__promo-title">{promotion.title}</p>
+                {promotion.discount_display ? (
+                  <p className="home-hero__promo-subtitle">{promotion.discount_display}</p>
+                ) : promotion.description ? (
+                  <p className="home-hero__promo-subtitle">{promotion.description}</p>
+                ) : (
+                  <p className="home-hero__promo-subtitle">View offer</p>
+                )}
+              </div>
+            </button>
+          );
+        })
+      : Array.from({ length: HERO_PLACEHOLDER_COUNT }).map((_, index) => (
+          <div key={index} className="home-hero__promo-empty-card" aria-label="Promotions coming soon">
+            <div className="home-hero__promo-empty-media" />
+            <div className="home-hero__promo-empty-body">
+              <p className="home-hero__promo-empty-title">Coming soon</p>
+              <p className="home-hero__promo-empty-copy">
+                Future deals and stories will appear here.
+              </p>
+            </div>
+          </div>
+        ));
+
   return (
     <section className="home-hero" aria-label="Homepage hero">
       <div className="home-hero__container">
-        <div className="home-hero__promo-row" aria-label="Promotions">
-          {promosLoading && promotions.length === 0 ? (
-            <div className="home-hero__promo-skeleton-track">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="home-hero__promo-skeleton" />
-              ))}
-            </div>
-          ) : promotions.length > 0 ? (
-            <ProductCarousel
-              itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
-              showNavigation
-              showPagination={false}
-              autoPlay={false}
-              className="home-hero__promo-carousel"
-            >
-              {promotions.map((promotion) => {
-                const id = typeof promotion.id === 'number' ? promotion.id : null;
-                const isActive = id !== null && id === activePromotionId;
-                const thumbSrc = promotion.banner_image_url || promotion.banner_image || null;
-                return (
-                  <button
-                    key={id ?? promotion.title}
-                    type="button"
-                    className={`home-hero__promo-card ${isActive ? 'home-hero__promo-card--active' : ''}`}
-                    onMouseEnter={() => {
-                      if (id !== null) setActivePromotionId(id);
-                    }}
-                    onFocus={() => {
-                      if (id !== null) setActivePromotionId(id);
-                    }}
-                    onClick={() => {
-                      if (id !== null) setActivePromotionId(id);
-                    }}
-                    aria-pressed={isActive}
-                  >
-                    <div className="home-hero__promo-media">
-                      {thumbSrc ? (
-                        <Image
-                          src={getCloudinarySizedImageUrl(thumbSrc, PROMO_THUMB_SIZE, 'contain')}
-                          alt={promotion.title}
-                          width={PROMO_THUMB_SIZE}
-                          height={PROMO_THUMB_SIZE}
-                          className="home-hero__promo-image"
-                          unoptimized={
-                            thumbSrc.includes('localhost') ||
-                            thumbSrc.includes('127.0.0.1') ||
-                            thumbSrc.includes('placehold.co')
-                          }
-                        />
-                      ) : (
-                        <div className="home-hero__promo-image home-hero__promo-image--placeholder" />
-                      )}
-                    </div>
-                    <div className="home-hero__promo-info">
-                      <p className="home-hero__promo-title">{promotion.title}</p>
-                      {promotion.discount_display ? (
-                        <p className="home-hero__promo-subtitle">{promotion.discount_display}</p>
-                      ) : promotion.description ? (
-                        <p className="home-hero__promo-subtitle">{promotion.description}</p>
-                      ) : (
-                        <p className="home-hero__promo-subtitle">View offer</p>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </ProductCarousel>
-          ) : (
-            <div className="home-hero__promo-empty-track" aria-label="Promotions coming soon">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="home-hero__promo-empty-card">
-                  <div className="home-hero__promo-empty-media" />
-                  <div className="home-hero__promo-empty-body">
-                    <p className="home-hero__promo-empty-title">Coming soon</p>
-                    <p className="home-hero__promo-empty-copy">
-                      Future deals and stories will appear here.
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Single grid: row1 = track (full width), row2 = nav (left) | banner (right), row3 = search (left), row4 = card (left) */}
+        <div className="home-hero__main-grid" aria-label="Promotions">
+          <ProductCarousel
+            itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
+            showNavigation
+            alwaysShowNavigation
+            splitNav
+            showPagination={false}
+            autoPlay={false}
+            className="home-hero__promo-carousel"
+          >
+            {...carouselContent}
+          </ProductCarousel>
 
-        <div className="home-hero__grid">
-          <div className="home-hero__left">
-            <form
-              className="home-hero__search"
-              onSubmit={(e) => {
+          <div className="home-hero__right">
+            {activePromotion && activeBannerSrc ? (
+              <Link href={getPromotionHref(activePromotion)} className="home-hero__banner" aria-label={activePromotion.title}>
+                <Image
+                  src={getCloudinarySizedImageUrl(activeBannerSrc, HERO_BANNER_SIZE, 'cover')}
+                  alt={activePromotion.title}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="home-hero__banner-image"
+                  priority
+                  unoptimized={activeBannerSrc.includes('localhost') || activeBannerSrc.includes('127.0.0.1') || activeBannerSrc.includes('placehold.co')}
+                />
+              </Link>
+            ) : (
+              <div className="home-hero__banner home-hero__banner--placeholder" />
+            )}
+          </div>
+
+          <form
+            className="home-hero__search"
+            onSubmit={(e) => {
                 e.preventDefault();
                 const q = query.trim();
                 if (!q) return;
                 router.push(`/products?search=${encodeURIComponent(q)}&focusSearch=1`);
               }}
-            >
-              <div className="home-hero__search-field">
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search products…"
-                  className="home-hero__search-input"
-                  type="text"
-                  inputMode="search"
-                />
-                <button className="home-hero__search-button" type="submit" aria-label="Search">
-                  <svg className="home-hero__search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="7" />
-                    <line x1="16.5" y1="16.5" x2="21" y2="21" />
-                  </svg>
-                </button>
-              </div>
-            </form>
+          >
+            <div className="home-hero__search-field">
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search products…"
+                className="home-hero__search-input"
+                type="text"
+                inputMode="search"
+              />
+              <button className="home-hero__search-button" type="submit" aria-label="Search">
+                <svg className="home-hero__search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="7" />
+                  <line x1="16.5" y1="16.5" x2="21" y2="21" />
+                </svg>
+              </button>
+            </div>
+          </form>
 
-            <div className="home-hero__left-card" aria-live="polite">
-              {!searchEnabled ? (
+          <div className="home-hero__left-card" aria-live="polite">
+            {!searchEnabled ? (
                 <div className="home-hero__placeholder">
                   <div className="home-hero__placeholder-media" aria-hidden />
                   <div className="home-hero__placeholder-body">
@@ -271,25 +277,6 @@ export function HomeHero() {
                     We couldn’t find anything for “{normalizedQuery}”. Try a different search.
                   </p>
                 </div>
-              )}
-            </div>
-          </div>
-
-          <div className="home-hero__right">
-            {activePromotion && activeBannerSrc ? (
-              <Link href={getPromotionHref(activePromotion)} className="home-hero__banner" aria-label={activePromotion.title}>
-                <Image
-                  src={getCloudinarySizedImageUrl(activeBannerSrc, HERO_BANNER_SIZE, 'cover')}
-                  alt={activePromotion.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="home-hero__banner-image"
-                  priority
-                  unoptimized={activeBannerSrc.includes('localhost') || activeBannerSrc.includes('127.0.0.1') || activeBannerSrc.includes('placehold.co')}
-                />
-              </Link>
-            ) : (
-              <div className="home-hero__banner home-hero__banner--placeholder" />
             )}
           </div>
         </div>

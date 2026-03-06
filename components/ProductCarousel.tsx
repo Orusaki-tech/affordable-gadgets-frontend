@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useEffect, ReactNode } from 'react';
+import React, { useRef, useState, useEffect, ReactNode } from 'react';
 
 interface ProductCarouselProps {
   children: ReactNode[];
@@ -10,6 +10,10 @@ interface ProductCarouselProps {
     desktop?: number;
   };
   showNavigation?: boolean;
+  /** When true, progress bar and arrows are always shown (e.g. hero) so layout matches across breakpoints. */
+  alwaysShowNavigation?: boolean;
+  /** When true, track and nav render as separate sibling elements for grid placement (e.g. hero: track full width, nav in left column). */
+  splitNav?: boolean;
   showPagination?: boolean;
   autoPlay?: boolean;
   autoPlayInterval?: number;
@@ -20,6 +24,8 @@ export function ProductCarousel({
   children,
   itemsPerView = { mobile: 1, tablet: 2, desktop: 4 },
   showNavigation = true,
+  alwaysShowNavigation = false,
+  splitNav = false,
   showPagination = false,
   autoPlay = false,
   autoPlayInterval = 5000,
@@ -131,19 +137,18 @@ export function ProductCarousel({
   const totalSlides = Math.ceil(children.length / itemsPerSlide);
   const progressPercent =
     totalSlides > 1 ? ((currentIndex + 1) / totalSlides) * 100 : 100;
+  const showProgressBlock = alwaysShowNavigation || totalSlides > 1;
+  const showArrows = showNavigation && (children.length > itemsPerSlide);
 
-  return (
+  const trackEl = (
     <div className={`product-carousel ${className}`}>
-      {/* Carousel Container */}
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
         className="product-carousel__track scrollbar-hide"
       >
         {children.map((child, index) => {
-          // Calculate width based on items per slide
           const itemWidth = `calc(100% / ${itemsPerSlide})`;
-          
           return (
             <div
               key={index}
@@ -159,9 +164,91 @@ export function ProductCarousel({
           );
         })}
       </div>
+    </div>
+  );
 
-      {/* Progress Bar + Arrows */}
-      {totalSlides > 1 && (
+  const navEl = showProgressBlock && (
+    <div className="product-carousel__nav samsung-progressbar">
+      <div className="samsung-progressbar-inner">
+        <div className="samsung-progressbar-bar">
+          <span
+            className="samsung-progressbar-fill"
+            style={{
+              transform: `scaleX(${progressPercent / 100})`,
+              transitionDuration: '300ms',
+            }}
+          />
+        </div>
+        {showNavigation && (showArrows || alwaysShowNavigation) && (
+          <div className="samsung-progressbar-arrows">
+            <button
+              onClick={() => scroll('left')}
+              disabled={!canScrollLeft}
+              className="samsung-progressbar-arrow"
+              aria-label="Previous Slide"
+              aria-disabled={!canScrollLeft}
+              type="button"
+            >
+              <span className="sr-only">Previous</span>
+              <svg className="samsung-progressbar-icon" focusable="false" aria-hidden="true" viewBox="0 0 40 40">
+                <g transform="translate(40 40) rotate(180)">
+                  <path d="M21.47,16.53A.75.75,0,0,1,22.53,15.47l4,4a.75.75,0,0,1,0,1.061l-4,4A.75.75,0,0,1,21.47,23.47l2.72-2.72H14.5a.75.75,0,0,1,0-1.5h9.689Z"></path>
+                </g>
+              </svg>
+            </button>
+            <button
+              onClick={() => scroll('right')}
+              disabled={!canScrollRight}
+              className="samsung-progressbar-arrow"
+              aria-label="Next Slide"
+              aria-disabled={!canScrollRight}
+              type="button"
+            >
+              <span className="sr-only">Next</span>
+              <svg className="samsung-progressbar-icon" focusable="false" aria-hidden="true" viewBox="0 0 40 40">
+                <path d="M21.47,16.53A.75.75,0,0,1,22.53,15.47l4,4a.75.75,0,0,1,0,1.061l-4,4A.75.75,0,0,1,21.47,23.47l2.72-2.72H14.5a.75.75,0,0,1,0-1.5h9.689Z"></path>
+              </svg>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  if (splitNav) {
+    return (
+      <>
+        {trackEl}
+        {navEl}
+      </>
+    );
+  }
+
+  return (
+    <div className={`product-carousel ${className}`}>
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="product-carousel__track scrollbar-hide"
+      >
+        {children.map((child, index) => {
+          const itemWidth = `calc(100% / ${itemsPerSlide})`;
+          return (
+            <div
+              key={index}
+              className="product-carousel__item samsung-carousel-item"
+              style={{
+                width: itemWidth,
+                minWidth: itemWidth,
+                animationDelay: `${Math.min(index + 1, 4) * 0.15}s`,
+              }}
+            >
+              {child}
+            </div>
+          );
+        })}
+      </div>
+      {showProgressBlock && (
         <div className="samsung-progressbar">
           <div className="samsung-progressbar-inner">
             <div className="samsung-progressbar-bar">
@@ -173,7 +260,7 @@ export function ProductCarousel({
                 }}
               />
             </div>
-            {showNavigation && children.length > itemsPerSlide && (
+            {showNavigation && (showArrows || alwaysShowNavigation) && (
               <div className="samsung-progressbar-arrows">
                 <button
                   onClick={() => scroll('left')}
@@ -181,6 +268,7 @@ export function ProductCarousel({
                   className="samsung-progressbar-arrow"
                   aria-label="Previous Slide"
                   aria-disabled={!canScrollLeft}
+                  type="button"
                 >
                   <span className="sr-only">Previous</span>
                   <svg className="samsung-progressbar-icon" focusable="false" aria-hidden="true" viewBox="0 0 40 40">
@@ -195,6 +283,7 @@ export function ProductCarousel({
                   className="samsung-progressbar-arrow"
                   aria-label="Next Slide"
                   aria-disabled={!canScrollRight}
+                  type="button"
                 >
                   <span className="sr-only">Next</span>
                   <svg className="samsung-progressbar-icon" focusable="false" aria-hidden="true" viewBox="0 0 40 40">
@@ -206,7 +295,6 @@ export function ProductCarousel({
           </div>
         </div>
       )}
-
     </div>
   );
 }

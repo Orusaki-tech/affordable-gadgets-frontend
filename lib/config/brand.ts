@@ -37,6 +37,7 @@ const normalizeApiBaseUrl = (url: string | undefined): string => {
 // Helper function to normalize site URL (must have protocol for Next.js metadata)
 const normalizeSiteUrl = (url: string | undefined): string => {
   const defaultUrl = 'https://www.affordable-gadgetske.com';
+  const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production';
 
   // If nothing is provided, use our canonical production domain
   if (!url || url.trim() === '') {
@@ -56,6 +57,12 @@ const normalizeSiteUrl = (url: string | undefined): string => {
   // If URL doesn't start with http:// or https://, add https://
   if (!normalized.startsWith('http://') && !normalized.startsWith('https://')) {
     normalized = 'https://' + normalized;
+  }
+
+  // In production, never publish *.vercel.app in canonical URLs (sitemap, metadata, etc.)
+  // This avoids misconfiguration where NEXT_PUBLIC_SITE_URL is left as the Vercel preview/domain.
+  if (isProduction && /(?:^|\.)vercel\.app$/.test(new URL(normalized).hostname)) {
+    return defaultUrl;
   }
 
   return normalized;

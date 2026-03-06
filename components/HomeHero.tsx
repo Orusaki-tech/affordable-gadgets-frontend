@@ -14,8 +14,21 @@ import { getCloudinarySizedImageUrl } from '@/lib/utils/cloudinary';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
 const PROMOTIONS_PAGE_SIZE = 50;
-const PROMO_THUMB_SIZE = 96;
+const PROMO_THUMB_SIZE = 320;
 const HERO_BANNER_SIZE = 1400;
+
+function normalizeLocations(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item));
+  }
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
 
 function sortPromotions(promotions: PublicPromotion[]) {
   return [...promotions].sort((a, b) => {
@@ -53,7 +66,16 @@ export function HomeHero() {
 
   const promotions = useMemo(() => {
     const results = (promotionsData as PaginatedPublicPromotionList | undefined)?.results ?? [];
-    return sortPromotions(results as PublicPromotion[]);
+
+    const featuredForHero = (results as PublicPromotion[]).filter((promo) => {
+      const locations = normalizeLocations((promo as any).display_locations);
+      return locations.length > 0 && locations.includes('homepage_hero');
+    });
+
+    const baseList =
+      featuredForHero.length > 0 ? featuredForHero : (results as PublicPromotion[]);
+
+    return sortPromotions(baseList);
   }, [promotionsData]);
 
   const [activePromotionId, setActivePromotionId] = useState<number | null>(null);
@@ -156,7 +178,19 @@ export function HomeHero() {
               })}
             </ProductCarousel>
           ) : (
-            <div className="home-hero__promo-empty">No promotions available right now.</div>
+            <div className="home-hero__promo-empty-track" aria-label="Promotions coming soon">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="home-hero__promo-empty-card">
+                  <div className="home-hero__promo-empty-media" />
+                  <div className="home-hero__promo-empty-body">
+                    <p className="home-hero__promo-empty-title">Coming soon</p>
+                    <p className="home-hero__promo-empty-copy">
+                      Future deals and stories will appear here.
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
@@ -181,7 +215,7 @@ export function HomeHero() {
                   inputMode="search"
                 />
                 <button className="home-hero__search-button" type="submit" aria-label="Search">
-                  <svg className="home-hero__search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <svg className="home-hero__search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="11" cy="11" r="7" />
                     <line x1="16.5" y1="16.5" x2="21" y2="21" />
                   </svg>

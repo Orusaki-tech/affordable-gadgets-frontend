@@ -1,3 +1,3 @@
 import './openapi';
 
-export * from '@shwari/api-client';
+export * from '../../packages/api-client/src';

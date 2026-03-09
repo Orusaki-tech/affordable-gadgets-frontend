@@ -12,11 +12,31 @@ const SCROLL_STEP = ITEM_WIDTH + GAP;
  * Each item is 240×120px with progress bar and samsung-progressbar-arrows.
  */
 const BRAND_ITEMS: { href: string; image?: string; label?: string }[] = [
-  { href: '/products', label: '1' },
-  { href: '/products', label: '2' },
-  { href: '/products', label: '3' },
-  { href: '/products', label: '4' },
-  { href: '/products', label: '5' },
+  {
+    href: '/products',
+    image: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773054258/3_lbgh7q.png',
+    label: 'Brand showcase 1',
+  },
+  {
+    href: '/products',
+    image: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773054258/5_ezh1ms.png',
+    label: 'Brand showcase 2',
+  },
+  {
+    href: '/products',
+    image: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773054258/4_bmik5e.png',
+    label: 'Brand showcase 3',
+  },
+  {
+    href: '/products',
+    image: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773054258/1_fvrjqp.png',
+    label: 'Brand showcase 4',
+  },
+  {
+    href: '/products',
+    image: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773054257/2_ogrdnk.png',
+    label: 'Brand showcase 5',
+  },
 ];
 
 export function BrandCarousel() {

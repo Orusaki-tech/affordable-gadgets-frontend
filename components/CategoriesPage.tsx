@@ -1,39 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { CATEGORY_CARDS, type CategoryCard } from '@/lib/config/categories';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from './ProductCard';
-
-const categories = [
-  {
-    name: 'Phones',
-    code: 'PH',
-    description: 'Latest smartphones from top brands',
-    icon: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773055199/Heat_forged_aluminum_unibody_design_for_exceptional_pro_capability._nwpsxm.png',
-    href: '/products?type=PH',
-  },
-  {
-    name: 'Laptops',
-    code: 'LT',
-    description: 'Powerful laptops for work and play',
-    icon: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773055801/mac_rehplw.png',
-    href: '/products?type=LT',
-  },
-  {
-    name: 'Tablets/Ipads',
-    code: 'TB',
-    description: 'Portable tablets for productivity',
-    icon: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773056536/ipadpro_klepgq.png',
-    href: '/products?type=TB',
-  },
-  {
-    name: 'Accessories',
-    code: 'AC',
-    description: 'Essential accessories and peripherals',
-    icon: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773056301/rhode_lk7kcy.png',
-    href: '/products?type=AC',
-  },
-];
 
 export function CategoriesPage() {
   return (
@@ -42,25 +12,25 @@ export function CategoriesPage() {
 
       {/* Category Cards */}
       <div className="categories-page__grid">
-        {categories.map((category) => (
-        <Link key={category.code} href={category.href} className="categories-page__card" prefetch={false}>
-          {/* Wrap the image in its own container for the background color */}
-          <div className="categories-page__card-image-wrapper">
-            <img 
-              src={category.icon} 
-              alt={category.name} 
-              className="categories-page__card-icon" 
-            />
-          </div>
-          {/* Title sits below the image wrapper */}
-          <p className="categories-page__card-title">{category.name}</p>
-        </Link>
+        {CATEGORY_CARDS.map((category) => (
+          <Link key={category.code} href={category.href} className="categories-page__card" prefetch={false}>
+            {/* Wrap the image in its own container for the background color */}
+            <div className="categories-page__card-image-wrapper">
+              <img
+                src={category.image}
+                alt={category.name}
+                className="categories-page__card-icon"
+              />
+            </div>
+            {/* Title sits below the image wrapper */}
+            <p className="categories-page__card-title">{category.name}</p>
+          </Link>
         ))}
       </div>
 
       {/* Featured Products by Category */}
       <div className="categories-page__sections">
-        {categories.map((category) => (
+        {CATEGORY_CARDS.map((category) => (
           <CategoryProducts key={category.code} category={category} />
         ))}
       </div>
@@ -68,15 +38,7 @@ export function CategoriesPage() {
   );
 }
 
-type Category = {
-  name: string;
-  code: string;
-  description: string;
-  icon: string;
-  href: string;
-};
-
-function CategoryProducts({ category }: { category: Category }) {
+function CategoryProducts({ category }: { category: CategoryCard }) {
   const { data, isLoading } = useProducts({ type: category.code, page_size: 4 });
   const filteredResults = (data?.results ?? []).filter(
     (product) => product.product_type === category.code

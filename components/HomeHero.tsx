@@ -29,8 +29,11 @@ type HomeHeroPromotion = PublicPromotion & {
 const PROMOTIONS_PAGE_SIZE = 50;
 const PROMO_THUMB_SIZE = 320;
 const HERO_BANNER_SIZE = 1400;
+const HERO_LEFT_PLACEHOLDER_SIZE = 800;
 /** Number of placeholder/skeleton cards when there are no hero promotions (keep 4 visible to match itemsPerView). */
 const HERO_PLACEHOLDER_COUNT = 4;
+const HERO_PROMOTION_PLACEHOLDER_IMAGE =
+  'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773069898/pixel8_cd7p2f.png';
 
 function normalizeLocations(value: unknown): string[] {
   if (Array.isArray(value)) {
@@ -133,6 +136,16 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
 
   const activeBannerSrc =
     activePromotion?.banner_image_url || activePromotion?.banner_image || null;
+  const fallbackBannerSrc = getCloudinarySizedImageUrl(
+    HERO_PROMOTION_PLACEHOLDER_IMAGE,
+    HERO_BANNER_SIZE,
+    'contain'
+  );
+  const leftPlaceholderSrc = getCloudinarySizedImageUrl(
+    HERO_PROMOTION_PLACEHOLDER_IMAGE,
+    HERO_LEFT_PLACEHOLDER_SIZE,
+    'contain'
+  );
 
   const carouselContent: ReactNode[] = promosLoading && promotions.length === 0
     ? Array.from({ length: HERO_PLACEHOLDER_COUNT }).map((_, i) => (
@@ -232,7 +245,7 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
             {activePromotion && activeBannerSrc ? (
               <Link href={getPromotionHref(activePromotion)} className="home-hero__banner" aria-label={activePromotion.title}>
                 <Image
-                  src={getCloudinarySizedImageUrl(activeBannerSrc, HERO_BANNER_SIZE, 'cover')}
+                  src={getCloudinarySizedImageUrl(activeBannerSrc, HERO_BANNER_SIZE, 'contain')}
                   alt={activePromotion.title}
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
@@ -243,7 +256,17 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
                 />
               </Link>
             ) : (
-              <div className="home-hero__banner home-hero__banner--placeholder" />
+              <div className="home-hero__banner home-hero__banner--placeholder" aria-label="Promotions placeholder">
+                <Image
+                  src={fallbackBannerSrc}
+                  alt="Promotions coming soon"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="home-hero__banner-image"
+                  priority
+                  fetchPriority="high"
+                />
+              </div>
             )}
           </div>
 
@@ -282,7 +305,15 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
           {!searchEnabled ? (
             <div className="home-hero__left-card" aria-live="polite">
                 <div className="home-hero__placeholder">
-                  <div className="home-hero__placeholder-media" aria-hidden />
+                  <div className="home-hero__placeholder-media" aria-hidden>
+                    <Image
+                      src={leftPlaceholderSrc}
+                      alt=""
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 420px"
+                      className="home-hero__placeholder-image"
+                    />
+                  </div>
                   <div className="home-hero__placeholder-body">
                     <p className="home-hero__placeholder-title">Search to start shopping</p>
                     <p className="home-hero__placeholder-copy">

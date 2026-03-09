@@ -1,46 +1,88 @@
-/* Brand carousel – doubled width 240×120px items; progress bar + arrows below (samsung-progressbar). */
+/* Brand carousel – 2 mobile, 3 tablet, 4 desktop. */
 .brand-carousel {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 900px;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
 }
 
-.brand-carousel__scroll {
+.brand-carousel__carousel {
+  width: 100%;
+}
+
+.brand-carousel__carousel .product-carousel__track {
+  padding-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.brand-carousel__carousel .product-carousel__item {
+  padding-left: 8px;
+  padding-right: 8px;
+  box-sizing: border-box;
+}
+
+.brand-carousel__carousel .samsung-progressbar {
+  margin-top: 12px;
+}
+
+.brand-carousel__carousel .samsung-progressbar-inner {
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-carousel__carousel .samsung-progressbar-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 2px;
+  background-color: var(--ui-gray-300);
+  border-radius: 2px;
+}
+
+.brand-carousel__carousel .samsung-progressbar-fill {
+  background-color: var(--ui-gray-700);
+}
+
+.brand-carousel__carousel .samsung-progressbar-arrows {
+  gap: 12px;
+}
+
+.brand-carousel__carousel .samsung-progressbar-arrow {
+  width: 36px;
+  height: 36px;
+  background-color: var(--ui-gray-200);
+  border: 1px solid var(--ui-gray-300);
+  color: var(--ui-gray-700);
+}
+
+.brand-carousel__carousel .samsung-progressbar-arrow:hover:not(:disabled) {
+  background-color: var(--ui-gray-300);
+  border-color: var(--ui-gray-400);
+}
+
+.brand-carousel__carousel .samsung-progressbar-arrow:disabled {
+  opacity: 0.5;
+}
+
+.brand-carousel__carousel .samsung-progressbar-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.brand-carousel__carousel .samsung-progressbar-icon path {
+  fill: currentColor;
+}
+
+.brand-carousel__item {
   width: 100%;
   min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.brand-carousel__scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.brand-carousel__track {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
-  width: max-content;
   height: 120px;
-  padding: 0 2px;
-}
-
-/* Brand-slider style: 240×120px (doubled width), 10px radius, #fff, flex center, 0.3s linear */
-.brand-carousel__item {
-  flex-shrink: 0 !important;
-  width: 240px !important;
-  min-width: 240px !important;
-  height: 120px !important;
-  min-height: 120px !important;
-  display: flex !important;
+  min-height: 120px;
+  display: flex;
   align-items: center;
   justify-content: center;
   background: #fff;

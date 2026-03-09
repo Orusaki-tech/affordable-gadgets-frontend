@@ -19,9 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@shwari/api-client": ["./packages/api-client/src/index.ts"],
-      "@shwari/api-client/*": ["./packages/api-client/src/*"]
+      "@/*": ["./*"]
     }
   },
   "include": [

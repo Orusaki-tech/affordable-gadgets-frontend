@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { OpenAPI, OrdersService, OrderStatusEnum } from '@/lib/api/generated';
+import { OpenAPI, OrdersService } from '@/lib/api/generated';
 import { inventoryBaseUrl } from '@/lib/api/openapi';
 import Link from 'next/link';
+import { ORDER_STATUS } from '@/lib/constants/apiEnums';
 
 export function PaymentCallbackClient() {
   const searchParams = useSearchParams();
@@ -41,8 +42,8 @@ export function PaymentCallbackClient() {
         console.log('[PESAPAL] Payment Status:', JSON.stringify(paymentStatus, null, 2));
 
         if (
-          paymentStatus.status === OrderStatusEnum.PAID ||
-          paymentStatus.status === OrderStatusEnum.DELIVERED
+          paymentStatus.status === ORDER_STATUS.PAID ||
+          paymentStatus.status === ORDER_STATUS.DELIVERED
         ) {
           console.log('[PESAPAL] Payment is COMPLETED - showing success');
           setStatus('success');
@@ -52,7 +53,7 @@ export function PaymentCallbackClient() {
             console.log('[PESAPAL] Redirecting to order details page...');
             router.push(`/orders/${orderId}`);
           }, 2000);
-        } else if (paymentStatus.status === OrderStatusEnum.CANCELED) {
+        } else if (paymentStatus.status === ORDER_STATUS.CANCELED) {
           console.log('[PESAPAL] Payment is', paymentStatus.status, '- showing failure');
           setStatus('failed');
           setMessage('Payment failed or was cancelled.');

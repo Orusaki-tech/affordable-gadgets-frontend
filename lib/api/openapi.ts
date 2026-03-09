@@ -1,4 +1,4 @@
-import { OpenAPI } from '../../packages/api-client/src';
+import { OpenAPI } from '@shwari/api-client';
 import { brandConfig } from '@/lib/config/brand';
 
 const normalizedBaseUrl = brandConfig.apiBaseUrl.replace(/\/+$/, '');

@@ -2,8 +2,10 @@
  * React hook for payment operations
  */
 import { useState, useEffect, useCallback } from 'react';
-import { OpenAPI, OrdersService, InitiatePaymentRequestRequest, Order, OrderStatusEnum } from '@/lib/api/generated';
+import { OpenAPI, OrdersService } from '@/lib/api/generated';
+import type { InitiatePaymentRequestRequest, Order } from '@/lib/api/generated';
 import { inventoryBaseUrl } from '@/lib/api/openapi';
+import { ORDER_STATUS } from '@/lib/constants/apiEnums';
 
 interface UsePaymentOptions {
   orderId: string | null;
@@ -91,7 +93,7 @@ export function usePayment({
       setPaymentStatus(status);
 
       // Check if payment is complete
-      if (status.status === OrderStatusEnum.PAID || status.status === OrderStatusEnum.DELIVERED) {
+      if (status.status === ORDER_STATUS.PAID || status.status === ORDER_STATUS.DELIVERED) {
         console.log('[PESAPAL] Payment is COMPLETED - stopping polling');
         setIsPolling(false);
         onPaymentComplete?.();
@@ -100,7 +102,7 @@ export function usePayment({
       }
 
       // Check if payment failed
-      if (status.status === OrderStatusEnum.CANCELED) {
+      if (status.status === ORDER_STATUS.CANCELED) {
         console.log('[PESAPAL] Payment is', status.status, '- stopping polling');
         setIsPolling(false);
         onPaymentFailed?.((status as any)?.message || 'Payment failed');

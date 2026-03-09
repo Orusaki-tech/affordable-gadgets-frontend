@@ -5,7 +5,7 @@ import { usePromotion } from '@/lib/hooks/usePromotions';
 import { useBundles } from '@/lib/hooks/useBundles';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
-import { PricingModeEnum, PublicBundle, PublicBundleItem, PublicProduct, PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
+import type { PublicBundle, PublicBundleItem, PublicProduct, PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo } from 'react';
@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getPlaceholderProductImage, getPlaceholderUnitImage, getPlaceholderVideoUrl, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
 import { getAndClearProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
+import { PRICING_MODE } from '@/lib/constants/apiEnums';
 
 interface ProductDetailProps {
   slug: string;
@@ -542,7 +543,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     const bundlePrice = bundle.bundle_price === null || bundle.bundle_price === undefined
       ? null
       : Number(bundle.bundle_price);
-    if (bundle.pricing_mode === PricingModeEnum.FX && bundlePrice !== null) {
+    if (bundle.pricing_mode === PRICING_MODE.FX && bundlePrice !== null) {
       return formatPrice(bundlePrice);
     }
     const minTotal = bundle.items_min_total ?? null;
@@ -552,11 +553,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     }
     let minPrice = minTotal;
     let maxPrice = maxTotal;
-    if (bundle.pricing_mode === PricingModeEnum.PC && bundle.discount_percentage) {
+    if (bundle.pricing_mode === PRICING_MODE.PC && bundle.discount_percentage) {
       const factor = 1 - Number(bundle.discount_percentage) / 100;
       minPrice = Math.max(0, minTotal * factor);
       maxPrice = Math.max(0, maxTotal * factor);
-    } else if (bundle.pricing_mode === PricingModeEnum.AM && bundle.discount_amount) {
+    } else if (bundle.pricing_mode === PRICING_MODE.AM && bundle.discount_amount) {
       minPrice = Math.max(0, minTotal - Number(bundle.discount_amount));
       maxPrice = Math.max(0, maxTotal - Number(bundle.discount_amount));
     }

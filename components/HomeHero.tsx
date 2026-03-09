@@ -9,7 +9,22 @@ import { useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductCarousel } from '@/components/ProductCarousel';
 import { getCloudinarySizedImageUrl } from '@/lib/utils/cloudinary';
+import { formatPrice } from '@/lib/utils/format';
 import { getProductHref } from '@/lib/utils/productRoutes';
+
+type PromotionPromoCard = {
+  product_id: number;
+  product_name: string;
+  product_slug?: string | null;
+  product_image_url?: string | null;
+  option_summary?: string | null;
+  original_price: string;
+  promotional_price: string;
+};
+
+type HomeHeroPromotion = PublicPromotion & {
+  promo_card?: PromotionPromoCard | null;
+};
 
 const PROMOTIONS_PAGE_SIZE = 50;
 const PROMO_THUMB_SIZE = 320;
@@ -30,7 +45,7 @@ function normalizeLocations(value: unknown): string[] {
   return [];
 }
 
-function sortPromotions(promotions: PublicPromotion[]) {
+function sortPromotions(promotions: HomeHeroPromotion[]) {
   return [...promotions].sort((a, b) => {
     const aPos = a.carousel_position;
     const bPos = b.carousel_position;
@@ -45,9 +60,10 @@ function sortPromotions(promotions: PublicPromotion[]) {
   });
 }
 
-function getPromotionHref(promotion: PublicPromotion): string {
+function getPromotionHref(promotion: HomeHeroPromotion): string {
   const promotionId = typeof promotion.id === 'number' ? promotion.id : null;
-  const firstProductId = Array.isArray(promotion.products) ? promotion.products[0] : null;
+  const promoCardProductId = promotion.promo_card?.product_id ?? null;
+  const firstProductId = promoCardProductId ?? (Array.isArray(promotion.products) ? promotion.products[0] : null);
 
   if (firstProductId) {
     return getProductHref(undefined, { fallbackId: firstProductId, promotionId });
@@ -58,16 +74,16 @@ function getPromotionHref(promotion: PublicPromotion): string {
   return '/products';
 }
 
-function getHeroPromotions(promotionsData?: PaginatedPublicPromotionList) {
+function getHeroPromotions(promotionsData?: PaginatedPublicPromotionList): HomeHeroPromotion[] {
   const results = promotionsData?.results ?? [];
 
-  const featuredForHero = (results as PublicPromotion[]).filter((promo) => {
-    const locations = normalizeLocations((promo as any).display_locations);
+  const featuredForHero = (results as HomeHeroPromotion[]).filter((promo) => {
+    const locations = normalizeLocations(promo.display_locations);
     return locations.length > 0 && locations.includes('homepage_hero');
   });
 
   const baseList =
-    featuredForHero.length > 0 ? featuredForHero : (results as PublicPromotion[]);
+    featuredForHero.length > 0 ? featuredForHero : (results as HomeHeroPromotion[]);
 
   return sortPromotions(baseList);
 }
@@ -126,7 +142,18 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
       ? promotions.map((promotion) => {
           const id = typeof promotion.id === 'number' ? promotion.id : null;
           const isActive = id !== null && id === activePromotionId;
-          const thumbSrc = promotion.banner_image_url || promotion.banner_image || null;
+          const promoCard = promotion.promo_card ?? null;
+          const thumbSrc = promoCard?.product_image_url || promotion.banner_image_url || promotion.banner_image || null;
+          const cardTitle = promoCard?.product_name || promotion.title;
+          const optionSummary = promoCard?.option_summary?.trim() || null;
+          const originalPrice = promoCard?.original_price ? Number(promoCard.original_price) : null;
+          const promotionalPrice = promoCard?.promotional_price ? Number(promoCard.promotional_price) : null;
+          const hasPromoPrice =
+            originalPrice !== null &&
+            Number.isFinite(originalPrice) &&
+            promotionalPrice !== null &&
+            Number.isFinite(promotionalPrice) &&
+            promotionalPrice < originalPrice;
           return (
             <button
               key={id ?? promotion.title}
@@ -141,7 +168,7 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
                 {thumbSrc ? (
                   <Image
                     src={getCloudinarySizedImageUrl(thumbSrc, PROMO_THUMB_SIZE, 'contain')}
-                    alt={promotion.title}
+                    alt={cardTitle}
                     width={PROMO_THUMB_SIZE}
                     height={PROMO_THUMB_SIZE}
                     className="home-hero__promo-image"
@@ -152,13 +179,21 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
                 )}
               </div>
               <div className="home-hero__promo-info">
-                <p className="home-hero__promo-title">{promotion.title}</p>
-                {promotion.discount_display ? (
+                <p className="home-hero__promo-title">{cardTitle}</p>
+                {optionSummary ? (
+                  <p className="home-hero__promo-options">{optionSummary}</p>
+                ) : promotion.discount_display ? (
                   <p className="home-hero__promo-subtitle">{promotion.discount_display}</p>
                 ) : promotion.description ? (
                   <p className="home-hero__promo-subtitle">{promotion.description}</p>
                 ) : (
                   <p className="home-hero__promo-subtitle">View offer</p>
+                )}
+                {hasPromoPrice && (
+                  <div className="home-hero__promo-price-row">
+                    <span className="home-hero__promo-price-old">{formatPrice(originalPrice)}</span>
+                    <span className="home-hero__promo-price-new">{formatPrice(promotionalPrice)}</span>
+                  </div>
                 )}
               </div>
             </button>

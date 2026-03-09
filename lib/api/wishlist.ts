@@ -1,6 +1,6 @@
 'use client';
 
-import { OpenAPI } from '../../packages/api-client/src';
+import { OpenAPI } from '@shwari/api-client';
 import { apiBaseUrl } from '@/lib/api/openapi';
 
 const SESSION_KEY_STORAGE = 'session_key';

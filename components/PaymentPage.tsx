@@ -7,7 +7,7 @@ import { usePayment } from '@/lib/hooks/usePayment';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
 import { brandConfig } from '@/lib/config/brand';
-import { OrderStatusEnum } from '@/lib/api/generated';
+import { ORDER_STATUS } from '@/lib/constants/apiEnums';
 
 interface PaymentPageProps {
   orderId: string;
@@ -137,7 +137,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
 
   // Payment status display
   if (paymentStatus) {
-    if (paymentStatus.status === OrderStatusEnum.PAID || paymentStatus.status === OrderStatusEnum.DELIVERED) {
+    if (paymentStatus.status === ORDER_STATUS.PAID || paymentStatus.status === ORDER_STATUS.DELIVERED) {
       return (
         <div className="payment-page">
           <div className="payment-page__card">
@@ -181,7 +181,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
       );
     }
 
-    if (paymentStatus.status === OrderStatusEnum.CANCELED) {
+    if (paymentStatus.status === ORDER_STATUS.CANCELED) {
       return (
         <div className="payment-page">
           <div className="payment-page__card">

@@ -7,6 +7,8 @@ import { ApiService } from '@/lib/api/generated';
 import { brandConfig } from '@/lib/config/brand';
 import type { PublicProduct } from '@/lib/api/generated';
 
+export const revalidate = 3600;
+
 interface ProductPageProps {
   params: Promise<{
     slug: string;

@@ -64,6 +64,18 @@ export function Footer() {
                   Categories
                 </Link>
               </li>
+              <li>
+                <Link href="/promotions" className="site-footer__link">
+                  <span className="site-footer__dot"></span>
+                  Promotions
+                </Link>
+              </li>
+              <li>
+                <Link href="/videos" className="site-footer__link">
+                  <span className="site-footer__dot"></span>
+                  Product Videos
+                </Link>
+              </li>
             </ul>
           </div>
 

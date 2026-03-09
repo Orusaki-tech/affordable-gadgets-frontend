@@ -231,8 +231,8 @@ export function HomeHero() {
             </div>
           </form>
 
-          <div className="home-hero__left-card" aria-live="polite">
-            {!searchEnabled ? (
+          {!searchEnabled ? (
+            <div className="home-hero__left-card" aria-live="polite">
                 <div className="home-hero__placeholder">
                   <div className="home-hero__placeholder-media" aria-hidden />
                   <div className="home-hero__placeholder-body">
@@ -242,7 +242,9 @@ export function HomeHero() {
                     </p>
                   </div>
                 </div>
-              ) : productsLoading ? (
+            </div>
+          ) : productsLoading ? (
+            <div className="home-hero__left-card" aria-live="polite">
                 <div className="home-hero__product-skeleton">
                   <div className="home-hero__product-skeleton-media" />
                   <div className="home-hero__product-skeleton-lines">
@@ -251,36 +253,32 @@ export function HomeHero() {
                     <div className="home-hero__product-skeleton-line home-hero__product-skeleton-line--shorter" />
                   </div>
                 </div>
-              ) : product ? (
-                <div className="home-hero__product-wrap">
-                  <ProductCard
-                    product={product}
-                    variant="minimal"
-                    showRatings={false}
-                    showQuickActions={false}
-                    showQuickView={false}
-                    showSwatches={false}
-                    showShippingBadges={false}
-                    showInterestCount={false}
-                  />
-                  <div className="home-hero__product-actions">
-                    <Link
-                      href={`/products?search=${encodeURIComponent(normalizedQuery)}&focusSearch=1`}
-                      className="home-hero__view-all"
-                    >
-                      View all results
-                    </Link>
-                  </div>
-                </div>
-              ) : (
+            </div>
+          ) : product ? (
+            <div className="home-hero__product-result" aria-live="polite">
+              <ProductCard
+                product={product}
+                variant="featured"
+              />
+              <div className="home-hero__product-actions">
+                <Link
+                  href={`/products?search=${encodeURIComponent(normalizedQuery)}&focusSearch=1`}
+                  className="home-hero__view-all"
+                >
+                  View all results
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="home-hero__left-card" aria-live="polite">
                 <div className="home-hero__no-results">
                   <p className="home-hero__no-results-title">No results</p>
                   <p className="home-hero__no-results-copy">
                     We couldn’t find anything for “{normalizedQuery}”. Try a different search.
                   </p>
                 </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

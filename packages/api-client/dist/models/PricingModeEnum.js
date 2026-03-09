@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PricingModeEnum = void 0;
 /* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -7,9 +10,9 @@
  * * `PC` - Percentage Off Items Total
  * * `AM` - Fixed Amount Off Items Total
  */
-export var PricingModeEnum;
+var PricingModeEnum;
 (function (PricingModeEnum) {
     PricingModeEnum["FX"] = "FX";
     PricingModeEnum["PC"] = "PC";
     PricingModeEnum["AM"] = "AM";
-})(PricingModeEnum || (PricingModeEnum = {}));
+})(PricingModeEnum || (exports.PricingModeEnum = PricingModeEnum = {}));

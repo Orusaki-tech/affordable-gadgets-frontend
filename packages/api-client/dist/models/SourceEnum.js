@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SourceEnum = void 0;
 /* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -7,9 +10,9 @@
  * * `SU` - External Supplier
  * * `IM` - External Import
  */
-export var SourceEnum;
+var SourceEnum;
 (function (SourceEnum) {
     SourceEnum["BB"] = "BB";
     SourceEnum["SU"] = "SU";
     SourceEnum["IM"] = "IM";
-})(SourceEnum || (SourceEnum = {}));
+})(SourceEnum || (exports.SourceEnum = SourceEnum = {}));

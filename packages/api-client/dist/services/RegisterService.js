@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class RegisterService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.RegisterService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class RegisterService {
     /**
      * Handles POST requests to /register/ to create a new User and Customer instance.
      * - Uses CustomerRegistrationSerializer for validation and atomic creation.
@@ -11,7 +14,7 @@ export class RegisterService {
      * @throws ApiError
      */
     static registerCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/register/',
             body: requestBody,
@@ -19,3 +22,4 @@ export class RegisterService {
         });
     }
 }
+exports.RegisterService = RegisterService;

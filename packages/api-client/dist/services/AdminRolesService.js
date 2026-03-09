@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class AdminRolesService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AdminRolesService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class AdminRolesService {
     /**
      * ViewSet for listing available admin roles.
      * Read-only access to see what roles can be assigned.
@@ -8,7 +11,7 @@ export class AdminRolesService {
      * @throws ApiError
      */
     static adminRolesList() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/admin-roles/',
         });
@@ -21,7 +24,7 @@ export class AdminRolesService {
      * @throws ApiError
      */
     static adminRolesRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/admin-roles/{id}/',
             path: {
@@ -30,3 +33,4 @@ export class AdminRolesService {
         });
     }
 }
+exports.AdminRolesService = AdminRolesService;

@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class AdminService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AdminService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class AdminService {
     /**
      * Fix all inventory units to be available.
      * @param requestBody
@@ -8,7 +11,7 @@ export class AdminService {
      * @throws ApiError
      */
     static adminFixProductVisibilityCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/admin/fix-product-visibility/',
             body: requestBody,
@@ -16,3 +19,4 @@ export class AdminService {
         });
     }
 }
+exports.AdminService = AdminService;

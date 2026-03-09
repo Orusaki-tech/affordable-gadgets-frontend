@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ConditionEnum = void 0;
 /* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -8,10 +11,10 @@
  * * `P` - Pre-owned
  * * `D` - Defective
  */
-export var ConditionEnum;
+var ConditionEnum;
 (function (ConditionEnum) {
     ConditionEnum["N"] = "N";
     ConditionEnum["R"] = "R";
     ConditionEnum["P"] = "P";
     ConditionEnum["D"] = "D";
-})(ConditionEnum || (ConditionEnum = {}));
+})(ConditionEnum || (exports.ConditionEnum = ConditionEnum = {}));

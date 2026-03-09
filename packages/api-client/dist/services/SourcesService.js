@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class SourcesService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SourcesService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class SourcesService {
     /**
      * Acquisition Source lookup table. Admin-only write, public read.
      * Uses IsAdminOrReadOnly.
@@ -9,7 +12,7 @@ export class SourcesService {
      * @throws ApiError
      */
     static sourcesList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/sources/',
             query: {
@@ -25,7 +28,7 @@ export class SourcesService {
      * @throws ApiError
      */
     static sourcesCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/sources/',
             body: requestBody,
@@ -40,7 +43,7 @@ export class SourcesService {
      * @throws ApiError
      */
     static sourcesRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/sources/{id}/',
             path: {
@@ -57,7 +60,7 @@ export class SourcesService {
      * @throws ApiError
      */
     static sourcesUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/sources/{id}/',
             path: {
@@ -76,7 +79,7 @@ export class SourcesService {
      * @throws ApiError
      */
     static sourcesPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/sources/{id}/',
             path: {
@@ -94,7 +97,7 @@ export class SourcesService {
      * @throws ApiError
      */
     static sourcesDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/sources/{id}/',
             path: {
@@ -103,3 +106,4 @@ export class SourcesService {
         });
     }
 }
+exports.SourcesService = SourcesService;

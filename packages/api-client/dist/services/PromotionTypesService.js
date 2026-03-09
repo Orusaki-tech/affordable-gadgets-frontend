@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class PromotionTypesService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PromotionTypesService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class PromotionTypesService {
     /**
      * PromotionType management ViewSet (admin and marketing managers).
      * @param page A page number within the paginated result set.
@@ -8,7 +11,7 @@ export class PromotionTypesService {
      * @throws ApiError
      */
     static promotionTypesList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/promotion-types/',
             query: {
@@ -23,7 +26,7 @@ export class PromotionTypesService {
      * @throws ApiError
      */
     static promotionTypesCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/promotion-types/',
             body: requestBody,
@@ -37,7 +40,7 @@ export class PromotionTypesService {
      * @throws ApiError
      */
     static promotionTypesRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/promotion-types/{id}/',
             path: {
@@ -53,7 +56,7 @@ export class PromotionTypesService {
      * @throws ApiError
      */
     static promotionTypesUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/promotion-types/{id}/',
             path: {
@@ -71,7 +74,7 @@ export class PromotionTypesService {
      * @throws ApiError
      */
     static promotionTypesPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/promotion-types/{id}/',
             path: {
@@ -88,7 +91,7 @@ export class PromotionTypesService {
      * @throws ApiError
      */
     static promotionTypesDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/promotion-types/{id}/',
             path: {
@@ -97,3 +100,4 @@ export class PromotionTypesService {
         });
     }
 }
+exports.PromotionTypesService = PromotionTypesService;

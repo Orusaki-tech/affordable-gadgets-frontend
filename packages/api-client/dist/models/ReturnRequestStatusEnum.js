@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReturnRequestStatusEnum = void 0;
 /* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -7,9 +10,9 @@
  * * `AP` - Approved
  * * `RE` - Rejected
  */
-export var ReturnRequestStatusEnum;
+var ReturnRequestStatusEnum;
 (function (ReturnRequestStatusEnum) {
     ReturnRequestStatusEnum["PE"] = "PE";
     ReturnRequestStatusEnum["AP"] = "AP";
     ReturnRequestStatusEnum["RE"] = "RE";
-})(ReturnRequestStatusEnum || (ReturnRequestStatusEnum = {}));
+})(ReturnRequestStatusEnum || (exports.ReturnRequestStatusEnum = ReturnRequestStatusEnum = {}));

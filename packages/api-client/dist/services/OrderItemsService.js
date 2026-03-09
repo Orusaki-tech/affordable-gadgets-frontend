@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class OrderItemsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OrderItemsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class OrderItemsService {
     /**
      * CRUD for Order Items. Strictly Admin-only access.
      * Generally used only for reporting and admin-level viewing of existing orders.
@@ -10,7 +13,7 @@ export class OrderItemsService {
      * @throws ApiError
      */
     static orderItemsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/order-items/',
             query: {
@@ -27,7 +30,7 @@ export class OrderItemsService {
      * @throws ApiError
      */
     static orderItemsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/order-items/',
             body: requestBody,
@@ -43,7 +46,7 @@ export class OrderItemsService {
      * @throws ApiError
      */
     static orderItemsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/order-items/{id}/',
             path: {
@@ -61,7 +64,7 @@ export class OrderItemsService {
      * @throws ApiError
      */
     static orderItemsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/order-items/{id}/',
             path: {
@@ -81,7 +84,7 @@ export class OrderItemsService {
      * @throws ApiError
      */
     static orderItemsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/order-items/{id}/',
             path: {
@@ -100,7 +103,7 @@ export class OrderItemsService {
      * @throws ApiError
      */
     static orderItemsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/order-items/{id}/',
             path: {
@@ -109,3 +112,4 @@ export class OrderItemsService {
         });
     }
 }
+exports.OrderItemsService = OrderItemsService;

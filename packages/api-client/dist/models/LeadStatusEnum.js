@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LeadStatusEnum = void 0;
 /* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -9,11 +12,11 @@
  * * `CLOSED` - Closed - No Sale
  * * `EXPIRED` - Expired - No Response
  */
-export var LeadStatusEnum;
+var LeadStatusEnum;
 (function (LeadStatusEnum) {
     LeadStatusEnum["NEW"] = "NEW";
     LeadStatusEnum["CONTACTED"] = "CONTACTED";
     LeadStatusEnum["CONVERTED"] = "CONVERTED";
     LeadStatusEnum["CLOSED"] = "CLOSED";
     LeadStatusEnum["EXPIRED"] = "EXPIRED";
-})(LeadStatusEnum || (LeadStatusEnum = {}));
+})(LeadStatusEnum || (exports.LeadStatusEnum = LeadStatusEnum = {}));

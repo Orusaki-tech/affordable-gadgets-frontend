@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class ReviewsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReviewsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class ReviewsService {
     /**
      * Handles customer and admin reviews.
      * - Everyone can read (GET).
@@ -16,7 +19,7 @@ export class ReviewsService {
      * @throws ApiError
      */
     static reviewsList(ordering, page, product, search) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/reviews/',
             query: {
@@ -39,7 +42,7 @@ export class ReviewsService {
      * @throws ApiError
      */
     static reviewsCreate(formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/reviews/',
             formData: formData,
@@ -58,7 +61,7 @@ export class ReviewsService {
      * @throws ApiError
      */
     static reviewsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/reviews/{id}/',
             path: {
@@ -79,7 +82,7 @@ export class ReviewsService {
      * @throws ApiError
      */
     static reviewsUpdate(id, formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/reviews/{id}/',
             path: {
@@ -102,7 +105,7 @@ export class ReviewsService {
      * @throws ApiError
      */
     static reviewsPartialUpdate(id, formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/reviews/{id}/',
             path: {
@@ -124,7 +127,7 @@ export class ReviewsService {
      * @throws ApiError
      */
     static reviewsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/reviews/{id}/',
             path: {
@@ -140,7 +143,7 @@ export class ReviewsService {
      * @throws ApiError
      */
     static reviewsBulkActionCreate(formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/reviews/bulk_action/',
             formData: formData,
@@ -148,3 +151,4 @@ export class ReviewsService {
         });
     }
 }
+exports.ReviewsService = ReviewsService;

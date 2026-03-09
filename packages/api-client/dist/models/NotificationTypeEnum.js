@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NotificationTypeEnum = void 0;
 /* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -15,7 +18,7 @@
  * * `RP` - Request Pending Approval
  * * `NL` - New Lead
  */
-export var NotificationTypeEnum;
+var NotificationTypeEnum;
 (function (NotificationTypeEnum) {
     NotificationTypeEnum["RA"] = "RA";
     NotificationTypeEnum["RR"] = "RR";
@@ -28,4 +31,4 @@ export var NotificationTypeEnum;
     NotificationTypeEnum["UR"] = "UR";
     NotificationTypeEnum["RP"] = "RP";
     NotificationTypeEnum["NL"] = "NL";
-})(NotificationTypeEnum || (NotificationTypeEnum = {}));
+})(NotificationTypeEnum || (exports.NotificationTypeEnum = NotificationTypeEnum = {}));

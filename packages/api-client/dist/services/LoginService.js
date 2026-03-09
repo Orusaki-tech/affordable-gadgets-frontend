@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class LoginService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LoginService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class LoginService {
     /**
      * POST: Authenticates a user (customer) and returns their authentication token
      * and basic user details (email, user_id).
@@ -10,7 +13,7 @@ export class LoginService {
      * @throws ApiError
      */
     static loginCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/login/',
             body: requestBody,
@@ -18,3 +21,4 @@ export class LoginService {
         });
     }
 }
+exports.LoginService = LoginService;

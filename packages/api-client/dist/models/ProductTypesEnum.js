@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProductTypesEnum = void 0;
 /* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -8,10 +11,10 @@
  * * `TB` - Tablet/iPad
  * * `AC` - Accessory
  */
-export var ProductTypesEnum;
+var ProductTypesEnum;
 (function (ProductTypesEnum) {
     ProductTypesEnum["PH"] = "PH";
     ProductTypesEnum["LT"] = "LT";
     ProductTypesEnum["TB"] = "TB";
     ProductTypesEnum["AC"] = "AC";
-})(ProductTypesEnum || (ProductTypesEnum = {}));
+})(ProductTypesEnum || (exports.ProductTypesEnum = ProductTypesEnum = {}));

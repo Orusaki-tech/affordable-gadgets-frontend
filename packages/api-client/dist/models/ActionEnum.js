@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ActionEnum = void 0;
 /* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -16,7 +19,7 @@
  * * `PC` - Price Change
  * * `SC` - Status Change
  */
-export var ActionEnum;
+var ActionEnum;
 (function (ActionEnum) {
     ActionEnum["CR"] = "CR";
     ActionEnum["UP"] = "UP";
@@ -30,4 +33,4 @@ export var ActionEnum;
     ActionEnum["BU"] = "BU";
     ActionEnum["PC"] = "PC";
     ActionEnum["SC"] = "SC";
-})(ActionEnum || (ActionEnum = {}));
+})(ActionEnum || (exports.ActionEnum = ActionEnum = {}));

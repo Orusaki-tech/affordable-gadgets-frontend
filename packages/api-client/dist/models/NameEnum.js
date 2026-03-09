@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NameEnum = void 0;
 /* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -9,11 +12,11 @@
  * * `OM` - Order Manager
  * * `MM` - Marketing Manager
  */
-export var NameEnum;
+var NameEnum;
 (function (NameEnum) {
     NameEnum["SP"] = "SP";
     NameEnum["IM"] = "IM";
     NameEnum["CC"] = "CC";
     NameEnum["OM"] = "OM";
     NameEnum["MM"] = "MM";
-})(NameEnum || (NameEnum = {}));
+})(NameEnum || (exports.NameEnum = NameEnum = {}));

@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class BundlesService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BundlesService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class BundlesService {
     /**
      * Bundle management ViewSet (admin and marketing managers).
      * @param page A page number within the paginated result set.
@@ -8,7 +11,7 @@ export class BundlesService {
      * @throws ApiError
      */
     static bundlesList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/bundles/',
             query: {
@@ -23,7 +26,7 @@ export class BundlesService {
      * @throws ApiError
      */
     static bundlesCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/bundles/',
             body: requestBody,
@@ -37,7 +40,7 @@ export class BundlesService {
      * @throws ApiError
      */
     static bundlesRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/bundles/{id}/',
             path: {
@@ -53,7 +56,7 @@ export class BundlesService {
      * @throws ApiError
      */
     static bundlesUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/bundles/{id}/',
             path: {
@@ -71,7 +74,7 @@ export class BundlesService {
      * @throws ApiError
      */
     static bundlesPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/bundles/{id}/',
             path: {
@@ -88,7 +91,7 @@ export class BundlesService {
      * @throws ApiError
      */
     static bundlesDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/bundles/{id}/',
             path: {
@@ -97,3 +100,4 @@ export class BundlesService {
         });
     }
 }
+exports.BundlesService = BundlesService;

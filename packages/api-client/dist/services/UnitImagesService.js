@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class UnitImagesService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UnitImagesService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class UnitImagesService {
     /**
      * CRUD for individual inventory unit images.
      * Only Admins can add/manage images; everyone can view unit images
@@ -11,7 +14,7 @@ export class UnitImagesService {
      * @throws ApiError
      */
     static unitImagesList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/unit-images/',
             query: {
@@ -29,7 +32,7 @@ export class UnitImagesService {
      * @throws ApiError
      */
     static unitImagesCreate(formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/unit-images/',
             formData: formData,
@@ -46,7 +49,7 @@ export class UnitImagesService {
      * @throws ApiError
      */
     static unitImagesRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/unit-images/{id}/',
             path: {
@@ -65,7 +68,7 @@ export class UnitImagesService {
      * @throws ApiError
      */
     static unitImagesUpdate(id, formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/unit-images/{id}/',
             path: {
@@ -86,7 +89,7 @@ export class UnitImagesService {
      * @throws ApiError
      */
     static unitImagesPartialUpdate(id, formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/unit-images/{id}/',
             path: {
@@ -106,7 +109,7 @@ export class UnitImagesService {
      * @throws ApiError
      */
     static unitImagesDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/unit-images/{id}/',
             path: {
@@ -115,3 +118,4 @@ export class UnitImagesService {
         });
     }
 }
+exports.UnitImagesService = UnitImagesService;

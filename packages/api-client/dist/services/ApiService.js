@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class ApiService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ApiService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class ApiService {
     /**
      * Custom token login view that updates last_login field.
      * Use this instead of the default obtain_auth_token for admin users.
@@ -12,7 +15,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiAuthTokenLoginCreate(formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/api/auth/token/login/',
             formData: formData,
@@ -30,7 +33,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicAccessoriesLinkList(accessory, mainProduct, page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/accessories-link/',
             query: {
@@ -49,7 +52,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicAccessoriesLinkCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/api/v1/public/accessories-link/',
             body: requestBody,
@@ -65,7 +68,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicAccessoriesLinkRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/accessories-link/{id}/',
             path: {
@@ -83,7 +86,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicAccessoriesLinkUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/api/v1/public/accessories-link/{id}/',
             path: {
@@ -103,7 +106,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicAccessoriesLinkPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/api/v1/public/accessories-link/{id}/',
             path: {
@@ -122,7 +125,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicAccessoriesLinkDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/api/v1/public/accessories-link/{id}/',
             path: {
@@ -138,7 +141,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicBundlesList(page, product) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/bundles/',
             query: {
@@ -154,7 +157,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicBundlesRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/bundles/{id}/',
             path: {
@@ -169,7 +172,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/cart/',
             query: {
@@ -184,7 +187,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/api/v1/public/cart/',
             body: requestBody,
@@ -198,7 +201,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/cart/{id}/',
             path: {
@@ -214,7 +217,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/api/v1/public/cart/{id}/',
             path: {
@@ -232,7 +235,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/api/v1/public/cart/{id}/',
             path: {
@@ -249,7 +252,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/api/v1/public/cart/{id}/',
             path: {
@@ -265,7 +268,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartBundlesCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/api/v1/public/cart/{id}/bundles/',
             path: {
@@ -283,7 +286,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartCheckoutCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/api/v1/public/cart/{id}/checkout/',
             path: {
@@ -301,7 +304,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartItemsCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/api/v1/public/cart/{id}/items/',
             path: {
@@ -319,7 +322,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartItemsDestroy(id, itemId) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/api/v1/public/cart/{id}/items/{item_id}/',
             path: {
@@ -335,7 +338,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicCartRecognizeRetrieve(phone) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/cart/recognize/',
             query: {
@@ -361,7 +364,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicPhoneSearchList(maxPrice, minPrice, page, pageSize) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/phone-search/',
             query: {
@@ -388,7 +391,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicProductsList(brandFilter, maxPrice, minPrice, ordering, page, pageSize, promotion, search, slug, type) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/products/',
             query: {
@@ -412,7 +415,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicProductsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/products/{id}/',
             path: {
@@ -430,7 +433,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicProductsUnitsList(id, ordering, page, search) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/products/{id}/units/',
             path: {
@@ -451,7 +454,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicPromotionsList(page, pageSize, displayLocation) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/promotions/',
             query: {
@@ -467,7 +470,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicPromotionsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/promotions/{id}/',
             path: {
@@ -490,7 +493,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicReviewsList(ordering, page, product, search) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/reviews/',
             query: {
@@ -513,7 +516,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicReviewsCreate(formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/api/v1/public/reviews/',
             formData: formData,
@@ -532,7 +535,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicReviewsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/reviews/{id}/',
             path: {
@@ -553,7 +556,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicReviewsUpdate(id, formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/api/v1/public/reviews/{id}/',
             path: {
@@ -576,7 +579,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicReviewsPartialUpdate(id, formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/api/v1/public/reviews/{id}/',
             path: {
@@ -598,7 +601,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicReviewsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/api/v1/public/reviews/{id}/',
             path: {
@@ -614,7 +617,7 @@ export class ApiService {
      * @throws ApiError
      */
     static apiV1PublicReviewsBulkActionCreate(formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/api/v1/public/reviews/bulk_action/',
             formData: formData,
@@ -622,3 +625,4 @@ export class ApiService {
         });
     }
 }
+exports.ApiService = ApiService;

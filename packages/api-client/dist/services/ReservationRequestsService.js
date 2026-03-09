@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class ReservationRequestsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReservationRequestsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class ReservationRequestsService {
     /**
      * ViewSet for managing reservation requests.
      * - Salespersons can create requests and view their own
@@ -10,7 +13,7 @@ export class ReservationRequestsService {
      * @throws ApiError
      */
     static reservationRequestsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/reservation-requests/',
             query: {
@@ -27,7 +30,7 @@ export class ReservationRequestsService {
      * @throws ApiError
      */
     static reservationRequestsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/reservation-requests/',
             body: requestBody,
@@ -43,7 +46,7 @@ export class ReservationRequestsService {
      * @throws ApiError
      */
     static reservationRequestsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/reservation-requests/{id}/',
             path: {
@@ -59,7 +62,7 @@ export class ReservationRequestsService {
      * @throws ApiError
      */
     static reservationRequestsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/reservation-requests/{id}/',
             path: {
@@ -79,7 +82,7 @@ export class ReservationRequestsService {
      * @throws ApiError
      */
     static reservationRequestsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/reservation-requests/{id}/',
             path: {
@@ -98,7 +101,7 @@ export class ReservationRequestsService {
      * @throws ApiError
      */
     static reservationRequestsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/reservation-requests/{id}/',
             path: {
@@ -107,3 +110,4 @@ export class ReservationRequestsService {
         });
     }
 }
+exports.ReservationRequestsService = ReservationRequestsService;

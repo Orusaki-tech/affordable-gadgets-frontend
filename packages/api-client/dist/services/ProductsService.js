@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class ProductsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProductsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class ProductsService {
     /**
      * CRUD for Product Templates.
      * - Public: Read-only access
@@ -13,7 +16,7 @@ export class ProductsService {
      * @throws ApiError
      */
     static productsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/products/',
             query: {
@@ -33,7 +36,7 @@ export class ProductsService {
      * @throws ApiError
      */
     static productsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/products/',
             body: requestBody,
@@ -52,7 +55,7 @@ export class ProductsService {
      * @throws ApiError
      */
     static productsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/products/{id}/',
             path: {
@@ -73,7 +76,7 @@ export class ProductsService {
      * @throws ApiError
      */
     static productsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/products/{id}/',
             path: {
@@ -96,7 +99,7 @@ export class ProductsService {
      * @throws ApiError
      */
     static productsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/products/{id}/',
             path: {
@@ -118,7 +121,7 @@ export class ProductsService {
      * @throws ApiError
      */
     static productsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/products/{id}/',
             path: {
@@ -134,7 +137,7 @@ export class ProductsService {
      * @throws ApiError
      */
     static productsAvailableUnitsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/products/{id}/available-units/',
             path: {
@@ -152,7 +155,7 @@ export class ProductsService {
      * @throws ApiError
      */
     static productsStockSummaryRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/products/{id}/stock-summary/',
             path: {
@@ -169,7 +172,7 @@ export class ProductsService {
      * @throws ApiError
      */
     static productsUpdateContentPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/products/{id}/update_content/',
             path: {
@@ -180,3 +183,4 @@ export class ProductsService {
         });
     }
 }
+exports.ProductsService = ProductsService;

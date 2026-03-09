@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class ReturnRequestsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReturnRequestsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class ReturnRequestsService {
     /**
      * ViewSet for managing return requests (bulk returns of reserved units).
      * - Salespersons can create return requests for their reserved units
@@ -10,7 +13,7 @@ export class ReturnRequestsService {
      * @throws ApiError
      */
     static returnRequestsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/return-requests/',
             query: {
@@ -27,7 +30,7 @@ export class ReturnRequestsService {
      * @throws ApiError
      */
     static returnRequestsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/return-requests/',
             body: requestBody,
@@ -43,7 +46,7 @@ export class ReturnRequestsService {
      * @throws ApiError
      */
     static returnRequestsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/return-requests/{id}/',
             path: {
@@ -61,7 +64,7 @@ export class ReturnRequestsService {
      * @throws ApiError
      */
     static returnRequestsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/return-requests/{id}/',
             path: {
@@ -81,7 +84,7 @@ export class ReturnRequestsService {
      * @throws ApiError
      */
     static returnRequestsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/return-requests/{id}/',
             path: {
@@ -100,7 +103,7 @@ export class ReturnRequestsService {
      * @throws ApiError
      */
     static returnRequestsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/return-requests/{id}/',
             path: {
@@ -115,7 +118,7 @@ export class ReturnRequestsService {
      * @throws ApiError
      */
     static returnRequestsBulkApproveCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/return-requests/bulk_approve/',
             body: requestBody,
@@ -123,3 +126,4 @@ export class ReturnRequestsService {
         });
     }
 }
+exports.ReturnRequestsService = ReturnRequestsService;

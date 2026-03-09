@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class BrandsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BrandsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class BrandsService {
     /**
      * Brand management ViewSet.
      * @param page A page number within the paginated result set.
@@ -8,7 +11,7 @@ export class BrandsService {
      * @throws ApiError
      */
     static brandsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/brands/',
             query: {
@@ -23,7 +26,7 @@ export class BrandsService {
      * @throws ApiError
      */
     static brandsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/brands/',
             body: requestBody,
@@ -37,7 +40,7 @@ export class BrandsService {
      * @throws ApiError
      */
     static brandsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/brands/{id}/',
             path: {
@@ -53,7 +56,7 @@ export class BrandsService {
      * @throws ApiError
      */
     static brandsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/brands/{id}/',
             path: {
@@ -71,7 +74,7 @@ export class BrandsService {
      * @throws ApiError
      */
     static brandsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/brands/{id}/',
             path: {
@@ -88,7 +91,7 @@ export class BrandsService {
      * @throws ApiError
      */
     static brandsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/brands/{id}/',
             path: {
@@ -97,3 +100,4 @@ export class BrandsService {
         });
     }
 }
+exports.BrandsService = BrandsService;

@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class ImagesService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ImagesService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class ImagesService {
     /**
      * CRUD for individual product images.
      * Only Admins can add/manage images; everyone can view product images
@@ -11,7 +14,7 @@ export class ImagesService {
      * @throws ApiError
      */
     static imagesList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/images/',
             query: {
@@ -29,7 +32,7 @@ export class ImagesService {
      * @throws ApiError
      */
     static imagesCreate(formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/images/',
             formData: formData,
@@ -46,7 +49,7 @@ export class ImagesService {
      * @throws ApiError
      */
     static imagesRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/images/{id}/',
             path: {
@@ -65,7 +68,7 @@ export class ImagesService {
      * @throws ApiError
      */
     static imagesUpdate(id, formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/images/{id}/',
             path: {
@@ -86,7 +89,7 @@ export class ImagesService {
      * @throws ApiError
      */
     static imagesPartialUpdate(id, formData) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/images/{id}/',
             path: {
@@ -106,7 +109,7 @@ export class ImagesService {
      * @throws ApiError
      */
     static imagesDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/images/{id}/',
             path: {
@@ -115,3 +118,4 @@ export class ImagesService {
         });
     }
 }
+exports.ImagesService = ImagesService;

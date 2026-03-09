@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class ProfilesService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProfilesService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class ProfilesService {
     /**
      * GET: Retrieve the authenticated user's Admin profile. Admin-only access.
      * Creates Admin profile if it doesn't exist (for staff users without Admin profile).
@@ -8,7 +11,7 @@ export class ProfilesService {
      * @throws ApiError
      */
     static profilesAdminRetrieve() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/profiles/admin/',
         });
@@ -21,7 +24,7 @@ export class ProfilesService {
      * @throws ApiError
      */
     static profilesCustomerRetrieve() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/profiles/customer/',
         });
@@ -35,7 +38,7 @@ export class ProfilesService {
      * @throws ApiError
      */
     static profilesCustomerUpdate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/profiles/customer/',
             body: requestBody,
@@ -51,7 +54,7 @@ export class ProfilesService {
      * @throws ApiError
      */
     static profilesCustomerPartialUpdate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/profiles/customer/',
             body: requestBody,
@@ -59,3 +62,4 @@ export class ProfilesService {
         });
     }
 }
+exports.ProfilesService = ProfilesService;

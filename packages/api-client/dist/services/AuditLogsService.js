@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class AuditLogsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuditLogsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class AuditLogsService {
     /**
      * ViewSet for audit logs (Inventory Manager and Superuser only).
      * Read-only access to view system audit trail.
@@ -9,7 +12,7 @@ export class AuditLogsService {
      * @throws ApiError
      */
     static auditLogsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/audit-logs/',
             query: {
@@ -25,7 +28,7 @@ export class AuditLogsService {
      * @throws ApiError
      */
     static auditLogsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/audit-logs/{id}/',
             path: {
@@ -34,3 +37,4 @@ export class AuditLogsService {
         });
     }
 }
+exports.AuditLogsService = AuditLogsService;

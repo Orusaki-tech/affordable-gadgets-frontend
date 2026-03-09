@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class UnitTransfersService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UnitTransfersService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class UnitTransfersService {
     /**
      * ViewSet for managing unit transfers between salespersons.
      * - Salespersons can request transfers
@@ -10,7 +13,7 @@ export class UnitTransfersService {
      * @throws ApiError
      */
     static unitTransfersList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/unit-transfers/',
             query: {
@@ -27,7 +30,7 @@ export class UnitTransfersService {
      * @throws ApiError
      */
     static unitTransfersCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/unit-transfers/',
             body: requestBody,
@@ -43,7 +46,7 @@ export class UnitTransfersService {
      * @throws ApiError
      */
     static unitTransfersRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/unit-transfers/{id}/',
             path: {
@@ -61,7 +64,7 @@ export class UnitTransfersService {
      * @throws ApiError
      */
     static unitTransfersUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/unit-transfers/{id}/',
             path: {
@@ -81,7 +84,7 @@ export class UnitTransfersService {
      * @throws ApiError
      */
     static unitTransfersPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/unit-transfers/{id}/',
             path: {
@@ -100,7 +103,7 @@ export class UnitTransfersService {
      * @throws ApiError
      */
     static unitTransfersDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/unit-transfers/{id}/',
             path: {
@@ -109,3 +112,4 @@ export class UnitTransfersService {
         });
     }
 }
+exports.UnitTransfersService = UnitTransfersService;

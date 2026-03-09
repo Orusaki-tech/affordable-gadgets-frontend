@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class OrdersService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OrdersService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class OrdersService {
     /**
      * Handles Order creation and management.
      * - Admins can view/manage all orders.
@@ -11,7 +14,7 @@ export class OrdersService {
      * @throws ApiError
      */
     static ordersList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/orders/',
             query: {
@@ -27,7 +30,7 @@ export class OrdersService {
      * @throws ApiError
      */
     static ordersCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/orders/',
             body: requestBody,
@@ -45,7 +48,7 @@ export class OrdersService {
      * @throws ApiError
      */
     static ordersRetrieve(orderId) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/orders/{order_id}/',
             path: {
@@ -62,7 +65,7 @@ export class OrdersService {
      * @throws ApiError
      */
     static ordersUpdate(orderId, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/orders/{order_id}/',
             path: {
@@ -83,7 +86,7 @@ export class OrdersService {
      * @throws ApiError
      */
     static ordersPartialUpdate(orderId, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/orders/{order_id}/',
             path: {
@@ -103,7 +106,7 @@ export class OrdersService {
      * @throws ApiError
      */
     static ordersDestroy(orderId) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/orders/{order_id}/',
             path: {
@@ -119,7 +122,7 @@ export class OrdersService {
      * @throws ApiError
      */
     static ordersConfirmPaymentCreate(orderId, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/orders/{order_id}/confirm_payment/',
             path: {
@@ -137,7 +140,7 @@ export class OrdersService {
      * @throws ApiError
      */
     static ordersInitiatePaymentCreate(orderId, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/orders/{order_id}/initiate_payment/',
             path: {
@@ -154,7 +157,7 @@ export class OrdersService {
      * @throws ApiError
      */
     static ordersPaymentStatusRetrieve(orderId) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/orders/{order_id}/payment_status/',
             path: {
@@ -174,7 +177,7 @@ export class OrdersService {
      * @throws ApiError
      */
     static ordersReceiptRetrieve(orderId) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/orders/{order_id}/receipt/',
             path: {
@@ -183,3 +186,4 @@ export class OrdersService {
         });
     }
 }
+exports.OrdersService = OrdersService;

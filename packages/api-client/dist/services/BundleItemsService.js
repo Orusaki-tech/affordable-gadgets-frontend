@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class BundleItemsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BundleItemsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class BundleItemsService {
     /**
      * Bundle item management (admin and marketing managers).
      * @param page A page number within the paginated result set.
@@ -8,7 +11,7 @@ export class BundleItemsService {
      * @throws ApiError
      */
     static bundleItemsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/bundle-items/',
             query: {
@@ -23,7 +26,7 @@ export class BundleItemsService {
      * @throws ApiError
      */
     static bundleItemsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/bundle-items/',
             body: requestBody,
@@ -37,7 +40,7 @@ export class BundleItemsService {
      * @throws ApiError
      */
     static bundleItemsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/bundle-items/{id}/',
             path: {
@@ -53,7 +56,7 @@ export class BundleItemsService {
      * @throws ApiError
      */
     static bundleItemsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/bundle-items/{id}/',
             path: {
@@ -71,7 +74,7 @@ export class BundleItemsService {
      * @throws ApiError
      */
     static bundleItemsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/bundle-items/{id}/',
             path: {
@@ -88,7 +91,7 @@ export class BundleItemsService {
      * @throws ApiError
      */
     static bundleItemsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/bundle-items/{id}/',
             path: {
@@ -97,3 +100,4 @@ export class BundleItemsService {
         });
     }
 }
+exports.BundleItemsService = BundleItemsService;

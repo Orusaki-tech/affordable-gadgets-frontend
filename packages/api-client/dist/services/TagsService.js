@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class TagsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TagsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class TagsService {
     /**
      * ViewSet for managing product tags.
      * - All authenticated staff users can read
@@ -9,7 +12,7 @@ export class TagsService {
      * @throws ApiError
      */
     static tagsList() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/tags/',
         });
@@ -23,7 +26,7 @@ export class TagsService {
      * @throws ApiError
      */
     static tagsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/tags/',
             body: requestBody,
@@ -39,7 +42,7 @@ export class TagsService {
      * @throws ApiError
      */
     static tagsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/tags/{id}/',
             path: {
@@ -57,7 +60,7 @@ export class TagsService {
      * @throws ApiError
      */
     static tagsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/tags/{id}/',
             path: {
@@ -77,7 +80,7 @@ export class TagsService {
      * @throws ApiError
      */
     static tagsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/tags/{id}/',
             path: {
@@ -96,7 +99,7 @@ export class TagsService {
      * @throws ApiError
      */
     static tagsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/tags/{id}/',
             path: {
@@ -105,3 +108,4 @@ export class TagsService {
         });
     }
 }
+exports.TagsService = TagsService;

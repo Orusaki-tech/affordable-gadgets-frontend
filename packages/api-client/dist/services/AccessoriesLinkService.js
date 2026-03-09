@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class AccessoriesLinkService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AccessoriesLinkService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class AccessoriesLinkService {
     /**
      * Link model between products and accessories. Admin-only write, public read.
      * Uses IsAdminOrReadOnly.
@@ -12,7 +15,7 @@ export class AccessoriesLinkService {
      * @throws ApiError
      */
     static accessoriesLinkList(accessory, mainProduct, page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/accessories-link/',
             query: {
@@ -31,7 +34,7 @@ export class AccessoriesLinkService {
      * @throws ApiError
      */
     static accessoriesLinkCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/accessories-link/',
             body: requestBody,
@@ -47,7 +50,7 @@ export class AccessoriesLinkService {
      * @throws ApiError
      */
     static accessoriesLinkRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/accessories-link/{id}/',
             path: {
@@ -65,7 +68,7 @@ export class AccessoriesLinkService {
      * @throws ApiError
      */
     static accessoriesLinkUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/accessories-link/{id}/',
             path: {
@@ -85,7 +88,7 @@ export class AccessoriesLinkService {
      * @throws ApiError
      */
     static accessoriesLinkPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/accessories-link/{id}/',
             path: {
@@ -104,7 +107,7 @@ export class AccessoriesLinkService {
      * @throws ApiError
      */
     static accessoriesLinkDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/accessories-link/{id}/',
             path: {
@@ -113,3 +116,4 @@ export class AccessoriesLinkService {
         });
     }
 }
+exports.AccessoriesLinkService = AccessoriesLinkService;

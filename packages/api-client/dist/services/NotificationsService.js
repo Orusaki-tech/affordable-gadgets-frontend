@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class NotificationsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NotificationsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class NotificationsService {
     /**
      * ViewSet for notifications (read-only, with mark-as-read action).
      * @param page A page number within the paginated result set.
@@ -8,7 +11,7 @@ export class NotificationsService {
      * @throws ApiError
      */
     static notificationsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/notifications/',
             query: {
@@ -23,7 +26,7 @@ export class NotificationsService {
      * @throws ApiError
      */
     static notificationsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/notifications/{id}/',
             path: {
@@ -39,7 +42,7 @@ export class NotificationsService {
      * @throws ApiError
      */
     static notificationsMarkReadCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/notifications/{id}/mark_read/',
             path: {
@@ -55,9 +58,10 @@ export class NotificationsService {
      * @throws ApiError
      */
     static notificationsUnreadCountRetrieve() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/notifications/unread_count/',
         });
     }
 }
+exports.NotificationsService = NotificationsService;

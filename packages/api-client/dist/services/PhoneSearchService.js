@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class PhoneSearchService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PhoneSearchService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class PhoneSearchService {
     /**
      * GET: Allows customers to search for available phone Inventory Units
      * within a specified budget range.
@@ -15,7 +18,7 @@ export class PhoneSearchService {
      * @throws ApiError
      */
     static phoneSearchList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/phone-search/',
             query: {
@@ -24,3 +27,4 @@ export class PhoneSearchService {
         });
     }
 }
+exports.PhoneSearchService = PhoneSearchService;

@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class LeadsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LeadsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class LeadsService {
     /**
      * Lead management for salespersons only.
      * @param page A page number within the paginated result set.
@@ -8,7 +11,7 @@ export class LeadsService {
      * @throws ApiError
      */
     static leadsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/leads/',
             query: {
@@ -23,7 +26,7 @@ export class LeadsService {
      * @throws ApiError
      */
     static leadsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/leads/',
             body: requestBody,
@@ -37,7 +40,7 @@ export class LeadsService {
      * @throws ApiError
      */
     static leadsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/leads/{id}/',
             path: {
@@ -53,7 +56,7 @@ export class LeadsService {
      * @throws ApiError
      */
     static leadsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/leads/{id}/',
             path: {
@@ -71,7 +74,7 @@ export class LeadsService {
      * @throws ApiError
      */
     static leadsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/leads/{id}/',
             path: {
@@ -88,7 +91,7 @@ export class LeadsService {
      * @throws ApiError
      */
     static leadsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/leads/{id}/',
             path: {
@@ -104,7 +107,7 @@ export class LeadsService {
      * @throws ApiError
      */
     static leadsAssignCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/leads/{id}/assign/',
             path: {
@@ -122,7 +125,7 @@ export class LeadsService {
      * @throws ApiError
      */
     static leadsCloseCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/leads/{id}/close/',
             path: {
@@ -140,7 +143,7 @@ export class LeadsService {
      * @throws ApiError
      */
     static leadsContactCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/leads/{id}/contact/',
             path: {
@@ -158,7 +161,7 @@ export class LeadsService {
      * @throws ApiError
      */
     static leadsConvertCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/leads/{id}/convert/',
             path: {
@@ -169,3 +172,4 @@ export class LeadsService {
         });
     }
 }
+exports.LeadsService = LeadsService;

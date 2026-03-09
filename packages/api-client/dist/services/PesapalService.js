@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class PesapalService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PesapalService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class PesapalService {
     /**
      * Handle Pesapal IPN (Instant Payment Notification) callbacks.
      * @param orderMerchantReference
@@ -13,7 +16,7 @@ export class PesapalService {
      * @throws ApiError
      */
     static pesapalIpnRetrieve(orderMerchantReference, orderNotificationType, orderTrackingId, paymentAccount, paymentMethod, paymentStatusDescription) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/pesapal/ipn/',
             query: {
@@ -32,9 +35,10 @@ export class PesapalService {
      * @throws ApiError
      */
     static pesapalIpnCreate() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/pesapal/ipn/',
         });
     }
 }
+exports.PesapalService = PesapalService;

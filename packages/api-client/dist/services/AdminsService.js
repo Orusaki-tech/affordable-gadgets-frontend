@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class AdminsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AdminsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class AdminsService {
     /**
      * Admin management ViewSet. Superuser-only access.
      * - List all admins
@@ -12,7 +15,7 @@ export class AdminsService {
      * @throws ApiError
      */
     static adminsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/admins/',
             query: {
@@ -27,7 +30,7 @@ export class AdminsService {
      * @throws ApiError
      */
     static adminsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/admins/',
             body: requestBody,
@@ -45,7 +48,7 @@ export class AdminsService {
      * @throws ApiError
      */
     static adminsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/admins/{id}/',
             path: {
@@ -65,7 +68,7 @@ export class AdminsService {
      * @throws ApiError
      */
     static adminsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/admins/{id}/',
             path: {
@@ -87,7 +90,7 @@ export class AdminsService {
      * @throws ApiError
      */
     static adminsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/admins/{id}/',
             path: {
@@ -108,7 +111,7 @@ export class AdminsService {
      * @throws ApiError
      */
     static adminsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/admins/{id}/',
             path: {
@@ -124,7 +127,7 @@ export class AdminsService {
      * @throws ApiError
      */
     static adminsBrandsCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/admins/{id}/brands/',
             path: {
@@ -142,7 +145,7 @@ export class AdminsService {
      * @throws ApiError
      */
     static adminsBrandsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/admins/{id}/brands/',
             path: {
@@ -160,7 +163,7 @@ export class AdminsService {
      * @throws ApiError
      */
     static adminsRolesCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/admins/{id}/roles/',
             path: {
@@ -178,7 +181,7 @@ export class AdminsService {
      * @throws ApiError
      */
     static adminsRolesUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/admins/{id}/roles/',
             path: {
@@ -189,3 +192,4 @@ export class AdminsService {
         });
     }
 }
+exports.AdminsService = AdminsService;

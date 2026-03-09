@@ -1,13 +1,16 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class ReportsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReportsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class ReportsService {
     /**
      * Get aging inventory report.
      * @returns any
      * @throws ApiError
      */
     static reportsAgingInventoryRetrieve() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/reports/aging_inventory/',
         });
@@ -18,7 +21,7 @@ export class ReportsService {
      * @throws ApiError
      */
     static reportsInventoryValueRetrieve() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/reports/inventory_value/',
         });
@@ -29,7 +32,7 @@ export class ReportsService {
      * @throws ApiError
      */
     static reportsProductPerformanceRetrieve() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/reports/product_performance/',
         });
@@ -40,7 +43,7 @@ export class ReportsService {
      * @throws ApiError
      */
     static reportsRequestManagementRetrieve() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/reports/request_management/',
         });
@@ -51,7 +54,7 @@ export class ReportsService {
      * @throws ApiError
      */
     static reportsSalespersonPerformanceRetrieve() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/reports/salesperson_performance/',
         });
@@ -62,9 +65,10 @@ export class ReportsService {
      * @throws ApiError
      */
     static reportsStockMovementRetrieve() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/reports/stock_movement/',
         });
     }
 }
+exports.ReportsService = ReportsService;

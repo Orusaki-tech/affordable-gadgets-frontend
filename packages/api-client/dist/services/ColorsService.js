@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class ColorsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ColorsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class ColorsService {
     /**
      * Color lookup table. Admin-only write, public read.
      * Uses IsAdminOrReadOnly.
@@ -9,7 +12,7 @@ export class ColorsService {
      * @throws ApiError
      */
     static colorsList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/colors/',
             query: {
@@ -25,7 +28,7 @@ export class ColorsService {
      * @throws ApiError
      */
     static colorsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/colors/',
             body: requestBody,
@@ -40,7 +43,7 @@ export class ColorsService {
      * @throws ApiError
      */
     static colorsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/colors/{id}/',
             path: {
@@ -57,7 +60,7 @@ export class ColorsService {
      * @throws ApiError
      */
     static colorsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/colors/{id}/',
             path: {
@@ -76,7 +79,7 @@ export class ColorsService {
      * @throws ApiError
      */
     static colorsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/colors/{id}/',
             path: {
@@ -94,7 +97,7 @@ export class ColorsService {
      * @throws ApiError
      */
     static colorsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/colors/{id}/',
             path: {
@@ -103,3 +106,4 @@ export class ColorsService {
         });
     }
 }
+exports.ColorsService = ColorsService;

@@ -1,6 +1,9 @@
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
-export class UnitsService {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UnitsService = void 0;
+const OpenAPI_1 = require("../core/OpenAPI");
+const request_1 = require("../core/request");
+class UnitsService {
     /**
      * CRUD for individual physical Inventory Units.
      * - Inventory Manager: Full access (read/write)
@@ -38,7 +41,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsList(condition, ordering, page, productTemplate, productTemplateBrand, productTemplateProductType, ramGb, ramGbGte, saleStatus, search, sellingPrice, sellingPriceGte, sellingPriceLte, storageGb, storageGbGte) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/units/',
             query: {
@@ -73,7 +76,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/units/',
             body: requestBody,
@@ -93,7 +96,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsRetrieve(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/units/{id}/',
             path: {
@@ -115,7 +118,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/units/{id}/',
             path: {
@@ -139,7 +142,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsPartialUpdate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/units/{id}/',
             path: {
@@ -162,7 +165,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsDestroy(id) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'DELETE',
             url: '/units/{id}/',
             path: {
@@ -182,7 +185,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsApproveBuybackCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/units/{id}/approve_buyback/',
             path: {
@@ -200,7 +203,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsCreateOrderCreate(id, requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/units/{id}/create_order/',
             path: {
@@ -218,7 +221,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsAvailableList(page) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/units/available/',
             query: {
@@ -241,7 +244,7 @@ export class UnitsService {
          * @throws ApiError
          */
     static unitsBulkUpdateCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/units/bulk_update/',
             body: requestBody,
@@ -254,7 +257,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsExportCsvRetrieve() {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/units/export_csv/',
         });
@@ -266,7 +269,7 @@ export class UnitsService {
      * @throws ApiError
      */
     static unitsImportCsvCreate(requestBody) {
-        return __request(OpenAPI, {
+        return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/units/import_csv/',
             body: requestBody,
@@ -274,3 +277,4 @@ export class UnitsService {
         });
     }
 }
+exports.UnitsService = UnitsService;

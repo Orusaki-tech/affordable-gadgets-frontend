@@ -3,11 +3,9 @@
 import Image from 'next/image';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProducts } from '@/lib/hooks/useProducts';
-import { useDebouncedValue } from '@/lib/hooks/useDebouncedValue';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductCarousel } from '@/components/ProductCarousel';
 import { getCloudinarySizedImageUrl } from '@/lib/utils/cloudinary';
@@ -61,7 +59,6 @@ function getPromotionHref(promotion: PublicPromotion): string {
 }
 
 export function HomeHero() {
-  const router = useRouter();
   const { data: promotionsData, isLoading: promosLoading } = usePromotions({
     page_size: PROMOTIONS_PAGE_SIZE,
   });
@@ -95,8 +92,8 @@ export function HomeHero() {
   }, [activePromotionId, promotions]);
 
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebouncedValue(query, 300);
-  const normalizedQuery = debouncedQuery.trim();
+  const [submittedQuery, setSubmittedQuery] = useState('');
+  const normalizedQuery = submittedQuery.trim();
   const searchEnabled = normalizedQuery.length >= 2;
 
   const { data: productsData, isLoading: productsLoading } = useProducts({
@@ -205,16 +202,21 @@ export function HomeHero() {
           <form
             className="home-hero__search"
             onSubmit={(e) => {
-                e.preventDefault();
-                const q = query.trim();
-                if (!q) return;
-                router.push(`/products?search=${encodeURIComponent(q)}&focusSearch=1`);
-              }}
+              e.preventDefault();
+              const q = query.trim();
+              setSubmittedQuery(q);
+            }}
           >
             <div className="home-hero__search-field">
               <input
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  const nextQuery = e.target.value;
+                  setQuery(nextQuery);
+                  if (!nextQuery.trim()) {
+                    setSubmittedQuery('');
+                  }
+                }}
                 placeholder="Search products…"
                 className="home-hero__search-input"
                 type="text"

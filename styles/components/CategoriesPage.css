@@ -38,13 +38,13 @@
   border-radius: 16px;
   overflow: hidden;
   display: flex;
-  align-items: flex-end; /* Aligns phone to the bottom of the box */
+  align-items: center;
   justify-content: center;
 }
 
 .categories-page__card-icon {
   object-fit: cover;
-  object-position: bottom;
+  object-position: center;
   width: 90%;
   height: 90%;
   border-radius: 16px;

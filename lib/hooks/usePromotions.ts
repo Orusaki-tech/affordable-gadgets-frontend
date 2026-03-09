@@ -20,18 +20,21 @@ export function usePromotions(params?: {
   page?: number;
   page_size?: number;
   display_location?: string | string[];
+  initialData?: PaginatedPublicPromotionList;
 }) {
-  const displayLocationParam = Array.isArray(params?.display_location)
-    ? params?.display_location.join(',')
-    : params?.display_location;
+  const { initialData, ...queryParams } = params ?? {};
+  const displayLocationParam = Array.isArray(queryParams.display_location)
+    ? queryParams.display_location.join(',')
+    : queryParams.display_location;
   return useQuery<PaginatedPublicPromotionList>({
-    queryKey: ['promotions', params],
+    queryKey: ['promotions', queryParams],
     queryFn: () =>
       ApiService.apiV1PublicPromotionsList(
-        params?.page,
-        params?.page_size,
+        queryParams.page,
+        queryParams.page_size,
         displayLocationParam
       ),
+    initialData,
     staleTime: 60000, // 1 minute
   });
 }

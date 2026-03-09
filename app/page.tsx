@@ -11,12 +11,88 @@ import {
 import { ImageCarousel } from '@/components/ImageCarousel';
 import { CollectionHeaderBanner } from '@/components/CollectionHeaderBanner';
 import { BrandCarousel } from '@/components/BrandCarousel';
+import { brandConfig } from '@/lib/config/brand';
+import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+const HOME_PAGE_REVALIDATE_SECONDS = 60;
+const HERO_PROMOTIONS_PAGE_SIZE = 50;
 
-export default function HomePage() {
+function normalizeLocations(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item));
+  }
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function sortPromotions(promotions: PublicPromotion[]) {
+  return [...promotions].sort((a, b) => {
+    const aPos = a.carousel_position;
+    const bPos = b.carousel_position;
+    const aHasPos = typeof aPos === 'number';
+    const bHasPos = typeof bPos === 'number';
+
+    if (aHasPos && bHasPos) return aPos - bPos;
+    if (aHasPos) return -1;
+    if (bHasPos) return 1;
+
+    return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+  });
+}
+
+function selectHomeHeroPromotions(promotions: PublicPromotion[]) {
+  const featuredForHero = promotions.filter((promo) => {
+    const locations = normalizeLocations((promo as { display_locations?: unknown }).display_locations);
+    return locations.length > 0 && locations.includes('homepage_hero');
+  });
+
+  const baseList = featuredForHero.length > 0 ? featuredForHero : promotions;
+  return sortPromotions(baseList);
+}
+
+async function fetchInitialHeroPromotions(): Promise<PaginatedPublicPromotionList | undefined> {
+  const searchParams = new URLSearchParams({
+    page_size: String(HERO_PROMOTIONS_PAGE_SIZE),
+  });
+
+  try {
+    const response = await fetch(
+      `${brandConfig.apiBaseUrl}/api/v1/public/promotions/?${searchParams.toString()}`,
+      {
+        next: { revalidate: HOME_PAGE_REVALIDATE_SECONDS },
+        headers: {
+          'X-Brand-Code': brandConfig.code,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      return undefined;
+    }
+
+    const data = (await response.json()) as PaginatedPublicPromotionList;
+    return {
+      ...data,
+      results: selectHomeHeroPromotions(
+        Array.isArray(data?.results) ? (data.results as PublicPromotion[]) : []
+      ),
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const initialHeroPromotionsData = await fetchInitialHeroPromotions();
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 via-white to-gray-50">
      <Suspense
@@ -29,7 +105,7 @@ export default function HomePage() {
         <HeaderWithAnnouncement />
       </Suspense>
       <main className="flex-1">
-        <HomeHero />
+        <HomeHero initialPromotionsData={initialHeroPromotionsData} />
 
         {/* Promotions */}
         <section id="promotions" className="bg-white scroll-mt-20">

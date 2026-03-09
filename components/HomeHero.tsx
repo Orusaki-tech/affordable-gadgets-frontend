@@ -58,26 +58,38 @@ function getPromotionHref(promotion: PublicPromotion): string {
   return '/products';
 }
 
-export function HomeHero() {
+function getHeroPromotions(promotionsData?: PaginatedPublicPromotionList) {
+  const results = promotionsData?.results ?? [];
+
+  const featuredForHero = (results as PublicPromotion[]).filter((promo) => {
+    const locations = normalizeLocations((promo as any).display_locations);
+    return locations.length > 0 && locations.includes('homepage_hero');
+  });
+
+  const baseList =
+    featuredForHero.length > 0 ? featuredForHero : (results as PublicPromotion[]);
+
+  return sortPromotions(baseList);
+}
+
+type HomeHeroProps = {
+  initialPromotionsData?: PaginatedPublicPromotionList;
+};
+
+export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
   const { data: promotionsData, isLoading: promosLoading } = usePromotions({
     page_size: PROMOTIONS_PAGE_SIZE,
+    initialData: initialPromotionsData,
   });
 
   const promotions = useMemo(() => {
-    const results = (promotionsData as PaginatedPublicPromotionList | undefined)?.results ?? [];
-
-    const featuredForHero = (results as PublicPromotion[]).filter((promo) => {
-      const locations = normalizeLocations((promo as any).display_locations);
-      return locations.length > 0 && locations.includes('homepage_hero');
-    });
-
-    const baseList =
-      featuredForHero.length > 0 ? featuredForHero : (results as PublicPromotion[]);
-
-    return sortPromotions(baseList);
+    return getHeroPromotions(promotionsData);
   }, [promotionsData]);
 
-  const [activePromotionId, setActivePromotionId] = useState<number | null>(null);
+  const [activePromotionId, setActivePromotionId] = useState<number | null>(() => {
+    const firstId = getHeroPromotions(initialPromotionsData)[0]?.id;
+    return typeof firstId === 'number' ? firstId : null;
+  });
 
   useEffect(() => {
     if (activePromotionId !== null) return;
@@ -191,6 +203,7 @@ export function HomeHero() {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="home-hero__banner-image"
                   priority
+                  fetchPriority="high"
                   unoptimized={activeBannerSrc.includes('localhost') || activeBannerSrc.includes('127.0.0.1') || activeBannerSrc.includes('placehold.co')}
                 />
               </Link>

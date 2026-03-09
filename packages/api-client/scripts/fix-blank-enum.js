@@ -20,9 +20,13 @@ if (fixed !== content) {
 
 if (fs.existsSync(indexTarget)) {
   const indexContent = fs.readFileSync(indexTarget, 'utf8');
-  const fixedIndex = indexContent.replace(
+  let fixedIndex = indexContent.replace(
     /export \{ BlankEnum \} from '\.\/models\/BlankEnum';/g,
     "export type { BlankEnum } from './models/BlankEnum';"
+  );
+  fixedIndex = fixedIndex.replace(
+    /export \{ ([A-Za-z]+Enum) \} from '\.\/models\/\1';/g,
+    "export type { $1 } from './models/$1';"
   );
   if (fixedIndex !== indexContent) {
     fs.writeFileSync(indexTarget, fixedIndex, 'utf8');

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { brandConfig } from '@/lib/config/brand';
@@ -14,11 +14,11 @@ export function Header() {
   const { itemCount } = useCart();
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [currentSearch, setCurrentSearch] = useState('');
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -77,16 +77,21 @@ export function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    setCurrentSearch(window.location.search);
+  }, [pathname]);
+
   const focusProductsSearchHref = useMemo(() => {
     const isOnProducts = pathname === '/products';
     if (!isOnProducts) {
       return '/products?focusSearch=1';
     }
-    const params = new URLSearchParams(searchParams?.toString?.() ?? '');
+    const params = new URLSearchParams(currentSearch);
     params.set('focusSearch', '1');
     const qs = params.toString();
     return `/products${qs ? `?${qs}` : ''}`;
-  }, [pathname, searchParams]);
+  }, [currentSearch, pathname]);
 
   return (
     <header className="site-header">

@@ -126,7 +126,7 @@ export default async function HomePage() {
         {/* Collection header banner – static image above Featured Products. */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-5">
           <CollectionHeaderBanner
-            src="https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773051436/banner208_l3akqy.png"
+            src="https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773132870/banner208_l3akqy.png"
             alt="Featured products"
           />
         </div>

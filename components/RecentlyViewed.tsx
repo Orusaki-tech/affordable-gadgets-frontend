@@ -38,7 +38,7 @@ export function RecentlyViewed() {
           itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
           showNavigation={true}
           showPagination={false}
-          autoPlay={false}
+          autoPlay
         >
           {[...Array(4)].map((_, i) => (
             <div key={i} className="recently-viewed__placeholder">
@@ -63,7 +63,7 @@ export function RecentlyViewed() {
         itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
         showNavigation={true}
         showPagination={false}
-        autoPlay={false}
+        autoPlay
       >
         {sortedProducts.map((product) => (
           <ProductCard key={product.id} product={product} variant="featured" />

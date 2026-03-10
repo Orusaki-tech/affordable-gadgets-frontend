@@ -28,7 +28,7 @@ export function ProductCarousel({
   splitNav = false,
   showPagination = false,
   autoPlay = false,
-  autoPlayInterval = 5000,
+  autoPlayInterval = 6000,
   className = '',
 }: ProductCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);

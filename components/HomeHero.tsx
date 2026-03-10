@@ -235,7 +235,7 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
             alwaysShowNavigation
             splitNav
             showPagination={false}
-            autoPlay={false}
+            autoPlay
             className="home-hero__promo-carousel"
           >
             {...carouselContent}

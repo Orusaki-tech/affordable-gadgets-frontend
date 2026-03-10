@@ -347,7 +347,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
           itemsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
           showNavigation={true}
           showPagination={false}
-          autoPlay={false}
+          autoPlay
         >
           {reviews.map((review) => {
             const imageUrl = review.review_image_url || review.review_image || null;

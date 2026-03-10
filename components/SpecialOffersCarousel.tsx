@@ -32,7 +32,7 @@ export function SpecialOffersCarousel({ promotions, sectionTitle = 'Special Offe
         itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
         showNavigation={true}
         showPagination={false}
-        autoPlay={false}
+        autoPlay
       >
         {promotions.map((promotion, index) => {
           const firstProductId = promotion.products && promotion.products.length > 0

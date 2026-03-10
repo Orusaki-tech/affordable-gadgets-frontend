@@ -37,7 +37,7 @@ export function ImageCarousel() {
         itemsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
         showNavigation={true}
         showPagination={false}
-        autoPlay={false}
+        autoPlay
       >
         {Array.from({ length: COLLECTION_CARD_COUNT }).map((_, index) => (
           <div key={`collection-card-${index}`} className="image-carousel__card" aria-hidden>

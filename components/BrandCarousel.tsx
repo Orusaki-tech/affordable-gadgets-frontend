@@ -43,7 +43,7 @@ export function BrandCarousel() {
         showNavigation
         alwaysShowNavigation
         showPagination={false}
-        autoPlay={false}
+        autoPlay
         className="brand-carousel__carousel"
       >
         {BRAND_ITEMS.map((item, index) => (

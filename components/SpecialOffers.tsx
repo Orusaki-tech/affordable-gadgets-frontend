@@ -114,7 +114,7 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
           itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
           showNavigation={true}
           showPagination={false}
-          autoPlay={false}
+          autoPlay
         >
           {specialOffersPromotions.map((promotion: PublicPromotion, index) => {
             // Get first product ID from promotion

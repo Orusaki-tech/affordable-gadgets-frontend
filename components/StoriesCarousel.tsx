@@ -136,7 +136,7 @@ interface StoriesCarouselProps {
   autoAdvanceDuration?: number;
 }
 
-export function StoriesCarousel({ autoAdvanceDuration = 5 }: StoriesCarouselProps) {
+export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProps) {
   const [selectedVideo, setSelectedVideo] = useState<{ url: string; title: string } | null>(null);
   const router = useRouter();
   const bannerContainerRef = useRef<HTMLDivElement | null>(null);

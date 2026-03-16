@@ -645,8 +645,9 @@
 
 .product-detail__includes-list {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
   font-size: 10px;
   color: var(--gray-600);
 }

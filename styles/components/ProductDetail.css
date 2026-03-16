@@ -234,7 +234,8 @@
   border-radius: 8px;
   border: none;
   background-color: #f9f4f8;
-  margin-bottom: 7px; /* 7px + 8px gap = 15px to variants section */
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .product-detail__title {

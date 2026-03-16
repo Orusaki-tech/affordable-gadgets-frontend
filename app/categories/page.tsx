@@ -37,6 +37,11 @@ export default function Categories() {
             and everyday accessories. Each category links directly to relevant products so shoppers and
             search engines can discover the right section faster.
           </p>
+          <p className="mt-2 text-sm leading-6 text-gray-600 sm:text-base">
+            Use the quick links below to jump into the category that matches how you shop&mdash;whether
+            you are upgrading your main phone, looking for a work laptop, or adding affordable accessories
+            like earphones, chargers, and cases.
+          </p>
           <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
             <Link href="/products?type=PH" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
               Phones

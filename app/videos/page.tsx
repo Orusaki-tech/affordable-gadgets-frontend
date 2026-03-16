@@ -37,7 +37,12 @@ export default function VideosPage() {
             <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Product Videos</h1>
             <p className="mt-3 text-base leading-7 text-gray-600 sm:text-lg">
               Browse product demos and video previews to get a closer look at devices before you buy. This
-              page surfaces phones, laptops, tablets, and accessories with supporting video content.
+              page surfaces phones, laptops, tablets, and accessories with supporting video content so you
+              can see condition, colour, and key features in real-world lighting.
+            </p>
+            <p className="mt-2 text-sm leading-6 text-gray-600 sm:text-base">
+              Use these short clips to compare models, understand size and design, and hear how each device
+              performs in everyday Kenyan use cases like mobile money, social media, work, and school.
             </p>
             <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
               <Link href="/products" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">

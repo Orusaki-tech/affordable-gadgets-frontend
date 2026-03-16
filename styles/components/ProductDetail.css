@@ -3,19 +3,6 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 8px 16px;
-  /* Local theme tokens for product detail page (inspired by Sony mockup) */
-  --primary: #0ba36a;
-  --primary-light: #34d399;
-  --primary-dark: #066b46;
-  --primary-rgb: 11, 163, 106;
-
-  --pd-surface-bg: #ffffff;
-  --pd-surface-subtle-bg: #f5f7fa;
-  --pd-shell-bg: #0b1120;
-  --pd-border-subtle: #e5e7eb;
-
-  background: radial-gradient(circle at top left, #1e293b 0, #020617 40%, #020617 100%);
-  color: var(--gray-900);
 }
 
 @media (min-width: 640px) {
@@ -131,8 +118,8 @@
   position: relative;
   aspect-ratio: 1 / 1;
   max-height: 400px;
-  background: #020617;
-  border: 1px solid rgba(15, 23, 42, 0.7);
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -186,8 +173,8 @@
   flex-direction: column;
   gap: 12px;
   padding: 20px;
-  background-color: var(--pd-surface-bg);
-  border: 1px solid var(--pd-border-subtle);
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -196,16 +183,15 @@
 .product-detail__info-header {
   padding: 12px 14px;
   border-radius: 8px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: radial-gradient(circle at top left, #0f172a 0, #020617 55%, #020617 100%);
-  color: var(--ui-white);
+  border: 1px solid var(--gray-200);
+  background-color: var(--gray-50);
 }
 
 .product-detail__info-price-block {
   padding: 12px 14px;
   border-radius: 8px;
-  border: 1px solid #bbf7d0;
-  background-color: #ecfdf3;
+  border: 1px solid var(--gray-200);
+  background-color: #fefce8;
 }
 
 .product-detail__title {
@@ -307,7 +293,7 @@
 .product-detail__price-current {
   font-size: 24px;
   font-weight: 700;
-  color: var(--primary-dark);
+  color: var(--gray-900);
 }
 
 .product-detail__price-current--promo {

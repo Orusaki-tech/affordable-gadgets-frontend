@@ -1017,6 +1017,26 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 </svg>
                 <span>Affordable shipping</span>
               </div>
+              <div className="product-detail__includes-item">
+                <svg className="product-detail__includes-icon product-detail__includes-icon--primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                </svg>
+                <span>1–2 days delivery</span>
+              </div>
+              <div className="product-detail__includes-item">
+                <svg className="product-detail__includes-icon product-detail__includes-icon--primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3zm0 0c-2.21 0-4 1.343-4 3v1a1 1 0 001 1h6a1 1 0 001-1v-1c0-1.657-1.79-3-4-3z" />
+                </svg>
+                <span>Secure payments</span>
+              </div>
+            </div>
+            <div className="product-detail__payments">
+              <span className="product-detail__payments-label">Pay with</span>
+              <div className="product-detail__payments-icons">
+                <span className="product-detail__payments-pill product-detail__payments-pill--visa">Visa</span>
+                <span className="product-detail__payments-pill product-detail__payments-pill--mpesa">M‑Pesa</span>
+                <span className="product-detail__payments-pill product-detail__payments-pill--paypal">PayPal</span>
+              </div>
             </div>
           </div>
 

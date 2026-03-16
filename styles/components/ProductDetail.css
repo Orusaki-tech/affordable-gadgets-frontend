@@ -209,6 +209,16 @@
   box-shadow: none !important;
 }
 
+@media (min-width: 1024px) {
+  .product-detail__info {
+    position: sticky;
+    top: 80px;
+    align-self: flex-start;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+}
+
 /* Important info blocks: borders and backgrounds */
 .product-detail__info-header {
   padding: 12px 14px;
@@ -656,6 +666,49 @@
 
 .product-detail__includes-icon--primary {
   color: var(--primary);
+}
+
+.product-detail__payments {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.product-detail__payments-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-700);
+}
+
+.product-detail__payments-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.product-detail__payments-pill {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--ui-white);
+  border: 1px solid var(--gray-200);
+}
+
+.product-detail__payments-pill--visa {
+  color: #1a1f71;
+  border-color: #1a1f7133;
+}
+
+.product-detail__payments-pill--mpesa {
+  color: #00a859;
+  border-color: #00a85933;
+}
+
+.product-detail__payments-pill--paypal {
+  color: #003087;
+  border-color: #00308733;
 }
 
 .product-detail__cta {

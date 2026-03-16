@@ -15,6 +15,12 @@ const staticPaths = [
   "/promotions",
   "/reviews",
   "/videos",
+  "/faq",
+  "/shipping",
+  "/budget-search",
+  "/contact",
+  "/privacy",
+  "/terms",
 ];
 
 const getBaseUrl = () => brandConfig.siteUrl.replace(/\/+$/, "");

@@ -14,7 +14,9 @@
   --pd-shell-bg: #0b1120;
   --pd-border-subtle: #e5e7eb;
 
-  background: radial-gradient(circle at top left, #1e293b 0, #020617 40%, #020617 100%);
+  /* Use a light, neutral page background so the cards feel airy,
+     closer to the reference mock instead of a dark shell. */
+  background: #f9fafb;
   color: var(--gray-900);
 }
 
@@ -131,8 +133,8 @@
   position: relative;
   aspect-ratio: 1 / 1;
   max-height: 400px;
-  background: #020617;
-  border: 1px solid rgba(15, 23, 42, 0.7);
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.35);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -197,8 +199,30 @@
   padding: 12px 14px;
   border-radius: 8px;
   border: 1px solid rgba(148, 163, 184, 0.35);
-  background: radial-gradient(circle at top left, #0f172a 0, #020617 55%, #020617 100%);
-  color: var(--ui-white);
+  /* Light header card instead of dark blue block */
+  background: #ffffff;
+  color: var(--gray-900);
+}
+
+.product-detail__header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.product-detail__certified-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #ecfdf3;
+  border: 1px solid #22c55e;
+  /* Darker text for WCAG-friendly contrast */
+  color: #166534;
 }
 
 .product-detail__info-price-block {
@@ -206,6 +230,53 @@
   border-radius: 8px;
   border: 1px solid #bbf7d0;
   background-color: #ecfdf3;
+}
+
+.product-detail__payment-note {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--gray-600);
+  margin-top: 4px;
+}
+
+.product-detail__payment-main {
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.product-detail__payment-alt {
+  color: var(--gray-500);
+}
+
+.product-detail__payments-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.product-detail__payments-label {
+  font-size: 11px;
+  color: var(--gray-600);
+}
+
+.product-detail__payments-logos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.product-detail__payments-chip {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  color: var(--gray-700);
 }
 
 .product-detail__title {
@@ -674,6 +745,18 @@
   font-weight: 600;
 }
 
+.product-detail__cta-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (min-width: 480px) {
+  .product-detail__cta-actions {
+    flex-direction: row;
+  }
+}
+
 .product-detail__cta-button {
   width: 100%;
   padding: 10px 12px;
@@ -691,8 +774,21 @@
 }
 
 .product-detail__cta-button--disabled {
-  background: var(--gray-400);
+  /* Higher-contrast disabled state so label is readable */
+  background: #e5e7eb;
+  color: var(--gray-600);
   cursor: not-allowed;
+}
+
+.product-detail__cta-button--secondary {
+  background: var(--ui-white);
+  color: var(--primary-dark);
+  border: 1px solid var(--primary-light);
+  box-shadow: none;
+}
+
+.product-detail__cta-button--secondary:hover {
+  background: var(--gray-50);
 }
 
 .product-detail__cta-loading {

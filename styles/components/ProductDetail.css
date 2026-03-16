@@ -229,7 +229,7 @@
 }
 
 .product-detail__info-price-block {
-  padding: 12px 14px;
+  padding: 0 14px;
   border-radius: 8px;
   border: none;
   background-color: #f9f4f8;

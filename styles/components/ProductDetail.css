@@ -200,7 +200,7 @@
 .product-detail__info {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   padding: 20px;
   background-color: #f9f4f8;
   border: none;
@@ -225,6 +225,7 @@
   border-radius: 8px;
   border: none;
   background-color: #f9f4f8;
+  margin-bottom: 7px; /* 7px + 8px gap = 15px to price block */
 }
 
 .product-detail__info-price-block {
@@ -232,6 +233,7 @@
   border-radius: 8px;
   border: none;
   background-color: #f9f4f8;
+  margin-bottom: 7px; /* 7px + 8px gap = 15px to variants section */
 }
 
 .product-detail__title {

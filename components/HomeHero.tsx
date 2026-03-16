@@ -227,7 +227,7 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
   return (
     <section className="home-hero" aria-label="Homepage hero">
       <div className="home-hero__container">
-        {/* Single grid: row1 = track (full width), row2 = nav (left) | banner (right), row3 = search (left), row4 = card (left) */}
+        {/* Single layout: carousel on top, then two-column hero (left: search + card, right: banner) on desktop */}
         <div className="home-hero__main-grid" aria-label="Promotions">
           <ProductCarousel
             itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
@@ -241,123 +241,127 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
             {...carouselContent}
           </ProductCarousel>
 
-          <div className="home-hero__right">
-            {activePromotion && activeBannerSrc ? (
-              <Link href={getPromotionHref(activePromotion)} className="home-hero__banner" aria-label={activePromotion.title}>
-                <Image
-                  src={getCloudinarySizedImageUrl(activeBannerSrc, HERO_BANNER_SIZE, 'contain')}
-                  alt={activePromotion.title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="home-hero__banner-image"
-                  priority
-                  fetchPriority="high"
-                  unoptimized={activeBannerSrc.includes('localhost') || activeBannerSrc.includes('127.0.0.1') || activeBannerSrc.includes('placehold.co')}
-                />
-              </Link>
-            ) : (
-              <div className="home-hero__banner home-hero__banner--placeholder" aria-label="Promotions placeholder">
-                <Image
-                  src={fallbackBannerSrc}
-                  alt="Promotions coming soon"
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="home-hero__banner-image"
-                  priority
-                  fetchPriority="high"
-                />
-              </div>
-            )}
-          </div>
-
-          <form
-            className="home-hero__search"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const q = query.trim();
-              setSubmittedQuery(q);
-            }}
-          >
-            <div className="home-hero__search-field">
-              <input
-                value={query}
-                onChange={(e) => {
-                  const nextQuery = e.target.value;
-                  setQuery(nextQuery);
-                  if (!nextQuery.trim()) {
-                    setSubmittedQuery('');
-                  }
+          <div className="home-hero__content-row">
+            <div className="home-hero__left-column">
+              <form
+                className="home-hero__search"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const q = query.trim();
+                  setSubmittedQuery(q);
                 }}
-                placeholder="Search products…"
-                className="home-hero__search-input"
-                type="text"
-                inputMode="search"
-              />
-              <button className="home-hero__search-button" type="submit" aria-label="Search">
-                <svg className="home-hero__search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="7" />
-                  <line x1="16.5" y1="16.5" x2="21" y2="21" />
-                </svg>
-              </button>
-            </div>
-          </form>
+              >
+                <div className="home-hero__search-field">
+                  <input
+                    value={query}
+                    onChange={(e) => {
+                      const nextQuery = e.target.value;
+                      setQuery(nextQuery);
+                      if (!nextQuery.trim()) {
+                        setSubmittedQuery('');
+                      }
+                    }}
+                    placeholder="Search products…"
+                    className="home-hero__search-input"
+                    type="text"
+                    inputMode="search"
+                  />
+                  <button className="home-hero__search-button" type="submit" aria-label="Search">
+                    <svg className="home-hero__search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="11" cy="11" r="7" />
+                      <line x1="16.5" y1="16.5" x2="21" y2="21" />
+                    </svg>
+                  </button>
+                </div>
+              </form>
 
-          {!searchEnabled ? (
-            <div className="home-hero__left-card" aria-live="polite">
-                <div className="home-hero__placeholder">
-                  <div className="home-hero__placeholder-media" aria-hidden>
-                    <Image
-                      src={leftPlaceholderSrc}
-                      alt=""
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 420px"
-                      className="home-hero__placeholder-image"
-                    />
+              {!searchEnabled ? (
+                <div className="home-hero__left-card" aria-live="polite">
+                  <div className="home-hero__placeholder">
+                    <div className="home-hero__placeholder-media" aria-hidden>
+                      <Image
+                        src={leftPlaceholderSrc}
+                        alt=""
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 420px"
+                        className="home-hero__placeholder-image"
+                      />
+                    </div>
+                    <div className="home-hero__placeholder-body">
+                      <p className="home-hero__placeholder-title">Search to start shopping</p>
+                      <p className="home-hero__placeholder-copy">
+                        Type a product name above and we’ll show the product card here.
+                      </p>
+                    </div>
                   </div>
-                  <div className="home-hero__placeholder-body">
-                    <p className="home-hero__placeholder-title">Search to start shopping</p>
-                    <p className="home-hero__placeholder-copy">
-                      Type a product name above and we’ll show the product card here.
+                </div>
+              ) : productsLoading ? (
+                <div className="home-hero__left-card" aria-live="polite">
+                  <div className="home-hero__product-skeleton">
+                    <div className="home-hero__product-skeleton-media" />
+                    <div className="home-hero__product-skeleton-lines">
+                      <div className="home-hero__product-skeleton-line" />
+                      <div className="home-hero__product-skeleton-line home-hero__product-skeleton-line--short" />
+                      <div className="home-hero__product-skeleton-line home-hero__product-skeleton-line--shorter" />
+                    </div>
+                  </div>
+                </div>
+              ) : product ? (
+                <div className="home-hero__product-result" aria-live="polite">
+                  <ProductCard
+                    product={product}
+                    variant="featured"
+                  />
+                  <div className="home-hero__product-actions">
+                    <Link
+                      href={`/products?search=${encodeURIComponent(normalizedQuery)}&focusSearch=1`}
+                      className="home-hero__view-all"
+                    >
+                      View all results
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="home-hero__left-card" aria-live="polite">
+                  <div className="home-hero__no-results">
+                    <p className="home-hero__no-results-title">No results</p>
+                    <p className="home-hero__no-results-copy">
+                      We couldn’t find anything for “{normalizedQuery}”. Try a different search.
                     </p>
                   </div>
                 </div>
+              )}
             </div>
-          ) : productsLoading ? (
-            <div className="home-hero__left-card" aria-live="polite">
-                <div className="home-hero__product-skeleton">
-                  <div className="home-hero__product-skeleton-media" />
-                  <div className="home-hero__product-skeleton-lines">
-                    <div className="home-hero__product-skeleton-line" />
-                    <div className="home-hero__product-skeleton-line home-hero__product-skeleton-line--short" />
-                    <div className="home-hero__product-skeleton-line home-hero__product-skeleton-line--shorter" />
-                  </div>
-                </div>
-            </div>
-          ) : product ? (
-            <div className="home-hero__product-result" aria-live="polite">
-              <ProductCard
-                product={product}
-                variant="featured"
-              />
-              <div className="home-hero__product-actions">
-                <Link
-                  href={`/products?search=${encodeURIComponent(normalizedQuery)}&focusSearch=1`}
-                  className="home-hero__view-all"
-                >
-                  View all results
+
+            <div className="home-hero__right">
+              {activePromotion && activeBannerSrc ? (
+                <Link href={getPromotionHref(activePromotion)} className="home-hero__banner" aria-label={activePromotion.title}>
+                  <Image
+                    src={getCloudinarySizedImageUrl(activeBannerSrc, HERO_BANNER_SIZE, 'contain')}
+                    alt={activePromotion.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="home-hero__banner-image"
+                    priority
+                    fetchPriority="high"
+                    unoptimized={activeBannerSrc.includes('localhost') || activeBannerSrc.includes('127.0.0.1') || activeBannerSrc.includes('placehold.co')}
+                  />
                 </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="home-hero__left-card" aria-live="polite">
-                <div className="home-hero__no-results">
-                  <p className="home-hero__no-results-title">No results</p>
-                  <p className="home-hero__no-results-copy">
-                    We couldn’t find anything for “{normalizedQuery}”. Try a different search.
-                  </p>
+              ) : (
+                <div className="home-hero__banner home-hero__banner--placeholder" aria-label="Promotions placeholder">
+                  <Image
+                    src={fallbackBannerSrc}
+                    alt="Promotions coming soon"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="home-hero__banner-image"
+                    priority
+                    fetchPriority="high"
+                  />
                 </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </section>

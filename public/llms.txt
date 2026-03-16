@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Aligns with robots.txt by allowing AI crawlers to access public pages.
+# Disallow any private or admin paths if needed, for example:
+# Disallow: /admin/
+

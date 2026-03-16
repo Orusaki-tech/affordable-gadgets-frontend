@@ -95,7 +95,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 via-white to-gray-50">
-     <Suspense
+      <Suspense
         fallback={
           <div className="site-header-wrapper">
             <HeaderWithAnnouncement />
@@ -105,6 +105,35 @@ export default async function HomePage() {
         <HeaderWithAnnouncement />
       </Suspense>
       <main className="flex-1">
+        <section className="bg-white/80 border-b border-gray-100">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+            <div className="max-w-4xl">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900">
+                Affordable gadgets in Kenya for every budget
+              </h1>
+              <p className="mt-3 text-base leading-7 text-gray-700 sm:text-lg">
+                Discover curated deals on smartphones, laptops, tablets, iPads, and accessories at Affordable
+                Gadgets Ke. Compare prices, explore payment options, and shop confident that every device is
+                sourced and tested for Kenyan customers.
+              </p>
+              <p className="mt-2 text-sm leading-6 text-gray-600 sm:text-base">
+                Start with today&apos;s promotions below, or jump straight to{' '}
+                <a href="/products" className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline">
+                  all products
+                </a>{' '}
+                or{' '}
+                <a
+                  href="/budget-search"
+                  className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline"
+                >
+                  shop by budget
+                </a>
+                .
+              </p>
+            </div>
+          </div>
+        </section>
+
         <HomeHero initialPromotionsData={initialHeroPromotionsData} />
 
         {/* Promotions */}

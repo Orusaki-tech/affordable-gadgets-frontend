@@ -1,11 +1,45 @@
 import { brandConfig } from '@/lib/config/brand';
 
 interface StructuredDataProps {
-  type?: 'Organization' | 'LocalBusiness' | 'BreadcrumbList' | 'WebSite' | 'Service';
+  type?:
+    | 'Organization'
+    | 'LocalBusiness'
+    | 'BreadcrumbList'
+    | 'WebSite'
+    | 'Service'
+    | 'Product'
+    | 'ItemList';
   breadcrumbs?: Array<{ name: string; url: string }>;
+  product?: {
+    name: string;
+    description?: string | null;
+    url: string;
+    image?: string | string[] | null;
+    brand?: string | null;
+    sku?: string | null;
+    priceCurrency?: string;
+    lowPrice?: number | null;
+    highPrice?: number | null;
+    availability?: 'InStock' | 'OutOfStock' | 'PreOrder' | 'Discontinued';
+  };
+  itemList?: {
+    name?: string;
+    url: string;
+    items: Array<{
+      name: string;
+      url: string;
+      type?: 'Product' | 'CollectionPage' | 'Thing';
+      image?: string | null;
+    }>;
+  };
 }
 
-export function StructuredData({ type = 'Organization', breadcrumbs }: StructuredDataProps) {
+export function StructuredData({
+  type = 'Organization',
+  breadcrumbs,
+  product,
+  itemList,
+}: StructuredDataProps) {
   const getOrganizationSchema = () => ({
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -195,6 +229,104 @@ export function StructuredData({ type = 'Organization', breadcrumbs }: Structure
     },
   });
 
+  const getProductSchema = () => {
+    // Build a minimal but valid Product schema suitable for Google parsing.
+    // Prefer server-rendered values so crawlers can see the content.
+    const baseUrl = brandConfig.siteUrl;
+    const input = product ?? null;
+    if (!input) return null;
+
+    const imageList = (() => {
+      if (!input.image) return undefined;
+      if (Array.isArray(input.image)) return input.image.filter(Boolean);
+      return [input.image].filter(Boolean);
+    })();
+
+    const currency = input.priceCurrency || 'KES';
+    const lowPrice = typeof input.lowPrice === 'number' ? input.lowPrice : null;
+    const highPrice = typeof input.highPrice === 'number' ? input.highPrice : null;
+
+    const availability =
+      input.availability === 'OutOfStock'
+        ? 'https://schema.org/OutOfStock'
+        : input.availability === 'PreOrder'
+          ? 'https://schema.org/PreOrder'
+          : input.availability === 'Discontinued'
+            ? 'https://schema.org/Discontinued'
+            : 'https://schema.org/InStock';
+
+    const offers = (() => {
+      if (lowPrice === null && highPrice === null) return undefined;
+      if (lowPrice !== null && highPrice !== null && lowPrice !== highPrice) {
+        return {
+          '@type': 'AggregateOffer',
+          lowPrice: String(lowPrice),
+          highPrice: String(highPrice),
+          priceCurrency: currency,
+          availability,
+          url: input.url,
+        };
+      }
+      const price = String(lowPrice ?? highPrice ?? 0);
+      return {
+        '@type': 'Offer',
+        price,
+        priceCurrency: currency,
+        availability,
+        url: input.url,
+      };
+    })();
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      '@id': `${input.url}#product`,
+      name: input.name,
+      description: input.description ?? undefined,
+      url: input.url,
+      image: imageList,
+      sku: input.sku ?? undefined,
+      brand: input.brand
+        ? {
+            '@type': 'Brand',
+            name: input.brand,
+          }
+        : undefined,
+      offers,
+      isRelatedTo: {
+        '@type': 'WebSite',
+        '@id': `${baseUrl}#website`,
+        url: baseUrl,
+        name: brandConfig.business.name,
+      },
+    };
+  };
+
+  const getItemListSchema = () => {
+    const input = itemList ?? null;
+    if (!input || !Array.isArray(input.items) || input.items.length === 0) return null;
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: input.name ?? undefined,
+      url: input.url,
+      itemListOrder: 'https://schema.org/ItemListOrderAscending',
+      numberOfItems: input.items.length,
+      itemListElement: input.items.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: item.url,
+        item: {
+          '@type': item.type ?? 'Thing',
+          name: item.name,
+          url: item.url,
+          image: item.image ? [item.image] : undefined,
+        },
+      })),
+    };
+  };
+
   const getSchema = () => {
     switch (type) {
       case 'LocalBusiness':
@@ -205,6 +337,10 @@ export function StructuredData({ type = 'Organization', breadcrumbs }: Structure
         return getWebSiteSchema();
       case 'Service':
         return getServiceSchema();
+      case 'Product':
+        return getProductSchema();
+      case 'ItemList':
+        return getItemListSchema();
       default:
         return getOrganizationSchema();
     }

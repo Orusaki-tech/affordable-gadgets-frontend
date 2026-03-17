@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { brandConfig } from "@/lib/config/brand";
+import { StructuredData } from "@/components/StructuredData";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,6 +63,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <StructuredData type="Organization" />
+        <StructuredData type="WebSite" />
+        <StructuredData type="LocalBusiness" />
         <Providers>{children}</Providers>
         <SpeedInsights />
       </body>

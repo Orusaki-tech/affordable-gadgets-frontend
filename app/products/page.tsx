@@ -4,6 +4,9 @@ import { Metadata } from 'next';
 import { ProductsPage } from '@/components/ProductsPage';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
+import { StructuredData } from '@/components/StructuredData';
+import { brandConfig } from '@/lib/config/brand';
+import { ApiService } from '@/lib/api/generated';
 
 export const revalidate = 3600;
 
@@ -15,9 +18,95 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ProductsListingPage() {
+function asString(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function asNumber(value: string | string[] | undefined) {
+  const str = asString(value);
+  if (!str) return undefined;
+  const num = Number(str);
+  return Number.isFinite(num) ? num : undefined;
+}
+
+type ProductsSearchParams = Record<string, string | string[] | undefined>;
+
+export default async function ProductsListingPage({
+  searchParams,
+}: {
+  searchParams?: ProductsSearchParams;
+}) {
+  const sp = searchParams ?? {};
+  const brandFilter = asString(sp.brand_filter);
+  const search = asString(sp.search);
+  const ordering = asString(sp.ordering);
+  const type = asString(sp.type);
+  const minPrice = asNumber(sp.min_price);
+  const maxPrice = asNumber(sp.max_price);
+  const promotion = asNumber(sp.promotion);
+
+  const qs = new URLSearchParams();
+  for (const [key, value] of Object.entries(sp)) {
+    if (value === undefined) continue;
+    if (Array.isArray(value)) {
+      value.forEach((v) => qs.append(key, v));
+    } else {
+      qs.set(key, value);
+    }
+  }
+  const productsUrl = `${brandConfig.siteUrl}/products${qs.toString() ? `?${qs.toString()}` : ''}`;
+
+  let results: Array<{ product_name: string; slug?: string; primary_image?: string | null }> = [];
+  try {
+    const data = await ApiService.apiV1PublicProductsList(
+      brandFilter,
+      maxPrice,
+      minPrice,
+      ordering,
+      1,
+      12,
+      promotion,
+      search,
+      undefined,
+      type
+    );
+    results = Array.isArray(data?.results) ? (data.results as typeof results) : [];
+  } catch {
+    results = [];
+  }
+
+  const itemListItems = results
+    .map((p) => {
+      const slug = p.slug;
+      if (!slug) return null;
+      return {
+        name: p.product_name,
+        url: `${brandConfig.siteUrl}/products/${slug}`,
+        image: p.primary_image ?? null,
+        type: 'Product' as const,
+      };
+    })
+    .filter(Boolean) as Array<{ name: string; url: string; image?: string | null; type: 'Product' }>;
+
   return (
     <div className="min-h-screen flex flex-col">
+      <StructuredData
+        type="BreadcrumbList"
+        breadcrumbs={[
+          { name: 'Home', url: brandConfig.siteUrl },
+          { name: 'Products', url: `${brandConfig.siteUrl}/products` },
+        ]}
+      />
+      {itemListItems.length > 0 && (
+        <StructuredData
+          type="ItemList"
+          itemList={{
+            name: `${brandConfig.name} products`,
+            url: productsUrl,
+            items: itemListItems,
+          }}
+        />
+      )}
       <Suspense
         fallback={
           <div className="site-header-wrapper">

@@ -4,6 +4,8 @@ import { Suspense } from 'react';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { CategoriesPage } from '@/components/CategoriesPage';
+import { StructuredData } from '@/components/StructuredData';
+import { brandConfig } from '@/lib/config/brand';
 
 export const revalidate = 3600;
 
@@ -16,8 +18,33 @@ export const metadata: Metadata = {
 };
 
 export default function Categories() {
+  const categoryItems = [
+    { name: 'Phones', url: `${brandConfig.siteUrl}/products?type=PH` },
+    { name: 'Laptops', url: `${brandConfig.siteUrl}/products?type=LT` },
+    { name: 'Tablets & iPads', url: `${brandConfig.siteUrl}/products?type=TB` },
+    { name: 'Accessories', url: `${brandConfig.siteUrl}/products?type=AC` },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
+      <StructuredData
+        type="BreadcrumbList"
+        breadcrumbs={[
+          { name: 'Home', url: brandConfig.siteUrl },
+          { name: 'Categories', url: `${brandConfig.siteUrl}/categories` },
+        ]}
+      />
+      <StructuredData
+        type="ItemList"
+        itemList={{
+          name: `${brandConfig.name} categories`,
+          url: `${brandConfig.siteUrl}/categories`,
+          items: categoryItems.map((item) => ({
+            ...item,
+            type: 'CollectionPage',
+          })),
+        }}
+      />
       <Suspense
         fallback={
           <div className="site-header-wrapper">

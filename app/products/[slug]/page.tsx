@@ -6,6 +6,7 @@ import { Footer } from '@/components/Footer';
 import { ApiService } from '@/lib/api/generated';
 import { brandConfig } from '@/lib/config/brand';
 import type { PublicProduct } from '@/lib/api/generated';
+import { StructuredData } from '@/components/StructuredData';
 
 export const revalidate = 3600;
 
@@ -100,9 +101,50 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
+  let product: PublicProduct | null = null;
+
+  try {
+    product = await fetchProductBySlug(slug);
+  } catch {
+    product = null;
+  }
+
+  const productUrl = `${brandConfig.siteUrl}/products/${slug}`;
+  const productName = product?.product_name ?? 'Product';
+  const description = buildProductDescription(product);
+  const imageUrl = resolveProductImage(product);
+  const lowPrice = typeof product?.min_price === 'number' ? product.min_price : null;
+  const highPrice = typeof product?.max_price === 'number' ? product.max_price : null;
+  const availability =
+    Number(product?.available_units_count ?? 0) > 0 ? 'InStock' : 'OutOfStock';
   
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f9f4f8' }}>
+      <StructuredData
+        type="BreadcrumbList"
+        breadcrumbs={[
+          { name: 'Home', url: brandConfig.siteUrl },
+          { name: 'Products', url: `${brandConfig.siteUrl}/products` },
+          { name: productName, url: productUrl },
+        ]}
+      />
+      {product && (
+        <StructuredData
+          type="Product"
+          product={{
+            name: productName,
+            description,
+            url: productUrl,
+            image: imageUrl,
+            brand: product.brand ?? null,
+            sku: slug,
+            priceCurrency: 'KES',
+            lowPrice,
+            highPrice,
+            availability,
+          }}
+        />
+      )}
       <Suspense
         fallback={
           <div className="site-header-wrapper">

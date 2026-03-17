@@ -14,6 +14,7 @@ import { BrandCarousel } from '@/components/BrandCarousel';
 import { brandConfig } from '@/lib/config/brand';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { Suspense } from 'react';
+import { StructuredData } from '@/components/StructuredData';
 
 const HOME_PAGE_REVALIDATE_SECONDS = 60;
 const HERO_PROMOTIONS_PAGE_SIZE = 50;
@@ -95,6 +96,10 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 via-white to-gray-50">
+      <StructuredData
+        type="BreadcrumbList"
+        breadcrumbs={[{ name: 'Home', url: brandConfig.siteUrl }]}
+      />
       <Suspense
         fallback={
           <div className="site-header-wrapper">

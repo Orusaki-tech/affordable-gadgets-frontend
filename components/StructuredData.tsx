@@ -40,12 +40,15 @@ export function StructuredData({
   product,
   itemList,
 }: StructuredDataProps) {
+  const brandImageUrl = `${brandConfig.siteUrl}/affordablelogo.png`;
+
   const getOrganizationSchema = () => ({
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: brandConfig.business.name,
     url: brandConfig.siteUrl,
     logo: `${brandConfig.siteUrl}/affordablelogo.png`,
+    image: [brandImageUrl],
     description: brandConfig.business.description,
     email: brandConfig.business.email,
     telephone: brandConfig.business.phone,
@@ -65,7 +68,7 @@ export function StructuredData({
     '@type': 'Store',
     name: brandConfig.business.name,
     image: [
-      `${brandConfig.siteUrl}/affordablelogo.png`,
+      brandImageUrl,
       // Add more image URLs if you have store photos
     ],
     '@id': `${brandConfig.siteUrl}#store`,
@@ -154,6 +157,7 @@ export function StructuredData({
     return {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
+      name: `${brandConfig.business.name} breadcrumbs`,
       itemListElement: breadcrumbs.map((crumb, index) => ({
         '@type': 'ListItem',
         position: index + 1,

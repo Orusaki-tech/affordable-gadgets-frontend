@@ -96,6 +96,8 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 via-white to-gray-50">
+      <StructuredData type="WebSite" />
+      <StructuredData type="LocalBusiness" />
       <StructuredData
         type="BreadcrumbList"
         breadcrumbs={[{ name: 'Home', url: brandConfig.siteUrl }]}

@@ -11,8 +11,9 @@ import { ApiService } from '@/lib/api/generated';
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Products',
-  description: 'Browse phones, laptops, tablets, iPads, and accessories with filters for brand, price, and category.',
+  title: 'Affordable Phones, Laptops & Electronics in Kenya | Affordable Gadgets',
+  description:
+    'Shop affordable phones, laptops, tablets, iPads and accessories in Kenya. Compare specs, prices and payment options and buy online or pick up in Nairobi CBD.',
   alternates: {
     canonical: '/products',
   },

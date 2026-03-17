@@ -27,6 +27,7 @@ export default function Categories() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <StructuredData type="LocalBusiness" />
       <StructuredData
         type="BreadcrumbList"
         breadcrumbs={[

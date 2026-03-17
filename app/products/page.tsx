@@ -34,9 +34,9 @@ type ProductsSearchParams = Record<string, string | string[] | undefined>;
 export default async function ProductsListingPage({
   searchParams,
 }: {
-  searchParams?: ProductsSearchParams;
+  searchParams?: Promise<ProductsSearchParams>;
 }) {
-  const sp = searchParams ?? {};
+  const sp = (await searchParams) ?? {};
   const brandFilter = asString(sp.brand_filter);
   const search = asString(sp.search);
   const ordering = asString(sp.ordering);

@@ -109,14 +109,6 @@ export function StructuredData({
       };
     }),
     sameAs: brandConfig.business.sameAs,
-    // Additional properties for better Google Business integration
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.6',
-      reviewCount: '2251',
-      bestRating: '5',
-      worstRating: '1',
-    },
     // Enhanced fields to beat competitors
     areaServed: {
       '@type': 'Country',

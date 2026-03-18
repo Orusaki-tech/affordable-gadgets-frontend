@@ -16,6 +16,7 @@ import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/ge
 import { Suspense } from 'react';
 import { StructuredData } from '@/components/StructuredData';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 const HOME_PAGE_REVALIDATE_SECONDS = 60;
 const HERO_PROMOTIONS_PAGE_SIZE = 50;
@@ -355,16 +356,19 @@ export default async function HomePage() {
               </p>
               <p className="mt-2 text-sm leading-6 text-gray-600 sm:text-base">
                 Start with today&apos;s promotions above, or jump straight to{' '}
-                <a href="/products" className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline">
+                <Link
+                  href="/products"
+                  className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline"
+                >
                   all products
-                </a>{' '}
+                </Link>{' '}
                 or{' '}
-                <a
+                <Link
                   href="/budget-search"
                   className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline"
                 >
                   shop by budget
-                </a>
+                </Link>
                 .
               </p>
             </div>

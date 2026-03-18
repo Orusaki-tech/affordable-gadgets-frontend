@@ -3,12 +3,18 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import { brandConfig } from '@/lib/config/brand';
+import { OpenAPI, OrdersService, type Order } from '@/lib/api/generated';
+import { inventoryBaseUrl } from '@/lib/api/openapi';
+import { GoogleCustomerReviewsOptIn } from '@/components/GoogleCustomerReviewsOptIn';
 
 export function PaymentSuccessClient() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('order_id');
   const paymentReference = searchParams.get('payment_reference');
+  const [order, setOrder] = useState<Order | null>(null);
+  const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState<string | null>(null);
 
   const downloadReceipt = () => {
     if (!orderId) return;
@@ -29,9 +35,77 @@ export function PaymentSuccessClient() {
     window.open(receiptUrl, '_blank');
   };
 
+  useEffect(() => {
+    let mounted = true;
+    const fetchOrder = async (id: string) => {
+      try {
+        const previousBase = OpenAPI.BASE;
+        OpenAPI.BASE = inventoryBaseUrl;
+        const data = await OrdersService.ordersRetrieve(id);
+        OpenAPI.BASE = previousBase;
+        if (mounted) setOrder(data);
+      } catch {
+        // If order isn't accessible yet, we still show success UI; opt-in will simply not render.
+        if (mounted) setOrder(null);
+      }
+    };
+
+    if (orderId) fetchOrder(orderId);
+    return () => {
+      mounted = false;
+    };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (!orderId) {
+      setEstimatedDeliveryDate(null);
+      return;
+    }
+    const deliveryEnd = (order as any)?.delivery_window_end as string | undefined;
+    const deliveryStart = (order as any)?.delivery_window_start as string | undefined;
+    const createdAt = order?.created_at;
+    const base = deliveryEnd || deliveryStart || createdAt;
+
+    const parsed = base ? new Date(base) : null;
+    const estimated = parsed && !Number.isNaN(parsed.valueOf()) ? parsed : null;
+
+    const fallback = new Date();
+    fallback.setDate(fallback.getDate() + 3);
+
+    const d = estimated || fallback;
+    const yyyy = String(d.getFullYear());
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    setEstimatedDeliveryDate(`${yyyy}-${mm}-${dd}`);
+  }, [orderId, order]);
+
+  const gcrPayload = useMemo(() => {
+    if (!orderId) return null;
+    const email = (order?.customer_email || '').trim();
+    if (!email) return null;
+    if (!estimatedDeliveryDate) return null;
+
+    return {
+      merchantId: 5748422735,
+      orderId,
+      email,
+      deliveryCountry: 'KE',
+      estimatedDeliveryDate,
+    };
+  }, [orderId, order, estimatedDeliveryDate]);
+
   return (
     <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
+        {gcrPayload ? (
+          <GoogleCustomerReviewsOptIn
+            merchantId={gcrPayload.merchantId}
+            orderId={gcrPayload.orderId}
+            email={gcrPayload.email}
+            deliveryCountry={gcrPayload.deliveryCountry}
+            estimatedDeliveryDate={gcrPayload.estimatedDeliveryDate}
+          />
+        ) : null}
         <div className="mb-6">
           <div className="flex justify-center mb-4">
             <Image

@@ -167,18 +167,23 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const initialHeroPromotionsData = await fetchInitialHeroPromotions();
   const featuredForSchema = await fetchFeaturedProductsForSchema();
-  const featuredItemListItems = featuredForSchema
-    .map((p) => {
+  type FeaturedItem = { name: string; url: string; image?: string | null; type: 'Thing' };
+  const isFeaturedItem = (value: FeaturedItem | null): value is FeaturedItem => value !== null;
+
+  const featuredItemListItems: FeaturedItem[] = featuredForSchema
+    .map((p): FeaturedItem | null => {
       const slug = p.slug?.trim();
       if (!slug) return null;
       return {
         name: p.product_name,
         url: `${brandConfig.siteUrl}/products/${slug}`,
         image: resolveProductImage(p.primary_image),
-        type: 'Product' as const,
+        // Use Thing for ItemList entries so Google doesn't require Product offers/reviews here.
+        // The actual Product rich result is emitted on the product detail page.
+        type: 'Thing',
       };
     })
-    .filter(Boolean) as Array<{ name: string; url: string; image?: string | null; type: 'Product' }>;
+    .filter(isFeaturedItem);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 via-white to-gray-50">

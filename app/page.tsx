@@ -15,9 +15,11 @@ import { brandConfig } from '@/lib/config/brand';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { Suspense } from 'react';
 import { StructuredData } from '@/components/StructuredData';
+import type { Metadata } from 'next';
 
 const HOME_PAGE_REVALIDATE_SECONDS = 60;
 const HERO_PROMOTIONS_PAGE_SIZE = 50;
+const FEATURED_SCHEMA_PAGE_SIZE = 8;
 
 function normalizeLocations(value: unknown): string[] {
   if (Array.isArray(value)) {
@@ -91,16 +93,132 @@ async function fetchInitialHeroPromotions(): Promise<PaginatedPublicPromotionLis
 
 export const revalidate = 60;
 
+const resolveProductImage = (image?: string | null) => {
+  if (!image) return null;
+  if (image.startsWith('http')) return image;
+  return `${brandConfig.apiBaseUrl}${image.startsWith('/') ? '' : '/'}${image}`;
+};
+
+async function fetchFeaturedProductsForSchema(): Promise<
+  Array<{ product_name: string; slug?: string | null; primary_image?: string | null }>
+> {
+  const searchParams = new URLSearchParams({
+    featured: '1',
+    page: '1',
+    page_size: String(FEATURED_SCHEMA_PAGE_SIZE),
+  });
+
+  try {
+    const response = await fetch(
+      `${brandConfig.apiBaseUrl}/api/v1/public/products/?${searchParams.toString()}`,
+      {
+        next: { revalidate: HOME_PAGE_REVALIDATE_SECONDS },
+        headers: {
+          'X-Brand-Code': brandConfig.code,
+        },
+      }
+    );
+    if (!response.ok) return [];
+    const data = (await response.json()) as { results?: unknown };
+    const results = Array.isArray((data as any)?.results) ? ((data as any).results as any[]) : [];
+    return results
+      .map((p) => ({
+        product_name: String(p?.product_name ?? ''),
+        slug: typeof p?.slug === "string" ? p.slug : null,
+        primary_image: typeof p?.primary_image === "string" ? p.primary_image : null,
+      }))
+      .filter((p) => Boolean(p.product_name));
+  } catch {
+    return [];
+  }
+}
+
+export const metadata: Metadata = {
+  title: 'Affordable Phones, Laptops & Electronics in Kenya | Affordable Gadgets',
+  description:
+    'Shop affordable phones, laptops, tablets, iPads and accessories in Kenya. Compare specs and prices, pay via M‑Pesa, and get fast delivery or Nairobi CBD pickup.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Affordable Phones, Laptops & Electronics in Kenya | Affordable Gadgets',
+    description:
+      'Shop affordable phones, laptops, tablets, iPads and accessories in Kenya. Compare specs and prices, pay via M‑Pesa, and get fast delivery or Nairobi CBD pickup.',
+    url: '/',
+    images: [
+      {
+        url: '/affordablegadgetslogo.png',
+        width: 1200,
+        height: 630,
+        alt: 'Affordable Gadgets Kenya',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Affordable Phones, Laptops & Electronics in Kenya | Affordable Gadgets',
+    description:
+      'Shop affordable phones, laptops, tablets, iPads and accessories in Kenya. Compare specs and prices, pay via M‑Pesa, and get fast delivery or Nairobi CBD pickup.',
+    images: ['/affordablegadgetslogo.png'],
+  },
+};
+
 export default async function HomePage() {
   const initialHeroPromotionsData = await fetchInitialHeroPromotions();
+  const featuredForSchema = await fetchFeaturedProductsForSchema();
+  const featuredItemListItems = featuredForSchema
+    .map((p) => {
+      const slug = p.slug?.trim();
+      if (!slug) return null;
+      return {
+        name: p.product_name,
+        url: `${brandConfig.siteUrl}/products/${slug}`,
+        image: resolveProductImage(p.primary_image),
+        type: 'Product' as const,
+      };
+    })
+    .filter(Boolean) as Array<{ name: string; url: string; image?: string | null; type: 'Product' }>;
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 via-white to-gray-50">
-      <StructuredData type="WebSite" />
-      <StructuredData type="LocalBusiness" />
+      {featuredItemListItems.length > 0 && (
+        <StructuredData
+          type="ItemList"
+          itemList={{
+            name: `${brandConfig.name} featured products`,
+            url: brandConfig.siteUrl,
+            items: featuredItemListItems,
+          }}
+        />
+      )}
       <StructuredData
         type="BreadcrumbList"
         breadcrumbs={[{ name: 'Home', url: brandConfig.siteUrl }]}
+      />
+      <StructuredData
+        type="FAQPage"
+        faqs={[
+          {
+            question: 'Do you deliver phones and laptops across Kenya?',
+            answer:
+              'Yes. We deliver in Nairobi and ship across Kenya. Delivery timelines and fees vary by location and are shown at checkout or on the shipping page.',
+          },
+          {
+            question: 'Can I pay with M‑Pesa?',
+            answer:
+              'Yes. We accept M‑Pesa and other payment options shown during checkout.',
+          },
+          {
+            question: 'Do your devices come with a warranty?',
+            answer:
+              'Most devices come with a warranty period as indicated on the product page and during checkout.',
+          },
+          {
+            question: 'Where are you located in Nairobi?',
+            answer:
+              'We are located at Kimathi House, Nairobi CBD. You can also order online for delivery.',
+          },
+        ]}
       />
       <Suspense
         fallback={
@@ -112,6 +230,9 @@ export default async function HomePage() {
         <HeaderWithAnnouncement />
       </Suspense>
       <main className="flex-1">
+        <h1 className="sr-only">
+          Affordable phones, laptops, tablets and accessories in Kenya
+        </h1>
         <HomeHero initialPromotionsData={initialHeroPromotionsData} />
 
         {/* Promotions */}
@@ -224,9 +345,9 @@ export default async function HomePage() {
         <section className="bg-white/80 border-t border-gray-100">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
             <div className="max-w-4xl">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900">
                 Affordable gadgets in Kenya for every budget
-              </h1>
+              </h2>
               <p className="mt-3 text-base leading-7 text-gray-700 sm:text-lg">
                 Discover curated deals on smartphones, laptops, tablets, iPads, and accessories at Affordable
                 Gadgets Ke. Compare prices, explore payment options, and shop confident that every device is

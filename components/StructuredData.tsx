@@ -318,7 +318,8 @@ export function StructuredData({
       itemListElement: input.items.map((item, index) => ({
         '@type': 'ListItem',
         position: index + 1,
-        url: item.url,
+        // Google Rich Results flags ListItem `url` + `item` as mutually exclusive.
+        // Keep `item.url` and omit ListItem.url to avoid invalid carousel/itemlist warnings.
         item: {
           '@type': item.type ?? 'Thing',
           name: item.name,

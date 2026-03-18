@@ -55,6 +55,29 @@ const fetchProductBySlug = async (slug: string) => {
   return response.results?.[0] ?? null;
 };
 
+const isFiniteNumber = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value);
+
+const fetchMinMaxPriceFromUnits = async (productId: number) => {
+  // Units endpoint supports ordering, so we can cheaply fetch extremes.
+  // This avoids emitting invalid Product schema when min/max prices are missing.
+  const [minRes, maxRes] = await Promise.all([
+    ApiService.apiV1PublicProductsUnitsList(productId, 'selling_price', 1),
+    ApiService.apiV1PublicProductsUnitsList(productId, '-selling_price', 1),
+  ]);
+
+  const minUnit = minRes.results?.[0];
+  const maxUnit = maxRes.results?.[0];
+
+  const minPrice = minUnit?.selling_price ? Number(minUnit.selling_price) : null;
+  const maxPrice = maxUnit?.selling_price ? Number(maxUnit.selling_price) : null;
+
+  return {
+    lowPrice: isFiniteNumber(minPrice) && minPrice > 0 ? minPrice : null,
+    highPrice: isFiniteNumber(maxPrice) && maxPrice > 0 ? maxPrice : null,
+  };
+};
+
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   let product: PublicProduct | null = null;
@@ -113,8 +136,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const productName = product?.product_name ?? 'Product';
   const description = buildProductDescription(product);
   const imageUrl = resolveProductImage(product);
-  const lowPrice = typeof product?.min_price === 'number' ? product.min_price : null;
-  const highPrice = typeof product?.max_price === 'number' ? product.max_price : null;
+  let lowPrice = isFiniteNumber(product?.min_price) ? product!.min_price : null;
+  let highPrice = isFiniteNumber(product?.max_price) ? product!.max_price : null;
+
+  // If product min/max price isn't present, derive it from available units (for valid schema.org offers).
+  if (product?.id && (!isFiniteNumber(lowPrice) || !isFiniteNumber(highPrice))) {
+    try {
+      const derived = await fetchMinMaxPriceFromUnits(product.id);
+      lowPrice = isFiniteNumber(lowPrice) ? lowPrice : derived.lowPrice;
+      highPrice = isFiniteNumber(highPrice) ? highPrice : derived.highPrice;
+    } catch {
+      // If units lookup fails, we'll avoid emitting invalid Product structured data below.
+    }
+  }
+
+  const hasAnyPrice = isFiniteNumber(lowPrice) || isFiniteNumber(highPrice);
   const availability =
     Number(product?.available_units_count ?? 0) > 0 ? 'InStock' : 'OutOfStock';
   
@@ -128,7 +164,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           { name: productName, url: productUrl },
         ]}
       />
-      {product && (
+      {product && hasAnyPrice && (
         <StructuredData
           type="Product"
           product={{

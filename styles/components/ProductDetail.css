@@ -315,13 +315,13 @@
 }
 
 .product-detail__promo--aside {
-  flex: 0 0 320px;
-  max-width: 360px;
+  flex: 0 0 250px;
+  max-width: 290px;
 }
 
 @media (max-width: 1023px) {
   .product-detail__promo--aside {
-    flex-basis: 280px;
+    flex-basis: 210px;
   }
 }
 

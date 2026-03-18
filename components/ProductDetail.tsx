@@ -717,43 +717,45 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
         {/* Right Column - Product Info */}
         <div className="product-detail__info">
-          {/* Title & Brand */}
-          <div className="product-detail__info-header">
-            <h1 className="product-detail__title">
-              {product.product_name}
-              {selectedUnitData && selectedUnitData.storage_gb && (
-                <span className="product-detail__title-storage"> - {selectedUnitData.storage_gb}GB -</span>
-              )}
-            </h1>
-            <p className="product-detail__brand">
-              <span className="product-detail__brand-name">{product.brand}</span> {product.model_series && <span className="product-detail__brand-series">• {product.model_series}</span>}
-            </p>
-            <button
-              type="button"
-              onClick={jumpToReviews}
-              className="product-detail__review-link"
-            >
-              Leave a review
-            </button>
-          </div>
+          <div className="product-detail__info-header-row">
+            {/* Title & Brand */}
+            <div className="product-detail__info-header">
+              <h1 className="product-detail__title">
+                {product.product_name}
+                {selectedUnitData && selectedUnitData.storage_gb && (
+                  <span className="product-detail__title-storage"> - {selectedUnitData.storage_gb}GB -</span>
+                )}
+              </h1>
+              <p className="product-detail__brand">
+                <span className="product-detail__brand-name">{product.brand}</span> {product.model_series && <span className="product-detail__brand-series">• {product.model_series}</span>}
+              </p>
+              <button
+                type="button"
+                onClick={jumpToReviews}
+                className="product-detail__review-link"
+              >
+                Leave a review
+              </button>
+            </div>
 
-          {/* Promotion Banner */}
-          {isEligibleForPromotion && promotion && (
-            <div className="product-detail__promo">
-              <div className="product-detail__promo-row">
-                <span className="product-detail__promo-icon">🎉</span>
-                <div className="product-detail__promo-body">
-                  <h3 className="product-detail__promo-title">{promotion.title}</h3>
-                  {promotion.discount_display && (
-                    <p className="product-detail__promo-discount">{promotion.discount_display}</p>
-                  )}
-                  {promotion.description && (
-                    <p className="product-detail__promo-copy">{promotion.description}</p>
-                  )}
+            {/* Promotion Banner */}
+            {isEligibleForPromotion && promotion && (
+              <div className="product-detail__promo product-detail__promo--aside">
+                <div className="product-detail__promo-row">
+                  <span className="product-detail__promo-icon">🎉</span>
+                  <div className="product-detail__promo-body">
+                    <h3 className="product-detail__promo-title">{promotion.title}</h3>
+                    {promotion.discount_display && (
+                      <p className="product-detail__promo-discount">{promotion.discount_display}</p>
+                    )}
+                    {promotion.description && (
+                      <p className="product-detail__promo-copy">{promotion.description}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Price - Single Price Display */}
               <div className="product-detail__info-price-block">

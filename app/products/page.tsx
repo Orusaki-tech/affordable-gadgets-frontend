@@ -10,14 +10,10 @@ import { ApiService } from '@/lib/api/generated';
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: 'Affordable Phones, Laptops & Electronics in Kenya | Affordable Gadgets',
-  description:
-    'Shop affordable phones, laptops, tablets, iPads and accessories in Kenya. Compare specs, prices and payment options and buy online or pick up in Nairobi CBD.',
-  alternates: {
-    canonical: '/products',
-  },
-};
+const BASE_TITLE =
+  'Affordable Phones, Laptops & Electronics in Kenya | Affordable Gadgets';
+const BASE_DESCRIPTION =
+  'Shop affordable phones, laptops, tablets, iPads and accessories in Kenya. Compare specs, prices and payment options and buy online or pick up in Nairobi CBD.';
 
 function asString(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -32,6 +28,38 @@ function asNumber(value: string | string[] | undefined) {
 
 type ProductsSearchParams = Record<string, string | string[] | undefined>;
 
+function buildCanonicalFromSearchParams(sp: ProductsSearchParams) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(sp)) {
+    if (value === undefined) continue;
+    if (key === 'focusSearch') continue;
+    if (Array.isArray(value)) {
+      value.forEach((v) => params.append(key, v));
+    } else {
+      params.set(key, value);
+    }
+  }
+  const qs = params.toString();
+  return `/products${qs ? `?${qs}` : ''}`;
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: Promise<ProductsSearchParams>;
+}): Promise<Metadata> {
+  const sp = (await searchParams) ?? {};
+  const page = asNumber(sp.page);
+  const suffix = page && page > 1 ? ` (Page ${page})` : '';
+  return {
+    title: `${BASE_TITLE}${suffix}`,
+    description: BASE_DESCRIPTION,
+    alternates: {
+      canonical: buildCanonicalFromSearchParams(sp),
+    },
+  };
+}
+
 export default async function ProductsListingPage({
   searchParams,
 }: {
@@ -45,6 +73,7 @@ export default async function ProductsListingPage({
   const minPrice = asNumber(sp.min_price);
   const maxPrice = asNumber(sp.max_price);
   const promotion = asNumber(sp.promotion);
+  const page = asNumber(sp.page) ?? 1;
 
   const qs = new URLSearchParams();
   for (const [key, value] of Object.entries(sp)) {
@@ -64,7 +93,7 @@ export default async function ProductsListingPage({
       maxPrice,
       minPrice,
       ordering,
-      1,
+      page,
       12,
       promotion,
       search,

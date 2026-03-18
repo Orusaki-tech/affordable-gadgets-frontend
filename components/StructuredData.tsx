@@ -8,7 +8,8 @@ interface StructuredDataProps {
     | 'WebSite'
     | 'Service'
     | 'Product'
-    | 'ItemList';
+    | 'ItemList'
+    | 'FAQPage';
   breadcrumbs?: Array<{ name: string; url: string }>;
   product?: {
     name: string;
@@ -32,6 +33,10 @@ interface StructuredDataProps {
       image?: string | null;
     }>;
   };
+  faqs?: Array<{
+    question: string;
+    answer: string;
+  }>;
 }
 
 export function StructuredData({
@@ -39,6 +44,7 @@ export function StructuredData({
   breadcrumbs,
   product,
   itemList,
+  faqs,
 }: StructuredDataProps) {
   const brandImageUrl = `${brandConfig.siteUrl}/affordablelogo.png`;
 
@@ -331,6 +337,30 @@ export function StructuredData({
     };
   };
 
+  const getFaqSchema = () => {
+    const items = (faqs ?? [])
+      .map((faq) => ({
+        question: String(faq.question ?? '').trim(),
+        answer: String(faq.answer ?? '').trim(),
+      }))
+      .filter((faq) => Boolean(faq.question) && Boolean(faq.answer));
+
+    if (items.length === 0) return null;
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: items.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.answer,
+        },
+      })),
+    };
+  };
+
   const getSchema = () => {
     switch (type) {
       case 'LocalBusiness':
@@ -345,6 +375,8 @@ export function StructuredData({
         return getProductSchema();
       case 'ItemList':
         return getItemListSchema();
+      case 'FAQPage':
+        return getFaqSchema();
       default:
         return getOrganizationSchema();
     }

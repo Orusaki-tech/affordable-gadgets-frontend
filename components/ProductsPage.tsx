@@ -31,7 +31,10 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const promotionId = searchParams.get('promotion');
   const focusSearch = searchParams.get('focusSearch');
   const searchInputRef = useRef<HTMLInputElement | null>(null);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(() => {
+    const initial = Number(searchParams.get('page') || 1);
+    return Number.isFinite(initial) && initial > 0 ? Math.floor(initial) : 1;
+  });
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const initialFilters = useMemo<FilterState>(
     () => ({
@@ -79,6 +82,12 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   }, [searchParams]);
 
   useEffect(() => {
+    const next = Number(searchParams.get('page') || 1);
+    const normalized = Number.isFinite(next) && next > 0 ? Math.floor(next) : 1;
+    setPage((prev) => (prev === normalized ? prev : normalized));
+  }, [searchParams]);
+
+  useEffect(() => {
     if (!focusSearch) return;
     const raf = window.requestAnimationFrame(() => {
       const el = searchInputRef.current;
@@ -102,7 +111,11 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     }
   }, [initialFilters]);
 
-  const updateQueryParams = (nextFilters?: FilterState, nextSearch?: string) => {
+  const updateQueryParams = (
+    nextFilters?: FilterState,
+    nextSearch?: string,
+    nextPage?: number
+  ) => {
     const params = new URLSearchParams(searchParams.toString());
     const updateParam = (key: string, value?: string) => {
       if (value) {
@@ -118,10 +131,22 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     updateParam('min_price', filtersToApply.minPrice);
     updateParam('max_price', filtersToApply.maxPrice);
     updateParam('search', nextSearch ?? search);
+    updateParam(
+      'page',
+      (typeof nextPage === 'number' ? nextPage : page) > 1
+        ? String(typeof nextPage === 'number' ? nextPage : page)
+        : undefined
+    );
 
     const paramString = params.toString();
     const hash = typeof window !== 'undefined' ? window.location.hash : '';
     const nextUrl = `/products${paramString ? `?${paramString}` : ''}${hash}`;
+    if (typeof window !== 'undefined') {
+      const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+      if (currentUrl === nextUrl) {
+        return;
+      }
+    }
     router.replace(nextUrl, { scroll: false });
   };
 
@@ -184,19 +209,24 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    updateQueryParams(undefined, search);
+    updateQueryParams(undefined, search, 1);
   };
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
     setPage(1);
-    updateQueryParams(newFilters);
+    updateQueryParams(newFilters, undefined, 1);
   };
 
   const handleSortChange = (newSort: string) => {
     setSort(newSort);
     setPage(1);
+    updateQueryParams(undefined, undefined, 1);
   };
+
+  useEffect(() => {
+    updateQueryParams(undefined, undefined, page);
+  }, [page, searchParams]);
 
   return (
     <div className="products-page">

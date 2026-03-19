@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { usePromotions } from '@/lib/hooks/usePromotions';
@@ -107,6 +107,14 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
     return getHeroPromotions(promotionsData);
   }, [promotionsData]);
 
+  const promoIds = useMemo(() => {
+    return promotions
+      .map((p) => p.id)
+      .filter((id): id is number => typeof id === 'number');
+  }, [promotions]);
+
+  const promoIdsKey = useMemo(() => promoIds.join('|'), [promoIds]);
+
   const [activePromotionId, setActivePromotionId] = useState<number | null>(() => {
     const firstId = getHeroPromotions(initialPromotionsData)[0]?.id;
     return typeof firstId === 'number' ? firstId : null;
@@ -114,36 +122,38 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
 
   useEffect(() => {
     if (activePromotionId !== null) return;
-    const firstId = promotions[0]?.id;
+    const firstId = promoIds[0];
     if (typeof firstId === 'number') setActivePromotionId(firstId);
-  }, [activePromotionId, promotions]);
+  }, [activePromotionId, promoIds]);
 
-  // Autoplay the hero banner without requiring hover.
+  // Rotate the hero banner every 6 seconds (no hover required).
+  const rotationIndexRef = useRef(0);
+
   useEffect(() => {
-    if (promotions.length <= 1) return;
-
-    const promoIds = promotions
-      .map((p) => p.id)
-      .filter((id): id is number => typeof id === 'number');
-
     if (promoIds.length <= 1) return;
-    if (activePromotionId === null) return;
 
-    if (!promoIds.includes(activePromotionId)) {
+    // If banner state is out of sync with available promos, snap to the first.
+    if (activePromotionId === null || !promoIds.includes(activePromotionId)) {
       setActivePromotionId(promoIds[0] ?? null);
-      return;
+      rotationIndexRef.current = 0;
+    } else {
+      rotationIndexRef.current = Math.max(0, promoIds.indexOf(activePromotionId));
     }
 
-    let idx = promoIds.indexOf(activePromotionId);
-    if (idx < 0) idx = 0;
-
     const interval = window.setInterval(() => {
-      idx = (idx + 1) % promoIds.length;
-      setActivePromotionId(promoIds[idx]);
+      rotationIndexRef.current = (rotationIndexRef.current + 1) % promoIds.length;
+      setActivePromotionId(promoIds[rotationIndexRef.current] ?? null);
     }, HERO_AUTOPLAY_INTERVAL_MS);
 
     return () => window.clearInterval(interval);
-  }, [promotions, activePromotionId]);
+    // Depend on promoIdsKey so we only restart when the promo set/order changes.
+  }, [promoIdsKey]);
+
+  const selectPromotion = (id: number) => {
+    const idx = promoIds.indexOf(id);
+    rotationIndexRef.current = idx >= 0 ? idx : 0;
+    setActivePromotionId(id);
+  };
 
   const activePromotion = useMemo(() => {
     if (!promotions.length) return null;
@@ -201,9 +211,9 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
               key={id ?? promotion.title}
               type="button"
               className={`home-hero__promo-card ${isActive ? 'home-hero__promo-card--active' : ''}`}
-              onMouseEnter={() => { if (id !== null) setActivePromotionId(id); }}
-              onFocus={() => { if (id !== null) setActivePromotionId(id); }}
-              onClick={() => { if (id !== null) setActivePromotionId(id); }}
+              onMouseEnter={() => { if (id !== null) selectPromotion(id); }}
+              onFocus={() => { if (id !== null) selectPromotion(id); }}
+              onClick={() => { if (id !== null) selectPromotion(id); }}
               aria-pressed={isActive}
             >
               <div className="home-hero__promo-media">

@@ -327,7 +327,7 @@
   gap: 10px;
   border: 1px solid var(--ui-gray-200);
   border-radius: 14px;
-  background: var(--ui-lime-400-60);
+  background: var(--ui-lime-400-80);
   padding: 10px 12px;
   box-shadow: 0 10px 20px var(--ui-black-06);
   min-width: 0;
@@ -379,7 +379,7 @@
 .home-hero__left-card {
   border: 1px solid var(--ui-gray-200);
   border-radius: 18px;
-  background: var(--ui-lime-400-60);
+  background: var(--ui-lime-400-80);
   box-shadow: 0 18px 40px var(--ui-black-08);
   padding: 14px;
   min-height: 200px;

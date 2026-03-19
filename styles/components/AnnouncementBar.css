@@ -2,8 +2,9 @@
 
 /* Match collection header banner placeholder color (gray) */
 .announcement-bar {
-  background-color: #121113;
-  color: #cdcdff;
+  background-color: #2f3137;
+  /* Near-white for strong contrast on the dark background */
+  color: #ffffff;
   box-sizing: border-box;
   width: 100%;
   min-height: 20px;
@@ -48,7 +49,7 @@
 
 .announcement-bar__item-icon {
   flex-shrink: 0;
-  color: var(--ui-emerald-600);
+  color: inherit; /* SVG uses stroke="currentColor" */
 }
 
 .announcement-bar__item-text {
@@ -66,14 +67,14 @@
 }
 
 .announcement-bar__item--link .announcement-bar__item-icon {
-  color: var(--ui-emerald-600);
+  color: inherit;
 }
 
 
 .announcement-bar__close {
   background: none;
   border: none;
-  color: var(--ui-gray-500);
+  color: inherit;
   cursor: pointer;
   display: flex;
   align-items: center;

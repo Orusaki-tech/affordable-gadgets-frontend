@@ -269,13 +269,13 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
         {/* Single layout: carousel on top, then two-column hero (left: search + card, right: banner) on desktop */}
         <div className="home-hero__main-grid" aria-label="Promotions">
           <ProductCarousel
-            itemsPerView={{ mobile: 1, tablet: 1, desktop: 1 }}
+            // Keep the promo cards visible (do not collapse to a single card).
+            // Banner rotation is handled by `activePromotionId` + timer.
+            itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
             showNavigation
             alwaysShowNavigation
             splitNav
             showPagination={false}
-            autoPlay
-            autoPlayInterval={HERO_AUTOPLAY_INTERVAL_MS}
             className="home-hero__promo-carousel"
           >
             {...carouselContent}

@@ -2,9 +2,9 @@
 
 /* Match collection header banner placeholder color (gray) */
 .announcement-bar {
-  background-color: #2f3137;
-  /* Near-white for strong contrast on the dark background */
-  color: #ffffff;
+  background-color: #f2f3f7;
+  /* Dark text for strong contrast on the light background */
+  color: #3e3e3e;
   box-sizing: border-box;
   width: 100%;
   min-height: 20px;

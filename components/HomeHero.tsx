@@ -30,6 +30,8 @@ const PROMOTIONS_PAGE_SIZE = 50;
 const PROMO_THUMB_SIZE = 320;
 const HERO_BANNER_SIZE = 1400;
 const HERO_LEFT_PLACEHOLDER_SIZE = 800;
+// Hero promo cards/banner rotation timing (user request).
+const HERO_AUTOPLAY_INTERVAL_MS = 6000;
 /** Number of placeholder/skeleton cards when there are no hero promotions (keep 4 visible to match itemsPerView). */
 const HERO_PLACEHOLDER_COUNT = 4;
 const HERO_PROMOTION_PLACEHOLDER_IMAGE =
@@ -115,6 +117,33 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
     const firstId = promotions[0]?.id;
     if (typeof firstId === 'number') setActivePromotionId(firstId);
   }, [activePromotionId, promotions]);
+
+  // Autoplay the hero banner without requiring hover.
+  useEffect(() => {
+    if (promotions.length <= 1) return;
+
+    const promoIds = promotions
+      .map((p) => p.id)
+      .filter((id): id is number => typeof id === 'number');
+
+    if (promoIds.length <= 1) return;
+    if (activePromotionId === null) return;
+
+    if (!promoIds.includes(activePromotionId)) {
+      setActivePromotionId(promoIds[0] ?? null);
+      return;
+    }
+
+    let idx = promoIds.indexOf(activePromotionId);
+    if (idx < 0) idx = 0;
+
+    const interval = window.setInterval(() => {
+      idx = (idx + 1) % promoIds.length;
+      setActivePromotionId(promoIds[idx]);
+    }, HERO_AUTOPLAY_INTERVAL_MS);
+
+    return () => window.clearInterval(interval);
+  }, [promotions, activePromotionId]);
 
   const activePromotion = useMemo(() => {
     if (!promotions.length) return null;
@@ -230,12 +259,13 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
         {/* Single layout: carousel on top, then two-column hero (left: search + card, right: banner) on desktop */}
         <div className="home-hero__main-grid" aria-label="Promotions">
           <ProductCarousel
-            itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
+            itemsPerView={{ mobile: 1, tablet: 1, desktop: 1 }}
             showNavigation
             alwaysShowNavigation
             splitNav
             showPagination={false}
             autoPlay
+            autoPlayInterval={HERO_AUTOPLAY_INTERVAL_MS}
             className="home-hero__promo-carousel"
           >
             {...carouselContent}

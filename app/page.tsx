@@ -135,14 +135,14 @@ async function fetchFeaturedProductsForSchema(): Promise<
 }
 
 export const metadata: Metadata = {
-  title: 'Affordable Phones, Laptops & Electronics in Kenya | Affordable Gadgets',
+  title: { absolute: 'Affordable Gadgets Ke | Premium Affordable Smartphones, Laptops and iPads in Kenya' },
   description:
     'Shop affordable phones, laptops, tablets, iPads and accessories in Kenya. Compare specs and prices, pay via M‑Pesa, and get fast delivery or Nairobi CBD pickup.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Affordable Phones, Laptops & Electronics in Kenya | Affordable Gadgets',
+    title: 'Affordable Gadgets Ke | Premium Affordable Smartphones, Laptops and iPads in Kenya',
     description:
       'Shop affordable phones, laptops, tablets, iPads and accessories in Kenya. Compare specs and prices, pay via M‑Pesa, and get fast delivery or Nairobi CBD pickup.',
     url: '/',
@@ -157,7 +157,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Affordable Phones, Laptops & Electronics in Kenya | Affordable Gadgets',
+    title: 'Affordable Gadgets Ke | Premium Affordable Smartphones, Laptops and iPads in Kenya',
     description:
       'Shop affordable phones, laptops, tablets, iPads and accessories in Kenya. Compare specs and prices, pay via M‑Pesa, and get fast delivery or Nairobi CBD pickup.',
     images: ['/affordablegadgetslogo.png'],

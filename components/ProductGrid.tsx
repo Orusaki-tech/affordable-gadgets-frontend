@@ -95,8 +95,9 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions,
 
       {/* Pagination */}
       {showPagination && (data.next || data.previous) && (() => {
-        const totalPages = Math.max(1, Math.ceil(data.count / pageSize));
-        const displayPage = Math.min(page, totalPages);
+        const count = typeof data.count === "number" && Number.isFinite(data.count) ? data.count : null;
+        const totalPages = count != null ? Math.max(1, Math.ceil(count / pageSize)) : null;
+        const displayPage = totalPages != null ? Math.min(page, totalPages) : page;
         return (
         <div className="product-grid__pagination">
           <button
@@ -107,7 +108,7 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions,
             Previous
           </button>
           <span className="product-grid__pagination-status">
-            Page {displayPage} of {totalPages}
+            {totalPages != null ? `Page ${displayPage} of ${totalPages}` : `Page ${displayPage}`}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}

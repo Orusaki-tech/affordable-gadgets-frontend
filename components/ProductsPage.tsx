@@ -337,8 +337,9 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
 
               {/* Pagination */}
               {(data.next || data.previous) && (() => {
-                const totalPages = Math.max(1, Math.ceil(data.count / PRODUCTS_VISIBLE_PAGE_SIZE));
-                const displayPage = Math.min(page, totalPages);
+                const count = typeof data.count === "number" && Number.isFinite(data.count) ? data.count : null;
+                const totalPages = count != null ? Math.max(1, Math.ceil(count / PRODUCTS_VISIBLE_PAGE_SIZE)) : null;
+                const displayPage = totalPages != null ? Math.min(page, totalPages) : page;
                 return (
                 <div className="products-page__pagination">
                   <button
@@ -349,7 +350,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
                     Previous
                   </button>
                   <span className="products-page__pagination-status">
-                    Page {displayPage} of {totalPages}
+                    {totalPages != null ? `Page ${displayPage} of ${totalPages}` : `Page ${displayPage}`}
                   </span>
                   <button
                     onClick={() => setPage((p) => p + 1)}

@@ -59,6 +59,9 @@ export function CartPage() {
         const response = await fetch(`${apiBaseUrl}/api/v1/public/delivery-rates/`, {
           headers: {
             'X-Brand-Code': brandConfig.code,
+            // Avoid ngrok interstitial HTML and force JSON response shape.
+            'ngrok-skip-browser-warning': '1',
+            Accept: 'application/json',
           },
         });
         if (!response.ok) {

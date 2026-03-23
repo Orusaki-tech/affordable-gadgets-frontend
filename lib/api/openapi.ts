@@ -6,7 +6,7 @@ const normalizedBaseUrl = brandConfig.apiBaseUrl.replace(/\/+$/, '');
 export const apiBaseUrl = normalizedBaseUrl;
 export const inventoryBaseUrl = `${normalizedBaseUrl}/api/inventory`;
 
-OpenAPI.BASE = normalizedBaseUrl;
+OpenAPI.BASE = inventoryBaseUrl;
 // Use 'omit' so CORS works when backend/ngrok returns Access-Control-Allow-Origin: *
 // (browsers reject * when credentials are 'include'). Auth uses Authorization header, not cookies.
 OpenAPI.WITH_CREDENTIALS = false;

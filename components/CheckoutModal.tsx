@@ -357,7 +357,7 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
     setAuthError(null);
     try {
       const previousBase = OpenAPI.BASE;
-      let res: { token?: string } | null = null;
+      let res: Awaited<ReturnType<typeof LoginService.loginCreate>> | null = null;
       try {
         OpenAPI.BASE = inventoryBaseUrl;
         res = await LoginService.loginCreate({
@@ -367,7 +367,7 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
       } finally {
         OpenAPI.BASE = previousBase;
       }
-      const token = (res as { token?: string })?.token;
+      const token = res?.token;
       if (token) {
         setAuthToken(token);
         setIsAuthenticated(true);
@@ -389,7 +389,7 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
     setAuthError(null);
     try {
       const previousBase = OpenAPI.BASE;
-      let res: { token?: string } | null = null;
+      let res: Awaited<ReturnType<typeof RegisterService.registerCreate>> | null = null;
       try {
         OpenAPI.BASE = inventoryBaseUrl;
         res = await RegisterService.registerCreate({
@@ -402,7 +402,7 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
       } finally {
         OpenAPI.BASE = previousBase;
       }
-      const token = (res as { token?: string })?.token;
+      const token = (res as { token?: string } | null)?.token;
       if (token) {
         setAuthToken(token);
         setIsAuthenticated(true);

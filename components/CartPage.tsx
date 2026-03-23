@@ -32,7 +32,7 @@ export function CartPage() {
   const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
   const [deliveryDetailsSaved, setDeliveryDetailsSaved] = useState(false);
   const [pendingCartSync, setPendingCartSync] = useState(false);
-  const [ordersPhone, setOrdersPhone] = useState('');
+  const [ordersEmail, setOrdersEmail] = useState('');
   const [ordersOtp, setOrdersOtp] = useState('');
   const [ordersOtpSent, setOrdersOtpSent] = useState(false);
   const [ordersLoading, setOrdersLoading] = useState(false);
@@ -435,8 +435,8 @@ export function CartPage() {
   };
 
   const sendOrdersOtp = async () => {
-    if (!ordersPhone.trim()) {
-      setError('Enter your phone number to receive an OTP');
+    if (!ordersEmail.trim()) {
+      setError('Enter your email address to receive an OTP');
       return;
     }
     setOrdersLoading(true);
@@ -448,7 +448,7 @@ export function CartPage() {
           'Content-Type': 'application/json',
           'X-Brand-Code': brandConfig.code,
         },
-        body: JSON.stringify({ phone: ordersPhone.trim() }),
+        body: JSON.stringify({ email: ordersEmail.trim() }),
       });
       const data = await response.json();
       if (!response.ok || !data.sent) {
@@ -463,8 +463,8 @@ export function CartPage() {
   };
 
   const fetchOrderHistory = async () => {
-    if (!ordersPhone.trim() || !ordersOtp.trim()) {
-      setError('Enter your phone and OTP');
+    if (!ordersEmail.trim() || !ordersOtp.trim()) {
+      setError('Enter your email and OTP');
       return;
     }
     setOrdersLoading(true);
@@ -476,7 +476,7 @@ export function CartPage() {
           'Content-Type': 'application/json',
           'X-Brand-Code': brandConfig.code,
         },
-        body: JSON.stringify({ phone: ordersPhone.trim(), otp: ordersOtp.trim() }),
+        body: JSON.stringify({ email: ordersEmail.trim(), otp: ordersOtp.trim() }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -812,14 +812,14 @@ export function CartPage() {
               ) : (
                 <>
                   <p className="cart-page__orders-copy">
-                    Verify your phone number to see past orders and download receipts.
+                    Verify your email address to see past orders and download receipts.
                   </p>
                   <div className="cart-page__orders-form">
                     <input
-                      type="tel"
-                      placeholder="Phone number"
-                      value={ordersPhone}
-                      onChange={(e) => setOrdersPhone(e.target.value)}
+                      type="email"
+                      placeholder="Email address"
+                      value={ordersEmail}
+                      onChange={(e) => setOrdersEmail(e.target.value)}
                       className="cart-page__input"
                     />
                     <div className="cart-page__orders-actions">

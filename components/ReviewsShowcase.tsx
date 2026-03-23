@@ -68,8 +68,8 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [productById, setProductById] = useState<Record<number, PublicProduct | null>>({});
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [reviewStep, setReviewStep] = useState<'phone' | 'otp' | 'form'>('phone');
-  const [reviewPhone, setReviewPhone] = useState('');
+  const [reviewStep, setReviewStep] = useState<'email' | 'otp' | 'form'>('email');
+  const [reviewEmail, setReviewEmail] = useState('');
   const [reviewOtp, setReviewOtp] = useState('');
   const [eligibleItems, setEligibleItems] = useState<EligibleReviewItem[]>([]);
   const [selectedOrderItemId, setSelectedOrderItemId] = useState<number | null>(null);
@@ -137,8 +137,8 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   }, [reviews]);
 
   const resetReviewFlow = () => {
-    setReviewStep('phone');
-    setReviewPhone('');
+    setReviewStep('email');
+    setReviewEmail('');
     setReviewOtp('');
     setEligibleItems([]);
     setSelectedOrderItemId(null);
@@ -161,8 +161,8 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   };
 
   const sendReviewOtp = async () => {
-    if (!reviewPhone.trim()) {
-      setReviewError('Please enter your phone number.');
+    if (!reviewEmail.trim()) {
+      setReviewError('Please enter your email address.');
       return;
     }
     setReviewError(null);
@@ -175,7 +175,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
           'Content-Type': 'application/json',
           'X-Brand-Code': brandConfig.code,
         },
-        body: JSON.stringify({ phone: reviewPhone.trim() }),
+        body: JSON.stringify({ email: reviewEmail.trim() }),
         credentials: 'include',
       });
       const data = await response.json();
@@ -185,7 +185,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
       if (data?.debug_code) {
         setReviewMessage(`OTP sent. Debug code: ${data.debug_code}`);
       } else {
-        setReviewMessage('OTP sent to your phone. Please enter it below.');
+        setReviewMessage('OTP sent to your email. Please enter it below.');
       }
       setReviewStep('otp');
     } catch (err: any) {
@@ -210,7 +210,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
           'Content-Type': 'application/json',
           'X-Brand-Code': brandConfig.code,
         },
-        body: JSON.stringify({ phone: reviewPhone.trim(), otp: reviewOtp.trim() }),
+        body: JSON.stringify({ email: reviewEmail.trim(), otp: reviewOtp.trim() }),
         credentials: 'include',
       });
       const data = await response.json();
@@ -223,7 +223,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
       setSelectedOrderItemId(items[0]?.order_item_id ?? null);
       setReviewStep('form');
       if (items.length === 0) {
-        setReviewMessage('No eligible purchases found for this phone number.');
+        setReviewMessage('No eligible purchases found for this email address.');
       }
     } catch (err: any) {
       setReviewError(err?.message || 'Failed to verify OTP.');
@@ -245,7 +245,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
     setIsSubmittingReview(true);
     try {
       const formData = new FormData();
-      formData.append('phone', reviewPhone.trim());
+      formData.append('email', reviewEmail.trim());
       formData.append('otp', reviewOtp.trim());
       formData.append('product_id', String(selectedEligibleItem.product_id));
       formData.append('order_item_id', String(selectedEligibleItem.order_item_id));
@@ -283,7 +283,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
       <div>
         <h3 className="reviews-showcase__title">Customer reviews</h3>
         <p className="reviews-showcase__subtitle">
-          Purchased with us? Verify your phone to leave a review.
+          Purchased with us? Verify your email to leave a review.
         </p>
       </div>
       <div className="reviews-showcase__actions">
@@ -680,15 +680,15 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
               </div>
             )}
 
-            {reviewStep === 'phone' && (
+            {reviewStep === 'email' && (
               <div className="reviews-showcase__form">
                 <label className="reviews-showcase__label">
-                  Phone number
+                  Email address
                   <input
-                    type="tel"
-                    value={reviewPhone}
-                    onChange={(event) => setReviewPhone(event.target.value)}
-                    placeholder="e.g. 0712345678"
+                    type="email"
+                    value={reviewEmail}
+                    onChange={(event) => setReviewEmail(event.target.value)}
+                    placeholder="e.g. customer@example.com"
                     className="reviews-showcase__input"
                   />
                 </label>
@@ -727,9 +727,9 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                   <button
                     type="button"
                     className="reviews-showcase__button reviews-showcase__button--secondary"
-                    onClick={() => setReviewStep('phone')}
+                    onClick={() => setReviewStep('email')}
                   >
-                    Change phone
+                    Change email
                   </button>
                 </div>
               </div>
@@ -739,13 +739,13 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
               <div className="reviews-showcase__form">
                 {reviewCustomer && (
                   <div className="reviews-showcase__notice">
-                    Signed in as <span className="font-semibold">{reviewCustomer.name || 'Customer'}</span> • {reviewCustomer.phone}
+                    Signed in as <span className="font-semibold">{reviewCustomer.name || 'Customer'}</span> • {reviewCustomer.email}
                   </div>
                 )}
 
                 {eligibleItems.length === 0 ? (
                   <div className="reviews-showcase__notice reviews-showcase__notice--empty">
-                    We could not find any paid or delivered purchases for this phone number.
+                    We could not find any paid or delivered purchases for this email address.
                   </div>
                 ) : (
                   <>

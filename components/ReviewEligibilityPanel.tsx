@@ -32,8 +32,8 @@ const formatPurchaseDate = (dateString?: string | null): string | null => {
 
 export function ReviewEligibilityPanel() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [step, setStep] = useState<'phone' | 'otp' | 'form'>('phone');
-  const [phone, setPhone] = useState('');
+  const [step, setStep] = useState<'email' | 'otp' | 'form'>('email');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [eligibleItems, setEligibleItems] = useState<EligibleReviewItem[]>([]);
   const [selectedOrderItemId, setSelectedOrderItemId] = useState<number | null>(null);
@@ -58,8 +58,8 @@ export function ReviewEligibilityPanel() {
       setError(null);
       return;
     }
-    setStep('phone');
-    setPhone('');
+    setStep('email');
+    setEmail('');
     setOtp('');
     setEligibleItems([]);
     setSelectedOrderItemId(null);
@@ -93,7 +93,7 @@ export function ReviewEligibilityPanel() {
 
   useEffect(() => {
     if (isLoggedIn) return;
-    setStep('phone');
+    setStep('email');
     setEligibleItems([]);
     setSelectedOrderItemId(null);
   }, [isLoggedIn]);
@@ -210,8 +210,8 @@ export function ReviewEligibilityPanel() {
   }, [isLoggedIn]);
 
   const sendOtp = async () => {
-    if (!phone.trim()) {
-      setError('Please enter your phone number.');
+    if (!email.trim()) {
+      setError('Please enter your email address.');
       return;
     }
     setError(null);
@@ -224,7 +224,7 @@ export function ReviewEligibilityPanel() {
           'Content-Type': 'application/json',
           'X-Brand-Code': brandConfig.code,
         },
-        body: JSON.stringify({ phone: phone.trim() }),
+        body: JSON.stringify({ email: email.trim() }),
         credentials: 'include',
       });
       const data = await response.json();
@@ -234,7 +234,7 @@ export function ReviewEligibilityPanel() {
       if (data?.debug_code) {
         setMessage(`OTP sent. Debug code: ${data.debug_code}`);
       } else {
-        setMessage('OTP sent to your phone. Please enter it below.');
+        setMessage('OTP sent to your email. Please enter it below.');
       }
       setStep('otp');
     } catch (err: any) {
@@ -259,7 +259,7 @@ export function ReviewEligibilityPanel() {
           'Content-Type': 'application/json',
           'X-Brand-Code': brandConfig.code,
         },
-        body: JSON.stringify({ phone: phone.trim(), otp: otp.trim() }),
+        body: JSON.stringify({ email: email.trim(), otp: otp.trim() }),
         credentials: 'include',
       });
       const data = await response.json();
@@ -272,7 +272,7 @@ export function ReviewEligibilityPanel() {
       setSelectedOrderItemId(items[0]?.order_item_id ?? null);
       setStep('form');
       if (items.length === 0) {
-        setMessage('No eligible purchases found for this phone number.');
+        setMessage('No eligible purchases found for this email address.');
       }
     } catch (err: any) {
       setError(err?.message || 'Failed to verify OTP.');
@@ -320,7 +320,7 @@ export function ReviewEligibilityPanel() {
         }
       } else {
         const formData = new FormData();
-        formData.append('phone', phone.trim());
+        formData.append('email', email.trim());
         formData.append('otp', otp.trim());
         formData.append('product_id', String(selectedEligibleItem.product_id));
         formData.append('order_item_id', String(selectedEligibleItem.order_item_id));
@@ -364,7 +364,7 @@ export function ReviewEligibilityPanel() {
             <p className="review-eligibility__subtitle">
               {isLoggedIn
                 ? 'Select an item from your account to leave a review.'
-                : 'Use the phone number from your checkout to find eligible reviews.'}
+                : 'Use the email from your checkout to find eligible reviews.'}
             </p>
           </div>
           <button
@@ -387,15 +387,15 @@ export function ReviewEligibilityPanel() {
           </div>
         )}
 
-        {!isLoggedIn && step === 'phone' && (
+        {!isLoggedIn && step === 'email' && (
           <div className="review-eligibility__section">
             <label className="review-eligibility__label">
-              Phone number
+              Email address
               <input
-                type="tel"
-                value={phone}
-                onChange={(event) => setPhone(event.target.value)}
-                placeholder="e.g. 0712345678"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="e.g. customer@example.com"
                 className="review-eligibility__input"
               />
             </label>
@@ -434,9 +434,9 @@ export function ReviewEligibilityPanel() {
               <button
                 type="button"
                 className="review-eligibility__secondary"
-                onClick={() => setStep('phone')}
+                onClick={() => setStep('email')}
               >
-                Change phone
+                Change email
               </button>
             </div>
           </div>
@@ -449,7 +449,7 @@ export function ReviewEligibilityPanel() {
             )}
             {customer && (
               <div className="review-eligibility__customer">
-                Signed in as <span className="review-eligibility__customer-name">{customer.name || 'Customer'}</span> • {customer.phone}
+                Signed in as <span className="review-eligibility__customer-name">{customer.name || 'Customer'}</span> • {customer.email}
               </div>
             )}
 
@@ -457,7 +457,7 @@ export function ReviewEligibilityPanel() {
               <div className="review-eligibility__empty">
                 {isLoggedIn
                   ? 'No eligible purchases found for your account yet.'
-                  : 'We could not find any paid or delivered purchases for this phone number.'}
+                  : 'We could not find any paid or delivered purchases for this email address.'}
               </div>
             ) : (
               <>

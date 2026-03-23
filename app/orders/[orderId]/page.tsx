@@ -8,7 +8,6 @@ import { OpenAPI, OrdersService, Order } from '@/lib/api/generated';
 import { inventoryBaseUrl } from '@/lib/api/openapi';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
-import { brandConfig } from '@/lib/config/brand';
 
 function OrderDetailContent() {
   const params = useParams();
@@ -17,6 +16,7 @@ function OrderDetailContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [polling, setPolling] = useState(true);
+  const [downloadingReceipt, setDownloadingReceipt] = useState(false);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
@@ -55,30 +55,34 @@ function OrderDetailContent() {
     };
   }, [orderId, polling]);
 
-  const downloadReceipt = () => {
+  const downloadReceipt = async () => {
     if (!orderId) return;
-    
-    // Get API base URL from brand config (already normalized)
-    let apiBaseUrl = brandConfig.apiBaseUrl || 'http://localhost:8000';
-    
-    // Fix: Handle empty, relative, or malformed base URLs
-    if (!apiBaseUrl || apiBaseUrl.trim() === '' || (apiBaseUrl.startsWith('/') && !apiBaseUrl.startsWith('http'))) {
-      apiBaseUrl = 'http://localhost:8000';
+    setDownloadingReceipt(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `${inventoryBaseUrl}/orders/${orderId}/receipt/?format=pdf`,
+        { method: 'GET', credentials: 'include' }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to download receipt (${response.status})`);
+      }
+
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = downloadUrl;
+      anchor.download = `receipt-${orderId}.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (err: any) {
+      setError(err?.message || 'Unable to download receipt right now.');
+    } finally {
+      setDownloadingReceipt(false);
     }
-    
-    // Remove trailing slash if present
-    apiBaseUrl = apiBaseUrl.replace(/\/+$/, '');
-    
-    // CRITICAL FIX: If URL still starts with // (protocol-relative), prepend https:
-    if (apiBaseUrl.startsWith('//')) {
-      apiBaseUrl = 'https:' + apiBaseUrl;
-    }
-    
-    // Construct the receipt URL properly, ensuring no double slashes
-    const receiptUrl = `${apiBaseUrl}/api/inventory/orders/${orderId}/receipt/?format=pdf`;
-    
-    // Open in new tab to download
-    window.open(receiptUrl, '_blank');
   };
 
   if (loading) {
@@ -287,12 +291,13 @@ function OrderDetailContent() {
           <div className="flex gap-4">
             <button
               onClick={downloadReceipt}
+              disabled={downloadingReceipt}
               className="flex-1 bg-[var(--primary)] text-white px-6 py-3 rounded-lg hover:bg-[var(--primary-dark)] font-semibold flex items-center justify-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Download Receipt
+              {downloadingReceipt ? 'Downloading Receipt...' : 'Download Receipt'}
             </button>
             <Link
               href="/products"

@@ -15,24 +15,33 @@ export function PaymentSuccessClient() {
   const paymentReference = searchParams.get('payment_reference');
   const [order, setOrder] = useState<Order | null>(null);
   const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState<string | null>(null);
+  const [downloadingReceipt, setDownloadingReceipt] = useState(false);
 
-  const downloadReceipt = () => {
+  const downloadReceipt = async () => {
     if (!orderId) return;
-
-    let apiBaseUrl = brandConfig.apiBaseUrl || 'http://localhost:8000';
-
-    if (!apiBaseUrl || apiBaseUrl.trim() === '' || (apiBaseUrl.startsWith('/') && !apiBaseUrl.startsWith('http'))) {
-      apiBaseUrl = 'http://localhost:8000';
+    setDownloadingReceipt(true);
+    try {
+      const response = await fetch(
+        `${inventoryBaseUrl}/orders/${orderId}/receipt/?format=pdf`,
+        { method: 'GET', credentials: 'include' }
+      );
+      if (!response.ok) {
+        throw new Error(`Failed to download receipt (${response.status})`);
+      }
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = downloadUrl;
+      anchor.download = `receipt-${orderId}.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (err) {
+      console.error('Receipt download failed', err);
+    } finally {
+      setDownloadingReceipt(false);
     }
-
-    apiBaseUrl = apiBaseUrl.replace(/\/+$/, '');
-
-    if (apiBaseUrl.startsWith('//')) {
-      apiBaseUrl = 'https:' + apiBaseUrl;
-    }
-
-    const receiptUrl = `${apiBaseUrl}/api/inventory/orders/${orderId}/receipt/?format=pdf`;
-    window.open(receiptUrl, '_blank');
   };
 
   useEffect(() => {
@@ -151,12 +160,13 @@ export function PaymentSuccessClient() {
           {orderId && (
             <button
               onClick={downloadReceipt}
+              disabled={downloadingReceipt}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold flex items-center justify-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Download Receipt
+              {downloadingReceipt ? 'Downloading Receipt...' : 'Download Receipt'}
             </button>
           )}
           <Link

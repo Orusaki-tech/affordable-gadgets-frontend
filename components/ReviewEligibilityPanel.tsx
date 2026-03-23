@@ -11,8 +11,8 @@ interface EligibleReviewItem {
   product_id: number;
   product_name: string;
   product_slug?: string;
-  order_id: string;
-  order_item_id: number;
+  order_id?: string | null;
+  order_item_id?: number | null;
   purchase_date?: string | null;
 }
 
@@ -36,7 +36,7 @@ export function ReviewEligibilityPanel() {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [eligibleItems, setEligibleItems] = useState<EligibleReviewItem[]>([]);
-  const [selectedOrderItemId, setSelectedOrderItemId] = useState<number | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [reviewImage, setReviewImage] = useState<File | null>(null);
@@ -47,7 +47,7 @@ export function ReviewEligibilityPanel() {
   const [isCheckingEligibility, setIsCheckingEligibility] = useState(false);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
-  const selectedEligibleItem = eligibleItems.find((item) => item.order_item_id === selectedOrderItemId) || null;
+  const selectedEligibleItem = eligibleItems.find((item) => item.product_id === selectedProductId) || null;
 
   const resetState = () => {
     if (isLoggedIn) {
@@ -62,7 +62,7 @@ export function ReviewEligibilityPanel() {
     setEmail('');
     setOtp('');
     setEligibleItems([]);
-    setSelectedOrderItemId(null);
+    setSelectedProductId(null);
     setRating(5);
     setComment('');
     setReviewImage(null);
@@ -95,7 +95,7 @@ export function ReviewEligibilityPanel() {
     if (isLoggedIn) return;
     setStep('email');
     setEligibleItems([]);
-    setSelectedOrderItemId(null);
+    setSelectedProductId(null);
   }, [isLoggedIn]);
 
   useEffect(() => {
@@ -194,7 +194,7 @@ export function ReviewEligibilityPanel() {
 
         const eligible = Array.from(uniqueByProduct.values());
         setEligibleItems(eligible);
-        setSelectedOrderItemId(eligible[0]?.order_item_id ?? null);
+        setSelectedProductId(eligible[0]?.product_id ?? null);
         setStep('form');
         if (eligible.length === 0) {
           setMessage('No eligible purchases found for your account yet.');
@@ -268,12 +268,33 @@ export function ReviewEligibilityPanel() {
       }
       setCustomer(data?.customer ?? null);
       const items = Array.isArray(data?.eligible_items) ? data.eligible_items : [];
-      setEligibleItems(items);
-      setSelectedOrderItemId(items[0]?.order_item_id ?? null);
-      setStep('form');
       if (items.length === 0) {
-        setMessage('No eligible purchases found for this email address.');
+        const products = await ApiService.apiV1PublicProductsList(
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          1,
+          100
+        );
+        const fallbackItems: EligibleReviewItem[] = (products?.results ?? [])
+          .filter((product) => typeof product.id === 'number')
+          .map((product) => ({
+            product_id: product.id!,
+            product_name: product.product_name || 'Product',
+            product_slug: product.slug || '',
+            order_id: null,
+            order_item_id: null,
+            purchase_date: null,
+          }));
+        setEligibleItems(fallbackItems);
+        setSelectedProductId(fallbackItems[0]?.product_id ?? null);
+        setMessage('OTP verified. You can now leave a review for any product.');
+      } else {
+        setEligibleItems(items);
+        setSelectedProductId(items[0]?.product_id ?? null);
       }
+      setStep('form');
     } catch (err: any) {
       setError(err?.message || 'Failed to verify OTP.');
     } finally {
@@ -323,7 +344,9 @@ export function ReviewEligibilityPanel() {
         formData.append('email', email.trim());
         formData.append('otp', otp.trim());
         formData.append('product_id', String(selectedEligibleItem.product_id));
-        formData.append('order_item_id', String(selectedEligibleItem.order_item_id));
+        if (selectedEligibleItem.order_item_id) {
+          formData.append('order_item_id', String(selectedEligibleItem.order_item_id));
+        }
         formData.append('rating', String(rating));
         formData.append('comment', comment.trim());
         if (reviewImage) {
@@ -364,7 +387,7 @@ export function ReviewEligibilityPanel() {
             <p className="review-eligibility__subtitle">
               {isLoggedIn
                 ? 'Select an item from your account to leave a review.'
-                : 'Use the email from your checkout to find eligible reviews.'}
+                : 'Verify your email with OTP, then choose a product to review.'}
             </p>
           </div>
           <button
@@ -457,17 +480,17 @@ export function ReviewEligibilityPanel() {
               <div className="review-eligibility__empty">
                 {isLoggedIn
                   ? 'No eligible purchases found for your account yet.'
-                  : 'We could not find any paid or delivered purchases for this email address.'}
+                  : 'No products available to review right now.'}
               </div>
             ) : (
               <>
                 <label className="review-eligibility__label">
-                  Purchased product
+                  Product
                   <select
-                    value={selectedOrderItemId ?? ''}
+                    value={selectedProductId ?? ''}
                     onChange={(event) => {
                       const value = event.target.value;
-                      setSelectedOrderItemId(value ? Number(value) : null);
+                      setSelectedProductId(value ? Number(value) : null);
                     }}
                     className="review-eligibility__select"
                   >
@@ -475,7 +498,7 @@ export function ReviewEligibilityPanel() {
                       Select a product
                     </option>
                     {eligibleItems.map((item) => (
-                      <option key={item.order_item_id} value={item.order_item_id}>
+                      <option key={`${item.product_id}-${item.order_item_id ?? 'na'}`} value={item.product_id}>
                         {item.product_name}
                         {formatPurchaseDate(item.purchase_date) ? ` • ${formatPurchaseDate(item.purchase_date)}` : ''}
                       </option>

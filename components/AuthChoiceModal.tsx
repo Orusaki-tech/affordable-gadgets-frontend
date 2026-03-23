@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { LoginService, RegisterService } from '@/lib/api/generated';
+import { LoginService, OpenAPI, RegisterService } from '@/lib/api/generated';
 import { brandConfig } from '@/lib/config/brand';
 import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
 
@@ -102,17 +102,23 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
     setAuthError(null);
     setAuthNotice(null);
     try {
-      const res = await LoginService.loginCreate({
-        username_or_email: authForm.username_or_email,
-        password: authForm.password,
-      });
-      setPendingVerificationEmail(null);
-      const token = (res as { token?: string })?.token;
-      if (token) {
-        setAuthToken(token);
+      const previousBase = OpenAPI.BASE;
+      try {
+        OpenAPI.BASE = inventoryBaseUrl;
+        const res = await LoginService.loginCreate({
+          username_or_email: authForm.username_or_email,
+          password: authForm.password,
+        });
+        setPendingVerificationEmail(null);
+        const token = (res as { token?: string })?.token;
+        if (token) {
+          setAuthToken(token);
+        }
+        onAuthSuccess();
+        onClose();
+      } finally {
+        OpenAPI.BASE = previousBase;
       }
-      onAuthSuccess();
-      onClose();
     } catch (err) {
       const message =
         (err as { body?: { detail?: string; error?: string } })?.body?.detail ||
@@ -135,11 +141,17 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
     setAuthError(null);
     setAuthNotice(null);
     try {
-      await RegisterService.registerCreate({
-        username: authForm.username,
-        email: authForm.email,
-        password: authForm.password,
-      });
+      const previousBase = OpenAPI.BASE;
+      try {
+        OpenAPI.BASE = inventoryBaseUrl;
+        await RegisterService.registerCreate({
+          username: authForm.username,
+          email: authForm.email,
+          password: authForm.password,
+        });
+      } finally {
+        OpenAPI.BASE = previousBase;
+      }
       setAuthNotice('Verification email sent. Please verify your email, then sign in to continue.');
       setPendingVerificationEmail(authForm.email);
       setAuthMode('login');

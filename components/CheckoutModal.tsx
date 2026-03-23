@@ -356,10 +356,17 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
     setIsAuthSubmitting(true);
     setAuthError(null);
     try {
-      const res = await LoginService.loginCreate({
-        username_or_email: authForm.username_or_email,
-        password: authForm.password,
-      });
+      const previousBase = OpenAPI.BASE;
+      let res: { token?: string } | null = null;
+      try {
+        OpenAPI.BASE = inventoryBaseUrl;
+        res = await LoginService.loginCreate({
+          username_or_email: authForm.username_or_email,
+          password: authForm.password,
+        });
+      } finally {
+        OpenAPI.BASE = previousBase;
+      }
       const token = (res as { token?: string })?.token;
       if (token) {
         setAuthToken(token);
@@ -381,13 +388,20 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
     setIsAuthSubmitting(true);
     setAuthError(null);
     try {
-      const res = await RegisterService.registerCreate({
-        username: authForm.username,
-        email: authForm.email,
-        password: authForm.password,
-        phone_number: formData.customer_phone || undefined,
-        address: formData.delivery_address || undefined,
-      });
+      const previousBase = OpenAPI.BASE;
+      let res: { token?: string } | null = null;
+      try {
+        OpenAPI.BASE = inventoryBaseUrl;
+        res = await RegisterService.registerCreate({
+          username: authForm.username,
+          email: authForm.email,
+          password: authForm.password,
+          phone_number: formData.customer_phone || undefined,
+          address: formData.delivery_address || undefined,
+        });
+      } finally {
+        OpenAPI.BASE = previousBase;
+      }
       const token = (res as { token?: string })?.token;
       if (token) {
         setAuthToken(token);

@@ -7,6 +7,9 @@ import type { InitiatePaymentRequestRequest, Order } from '@/lib/api/generated';
 import { inventoryBaseUrl } from '@/lib/api/openapi';
 import { ORDER_STATUS } from '@/lib/constants/apiEnums';
 
+const SUCCESS_PAYMENT_STATES = new Set(['PAID', 'DELIVERED', 'COMPLETED', 'SUCCESS', 'SUCCEEDED']);
+const FAILED_PAYMENT_STATES = new Set(['CANCELED', 'CANCELLED', 'FAILED', 'INVALID']);
+
 interface UsePaymentOptions {
   orderId: string | null;
   onPaymentComplete?: () => void;
@@ -91,9 +94,20 @@ export function usePayment({
       OpenAPI.BASE = previousBase;
       console.log('[PESAPAL] Payment Status received:', JSON.stringify(status, null, 2));
       setPaymentStatus(status);
+      const normalizedStatus = String(status.status || '').toUpperCase();
+      const normalizedOrderStatus = String((status as any).order_status || '').toUpperCase();
+      const isSuccess =
+        SUCCESS_PAYMENT_STATES.has(normalizedStatus) ||
+        SUCCESS_PAYMENT_STATES.has(normalizedOrderStatus) ||
+        status.status === ORDER_STATUS.PAID ||
+        status.status === ORDER_STATUS.DELIVERED;
+      const isFailure =
+        FAILED_PAYMENT_STATES.has(normalizedStatus) ||
+        FAILED_PAYMENT_STATES.has(normalizedOrderStatus) ||
+        status.status === ORDER_STATUS.CANCELED;
 
       // Check if payment is complete
-      if (status.status === ORDER_STATUS.PAID || status.status === ORDER_STATUS.DELIVERED) {
+      if (isSuccess) {
         console.log('[PESAPAL] Payment is COMPLETED - stopping polling');
         setIsPolling(false);
         onPaymentComplete?.();
@@ -102,7 +116,7 @@ export function usePayment({
       }
 
       // Check if payment failed
-      if (status.status === ORDER_STATUS.CANCELED) {
+      if (isFailure) {
         console.log('[PESAPAL] Payment is', status.status, '- stopping polling');
         setIsPolling(false);
         onPaymentFailed?.((status as any)?.message || 'Payment failed');

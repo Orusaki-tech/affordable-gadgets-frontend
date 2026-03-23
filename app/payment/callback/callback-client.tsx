@@ -1,21 +1,28 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { OpenAPI, OrdersService } from '@/lib/api/generated';
+import { OpenAPI, OrdersService, PesapalService } from '@/lib/api/generated';
 import { inventoryBaseUrl } from '@/lib/api/openapi';
 import Link from 'next/link';
 import { ORDER_STATUS } from '@/lib/constants/apiEnums';
+
+const SUCCESS_PAYMENT_STATES = new Set(['PAID', 'DELIVERED', 'COMPLETED', 'SUCCESS', 'SUCCEEDED']);
+const FAILED_PAYMENT_STATES = new Set(['CANCELED', 'CANCELLED', 'FAILED', 'INVALID']);
 
 export function PaymentCallbackClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading');
   const [message, setMessage] = useState<string>('Processing payment...');
+  const hasStartedRef = useRef(false);
   const orderTrackingId = searchParams.get('OrderTrackingId');
   const orderMerchantReference = searchParams.get('OrderMerchantReference');
 
   useEffect(() => {
+    if (hasStartedRef.current) return;
+    hasStartedRef.current = true;
+
     console.log('\n[PESAPAL] ========== CALLBACK PAGE: PROCESSING CALLBACK ==========');
     console.log('[PESAPAL] Order Tracking ID:', orderTrackingId);
     console.log('[PESAPAL] Order Merchant Reference:', orderMerchantReference);
@@ -32,19 +39,33 @@ export function PaymentCallbackClient() {
       return;
     }
 
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let isMounted = true;
+    const maxAttempts = 20; // 20 * 3s ~= 1 minute
+    let attempts = 0;
+
     const checkStatus = async () => {
+      const previousBase = OpenAPI.BASE;
       try {
+        attempts += 1;
         console.log('[PESAPAL] Checking payment status for order:', orderId);
-        const previousBase = OpenAPI.BASE;
         OpenAPI.BASE = inventoryBaseUrl;
         const paymentStatus = await OrdersService.ordersPaymentStatusRetrieve(orderId);
-        OpenAPI.BASE = previousBase;
         console.log('[PESAPAL] Payment Status:', JSON.stringify(paymentStatus, null, 2));
-
-        if (
+        const normalizedStatus = String(paymentStatus.status || '').toUpperCase();
+        const normalizedOrderStatus = String((paymentStatus as any).order_status || '').toUpperCase();
+        const isSuccess =
+          SUCCESS_PAYMENT_STATES.has(normalizedStatus) ||
+          SUCCESS_PAYMENT_STATES.has(normalizedOrderStatus) ||
           paymentStatus.status === ORDER_STATUS.PAID ||
-          paymentStatus.status === ORDER_STATUS.DELIVERED
-        ) {
+          paymentStatus.status === ORDER_STATUS.DELIVERED;
+        const isFailure =
+          FAILED_PAYMENT_STATES.has(normalizedStatus) ||
+          FAILED_PAYMENT_STATES.has(normalizedOrderStatus) ||
+          paymentStatus.status === ORDER_STATUS.CANCELED;
+
+        if (isSuccess) {
+          if (!isMounted) return;
           console.log('[PESAPAL] Payment is COMPLETED - showing success');
           setStatus('success');
           setMessage('Payment completed successfully!');
@@ -53,25 +74,65 @@ export function PaymentCallbackClient() {
             console.log('[PESAPAL] Redirecting to order details page...');
             router.push(`/orders/${orderId}`);
           }, 2000);
-        } else if (paymentStatus.status === ORDER_STATUS.CANCELED) {
+        } else if (isFailure) {
+          if (!isMounted) return;
           console.log('[PESAPAL] Payment is', paymentStatus.status, '- showing failure');
           setStatus('failed');
           setMessage('Payment failed or was cancelled.');
+        } else if (attempts >= maxAttempts) {
+          if (!isMounted) return;
+          console.log('[PESAPAL] Max callback polling attempts reached');
+          setStatus('failed');
+          setMessage('Payment verification timed out. Please check your order status in Orders.');
         } else {
           console.log('[PESAPAL] Payment status:', paymentStatus.status, '- will poll again in 3 seconds');
+          if (!isMounted) return;
           setMessage('Payment is being processed...');
-          setTimeout(checkStatus, 3000);
+          timeoutId = setTimeout(checkStatus, 3000);
         }
       } catch (error: any) {
+        if (!isMounted) return;
         console.log('[PESAPAL] ========== CALLBACK PAGE: ERROR CHECKING STATUS ==========');
         console.log('[PESAPAL] Error checking payment status:', error);
         console.log('[PESAPAL] ===========================================================\n');
         setStatus('failed');
         setMessage('Unable to verify payment status. Please check your order status.');
+      } finally {
+        OpenAPI.BASE = previousBase;
       }
     };
 
-    checkStatus();
+    const processCallback = async () => {
+      // Forward Pesapal callback params to backend so order status can be reconciled.
+      if (orderTrackingId || orderMerchantReference) {
+        const previousBase = OpenAPI.BASE;
+        try {
+          OpenAPI.BASE = inventoryBaseUrl;
+          await PesapalService.pesapalIpnRetrieve(
+            orderMerchantReference || undefined,
+            searchParams.get('OrderNotificationType') || undefined,
+            orderTrackingId || undefined,
+            searchParams.get('PaymentAccount') || undefined,
+            searchParams.get('PaymentMethod') || undefined,
+            searchParams.get('PaymentStatusDescription') || undefined
+          );
+        } catch (ipnErr) {
+          // Continue to polling even if IPN forwarding fails.
+          console.warn('[PESAPAL] Failed to forward callback params to backend IPN endpoint', ipnErr);
+        } finally {
+          OpenAPI.BASE = previousBase;
+        }
+      }
+
+      await checkStatus();
+    };
+
+    processCallback();
+
+    return () => {
+      isMounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [searchParams, orderMerchantReference, router, orderTrackingId]);
 
   return (

@@ -16,6 +16,8 @@ export function PaymentSuccessClient() {
   const [order, setOrder] = useState<Order | null>(null);
   const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState<string | null>(null);
   const [downloadingReceipt, setDownloadingReceipt] = useState(false);
+  const [orderFetchFailed, setOrderFetchFailed] = useState(false);
+  const [gcrAlreadyShown, setGcrAlreadyShown] = useState(false);
 
   const downloadReceipt = async () => {
     if (!orderId) return;
@@ -47,15 +49,23 @@ export function PaymentSuccessClient() {
   useEffect(() => {
     let mounted = true;
     const fetchOrder = async (id: string) => {
+      const previousBase = OpenAPI.BASE;
       try {
-        const previousBase = OpenAPI.BASE;
         OpenAPI.BASE = inventoryBaseUrl;
         const data = await OrdersService.ordersRetrieve(id);
-        OpenAPI.BASE = previousBase;
-        if (mounted) setOrder(data);
-      } catch {
+        if (mounted) {
+          setOrder(data);
+          setOrderFetchFailed(false);
+        }
+      } catch (error) {
+        console.warn('[GCR] Failed to fetch order for opt-in payload', { orderId: id, error });
         // If order isn't accessible yet, we still show success UI; opt-in will simply not render.
-        if (mounted) setOrder(null);
+        if (mounted) {
+          setOrder(null);
+          setOrderFetchFailed(true);
+        }
+      } finally {
+        OpenAPI.BASE = previousBase;
       }
     };
 
@@ -63,6 +73,15 @@ export function PaymentSuccessClient() {
     return () => {
       mounted = false;
     };
+  }, [orderId]);
+
+  useEffect(() => {
+    if (!orderId || typeof window === 'undefined') {
+      setGcrAlreadyShown(false);
+      return;
+    }
+    const key = `gcr-optin-shown:${orderId}`;
+    setGcrAlreadyShown(window.sessionStorage.getItem(key) === '1');
   }, [orderId]);
 
   useEffect(() => {
@@ -103,10 +122,19 @@ export function PaymentSuccessClient() {
     };
   }, [orderId, order, estimatedDeliveryDate]);
 
+  const shouldRenderGcrOptIn = !!gcrPayload && !gcrAlreadyShown;
+
+  useEffect(() => {
+    if (!shouldRenderGcrOptIn || !orderId || typeof window === 'undefined') return;
+    const key = `gcr-optin-shown:${orderId}`;
+    window.sessionStorage.setItem(key, '1');
+    setGcrAlreadyShown(true);
+  }, [shouldRenderGcrOptIn, orderId]);
+
   return (
     <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
-        {gcrPayload ? (
+        {shouldRenderGcrOptIn ? (
           <GoogleCustomerReviewsOptIn
             merchantId={gcrPayload.merchantId}
             orderId={gcrPayload.orderId}
@@ -153,6 +181,11 @@ export function PaymentSuccessClient() {
           {paymentReference && (
             <p className="text-sm text-gray-500 mb-4">
               Payment Reference: <span className="font-mono font-semibold">{paymentReference}</span>
+            </p>
+          )}
+          {orderFetchFailed && (
+            <p className="text-xs text-amber-700 mb-4">
+              We could not load full order details yet. Your confirmation is still valid.
             </p>
           )}
         </div>

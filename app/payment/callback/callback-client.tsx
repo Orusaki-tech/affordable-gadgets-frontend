@@ -71,8 +71,12 @@ export function PaymentCallbackClient() {
           setMessage('Payment completed successfully!');
 
           setTimeout(() => {
-            console.log('[PESAPAL] Redirecting to order details page...');
-            router.push(`/orders/${orderId}`);
+            console.log('[PESAPAL] Redirecting to payment success page for GCR opt-in...');
+            const params = new URLSearchParams({ order_id: orderId });
+            if (orderTrackingId) {
+              params.set('payment_reference', orderTrackingId);
+            }
+            router.push(`/payment/success?${params.toString()}`);
           }, 2000);
         } else if (isFailure) {
           if (!isMounted) return;

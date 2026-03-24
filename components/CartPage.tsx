@@ -505,6 +505,17 @@ export function CartPage() {
     return `${apiUrl}/api/inventory/orders/${orderId}/receipt/?format=pdf`;
   };
 
+  const isPaidOrderStatus = (status?: string) => {
+    const normalized = (status || '').trim().toUpperCase();
+    return ['PAID', 'DELIVERED', 'COMPLETED', 'SUCCESS', 'SUCCEEDED'].includes(normalized);
+  };
+
+  const getGoogleReviewUrl = (orderId?: string) => {
+    if (!orderId) return '/payment/success';
+    const params = new URLSearchParams({ order_id: orderId });
+    return `/payment/success?${params.toString()}`;
+  };
+
   const deliveryDateLabel = formData.delivery_date
     ? new Date(formData.delivery_date).toLocaleDateString('en-GB', {
         weekday: 'long',
@@ -806,6 +817,18 @@ export function CartPage() {
                             >
                               Leave review
                             </Link>
+                            {(order.gcr_eligible ?? isPaidOrderStatus(order.status)) && (
+                              <Link
+                                href={getGoogleReviewUrl(order.order_id)}
+                                className="cart-page__link cart-page__order-link"
+                                title={
+                                  order.gcr_reason ||
+                                  'Opens Google purchase review prompt (Google eligibility rules apply)'
+                                }
+                              >
+                                Google review
+                              </Link>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -887,6 +910,18 @@ export function CartPage() {
                             >
                               Leave review
                             </Link>
+                            {(order.gcr_eligible ?? isPaidOrderStatus(order.status)) && (
+                              <Link
+                                href={getGoogleReviewUrl(order.order_id)}
+                                className="cart-page__link cart-page__order-link"
+                                title={
+                                  order.gcr_reason ||
+                                  'Opens Google purchase review prompt (Google eligibility rules apply)'
+                                }
+                              >
+                                Google review
+                              </Link>
+                            )}
                           </div>
                         </div>
                       ))}

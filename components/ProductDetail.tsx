@@ -210,8 +210,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [canScrollUnitsLeft, setCanScrollUnitsLeft] = useState(false);
   const [canScrollUnitsRight, setCanScrollUnitsRight] = useState(false);
 
-  const jumpToReviews = () => {
-    setActiveTab('reviews');
+  const jumpToTab = (tab: TabType) => {
+    setActiveTab(tab);
     setTimeout(() => {
       const target = document.getElementById('product-reviews');
       if (target) {
@@ -833,13 +833,25 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               <p className="product-detail__brand">
                 <span className="product-detail__brand-name">{product.brand}</span> {product.model_series && <span className="product-detail__brand-series">• {product.model_series}</span>}
               </p>
-              <button
-                type="button"
-                onClick={jumpToReviews}
-                className="product-detail__review-link"
-              >
-                Leave a review
-              </button>
+              <div className="product-detail__quick-tabs" role="navigation" aria-label="Jump to product sections">
+                {(
+                  [
+                    { id: 'overview' as TabType, label: 'Overview' },
+                    { id: 'reviews' as TabType, label: 'Leave a review' },
+                    { id: 'videos' as TabType, label: 'Videos' },
+                    { id: 'compare' as TabType, label: 'Compare' },
+                  ] as const
+                ).map(({ id, label }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => jumpToTab(id)}
+                    className={`product-detail__quick-tab ${activeTab === id ? 'product-detail__quick-tab--active' : ''}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Promotion Banner */}

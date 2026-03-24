@@ -1,4 +1,9 @@
-/* Homepage product video reel — uses ProductCarousel (Samsung progress bar) */
+/* Homepage product video reel — Reebelo-style Swiper (portrait slides + round nav) */
+
+.home-product-videos__swiper.swiper {
+  overflow: visible;
+  padding-bottom: 2px;
+}
 
 .home-product-videos__slide-inner {
   position: relative;
@@ -18,18 +23,22 @@
   position: relative;
   width: 100%;
   aspect-ratio: 9 / 16;
-  max-height: min(52vh, 520px);
+  max-height: min(50vh, 520px);
   background: #111;
 }
 
 .home-product-videos__media-wrap video,
-.home-product-videos__media-wrap iframe {
+.home-product-videos__media-wrap .home-product-videos__embed-frame {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   border: 0;
   object-fit: cover;
+}
+
+.home-product-videos__embed-frame {
+  border-radius: 12px;
 }
 
 .home-product-videos__poster {
@@ -55,7 +64,9 @@
   color: #111;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   transform: translate(-50%, -50%);
-  transition: opacity 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
   pointer-events: none;
 }
 
@@ -68,34 +79,73 @@
 
 .home-product-videos__play--hidden {
   opacity: 0;
+  visibility: hidden;
 }
 
-.home-product-videos__title {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 5;
-  display: block;
-  padding: 10px 12px 12px;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.25;
-  color: #fff;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+.home-product-videos__caption {
   text-decoration: none;
 }
 
-.home-product-videos__title:hover {
-  color: #fff;
+.home-product-videos__caption:hover {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-@media (min-width: 640px) {
-  .home-product-videos__title {
-    font-size: 13px;
-    padding: 12px 14px 14px;
+/* Round prev/next — match Reebelo (hidden on small screens) */
+.home-product-videos__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 11;
+  display: none;
+  height: 0;
+  width: 0;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: #374151;
+  transform: translateY(-50%) scale(0.9);
+  transition: transform 0.5s ease, background-color 0.5s ease, color 0.5s ease;
+  user-select: none;
+}
+
+@media (min-width: 1024px) {
+  .home-product-videos__nav {
+    display: flex;
+    height: 56px;
+    width: 56px;
+    border: 1px solid #374151;
+  }
+
+  .home-product-videos__nav:hover {
+    background: #374151;
+    color: #fff;
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .home-product-videos__nav.swiper-button-disabled,
+  .home-product-videos__nav:disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .home-product-videos__nav--prev {
+    left: -8px;
+  }
+
+  .home-product-videos__nav--next {
+    right: -8px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .home-product-videos__nav--prev {
+    left: -24px;
+  }
+
+  .home-product-videos__nav--next {
+    right: -24px;
   }
 }

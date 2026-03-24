@@ -39,11 +39,11 @@ export const HomeProductVideosClient = dynamic(
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-6 w-48 animate-pulse rounded bg-gray-200" />
           <div className="mt-3 h-4 max-w-lg animate-pulse rounded bg-gray-100" />
-          <div className="mt-5 flex gap-4">
-            {[...Array(4)].map((_, i) => (
+          <div className="mt-5 flex gap-[15px]">
+            {[...Array(5)].map((_, i) => (
               <div
                 key={`home-videos-skel-${i}`}
-                className="aspect-[9/16] w-[175px] shrink-0 animate-pulse rounded-xl bg-gray-200 sm:w-[185px]"
+                className="h-[min(50vh,520px)] w-[175px] shrink-0 animate-pulse rounded-xl bg-gray-200 sm:w-[185px]"
               />
             ))}
           </div>

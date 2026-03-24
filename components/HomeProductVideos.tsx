@@ -1,18 +1,30 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import { ApiService } from '@/lib/api/generated';
 import type { PublicProductList } from '@/lib/api/generated';
-import { ProductCarousel } from '@/components/ProductCarousel';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import {
   resolveProductVideoMedia,
   youtubePosterUrlFromLink,
   type ResolvedProductVideo,
 } from '@/lib/utils/productVideo';
+
+import 'swiper/css';
+import 'swiper/css/navigation';
 
 const HOMEPAGE_VIDEOS_PAGE_SIZE = 24;
 
@@ -44,6 +56,8 @@ function buildEmbedAutoplaySrc(resolved: ResolvedProductVideo): string {
       parsed.searchParams.set('autoplay', '1');
       parsed.searchParams.set('playsinline', '1');
       parsed.searchParams.set('mute', '1');
+      parsed.searchParams.set('modestbranding', '1');
+      parsed.searchParams.set('rel', '0');
       return parsed.toString();
     }
     if (parsed.hostname.includes('vimeo.com')) {
@@ -55,6 +69,18 @@ function buildEmbedAutoplaySrc(resolved: ResolvedProductVideo): string {
   }
   if (u.includes('autoplay=1')) return u;
   return `${u}${u.includes('?') ? '&' : '?'}autoplay=1`;
+}
+
+function ChevronNavIcon({ flip }: { flip?: boolean }) {
+  return (
+    <svg className="block h-3 w-3 fill-current" viewBox="0 0 100 100" aria-hidden>
+      <path
+        fill="currentColor"
+        d="M 10,50 L 60,100 L 70,90 L 30,50 L 70,10 L 60,0 Z"
+        transform={flip ? 'translate(100, 100) rotate(180)' : 'translate(0, 0) rotate(0)'}
+      />
+    </svg>
+  );
 }
 
 function HomepageVideoSlide({
@@ -107,20 +133,21 @@ function HomepageVideoSlide({
     }
   };
 
-  const showPlay = resolved.mode === 'embed' ? !isPlaying : !isPlaying;
+  const showPlay = !isPlaying;
+  const playClassMods = showPlay ? 'group-hover:hidden' : 'home-product-videos__play--hidden';
 
   return (
-    <div className="h-full w-full">
+    <div className="home-product-videos__slide-stack w-[175px] shrink-0 sm:w-[185px]">
       <div className="home-product-videos__slide-inner">
         <button
           type="button"
-          className="relative w-full cursor-pointer border-0 bg-transparent p-0 text-left"
+          className="group relative h-full w-full grow-0 cursor-pointer border-0 bg-transparent p-0 outline-none"
           onClick={() => toggle()}
           aria-label={`Play video: ${name}`}
         >
           <div className="home-product-videos__media-wrap">
             <span
-              className={`home-product-videos__play ${showPlay ? '' : 'home-product-videos__play--hidden'}`}
+              className={`home-product-videos__play ${playClassMods}`}
               aria-hidden
             >
               <svg className="ml-1 h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -131,11 +158,13 @@ function HomepageVideoSlide({
             {resolved.mode === 'file' && (
               <video
                 ref={setRef}
+                className="h-full max-h-[50vh] w-full rounded-xl object-cover"
                 src={resolved.src}
                 poster={product.primary_image ?? undefined}
                 preload="none"
                 playsInline
                 disablePictureInPicture
+                disableRemotePlayback
                 controls={isPlaying}
                 onClick={(ev) => {
                   if (isPlaying) ev.stopPropagation();
@@ -153,8 +182,8 @@ function HomepageVideoSlide({
                     src={embedPosterUrl}
                     alt=""
                     fill
-                    className="home-product-videos__poster"
-                    sizes="200px"
+                    className="home-product-videos__poster rounded-xl"
+                    sizes="185px"
                     unoptimized={
                       embedPosterUrl.includes('ytimg.com') ||
                       embedPosterUrl.includes('localhost') ||
@@ -163,11 +192,12 @@ function HomepageVideoSlide({
                   />
                 ) : null}
                 {!isPlaying && !embedPosterUrl ? (
-                  <div className="absolute inset-0 bg-neutral-900" aria-hidden />
+                  <div className="absolute inset-0 rounded-xl bg-neutral-900" aria-hidden />
                 ) : null}
                 {isPlaying ? (
                   <iframe
                     title={name}
+                    className="home-product-videos__embed-frame"
                     src={buildEmbedAutoplaySrc(resolved)}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
@@ -177,16 +207,22 @@ function HomepageVideoSlide({
             )}
           </div>
         </button>
-        <Link href={href} className="home-product-videos__title">
-          {name}
-        </Link>
       </div>
+      <Link
+        href={href}
+        className="home-product-videos__caption mt-2 block text-[11px] font-bold leading-snug text-gray-900 sm:text-xs"
+      >
+        {name}
+      </Link>
     </div>
   );
 }
 
 export function HomeProductVideos() {
   const deckKey = 'home-product-videos';
+  const navUid = useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const prevNavSelector = `#hpv-nav-prev-${navUid}`;
+  const nextNavSelector = `#hpv-nav-next-${navUid}`;
   const { data: products, isLoading } = useQuery({
     queryKey: ['products', 'homepage_videos'],
     queryFn: fetchHomepageVideoProducts,
@@ -195,7 +231,6 @@ export function HomeProductVideos() {
 
   const videoEls = useRef<Map<string, HTMLVideoElement>>(new Map());
   const [playingKey, setPlayingKey] = useState<string | null>(null);
-
   const registerVideo = useCallback((key: string, el: HTMLVideoElement | null) => {
     if (el) videoEls.current.set(key, el);
     else videoEls.current.delete(key);
@@ -214,11 +249,11 @@ export function HomeProductVideos() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-7 w-56 animate-pulse rounded bg-gray-200" />
           <div className="mt-2 h-4 max-w-xl animate-pulse rounded bg-gray-100" />
-          <div className="mt-6 flex gap-4">
-            {[...Array(4)].map((_, i) => (
+          <div className="mt-5 flex gap-[15px] overflow-hidden">
+            {[...Array(5)].map((_, i) => (
               <div
                 key={`hpv-skel-${i}`}
-                className="aspect-[9/16] max-h-[min(52vh,520px)] min-w-[140px] flex-1 animate-pulse rounded-xl bg-gray-200"
+                className="h-[min(50vh,520px)] w-[175px] shrink-0 animate-pulse rounded-xl bg-gray-200 sm:w-[185px]"
               />
             ))}
           </div>
@@ -244,25 +279,53 @@ export function HomeProductVideos() {
           Find out more about your favourite devices and accessories here
         </p>
 
-        <div className="mt-6">
-          <ProductCarousel
-            itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
-            showNavigation
-            showPagination={false}
-            autoPlay={false}
-            className="home-product-videos__carousel"
+        <div className="relative mt-5 gap-3">
+          <button
+            type="button"
+            id={`hpv-nav-prev-${navUid}`}
+            className="home-product-videos__nav home-product-videos__nav--prev"
+            aria-label="Previous videos"
+          >
+            <span className="hidden lg:block">
+              <ChevronNavIcon />
+            </span>
+          </button>
+          <button
+            type="button"
+            id={`hpv-nav-next-${navUid}`}
+            className="home-product-videos__nav home-product-videos__nav--next"
+            aria-label="Next videos"
+          >
+            <span className="hidden lg:block">
+              <ChevronNavIcon flip />
+            </span>
+          </button>
+
+          <Swiper
+            modules={[Navigation]}
+            spaceBetween={15}
+            slidesPerView="auto"
+            slidesOffsetBefore={0}
+            slidesOffsetAfter={0}
+            watchOverflow
+            className="home-product-videos__swiper !overflow-visible"
+            navigation={{
+              prevEl: prevNavSelector,
+              nextEl: nextNavSelector,
+            }}
           >
             {products.map((product) => (
-              <HomepageVideoSlide
-                key={product.id}
-                product={product}
-                playingKey={playingKey}
-                setPlayingKey={setPlayingKey}
-                registerVideo={registerVideo}
-                deckKey={deckKey}
-              />
+              <SwiperSlide key={product.id} className="!w-auto">
+                <HomepageVideoSlide
+                  product={product}
+                  playingKey={playingKey}
+                  setPlayingKey={setPlayingKey}
+                  registerVideo={registerVideo}
+                  deckKey={deckKey}
+                />
+              </SwiperSlide>
             ))}
-          </ProductCarousel>
+          </Swiper>
         </div>
       </div>
     </section>

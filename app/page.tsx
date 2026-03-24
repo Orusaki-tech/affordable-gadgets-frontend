@@ -4,6 +4,7 @@ import { HomeHero } from '@/components/HomeHero';
 import { SpecialOffersServer } from '@/components/SpecialOffersServer';
 import {
   ProductGridClient,
+  HomeProductVideosClient,
   ReviewsShowcaseClient,
   CategoriesSectionClient,
   RecentlyViewedClient,
@@ -279,6 +280,9 @@ export default async function HomePage() {
             <ProductGridClient featuredOnly pageSize={5} showPagination={false} cardOptions={{ variant: 'featured' }} />
           </div>
         </section>
+
+        {/* Product / testimonial videos (template for future product-specific reels) */}
+        <HomeProductVideosClient />
 
         {/* Reviews Showcase */}
         <section id="reviews" className="bg-white scroll-mt-20">

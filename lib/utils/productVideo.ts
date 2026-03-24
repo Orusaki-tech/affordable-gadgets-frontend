@@ -20,29 +20,54 @@ export function vimeoEmbedUrl(url: string, autoplay = false): string | null {
   return `https://player.vimeo.com/video/${id}${q}`;
 }
 
-export function youtubeEmbedUrlFromLink(url: string, autoplay = false): string | null {
+/** Resolves a YouTube video id from watch, short, embed, youtu.be, or m.youtube URLs. */
+export function youtubeVideoIdFromLink(url: string): string | null {
   if (!url) return null;
-  if (url.includes('youtube.com/embed/')) {
-    if (!autoplay) return url.split('&autoplay')[0];
-    return url.includes('autoplay=1') ? url : `${url}${url.includes('?') ? '&' : '?'}autoplay=1`;
+  let normalized = url.trim();
+  normalized = normalized.replace(/^https?:\/\/m\.youtube\.com\//i, 'https://www.youtube.com/');
+
+  if (normalized.includes('youtube.com/embed/')) {
+    const embedMatch = normalized.match(/embed\/([^?&]+)/);
+    if (embedMatch) {
+      return embedMatch[1].split('&')[0].split('?')[0] || null;
+    }
   }
   let videoId: string | null = null;
-  const watchMatch = url.match(/[?&]v=([^&]+)/);
+  const watchMatch = normalized.match(/[?&]v=([^&]+)/);
   if (watchMatch) videoId = watchMatch[1];
   if (!videoId) {
-    const shortMatch = url.match(/youtu\.be\/([^?&]+)/);
+    const shortMatch = normalized.match(/youtu\.be\/([^?&]+)/);
     if (shortMatch) videoId = shortMatch[1];
   }
   if (!videoId) {
-    const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&/]+)/);
+    const shortsMatch = normalized.match(/youtube\.com\/shorts\/([^?&/]+)/);
     if (shortsMatch) videoId = shortsMatch[1];
   }
   if (!videoId) {
-    const embedMatch = url.match(/embed\/([^?&]+)/);
+    const embedMatch = normalized.match(/embed\/([^?&]+)/);
     if (embedMatch) videoId = embedMatch[1];
   }
   if (!videoId) return null;
-  videoId = videoId.split('&')[0].split('?')[0];
+  return videoId.split('&')[0].split('?')[0] || null;
+}
+
+/** Static poster for carousel slides when the product has no primary image (9:16 frame uses object-cover). */
+export function youtubePosterUrlFromLink(url: string): string | null {
+  const id = youtubeVideoIdFromLink(url);
+  if (!id) return null;
+  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+}
+
+export function youtubeEmbedUrlFromLink(url: string, autoplay = false): string | null {
+  if (!url) return null;
+  let normalized = url.trim();
+  normalized = normalized.replace(/^https?:\/\/m\.youtube\.com\//i, 'https://www.youtube.com/');
+
+  if (normalized.includes('youtube.com/embed/') && !autoplay) {
+    return normalized.split('&autoplay')[0].split('?autoplay')[0];
+  }
+  const videoId = youtubeVideoIdFromLink(normalized);
+  if (!videoId) return null;
   const q = autoplay ? '?autoplay=1' : '';
   return `https://www.youtube.com/embed/${videoId}${q}`;
 }

@@ -8,7 +8,7 @@ import { useProductAccessories } from '@/lib/hooks/useAccessories';
 import type { PublicBundle, PublicBundleItem, PublicProduct, PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import Link from 'next/link';
@@ -70,6 +70,27 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
   const primaryImage = unitImages.find((img: InventoryUnitImage) => img.is_primary) || (unitImages.length > 0 ? unitImages[0] : null);
   const displayImage = (unitImages.length > imageIndex ? unitImages[imageIndex] : null) || primaryImage;
   const imageUrl = displayImage?.image_url || null;
+  const conditionLabel =
+    unit.condition === 'N'
+      ? 'New'
+      : unit.condition === 'R'
+        ? 'Refurbished'
+        : unit.condition === 'P'
+          ? 'Pre-owned'
+          : unit.condition;
+  const unitTitle = [
+    typeof unit.storage_gb === 'number' ? `${unit.storage_gb}GB` : null,
+    unit.color_name || null,
+  ]
+    .filter(Boolean)
+    .join(' • ') || `Unit ${unit.id ?? ''}`;
+  const unitSubtitle = [
+    conditionLabel,
+    typeof unit.grade === 'string' && unit.grade ? `Grade ${unit.grade}` : null,
+    typeof unit.ram_gb === 'number' ? `${unit.ram_gb}GB RAM` : null,
+  ]
+    .filter(Boolean)
+    .join(' • ');
   
   const handleImageClick = (index: number, img: InventoryUnitImage) => {
     setImageIndex(index);
@@ -91,32 +112,57 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
         isSelected ? 'product-detail__unit-card--selected' : ''
       }`}
     >
-      {/* Unit Info - Compact */}
-      <div>
-        <div className="product-detail__unit-row">
-          {promotionPrice ? (
-            <div>
-              <p className="product-detail__unit-price product-detail__unit-price--promo">{formatPrice(promotionPrice)}</p>
-              <p className="product-detail__unit-price-old">{formatPrice(Number(unit.selling_price))}</p>
-            </div>
-          ) : (
-            <p className="product-detail__unit-price">{formatPrice(Number(unit.selling_price))}</p>
-          )}
-          {isSelected && (
-            <span className="product-detail__unit-selected">
-              ✓ Selected
-            </span>
-          )}
+      <div className="product-detail__unit-card-top">
+        <div className="product-detail__unit-icon" aria-hidden>
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.75a1.25 1.25 0 0 1 1.25 1.25v1.2a7 7 0 0 1 5.55 5.55H20a1.25 1.25 0 1 1 0 2.5h-1.2a7 7 0 0 1-5.55 5.55V20a1.25 1.25 0 1 1-2.5 0v-1.2a7 7 0 0 1-5.55-5.55H4a1.25 1.25 0 1 1 0-2.5h1.2a7 7 0 0 1 5.55-5.55V4A1.25 1.25 0 0 1 12 2.75m0 5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9" />
+          </svg>
         </div>
-
-        {/* Specs Badges - Only Condition and Grade (differentiating factors) */}
-        <div className="product-detail__unit-badges">
-          <span className="product-detail__unit-badge">{unit.condition === 'N' ? 'New' : unit.condition === 'R' ? 'Refurbished' : unit.condition === 'P' ? 'Pre-owned' : unit.condition}</span>
-          {typeof unit.grade === 'string' && unit.grade && (
-            <span className="product-detail__unit-badge">Grade {unit.grade}</span>
-          )}
+        <div className="product-detail__unit-copy">
+          <p className="product-detail__unit-title">{unitTitle}</p>
+          {unitSubtitle && <p className="product-detail__unit-subtitle">{unitSubtitle}</p>}
         </div>
       </div>
+      <div className="product-detail__unit-row">
+        {promotionPrice ? (
+          <div>
+            <p className="product-detail__unit-price product-detail__unit-price--promo">{formatPrice(promotionPrice)}</p>
+            <p className="product-detail__unit-price-old">{formatPrice(Number(unit.selling_price))}</p>
+          </div>
+        ) : (
+          <p className="product-detail__unit-price">{formatPrice(Number(unit.selling_price))}</p>
+        )}
+        {isSelected && (
+          <span className="product-detail__unit-selected">
+            ✓ Selected
+          </span>
+        )}
+      </div>
+      {unitImages.length > 0 && (
+        <div className="product-detail__unit-thumb-row">
+          {unitImages.slice(0, 4).map((img, index) => (
+            <button
+              key={`${img.id ?? index}-${img.image_url}`}
+              type="button"
+              className="product-detail__unit-thumb-btn"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleImageClick(index, img);
+              }}
+              title={img.color_name || 'Unit image'}
+            >
+              <Image
+                src={img.image_url || imageUrl || ''}
+                alt={`${unitTitle} image ${index + 1}`}
+                width={28}
+                height={28}
+                className="product-detail__unit-thumb-image"
+                unoptimized={!img.image_url || img.image_url.includes('localhost') || img.image_url.includes('placehold.co')}
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -160,6 +206,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [selectedBundleItems, setSelectedBundleItems] = useState<Record<number, Set<number>>>({});
   const [bundleSuccessMessage, setBundleSuccessMessage] = useState<string | null>(null);
   const [selectedAccessoryVariants, setSelectedAccessoryVariants] = useState<Record<number, number>>({});
+  const unitsCarouselRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollUnitsLeft, setCanScrollUnitsLeft] = useState(false);
+  const [canScrollUnitsRight, setCanScrollUnitsRight] = useState(false);
 
   const jumpToReviews = () => {
     setActiveTab('reviews');
@@ -363,6 +412,33 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       return true;
     });
   }, [units, selectedStorage, selectedRAM, selectedColor, selectedCondition, selectedGrade, selectedBattery]);
+
+  const updateUnitsCarouselButtons = () => {
+    const container = unitsCarouselRef.current;
+    if (!container) return;
+    setCanScrollUnitsLeft(container.scrollLeft > 4);
+    setCanScrollUnitsRight(
+      container.scrollLeft < container.scrollWidth - container.clientWidth - 4
+    );
+  };
+
+  useEffect(() => {
+    const container = unitsCarouselRef.current;
+    if (!container) return;
+    updateUnitsCarouselButtons();
+    container.addEventListener('scroll', updateUnitsCarouselButtons, { passive: true });
+    return () => container.removeEventListener('scroll', updateUnitsCarouselButtons);
+  }, [filteredUnits.length]);
+
+  const scrollUnitsCarousel = (direction: 'left' | 'right') => {
+    const container = unitsCarouselRef.current;
+    if (!container) return;
+    const amount = container.clientWidth;
+    container.scrollBy({
+      left: direction === 'left' ? -amount : amount,
+      behavior: 'smooth',
+    });
+  };
 
   // Auto-select from filtered units when Storage and Color are selected
   useEffect(() => {
@@ -1134,7 +1210,27 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </summary>
-                <div className="product-detail__units-list">
+                <div className="product-detail__units-carousel-nav">
+                  <button
+                    type="button"
+                    className="product-detail__units-carousel-btn"
+                    onClick={() => scrollUnitsCarousel('left')}
+                    disabled={!canScrollUnitsLeft}
+                    aria-label="Previous units"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    className="product-detail__units-carousel-btn"
+                    onClick={() => scrollUnitsCarousel('right')}
+                    disabled={!canScrollUnitsRight}
+                    aria-label="Next units"
+                  >
+                    ›
+                  </button>
+                </div>
+                <div ref={unitsCarouselRef} className="product-detail__units-list">
                   {filteredUnits.map((unit) => {
                     const unitPromotionPrice = isEligibleForPromotion && promotion && unit.selling_price
                       ? calculatePromotionPrice(Number(unit.selling_price))

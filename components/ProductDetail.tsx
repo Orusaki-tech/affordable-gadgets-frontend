@@ -1270,7 +1270,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   <Image src="/payment-logos/visa-cropped.png" alt="Visa" width={60} height={18} className="product-detail__payments-logo-image" />
                 </span>
                 <span className="product-detail__payments-logo product-detail__payments-logo--mpesa">
-                  <Image src="/payment-logos/mpesa-cropped.png" alt="M-Pesa" width={70} height={18} className="product-detail__payments-logo-image" />
+                  <Image src="/payment-logos/mpesa-cropped.png" alt="M-Pesa" width={120} height={40} className="product-detail__payments-logo-image" />
                 </span>
                 <span className="product-detail__payments-logo product-detail__payments-logo--paypal">
                   <Image src="/payment-logos/paypal.png" alt="PayPal" width={62} height={18} className="product-detail__payments-logo-image" />

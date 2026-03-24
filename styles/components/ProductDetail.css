@@ -827,7 +827,7 @@
 .product-detail__payments-logo-image {
   width: auto;
   max-width: 100%;
-  height: 13px;
+  height: 14px;
   object-fit: contain;
 }
 
@@ -836,26 +836,14 @@
   border-color: #1a1f7133;
 }
 
-.product-detail__payments-logo--visa .product-detail__payments-logo-image {
-  height: 12px;
-}
-
 .product-detail__payments-logo--mpesa {
-  min-width: 74px;
+  min-width: 78px;
   border-color: #00a85933;
-}
-
-.product-detail__payments-logo--mpesa .product-detail__payments-logo-image {
-  height: 12px;
 }
 
 .product-detail__payments-logo--paypal {
   min-width: 68px;
   border-color: #00308733;
-}
-
-.product-detail__payments-logo--paypal .product-detail__payments-logo-image {
-  height: 13px;
 }
 
 .product-detail__cta {

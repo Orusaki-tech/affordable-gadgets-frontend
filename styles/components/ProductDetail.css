@@ -7,6 +7,9 @@
   border: none;
   outline: none;
   box-shadow: none;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 640px) {
@@ -103,6 +106,10 @@
 .product-detail__layout {
   display: grid;
   gap: 16px;
+  min-width: 0;
+  width: 100%;
+  /* minmax(0, 1fr) lets columns shrink below intrinsic content width (avoids horizontal spill on narrow viewports) */
+  grid-template-columns: minmax(0, 1fr);
 }
 
 @media (min-width: 1024px) {
@@ -116,12 +123,17 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
+  width: 100%;
 }
 
 .product-detail__gallery-main {
   position: relative;
+  width: 100%;
+  max-width: 100%;
   aspect-ratio: 1 / 1;
   max-height: 400px;
+  min-height: 0;
   background: #ffffff;
   border: none;
   border-radius: 12px;
@@ -208,6 +220,10 @@
   outline: none;
   border-radius: 10px;
   box-shadow: none !important;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 1024px) {
@@ -227,6 +243,8 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 @media (max-width: 639px) {
@@ -276,6 +294,7 @@
   font-weight: 700;
   color: var(--gray-900);
   line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 @media (min-width: 640px) {

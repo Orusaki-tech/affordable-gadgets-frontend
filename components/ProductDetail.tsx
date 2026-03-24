@@ -23,6 +23,22 @@ interface ProductDetailProps {
 
 type TabType = 'overview' | 'specs' | 'reviews' | 'videos' | 'compare';
 
+function firstTruthyImageUrl(...urls: (string | null | undefined)[]): string {
+  for (const raw of urls) {
+    const s = typeof raw === 'string' ? raw.trim() : '';
+    if (s.length > 0) return s;
+  }
+  return '';
+}
+
+/** Prefer primary, then first entry with a non-empty URL (primary row is sometimes blank in API data). */
+function firstValidUnitImageUrl(images: InventoryUnitImage[] | null | undefined): string {
+  if (!images?.length) return '';
+  const primary = images.find((img) => img.is_primary);
+  const ordered = primary ? [primary, ...images.filter((img) => img !== primary)] : [...images];
+  return firstTruthyImageUrl(...ordered.map((img) => img.image_url));
+}
+
 const LazyReviewsShowcase = dynamic(
   () => import('./ReviewsShowcase').then((mod) => mod.ReviewsShowcase),
   {
@@ -198,6 +214,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
   const productId = product?.id;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [mainImageLoadFailed, setMainImageLoadFailed] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -582,12 +599,26 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   // Get main display image - show selected unit's image if available, otherwise product image
   const mainDisplayImage = useMemo(() => {
+    const placeholder = product ? getPlaceholderProductImage(product.product_name) : '';
     if (selectedUnitData?.images && selectedUnitData.images.length > 0) {
-      const primaryImg = selectedUnitData.images.find((img: InventoryUnitImage) => img.is_primary);
-      return primaryImg?.image_url || selectedUnitData.images[0]?.image_url || productImages[selectedImageIndex] || product?.primary_image || (product ? getPlaceholderProductImage(product.product_name) : '');
+      const fromUnit = firstValidUnitImageUrl(selectedUnitData.images);
+      return firstTruthyImageUrl(
+        fromUnit,
+        productImages[selectedImageIndex],
+        product?.primary_image,
+        placeholder
+      );
     }
-    return productImages[selectedImageIndex] || product?.primary_image || (product ? getPlaceholderProductImage(product.product_name) : '');
+    return firstTruthyImageUrl(
+      productImages[selectedImageIndex],
+      product?.primary_image,
+      placeholder
+    );
   }, [selectedUnitData, productImages, selectedImageIndex, product?.primary_image, product]);
+
+  useEffect(() => {
+    setMainImageLoadFailed(false);
+  }, [mainDisplayImage]);
 
   // Calculate promotion prices
   const calculatePromotionPrice = useMemo(() => {
@@ -758,13 +789,22 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           {/* Main Image */}
           <div className="product-detail__gallery-main">
             <Image
-              src={mainDisplayImage || getPlaceholderProductImage(product.product_name)}
+              src={
+                (mainImageLoadFailed ? getPlaceholderProductImage(product.product_name) : mainDisplayImage) ||
+                getPlaceholderProductImage(product.product_name)
+              }
               alt={product.product_name}
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="product-detail__gallery-image"
               priority
-              unoptimized={!mainDisplayImage || mainDisplayImage.includes('localhost') || mainDisplayImage.includes('placehold.co')}
+              unoptimized={
+                mainImageLoadFailed ||
+                !mainDisplayImage ||
+                mainDisplayImage.includes('localhost') ||
+                mainDisplayImage.includes('placehold.co')
+              }
+              onError={() => setMainImageLoadFailed(true)}
             />
             <div className="product-detail__gallery-certified" aria-label="Certified">
               <svg className="product-detail__gallery-certified-icon" fill="currentColor" viewBox="0 0 20 20" aria-hidden>

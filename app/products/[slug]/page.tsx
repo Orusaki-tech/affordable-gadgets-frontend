@@ -190,7 +190,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       >
         <HeaderWithAnnouncement />
       </Suspense>
-      <main className="flex-1 py-8">
+      <main className="flex-1 min-w-0 py-8">
         <Suspense fallback={
           <div className="container mx-auto px-4">
             <div className="animate-pulse">

@@ -155,7 +155,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     Number(product?.available_units_count ?? 0) > 0 ? 'InStock' : 'OutOfStock';
   
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f9f4f8' }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#ffffff' }}>
       <StructuredData
         type="BreadcrumbList"
         breadcrumbs={[

@@ -887,8 +887,10 @@
 }
 
 .product-detail__cta-button--disabled {
-  background: var(--gray-400);
+  background: linear-gradient(120deg, #eef3ff 0%, #f9ebff 40%, #eaf6ff 100%);
+  color: #4f5a74;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .product-detail__cta-loading {
@@ -927,6 +929,8 @@
   font-weight: 700;
   color: var(--gray-700);
   padding: 4px 0;
+  margin-bottom: 2px;
+  padding-bottom: 2px;
 }
 
 .product-detail__units-toggle:hover {
@@ -957,7 +961,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 0;
 }
 
 .product-detail__units-carousel-btn {

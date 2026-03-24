@@ -1161,6 +1161,59 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             </div>
           ) : null}
 
+          {/* View All Available Units */}
+          {filteredUnits.length > 0 && (
+            <div className="product-detail__units">
+              <div className="product-detail__units-toggle">
+                <span>View All Available Units ({filteredUnits.length})</span>
+                <div className="product-detail__units-carousel-nav">
+                  <button
+                    type="button"
+                    className="product-detail__units-carousel-btn"
+                    onClick={() => scrollUnitsCarousel('left')}
+                    disabled={!canScrollUnitsLeft}
+                    aria-label="Previous units"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    className="product-detail__units-carousel-btn"
+                    onClick={() => scrollUnitsCarousel('right')}
+                    disabled={!canScrollUnitsRight}
+                    aria-label="Next units"
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+              <div ref={unitsCarouselRef} className="product-detail__units-list">
+                {filteredUnits.map((unit) => {
+                  const unitPromotionPrice = isEligibleForPromotion && promotion && unit.selling_price
+                    ? calculatePromotionPrice(Number(unit.selling_price))
+                    : null;
+                  
+                  return <UnitCard
+                    key={unit.id}
+                    unit={unit}
+                    isSelected={selectedUnit === unit.id}
+                    onSelect={setSelectedUnit}
+                    promotionPrice={unitPromotionPrice}
+                    onColorSelect={setSelectedColor}
+                  />;
+                })}
+              </div>
+            </div>
+          )}
+
+          {filteredUnits.length === 0 && units && units.length > 0 && (
+            <div className="product-detail__units-empty">
+              <p className="product-detail__units-empty-text">
+                No units match the selected criteria. Please adjust your selection.
+              </p>
+            </div>
+          )}
+
           {/* Comes With Section */}
           <div className="product-detail__includes">
             <p className="product-detail__includes-title">Comes with</p>
@@ -1200,58 +1253,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             </div>
           </div>
 
-          {/* View All Available Units */}
-          {filteredUnits.length > 0 && (
-            <div className="product-detail__units">
-              <div className="product-detail__units-toggle">
-                <span>View All Available Units ({filteredUnits.length})</span>
-              </div>
-              <div className="product-detail__units-carousel-nav">
-                <button
-                  type="button"
-                  className="product-detail__units-carousel-btn"
-                  onClick={() => scrollUnitsCarousel('left')}
-                  disabled={!canScrollUnitsLeft}
-                  aria-label="Previous units"
-                >
-                  ‹
-                </button>
-                <button
-                  type="button"
-                  className="product-detail__units-carousel-btn"
-                  onClick={() => scrollUnitsCarousel('right')}
-                  disabled={!canScrollUnitsRight}
-                  aria-label="Next units"
-                >
-                  ›
-                </button>
-              </div>
-              <div ref={unitsCarouselRef} className="product-detail__units-list">
-                {filteredUnits.map((unit) => {
-                  const unitPromotionPrice = isEligibleForPromotion && promotion && unit.selling_price
-                    ? calculatePromotionPrice(Number(unit.selling_price))
-                    : null;
-                  
-                  return <UnitCard
-                    key={unit.id}
-                    unit={unit}
-                    isSelected={selectedUnit === unit.id}
-                    onSelect={setSelectedUnit}
-                    promotionPrice={unitPromotionPrice}
-                    onColorSelect={setSelectedColor}
-                  />;
-                })}
-              </div>
-            </div>
-          )}
-
-          {filteredUnits.length === 0 && units && units.length > 0 && (
-            <div className="product-detail__units-empty">
-              <p className="product-detail__units-empty-text">
-                No units match the selected criteria. Please adjust your selection.
-              </p>
-            </div>
-          )}
         </div>
       </div>
 

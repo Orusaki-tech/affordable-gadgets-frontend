@@ -387,10 +387,12 @@ class ApiService {
      * @param search
      * @param slug
      * @param type
+     * @param featured If true, return only products tagged Featured.
+     * @param homepageVideos If true, return only products tagged Video with a product_video_url or uploaded product video file.
      * @returns PaginatedPublicProductListList
      * @throws ApiError
      */
-    static apiV1PublicProductsList(brandFilter, maxPrice, minPrice, ordering, page, pageSize, promotion, search, slug, type) {
+    static apiV1PublicProductsList(brandFilter, maxPrice, minPrice, ordering, page, pageSize, promotion, search, slug, type, featured, homepageVideos) {
         return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/products/',
@@ -405,6 +407,8 @@ class ApiService {
                 'search': search,
                 'slug': slug,
                 'type': type,
+                'featured': featured,
+                'homepage_videos': homepageVideos,
             },
         });
     }

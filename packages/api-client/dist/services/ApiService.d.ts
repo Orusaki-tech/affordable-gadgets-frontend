@@ -220,10 +220,12 @@ export declare class ApiService {
      * @param search
      * @param slug
      * @param type
+     * @param featured If true, return only products tagged Featured.
+     * @param homepageVideos If true, return only products tagged Video with a product_video_url or uploaded product video file.
      * @returns PaginatedPublicProductListList
      * @throws ApiError
      */
-    static apiV1PublicProductsList(brandFilter?: string, maxPrice?: number, minPrice?: number, ordering?: string, page?: number, pageSize?: number, promotion?: number, search?: string, slug?: string, type?: string): CancelablePromise<PaginatedPublicProductListList>;
+    static apiV1PublicProductsList(brandFilter?: string, maxPrice?: number, minPrice?: number, ordering?: string, page?: number, pageSize?: number, promotion?: number, search?: string, slug?: string, type?: string, featured?: boolean, homepageVideos?: boolean): CancelablePromise<PaginatedPublicProductListList>;
     /**
      * Cache public product detail responses.
      * @param id A unique integer value identifying this product.

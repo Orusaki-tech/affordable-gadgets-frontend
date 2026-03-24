@@ -66,6 +66,10 @@ export type PublicProduct = {
      * Link to product video (YouTube, Vimeo, etc.)
      */
     product_video_url?: string | null;
+    /**
+     * URL for uploaded product video file (e.g. Cloudinary), when present.
+     */
+    readonly product_video_file_url?: string | null;
     readonly tags?: Array<string>;
     readonly has_active_bundle?: boolean;
     /**

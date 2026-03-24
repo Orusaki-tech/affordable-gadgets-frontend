@@ -1,198 +1,245 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
-import { HOME_PRODUCT_VIDEOS, type HomeProductVideo } from '@/lib/config/homeProductVideos';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { ApiService } from '@/lib/api/generated';
+import type { PublicProductList } from '@/lib/api/generated';
+import { ProductCarousel } from '@/components/ProductCarousel';
+import { getProductHref } from '@/lib/utils/productRoutes';
+import { resolveProductVideoMedia, type ResolvedProductVideo } from '@/lib/utils/productVideo';
 
-const SLIDE_STEP_PX = 200;
+const HOMEPAGE_VIDEOS_PAGE_SIZE = 24;
 
-function VideoSlide({
-  item,
-  playingId,
-  setPlayingId,
+async function fetchHomepageVideoProducts(): Promise<PublicProductList[]> {
+  const res = await ApiService.apiV1PublicProductsList(
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    1,
+    HOMEPAGE_VIDEOS_PAGE_SIZE,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    true
+  );
+  const rows = (res.results ?? []) as PublicProductList[];
+  return rows.filter((p) => resolveProductVideoMedia(p) !== null);
+}
+
+function buildEmbedAutoplaySrc(resolved: ResolvedProductVideo): string {
+  const u = resolved.src;
+  if (u.includes('autoplay=1')) return u;
+  return `${u}${u.includes('?') ? '&' : '?'}autoplay=1`;
+}
+
+function HomepageVideoSlide({
+  product,
+  playingKey,
+  setPlayingKey,
   registerVideo,
+  deckKey,
 }: {
-  item: HomeProductVideo;
-  playingId: string | null;
-  setPlayingId: Dispatch<SetStateAction<string | null>>;
-  registerVideo: (id: string, el: HTMLVideoElement | null) => void;
+  product: PublicProductList;
+  playingKey: string | null;
+  setPlayingKey: Dispatch<SetStateAction<string | null>>;
+  registerVideo: (key: string, el: HTMLVideoElement | null) => void;
+  deckKey: string;
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const isPlaying = playingId === item.id;
+  const resolved = resolveProductVideoMedia(product);
+  const name = product.product_name ?? 'Product';
+  const href = getProductHref(product);
+  const slideKey = `${deckKey}-${product.id}`;
+  const isPlaying = playingKey === slideKey;
 
-  const setVideoRef = useCallback(
+  const setRef = useCallback(
     (el: HTMLVideoElement | null) => {
       videoRef.current = el;
-      registerVideo(item.id, el);
+      if (resolved?.mode === 'file') registerVideo(slideKey, el);
+      else registerVideo(slideKey, null);
     },
-    [item.id, registerVideo]
+    [registerVideo, resolved?.mode, slideKey]
   );
 
-  const toggle = useCallback(() => {
+  if (!resolved) return null;
+
+  const toggle = () => {
+    if (resolved.mode === 'embed') {
+      setPlayingKey((prev) => (prev === slideKey ? null : slideKey));
+      return;
+    }
     const el = videoRef.current;
     if (!el) return;
     if (el.paused) {
-      setPlayingId(item.id);
+      setPlayingKey(slideKey);
       void el.play();
     } else {
       el.pause();
-      setPlayingId(null);
+      setPlayingKey(null);
     }
-  }, [item.id, setPlayingId]);
+  };
+
+  const showPlay = resolved.mode === 'embed' ? !isPlaying : !isPlaying;
 
   return (
-    <div
-      className="w-[175px] shrink-0 snap-start scroll-ml-1 first:scroll-ml-0 sm:w-[185px]"
-      data-home-product-video-slide
-    >
-      <button
-        type="button"
-        className="group relative flex w-full cursor-pointer flex-col outline-none"
-        aria-label={`Play video: ${item.title}`}
-        onClick={toggle}
-      >
-        <span
-          className={`pointer-events-none absolute top-1/2 left-1/2 z-[1] flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white shadow-lg transition-opacity duration-200 sm:h-14 sm:w-14 ${
-            isPlaying ? 'pointer-events-none opacity-0' : 'opacity-100'
-          }`}
-          aria-hidden
+    <div className="h-full w-full">
+      <div className="home-product-videos__slide-inner">
+        <button
+          type="button"
+          className="relative w-full cursor-pointer border-0 bg-transparent p-0 text-left"
+          onClick={() => toggle()}
+          aria-label={`Play video: ${name}`}
         >
-          <svg className="ml-0.5 h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-            <path d="M8 5v14l11-7z" />
-          </svg>
-        </span>
-        <div className="relative aspect-[9/16] w-full max-h-[50vh] overflow-hidden rounded-xl bg-black">
-          <video
-            ref={setVideoRef}
-            className="h-full w-full object-cover"
-            poster={item.poster ?? undefined}
-            preload="none"
-            playsInline
-            disablePictureInPicture
-            controls={isPlaying}
-            onClick={(e) => {
-              if (isPlaying) e.stopPropagation();
-            }}
-            onPlay={() => setPlayingId(item.id)}
-            onPause={() => setPlayingId((prev) => (prev === item.id ? null : prev))}
-            onEnded={() => setPlayingId(null)}
-          >
-            <source src={item.src} type="video/mp4" />
-          </video>
-        </div>
-      </button>
+          <div className="home-product-videos__media-wrap">
+            <span
+              className={`home-product-videos__play ${showPlay ? '' : 'home-product-videos__play--hidden'}`}
+              aria-hidden
+            >
+              <svg className="ml-1 h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </span>
+
+            {resolved.mode === 'file' && (
+              <video
+                ref={setRef}
+                src={resolved.src}
+                poster={product.primary_image ?? undefined}
+                preload="none"
+                playsInline
+                disablePictureInPicture
+                controls={isPlaying}
+                onClick={(ev) => {
+                  if (isPlaying) ev.stopPropagation();
+                }}
+                onPlay={() => setPlayingKey(slideKey)}
+                onPause={() => setPlayingKey((prev) => (prev === slideKey ? null : prev))}
+                onEnded={() => setPlayingKey(null)}
+              />
+            )}
+
+            {resolved.mode === 'embed' && (
+              <>
+                {!isPlaying && product.primary_image ? (
+                  <Image
+                    src={product.primary_image}
+                    alt=""
+                    fill
+                    className="home-product-videos__poster"
+                    sizes="200px"
+                    unoptimized={
+                      !product.primary_image ||
+                      product.primary_image.includes('localhost') ||
+                      product.primary_image.includes('placehold.co')
+                    }
+                  />
+                ) : null}
+                {!isPlaying && !product.primary_image ? (
+                  <div className="absolute inset-0 bg-neutral-900" aria-hidden />
+                ) : null}
+                {isPlaying ? (
+                  <iframe
+                    title={name}
+                    src={buildEmbedAutoplaySrc(resolved)}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                ) : null}
+              </>
+            )}
+          </div>
+        </button>
+        <Link href={href} className="home-product-videos__title">
+          {name}
+        </Link>
+      </div>
     </div>
   );
 }
 
 export function HomeProductVideos() {
-  const videos = HOME_PRODUCT_VIDEOS;
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const deckKey = 'home-product-videos';
+  const { data: products, isLoading } = useQuery({
+    queryKey: ['products', 'homepage_videos'],
+    queryFn: fetchHomepageVideoProducts,
+    staleTime: 60_000,
+  });
+
   const videoEls = useRef<Map<string, HTMLVideoElement>>(new Map());
-  const [playingId, setPlayingId] = useState<string | null>(null);
-  const [canLeft, setCanLeft] = useState(false);
-  const [canRight, setCanRight] = useState(false);
+  const [playingKey, setPlayingKey] = useState<string | null>(null);
 
-  const registerVideo = useCallback((id: string, el: HTMLVideoElement | null) => {
-    if (el) videoEls.current.set(id, el);
-    else videoEls.current.delete(id);
-  }, []);
-
-  const syncScrollHints = useCallback(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    setCanLeft(el.scrollLeft > 8);
-    setCanRight(max > 8 && el.scrollLeft < max - 8);
+  const registerVideo = useCallback((key: string, el: HTMLVideoElement | null) => {
+    if (el) videoEls.current.set(key, el);
+    else videoEls.current.delete(key);
   }, []);
 
   useEffect(() => {
-    syncScrollHints();
-    const el = scrollerRef.current;
-    if (!el) return;
-    el.addEventListener('scroll', syncScrollHints, { passive: true });
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(syncScrollHints) : null;
-    ro?.observe(el);
-    return () => {
-      el.removeEventListener('scroll', syncScrollHints);
-      ro?.disconnect();
-    };
-  }, [syncScrollHints, videos.length]);
+    if (!playingKey) return;
+    videoEls.current.forEach((el, key) => {
+      if (key !== playingKey && !el.paused) el.pause();
+    });
+  }, [playingKey]);
 
-  const pauseOthers = useCallback(
-    (exceptId: string | null) => {
-      videoEls.current.forEach((videoEl, id) => {
-        if (id !== exceptId && !videoEl.paused) {
-          videoEl.pause();
-        }
-      });
-    },
-    []
-  );
+  if (isLoading) {
+    return (
+      <section className="bg-[#F9F9F9] py-8 scroll-mt-20" aria-labelledby="home-product-videos-heading">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="h-7 w-56 animate-pulse rounded bg-gray-200" />
+          <div className="mt-2 h-4 max-w-xl animate-pulse rounded bg-gray-100" />
+          <div className="mt-6 flex gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={`hpv-skel-${i}`}
+                className="aspect-[9/16] max-h-[min(52vh,520px)] min-w-[140px] flex-1 animate-pulse rounded-xl bg-gray-200"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-  useEffect(() => {
-    pauseOthers(playingId);
-  }, [playingId, pauseOthers]);
-
-  const scrollByDir = useCallback((dir: -1 | 1) => {
-    scrollerRef.current?.scrollBy({ left: dir * SLIDE_STEP_PX, behavior: 'smooth' });
-  }, []);
-
-  if (videos.length === 0) {
+  if (!products || products.length === 0) {
     return null;
   }
 
   return (
-    <section className="bg-[#F9F9F9] py-8 scroll-mt-20" aria-labelledby="home-product-videos-heading">
+    <section
+      className="bg-[#F9F9F9] py-8 scroll-mt-20"
+      aria-labelledby="home-product-videos-heading"
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <h2 id="home-product-videos-heading" className="text-lg font-bold text-gray-900 md:text-xl">
-          See it in action
+          Product videos
         </h2>
         <p className="mt-1 max-w-3xl text-sm text-gray-600 md:text-base">
-          Short clips from our community — soon you&apos;ll see product-specific videos here, the same way we&apos;ll
-          surface them on each product page.
+          Find out more about your favourite devices and accessories here
         </p>
 
-        <div className="relative mt-5">
-          <div
-            ref={scrollerRef}
-            className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-1 scroll-smooth"
-            style={{ scrollbarWidth: 'thin' }}
+        <div className="mt-6">
+          <ProductCarousel
+            itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
+            showNavigation
+            showPagination={false}
+            autoPlay={false}
+            className="home-product-videos__carousel"
           >
-            {videos.map((item) => (
-              <VideoSlide
-                key={item.id}
-                item={item}
-                playingId={playingId}
-                setPlayingId={setPlayingId}
+            {products.map((product) => (
+              <HomepageVideoSlide
+                key={product.id}
+                product={product}
+                playingKey={playingKey}
+                setPlayingKey={setPlayingKey}
                 registerVideo={registerVideo}
+                deckKey={deckKey}
               />
             ))}
-          </div>
-
-          <button
-            type="button"
-            className={`absolute top-1/2 left-0 z-10 hidden h-11 w-11 -translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-gray-700 bg-white text-gray-900 shadow-sm transition hover:scale-105 hover:bg-gray-800 hover:text-white lg:flex ${
-              canLeft ? '' : 'pointer-events-none opacity-30'
-            }`}
-            onClick={() => scrollByDir(-1)}
-            aria-label="Scroll videos left"
-          >
-            <svg className="h-3 w-3" viewBox="0 0 100 100" fill="currentColor" aria-hidden>
-              <path d="M 10,50 L 60,100 L 70,90 L 30,50 L 70,10 L 60,0 Z" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            className={`absolute top-1/2 right-0 z-10 hidden h-11 w-11 translate-x-2 -translate-y-1/2 items-center justify-center rounded-full border border-gray-700 bg-white text-gray-900 shadow-sm transition hover:scale-105 hover:bg-gray-800 hover:text-white lg:flex ${
-              canRight ? '' : 'pointer-events-none opacity-30'
-            }`}
-            onClick={() => scrollByDir(1)}
-            aria-label="Scroll videos right"
-          >
-            <svg className="h-3 w-3" viewBox="0 0 100 100" fill="currentColor" aria-hidden>
-              <path d="M 10,50 L 60,100 L 70,90 L 30,50 L 70,10 L 60,0 Z" transform="translate(100, 100) rotate(180)" />
-            </svg>
-          </button>
+          </ProductCarousel>
         </div>
       </div>
     </section>

@@ -100,7 +100,13 @@ export function convertToYouTubeEmbed(url: string | null | undefined): string {
   if (shortMatch) {
     videoId = shortMatch[1];
   }
-  
+
+  // Format: https://www.youtube.com/shorts/VIDEO_ID (YouTube Shorts — same 9:16 as Reels)
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&/]+)/);
+  if (shortsMatch) {
+    videoId = shortsMatch[1];
+  }
+
   // Format: https://www.youtube.com/embed/VIDEO_ID
   const embedMatch = url.match(/embed\/([^?&]+)/);
   if (embedMatch) {

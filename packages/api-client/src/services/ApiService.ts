@@ -468,6 +468,8 @@ export class ApiService {
      * @param search
      * @param slug
      * @param type
+     * @param featured If true, return only products tagged Featured.
+     * @param homepageVideos If true, return only products tagged Video with a product_video_url or uploaded product video file.
      * @returns PaginatedPublicProductListList
      * @throws ApiError
      */
@@ -482,6 +484,8 @@ export class ApiService {
         search?: string,
         slug?: string,
         type?: string,
+        featured?: boolean,
+        homepageVideos?: boolean,
     ): CancelablePromise<PaginatedPublicProductListList> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -497,6 +501,8 @@ export class ApiService {
                 'search': search,
                 'slug': slug,
                 'type': type,
+                'featured': featured,
+                'homepage_videos': homepageVideos,
             },
         });
     }

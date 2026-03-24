@@ -5788,6 +5788,16 @@ paths:
         name: type
         schema:
           type: string
+      - in: query
+        name: featured
+        schema:
+          type: boolean
+        description: If true, return only products tagged Featured.
+      - in: query
+        name: homepage_videos
+        schema:
+          type: boolean
+        description: If true, return only products tagged Video with a product_video_url or uploaded product video file.
       tags:
       - api
       security:
@@ -10203,6 +10213,12 @@ components:
           nullable: true
           description: Link to product video (YouTube, Vimeo, etc.)
           maxLength: 500
+        product_video_file_url:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+          description: URL for uploaded product video file (e.g. Cloudinary), when present.
         tags:
           type: array
           items:
@@ -10297,6 +10313,12 @@ components:
           nullable: true
           description: Link to product video (YouTube, Vimeo, etc.)
           maxLength: 500
+        product_video_file_url:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+          description: URL for uploaded product video file (e.g. Cloudinary), when present.
         has_active_bundle:
           type: boolean
           readOnly: true

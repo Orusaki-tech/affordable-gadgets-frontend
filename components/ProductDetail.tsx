@@ -612,6 +612,34 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     return calculatePromotionPrice(Number(selectedUnitData.selling_price));
   }, [isEligibleForPromotion, selectedUnitData, calculatePromotionPrice]);
 
+  const promoBannerDetails = useMemo(() => {
+    if (!promotion) return 'Check out our best offers';
+
+    const details: string[] = [];
+
+    if (promotion.discount_display) {
+      details.push(promotion.discount_display);
+    }
+
+    if (promotion.description && promotion.description.trim()) {
+      details.push(promotion.description.trim());
+    }
+
+    const start = new Date(promotion.start_date);
+    const end = new Date(promotion.end_date);
+    const hasValidDates = !Number.isNaN(start.valueOf()) && !Number.isNaN(end.valueOf());
+    if (hasValidDates) {
+      const formatDate = (value: Date) =>
+        value.toLocaleDateString('en-KE', {
+          month: 'short',
+          day: 'numeric',
+        });
+      details.push(`Valid ${formatDate(start)} - ${formatDate(end)}`);
+    }
+
+    return details.length > 0 ? details.join(' • ') : 'Check out our best offers';
+  }, [promotion]);
+
   if (!product && productLoading) {
     return (
       <div className="product-detail__loading">
@@ -749,9 +777,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     </svg>
                   </span>
                   <div className="product-detail__promo-body">
-                    <h3 className="product-detail__promo-title">Deals available</h3>
+                    <h3 className="product-detail__promo-title">{promotion.title || 'Deals available'}</h3>
                     <p className="product-detail__promo-copy">
-                      {promotion.description || 'Check out our best offers'}
+                      {promoBannerDetails}
                     </p>
                   </div>
                   <div className="product-detail__promo-cta-wrap">

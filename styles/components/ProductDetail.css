@@ -305,14 +305,13 @@
 
 .product-detail__quick-tabs {
   margin-top: 8px;
+  padding: 0 14px;
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
 }
 
 .product-detail__quick-tab {

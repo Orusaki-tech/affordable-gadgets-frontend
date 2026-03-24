@@ -879,50 +879,86 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             )}
           </div>
 
-          {/* Price - Single Price Display */}
-              <div className="product-detail__info-price-block">
-            {selectedUnitData ? (
-              <div className="product-detail__price">
-                {isEligibleForPromotion && promotionUnitPrice !== null ? (
-                  <div>
-                    <p className="product-detail__price-current product-detail__price-current--promo">
-                      {formatPrice(promotionUnitPrice)}
-                    </p>
-                    <p className="product-detail__price-old">
+          <div className="product-detail__price-cta-row">
+            {/* Price - Single Price Display */}
+            <div className="product-detail__info-price-block">
+              {selectedUnitData ? (
+                <div className="product-detail__price">
+                  {isEligibleForPromotion && promotionUnitPrice !== null ? (
+                    <div>
+                      <p className="product-detail__price-current product-detail__price-current--promo">
+                        {formatPrice(promotionUnitPrice)}
+                      </p>
+                      <p className="product-detail__price-old">
+                        {formatPrice(Number(selectedUnitData.selling_price))}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="product-detail__price-current">
                       {formatPrice(Number(selectedUnitData.selling_price))}
                     </p>
-                  </div>
-                ) : (
-                  <p className="product-detail__price-current">
-                    {formatPrice(Number(selectedUnitData.selling_price))}
-                  </p>
-                )}
-              </div>
-            ) : product.min_price !== null && product.max_price !== null ? (
-              <div className="product-detail__price">
-                {isEligibleForPromotion && promotionMinPrice !== null && promotionMaxPrice !== null ? (
-                  <div>
-                    <p className="product-detail__price-current product-detail__price-current--promo">
-                      {promotionMinPrice === promotionMaxPrice
-                        ? formatPrice(promotionMinPrice)
-                        : `${formatPrice(promotionMinPrice)} - ${formatPrice(promotionMaxPrice)}`}
+                  )}
+                </div>
+              ) : product.min_price !== null && product.max_price !== null ? (
+                <div className="product-detail__price">
+                  {isEligibleForPromotion && promotionMinPrice !== null && promotionMaxPrice !== null ? (
+                    <div>
+                      <p className="product-detail__price-current product-detail__price-current--promo">
+                        {promotionMinPrice === promotionMaxPrice
+                          ? formatPrice(promotionMinPrice)
+                          : `${formatPrice(promotionMinPrice)} - ${formatPrice(promotionMaxPrice)}`}
+                      </p>
+                      <p className="product-detail__price-old">
+                        {product.min_price === product.max_price
+                          ? formatPrice(product.min_price)
+                          : `${formatPrice(product.min_price)} - ${formatPrice(product.max_price)}`}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="product-detail__price-current">
+                      {product.min_price === product.max_price
+                        ? formatPrice(product.min_price)
+                        : `${formatPrice(product.min_price)} - ${formatPrice(product.max_price)}`}
                     </p>
-                    <p className="product-detail__price-old">
-                  {product.min_price === product.max_price
-                    ? formatPrice(product.min_price)
-                    : `${formatPrice(product.min_price)} - ${formatPrice(product.max_price)}`}
-                </p>
-              </div>
-                ) : (
-                  <p className="product-detail__price-current">
-                    {product.min_price === product.max_price
-                      ? formatPrice(product.min_price)
-                      : `${formatPrice(product.min_price)} - ${formatPrice(product.max_price)}`}
-                </p>
-              )}
+                  )}
+                </div>
+              ) : null}
             </div>
-            ) : null}
+            {/* Add to Cart Button aligned beside price */}
+            {Number(product.available_units_count ?? 0) > 0 && (
+              <div className="product-detail__cta product-detail__cta--inline">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!selectedUnit || isAddingToCart}
+                  className={`product-detail__cta-button ${
+                    !selectedUnit || isAddingToCart ? 'product-detail__cta-button--disabled' : ''
+                  }`}
+                >
+                  {isAddingToCart ? (
+                    <span className="product-detail__cta-loading">
+                      <svg className="product-detail__cta-spinner" fill="none" viewBox="0 0 24 24">
+                        <circle className="product-detail__cta-spinner-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="product-detail__cta-spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Adding...
+                    </span>
+                  ) : selectedUnit ? (
+                    'Add to cart'
+                  ) : (
+                    'Select a Variant First'
+                  )}
+                </button>
+              </div>
+            )}
           </div>
+          {showSuccessMessage && (
+            <div className="product-detail__cta-alert">
+              <svg className="product-detail__cta-alert-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="product-detail__cta-alert-text">Added to cart successfully!</span>
+            </div>
+          )}
 
           {/* Product Condition Badge */}
           {selectedUnitData && (
@@ -1164,89 +1200,48 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             </div>
           </div>
 
-          {/* Add to Cart Button - Prominent */}
-          {Number(product.available_units_count ?? 0) > 0 && (
-            <div className="product-detail__cta">
-              {showSuccessMessage && (
-                <div className="product-detail__cta-alert">
-                  <svg className="product-detail__cta-alert-icon" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="product-detail__cta-alert-text">Added to cart successfully!</span>
-                </div>
-              )}
-
-              <button
-                onClick={handleAddToCart}
-                disabled={!selectedUnit || isAddingToCart}
-                className={`product-detail__cta-button ${
-                  !selectedUnit || isAddingToCart ? 'product-detail__cta-button--disabled' : ''
-                }`}
-              >
-                {isAddingToCart ? (
-                  <span className="product-detail__cta-loading">
-                    <svg className="product-detail__cta-spinner" fill="none" viewBox="0 0 24 24">
-                      <circle className="product-detail__cta-spinner-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="product-detail__cta-spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Adding...
-                  </span>
-                ) : selectedUnit ? (
-                  'Add to cart'
-                ) : (
-                  'Select a Variant First'
-                )}
-              </button>
-            </div>
-          )}
-
-          {/* View All Available Units - Collapsible */}
+          {/* View All Available Units */}
           {filteredUnits.length > 0 && (
             <div className="product-detail__units">
-              <details className="product-detail__units-details">
-                <summary className="product-detail__units-toggle">
-                  <span>View All Available Units ({filteredUnits.length})</span>
-                  <svg className="product-detail__units-toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <div className="product-detail__units-carousel-nav">
-                  <button
-                    type="button"
-                    className="product-detail__units-carousel-btn"
-                    onClick={() => scrollUnitsCarousel('left')}
-                    disabled={!canScrollUnitsLeft}
-                    aria-label="Previous units"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    type="button"
-                    className="product-detail__units-carousel-btn"
-                    onClick={() => scrollUnitsCarousel('right')}
-                    disabled={!canScrollUnitsRight}
-                    aria-label="Next units"
-                  >
-                    ›
-                  </button>
-                </div>
-                <div ref={unitsCarouselRef} className="product-detail__units-list">
-                  {filteredUnits.map((unit) => {
-                    const unitPromotionPrice = isEligibleForPromotion && promotion && unit.selling_price
-                      ? calculatePromotionPrice(Number(unit.selling_price))
-                      : null;
-                    
-                    return <UnitCard
-                      key={unit.id}
-                      unit={unit}
-                      isSelected={selectedUnit === unit.id}
-                      onSelect={setSelectedUnit}
-                      promotionPrice={unitPromotionPrice}
-                      onColorSelect={setSelectedColor}
-                    />;
-                  })}
-        </div>
-              </details>
+              <div className="product-detail__units-toggle">
+                <span>View All Available Units ({filteredUnits.length})</span>
+              </div>
+              <div className="product-detail__units-carousel-nav">
+                <button
+                  type="button"
+                  className="product-detail__units-carousel-btn"
+                  onClick={() => scrollUnitsCarousel('left')}
+                  disabled={!canScrollUnitsLeft}
+                  aria-label="Previous units"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  className="product-detail__units-carousel-btn"
+                  onClick={() => scrollUnitsCarousel('right')}
+                  disabled={!canScrollUnitsRight}
+                  aria-label="Next units"
+                >
+                  ›
+                </button>
+              </div>
+              <div ref={unitsCarouselRef} className="product-detail__units-list">
+                {filteredUnits.map((unit) => {
+                  const unitPromotionPrice = isEligibleForPromotion && promotion && unit.selling_price
+                    ? calculatePromotionPrice(Number(unit.selling_price))
+                    : null;
+                  
+                  return <UnitCard
+                    key={unit.id}
+                    unit={unit}
+                    isSelected={selectedUnit === unit.id}
+                    onSelect={setSelectedUnit}
+                    promotionPrice={unitPromotionPrice}
+                    onColorSelect={setSelectedColor}
+                  />;
+                })}
+              </div>
             </div>
           )}
 

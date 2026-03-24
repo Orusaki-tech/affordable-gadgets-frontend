@@ -8,7 +8,11 @@ import { ApiService } from '@/lib/api/generated';
 import type { PublicProductList } from '@/lib/api/generated';
 import { ProductCarousel } from '@/components/ProductCarousel';
 import { getProductHref } from '@/lib/utils/productRoutes';
-import { resolveProductVideoMedia, type ResolvedProductVideo } from '@/lib/utils/productVideo';
+import {
+  resolveProductVideoMedia,
+  youtubePosterUrlFromLink,
+  type ResolvedProductVideo,
+} from '@/lib/utils/productVideo';
 
 const HOMEPAGE_VIDEOS_PAGE_SIZE = 24;
 
@@ -33,6 +37,22 @@ async function fetchHomepageVideoProducts(): Promise<PublicProductList[]> {
 
 function buildEmbedAutoplaySrc(resolved: ResolvedProductVideo): string {
   const u = resolved.src;
+  try {
+    const href = u.startsWith('//') ? `https:${u}` : u;
+    const parsed = new URL(href);
+    if (parsed.hostname.includes('youtube.com')) {
+      parsed.searchParams.set('autoplay', '1');
+      parsed.searchParams.set('playsinline', '1');
+      parsed.searchParams.set('mute', '1');
+      return parsed.toString();
+    }
+    if (parsed.hostname.includes('vimeo.com')) {
+      parsed.searchParams.set('autoplay', '1');
+      return parsed.toString();
+    }
+  } catch {
+    /* use fallback below */
+  }
   if (u.includes('autoplay=1')) return u;
   return `${u}${u.includes('?') ? '&' : '?'}autoplay=1`;
 }
@@ -56,6 +76,9 @@ function HomepageVideoSlide({
   const href = getProductHref(product);
   const slideKey = `${deckKey}-${product.id}`;
   const isPlaying = playingKey === slideKey;
+  const embedPosterUrl =
+    product.primary_image ||
+    (product.product_video_url ? youtubePosterUrlFromLink(product.product_video_url) : null);
 
   const setRef = useCallback(
     (el: HTMLVideoElement | null) => {
@@ -125,21 +148,21 @@ function HomepageVideoSlide({
 
             {resolved.mode === 'embed' && (
               <>
-                {!isPlaying && product.primary_image ? (
+                {!isPlaying && embedPosterUrl ? (
                   <Image
-                    src={product.primary_image}
+                    src={embedPosterUrl}
                     alt=""
                     fill
                     className="home-product-videos__poster"
                     sizes="200px"
                     unoptimized={
-                      !product.primary_image ||
-                      product.primary_image.includes('localhost') ||
-                      product.primary_image.includes('placehold.co')
+                      embedPosterUrl.includes('ytimg.com') ||
+                      embedPosterUrl.includes('localhost') ||
+                      embedPosterUrl.includes('placehold.co')
                     }
                   />
                 ) : null}
-                {!isPlaying && !product.primary_image ? (
+                {!isPlaying && !embedPosterUrl ? (
                   <div className="absolute inset-0 bg-neutral-900" aria-hidden />
                 ) : null}
                 {isPlaying ? (

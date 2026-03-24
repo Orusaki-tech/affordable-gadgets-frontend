@@ -5,6 +5,8 @@ import { SpecialOffersCarousel } from './SpecialOffersCarousel';
 interface SpecialOffersServerProps {
   filter?: 'special_offers' | 'flash_sales';
   pageSize?: number;
+  /** Pass false when the page wrapper already renders the section heading. */
+  showSectionTitle?: boolean;
 }
 
 const DEFAULT_PAGE_SIZE = 12;
@@ -58,7 +60,7 @@ async function fetchPromotions(
 }
 
 export async function SpecialOffersServer(
-  { filter, pageSize }: SpecialOffersServerProps = {}
+  { filter, pageSize, showSectionTitle = true }: SpecialOffersServerProps = {}
 ) {
   const resolvedPageSize = typeof pageSize === 'number'
     ? pageSize
@@ -99,5 +101,11 @@ export async function SpecialOffersServer(
     ? 'Flash Sales'
     : 'Special Offers';
 
-  return <SpecialOffersCarousel promotions={specialOffersPromotions} sectionTitle={sectionTitle} />;
+  return (
+    <SpecialOffersCarousel
+      promotions={specialOffersPromotions}
+      sectionTitle={sectionTitle}
+      showSectionTitle={showSectionTitle}
+    />
+  );
 }

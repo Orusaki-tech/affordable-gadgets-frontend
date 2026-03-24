@@ -87,6 +87,7 @@ export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions,
         showNavigation={true}
         showPagination={showPagination}
         autoPlay
+        autoPlayInterval={featuredOnly ? 6000 : 3000}
       >
         {data.results.map((product) => (
           <ProductCard key={product.id} product={product} {...cardOptions} />

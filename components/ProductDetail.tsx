@@ -741,18 +741,36 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             {/* Promotion Banner */}
             {isEligibleForPromotion && promotion && (
               <div className="product-detail__promo product-detail__promo--aside">
+                <div className="product-detail__promo-notch product-detail__promo-notch--left" aria-hidden />
                 <div className="product-detail__promo-row">
-                  <span className="product-detail__promo-icon">🎉</span>
+                  <span className="product-detail__promo-icon" aria-hidden>
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M10.4 2.785a1.25 1.25 0 0 1 .883.366l8.693 8.693a1.25 1.25 0 0 1 0 1.767l-6.365 6.365a1.25 1.25 0 0 1-1.767 0L3.15 11.283A1.25 1.25 0 0 1 2.785 10.4V4.035l.007-.128a1.25 1.25 0 0 1 1.243-1.122H10.4m-2.9 3.2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3" />
+                    </svg>
+                  </span>
                   <div className="product-detail__promo-body">
-                    <h3 className="product-detail__promo-title">{promotion.title}</h3>
-                    {promotion.discount_display && (
-                      <p className="product-detail__promo-discount">{promotion.discount_display}</p>
-                    )}
-                    {promotion.description && (
-                      <p className="product-detail__promo-copy">{promotion.description}</p>
-                    )}
+                    <h3 className="product-detail__promo-title">Deals available</h3>
+                    <p className="product-detail__promo-copy">
+                      {promotion.description || 'Check out our best offers'}
+                    </p>
+                  </div>
+                  <div className="product-detail__promo-cta-wrap">
+                    <button
+                      type="button"
+                      className="product-detail__promo-cta"
+                      onClick={() => {
+                        if (promotion.id) {
+                          router.push(`/products?promotion=${promotion.id}`);
+                          return;
+                        }
+                        router.push('/promotions');
+                      }}
+                    >
+                      View
+                    </button>
                   </div>
                 </div>
+                <div className="product-detail__promo-notch product-detail__promo-notch--right" aria-hidden />
               </div>
             )}
           </div>

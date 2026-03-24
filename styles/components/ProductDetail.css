@@ -3,7 +3,7 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 8px 16px;
-  background-color: #f9f4f8;
+  background-color: #ffffff;
   border: none;
   outline: none;
   box-shadow: none;
@@ -122,7 +122,7 @@
   position: relative;
   aspect-ratio: 1 / 1;
   max-height: 400px;
-  background: #f9f4f8;
+  background: #ffffff;
   border: none;
   border-radius: 12px;
   overflow: hidden;
@@ -130,7 +130,7 @@
 
 .product-detail__gallery-image {
   object-fit: contain;
-  background-color: #f9f4f8;
+  background-color: #ffffff;
 }
 
 .product-detail__gallery-certified {
@@ -182,7 +182,7 @@
 
 .product-detail__thumbnail-image {
   object-fit: contain;
-  background: #f9f4f8;
+  background: #ffffff;
 }
 
 .product-detail__thumbnail-label {
@@ -203,7 +203,7 @@
   gap: 8px;
   padding: 0 20px 20px 20px;
   margin-top: 0;
-  background-color: #f9f4f8;
+  background-color: #ffffff;
   border: none;
   outline: none;
   border-radius: 10px;
@@ -239,7 +239,7 @@
   padding: 0 14px 0 14px;
   border-radius: 8px;
   border: none;
-  background-color: #f9f4f8;
+  background-color: #ffffff;
   margin-top: 0;
   margin-bottom: 0;
   flex: 1;
@@ -250,7 +250,7 @@
   padding: 0 14px;
   border-radius: 8px;
   border: none;
-  background-color: #f9f4f8;
+  background-color: #ffffff;
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -308,20 +308,22 @@
 }
 
 .product-detail__promo {
-  padding: 8px;
-  border-radius: 8px;
-  background: linear-gradient(90deg, var(--ui-red-50), var(--ui-white)7ed, var(--ui-yellow-100));
-  border: 1px solid var(--ui-red-300);
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6ce9a7 0%, #63e5a3 48%, #56d792 100%);
+  border: 1px solid #45c985;
+  box-shadow: 0 4px 14px rgba(44, 140, 97, 0.2);
 }
 
 .product-detail__promo--aside {
-  flex: 0 0 250px;
-  max-width: 290px;
+  flex: 0 0 300px;
+  max-width: 330px;
 }
 
 @media (max-width: 1023px) {
   .product-detail__promo--aside {
-    flex-basis: 210px;
+    flex-basis: 260px;
   }
 }
 
@@ -335,33 +337,83 @@
 
 .product-detail__promo-row {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
+  min-height: 74px;
+  padding: 10px 14px;
 }
 
 .product-detail__promo-body {
   flex: 1;
+  min-width: 0;
 }
 
 .product-detail__promo-icon {
-  font-size: 16px;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.28);
+  color: #0e1d18;
+}
+
+.product-detail__promo-icon svg {
+  width: 18px;
+  height: 18px;
 }
 
 .product-detail__promo-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--ui-red-700);
-}
-
-.product-detail__promo-discount {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ui-red-600);
+  line-height: 1.2;
+  color: #082216;
 }
 
 .product-detail__promo-copy {
-  font-size: 10px;
-  color: var(--gray-700);
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(8, 34, 22, 0.82);
+}
+
+.product-detail__promo-cta-wrap {
+  flex-shrink: 0;
+}
+
+.product-detail__promo-cta {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background: #10131f;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.product-detail__promo-cta:hover {
+  background: #171c2d;
+}
+
+.product-detail__promo-notch {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: #ffffff;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.product-detail__promo-notch--left {
+  left: -7px;
+}
+
+.product-detail__promo-notch--right {
+  right: -7px;
 }
 
 .product-detail__price {
@@ -437,7 +489,7 @@
   padding: 12px 14px;
   border-radius: 8px;
   border: none;
-  background-color: #f9f4f8;
+  background-color: #ffffff;
 }
 
 .product-detail__variants-note {
@@ -672,7 +724,7 @@
   padding: 12px 14px;
   border-radius: 8px;
   border: none;
-  background-color: #f9f4f8;
+  background-color: #ffffff;
 }
 
 .product-detail__includes-title {
@@ -759,7 +811,7 @@
   padding: 12px 14px;
   border-radius: 8px;
   border: none;
-  background-color: #f9f4f8;
+  background-color: #ffffff;
 }
 
 .product-detail__cta-alert {
@@ -828,7 +880,7 @@
   padding: 12px 14px;
   border-radius: 8px;
   border: none;
-  background-color: #f9f4f8;
+  background-color: #ffffff;
 }
 
 .product-detail__units-toggle {

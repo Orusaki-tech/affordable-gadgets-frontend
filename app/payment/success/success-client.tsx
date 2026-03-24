@@ -91,16 +91,15 @@ export function PaymentSuccessClient() {
     }
     const deliveryEnd = (order as any)?.delivery_window_end as string | undefined;
     const deliveryStart = (order as any)?.delivery_window_start as string | undefined;
-    const createdAt = order?.created_at;
-    const base = deliveryEnd || deliveryStart || createdAt;
+    const base = deliveryEnd || deliveryStart;
 
     const parsed = base ? new Date(base) : null;
     const estimated = parsed && !Number.isNaN(parsed.valueOf()) ? parsed : null;
-
-    const fallback = new Date();
-    fallback.setDate(fallback.getDate() + 3);
-
-    const d = estimated || fallback;
+    if (!estimated) {
+      setEstimatedDeliveryDate(null);
+      return;
+    }
+    const d = estimated;
     const yyyy = String(d.getFullYear());
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');

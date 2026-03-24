@@ -3,8 +3,8 @@
   top: 0;
   z-index: 50;
   background: var(--ui-white);
-  border-bottom: 1px solid var(--ui-gray-100);
-  box-shadow: 0 4px 12px var(--ui-black-08);
+  border-bottom: 1px solid var(--ui-gray-200);
+  box-shadow: none;
 }
 
 .site-header__container {

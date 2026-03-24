@@ -36,6 +36,7 @@ export function ProductCarousel({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [itemsPerSlide, setItemsPerSlide] = useState(itemsPerView.desktop || 4);
+  const [isHoverPaused, setIsHoverPaused] = useState(false);
 
   // Calculate items per slide based on viewport
   useEffect(() => {
@@ -76,7 +77,7 @@ export function ProductCarousel({
 
   // Auto-play functionality
   useEffect(() => {
-    if (!autoPlay || children.length <= itemsPerSlide) return;
+    if (!autoPlay || isHoverPaused || children.length <= itemsPerSlide) return;
 
     const interval = setInterval(() => {
       if (scrollContainerRef.current) {
@@ -97,7 +98,7 @@ export function ProductCarousel({
     }, autoPlayInterval);
 
     return () => clearInterval(interval);
-  }, [autoPlay, autoPlayInterval, children.length, itemsPerSlide]);
+  }, [autoPlay, autoPlayInterval, children.length, itemsPerSlide, isHoverPaused]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;
@@ -145,6 +146,14 @@ export function ProductCarousel({
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
+        onMouseEnter={() => setIsHoverPaused(true)}
+        onMouseLeave={() => setIsHoverPaused(false)}
+        onFocusCapture={() => setIsHoverPaused(true)}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            setIsHoverPaused(false);
+          }
+        }}
         className="product-carousel__track scrollbar-hide"
       >
         {children.map((child, index) => {
@@ -229,6 +238,14 @@ export function ProductCarousel({
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
+        onMouseEnter={() => setIsHoverPaused(true)}
+        onMouseLeave={() => setIsHoverPaused(false)}
+        onFocusCapture={() => setIsHoverPaused(true)}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            setIsHoverPaused(false);
+          }
+        }}
         className="product-carousel__track scrollbar-hide"
       >
         {children.map((child, index) => {

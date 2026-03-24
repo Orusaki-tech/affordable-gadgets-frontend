@@ -337,6 +337,12 @@ export function ProductCard({
     return Math.max(...prices);
   }, [activeUnits]);
 
+  const activeUnitsMinPrice = useMemo(() => {
+    if (activeUnits.length === 0) return null;
+    const prices = activeUnits.map((u) => parseFloat(String(u.selling_price ?? '0')));
+    return Math.min(...prices);
+  }, [activeUnits]);
+
   const showSinglePrice = hasAnyVariantFilter && activeUnits.length > 0;
   const resolvedPriceText = showSinglePrice && activeUnitsMaxPrice !== null
     ? formatPrice(activeUnitsMaxPrice)
@@ -346,7 +352,12 @@ export function ProductCard({
 
   /** Show add-to-cart button (icon + price) on hover when at least one variant can be added; button shows single/max price */
   const showAddToCartSingleButton = activeUnits.length >= 1 && activeUnitsMaxPrice != null;
-  const addToCartButtonPriceText = activeUnitsMaxPrice != null ? formatPrice(activeUnitsMaxPrice) : resolvedPriceText;
+  const addToCartButtonPriceText =
+    activeUnitsMinPrice != null && activeUnitsMaxPrice != null
+      ? activeUnitsMinPrice === activeUnitsMaxPrice
+        ? formatPrice(activeUnitsMaxPrice)
+        : `${formatPrice(activeUnitsMinPrice)} - ${formatPrice(activeUnitsMaxPrice)}`
+      : resolvedPriceText;
 
   const cartIconSvg = (
     <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
@@ -401,105 +412,103 @@ export function ProductCard({
           </div>
           <div className="product-card__footer-overlay">
             <div className="product-card__overlay-row">
-              <span className="product-card__overlay-label">Color</span>
-              <div className="product-card__overlay-swatches">
-                {colorOptions.length > 0 ? (
-                  colorOptions.map((color) => {
-                    const normalized = color.name.trim().toLowerCase();
-                    const isActive =
-                      !!selectedColor &&
-                      selectedColor.trim().toLowerCase() === normalized;
-                    return (
-                      <button
-                        key={color.name}
-                        type="button"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          setSelectedColor((prev) =>
-                            prev && prev.trim().toLowerCase() === normalized ? null : color.name
-                          );
-                        }}
-                        className={`product-card__overlay-swatch ${
-                          isActive ? 'product-card__overlay-swatch--active' : ''
-                        }`}
-                      >
-                        {color.name}
-                      </button>
-                    );
-                  })
-                ) : (
-                  <span className="product-card__overlay-empty">No colors</span>
-                )}
+              <div className="product-card__overlay-header">
+                <Image
+                  src={primaryImage}
+                  alt={product.product_name}
+                  width={30}
+                  height={30}
+                  className="product-card__overlay-thumb"
+                  unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
+                />
+                <p className="product-card__name product-card__name--featured">{product.product_name}</p>
               </div>
-            </div>
-            <div className="product-card__overlay-row">
-              <span className="product-card__overlay-label">Storage</span>
-              <div className="product-card__storage-options product-card__storage-options--expanded">
-                {storageOptions.length > 0 ? (
-                  storageOptions.map((option) => (
-                    <button
-                      key={option.storage}
-                      type="button"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        setSelectedStorage((prev) =>
-                          prev === option.storage ? null : option.storage
-                        );
-                      }}
-                      className={`product-card__storage-option ${
-                        selectedStorage === option.storage
-                          ? 'product-card__storage-option--active'
-                          : ''
-                      }`}
-                    >
-                      {option.storage}GB
-                    </button>
-                  ))
-                ) : (
-                  <span className="product-card__overlay-empty">No storage</span>
-                )}
-              </div>
-            </div>
-            <div className="product-card__overlay-row">
-              <span className="product-card__overlay-label">RAM</span>
-              <div className="product-card__ram-options">
-                {ramOptions.length > 0 ? (
-                  ramOptions.map((ram) => (
-                    <button
-                      key={ram}
-                      type="button"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        setSelectedRam((prev) => (prev === ram ? null : ram));
-                      }}
-                      className={`product-card__ram-chip ${
-                        selectedRam === ram ? 'product-card__ram-chip--active' : ''
-                      }`}
-                    >
-                      {ram}GB
-                    </button>
-                  ))
-                ) : (
-                  <span className="product-card__overlay-empty">No RAM</span>
-                )}
-              </div>
-            </div>
-            <div className="product-card__overlay-row">
-              <span className="product-card__overlay-label">Price</span>
-              <span className="product-card__overlay-price">
-                {resolvedPriceText}
-              </span>
-              {hasAnyVariantFilter && activeUnits.length === 0 && (
-                <span className="product-card__overlay-price-hint">No variant for this selection</span>
-              )}
             </div>
             {showRatings && (
               <div className="product-card__overlay-row product-card__footer-rating">
                 <RatingStars rating={averageRating} count={reviewCount} />
               </div>
+            )}
+            {colorOptions.length > 0 && (
+            <div className="product-card__overlay-row">
+              <span className="product-card__overlay-label">Color</span>
+              <div className="product-card__overlay-swatches">
+                {colorOptions.map((color) => {
+                  const normalized = color.name.trim().toLowerCase();
+                  const isActive =
+                    !!selectedColor &&
+                    selectedColor.trim().toLowerCase() === normalized;
+                  return (
+                    <button
+                      key={color.name}
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setSelectedColor((prev) =>
+                          prev && prev.trim().toLowerCase() === normalized ? null : color.name
+                        );
+                      }}
+                      className={`product-card__overlay-swatch ${
+                        isActive ? 'product-card__overlay-swatch--active' : ''
+                      }`}
+                    >
+                      {color.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            )}
+            {storageOptions.length > 0 && (
+            <div className="product-card__overlay-row">
+              <span className="product-card__overlay-label">Storage</span>
+              <div className="product-card__storage-options product-card__storage-options--expanded">
+                {storageOptions.map((option) => (
+                  <button
+                    key={option.storage}
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setSelectedStorage((prev) =>
+                        prev === option.storage ? null : option.storage
+                      );
+                    }}
+                    className={`product-card__storage-option ${
+                      selectedStorage === option.storage
+                        ? 'product-card__storage-option--active'
+                        : ''
+                    }`}
+                  >
+                    {option.storage}GB
+                  </button>
+                ))}
+              </div>
+            </div>
+            )}
+            {ramOptions.length > 0 && (
+            <div className="product-card__overlay-row">
+              <span className="product-card__overlay-label">RAM</span>
+              <div className="product-card__ram-options">
+                {ramOptions.map((ram) => (
+                  <button
+                    key={ram}
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setSelectedRam((prev) => (prev === ram ? null : ram));
+                    }}
+                    className={`product-card__ram-chip ${
+                      selectedRam === ram ? 'product-card__ram-chip--active' : ''
+                    }`}
+                  >
+                    {ram}GB
+                  </button>
+                ))}
+              </div>
+            </div>
             )}
             <div className="product-card__overlay-actions">
               {showAddToCartSingleButton && (

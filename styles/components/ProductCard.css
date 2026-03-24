@@ -288,6 +288,22 @@
   min-height: 28px;
 }
 
+.product-card__overlay-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.product-card__overlay-thumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  object-fit: contain;
+  background: var(--ui-gray-50);
+  flex-shrink: 0;
+}
+
 .product-card__overlay-empty {
   font-size: 10px;
   font-weight: 500;

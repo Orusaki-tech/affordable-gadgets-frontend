@@ -9,21 +9,13 @@ import { ProductCarousel } from './ProductCarousel';
 interface SpecialOffersCarouselProps {
   promotions: PublicPromotion[];
   sectionTitle?: string;
-  /** When false, omit the inner heading (e.g. parent section already has a title). */
-  showSectionTitle?: boolean;
 }
 
-export function SpecialOffersCarousel({
-  promotions,
-  sectionTitle = 'Special Offers',
-  showSectionTitle = true,
-}: SpecialOffersCarouselProps) {
+export function SpecialOffersCarousel({ promotions, sectionTitle = 'Special Offers' }: SpecialOffersCarouselProps) {
   if (promotions.length === 0) {
     return (
       <div className="special-offers-carousel">
-        {showSectionTitle ? (
-          <h2 className="special-offers-carousel__title section-label">{sectionTitle}</h2>
-        ) : null}
+        <h2 className="special-offers-carousel__title section-label">{sectionTitle}</h2>
         <div className="special-offers-carousel__grid">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="special-offers-carousel__card" />
@@ -35,9 +27,7 @@ export function SpecialOffersCarousel({
 
   return (
     <div className="special-offers-carousel">
-      {showSectionTitle ? (
-        <h2 className="special-offers-carousel__title section-label">{sectionTitle}</h2>
-      ) : null}
+      <h2 className="special-offers-carousel__title section-label">{sectionTitle}</h2>
       <ProductCarousel
         itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
         showNavigation={true}

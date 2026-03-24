@@ -269,9 +269,9 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
         {/* Single layout: carousel on top, then two-column hero (left: search + card, right: banner) on desktop */}
         <div className="home-hero__main-grid" aria-label="Promotions">
           <ProductCarousel
-            // Match Special Offers / Promotions section: two tiles across on small screens.
+            // Keep the promo cards visible (do not collapse to a single card).
             // Banner rotation is handled by `activePromotionId` + timer.
-            itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
+            itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
             showNavigation
             alwaysShowNavigation
             splitNav

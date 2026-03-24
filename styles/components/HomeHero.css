@@ -515,6 +515,13 @@
   position: relative;
 }
 
+/* Stacked layout: small gap between the green search card and the promo banner below */
+@media (max-width: 1023px) {
+  .home-hero__right {
+    margin-top: 2px;
+  }
+}
+
 /* Hero banner: fixed 16:9 ratio, image fills the card */
 .home-hero__banner {
   position: relative;

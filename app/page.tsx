@@ -254,7 +254,7 @@ export default async function HomePage() {
               <p className="text-gray-600 text-lg sm:text-xl">Don't miss out on these amazing deals</p>
 
             </div>
-            <SpecialOffersServer pageSize={12} showSectionTitle={false} />
+            <SpecialOffersServer pageSize={12} />
           </div>
         </section>
 

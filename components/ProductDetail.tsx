@@ -1169,7 +1169,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 <div className="product-detail__units-carousel-nav">
                   <button
                     type="button"
-                    className="product-detail__units-carousel-btn"
+                    className={`product-detail__units-carousel-btn ${
+                      canScrollUnitsLeft
+                        ? 'product-detail__units-carousel-btn--active'
+                        : 'product-detail__units-carousel-btn--inactive'
+                    }`}
                     onClick={() => scrollUnitsCarousel('left')}
                     disabled={!canScrollUnitsLeft}
                     aria-label="Previous units"
@@ -1178,7 +1182,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   </button>
                   <button
                     type="button"
-                    className="product-detail__units-carousel-btn"
+                    className={`product-detail__units-carousel-btn ${
+                      canScrollUnitsRight
+                        ? 'product-detail__units-carousel-btn--active'
+                        : 'product-detail__units-carousel-btn--inactive'
+                    }`}
                     onClick={() => scrollUnitsCarousel('right')}
                     disabled={!canScrollUnitsRight}
                     aria-label="Next units"
@@ -1246,9 +1254,15 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <div className="product-detail__payments">
               <span className="product-detail__payments-label">Pay with</span>
               <div className="product-detail__payments-icons">
-                <span className="product-detail__payments-pill product-detail__payments-pill--visa">Visa</span>
-                <span className="product-detail__payments-pill product-detail__payments-pill--mpesa">M‑Pesa</span>
-                <span className="product-detail__payments-pill product-detail__payments-pill--paypal">PayPal</span>
+                <span className="product-detail__payments-logo product-detail__payments-logo--visa">
+                  <Image src="/payment-logos/visa-cropped.png" alt="Visa" width={60} height={18} className="product-detail__payments-logo-image" />
+                </span>
+                <span className="product-detail__payments-logo product-detail__payments-logo--mpesa">
+                  <Image src="/payment-logos/mpesa-cropped.png" alt="M-Pesa" width={70} height={18} className="product-detail__payments-logo-image" />
+                </span>
+                <span className="product-detail__payments-logo product-detail__payments-logo--paypal">
+                  <Image src="/payment-logos/paypal.png" alt="PayPal" width={62} height={18} className="product-detail__payments-logo-image" />
+                </span>
               </div>
             </div>
           </div>

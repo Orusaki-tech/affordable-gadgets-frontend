@@ -796,28 +796,50 @@
   gap: 6px;
 }
 
-.product-detail__payments-pill {
-  padding: 3px 8px;
+.product-detail__payments-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  height: 24px;
+  padding: 0 6px;
   border-radius: 999px;
-  font-size: 10px;
-  font-weight: 700;
-  background: var(--ui-white);
   border: 1px solid var(--gray-200);
+  background: var(--ui-white);
 }
 
-.product-detail__payments-pill--visa {
-  color: #1a1f71;
+.product-detail__payments-logo-image {
+  width: auto;
+  max-width: 100%;
+  height: 13px;
+  object-fit: contain;
+}
+
+.product-detail__payments-logo--visa {
+  min-width: 68px;
   border-color: #1a1f7133;
 }
 
-.product-detail__payments-pill--mpesa {
-  color: #00a859;
+.product-detail__payments-logo--visa .product-detail__payments-logo-image {
+  height: 12px;
+}
+
+.product-detail__payments-logo--mpesa {
+  min-width: 74px;
   border-color: #00a85933;
 }
 
-.product-detail__payments-pill--paypal {
-  color: #003087;
+.product-detail__payments-logo--mpesa .product-detail__payments-logo-image {
+  height: 12px;
+}
+
+.product-detail__payments-logo--paypal {
+  min-width: 68px;
   border-color: #00308733;
+}
+
+.product-detail__payments-logo--paypal .product-detail__payments-logo-image {
+  height: 13px;
 }
 
 .product-detail__cta {
@@ -891,6 +913,10 @@
   color: #4f5a74;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+.product-detail__cta-button--disabled:hover {
+  color: #ffffff;
 }
 
 .product-detail__cta-loading {
@@ -968,9 +994,9 @@
   width: 26px;
   height: 26px;
   border-radius: 999px;
-  border: 1px solid var(--gray-300);
+  border: 1px solid #000000;
   background: #ffffff;
-  color: var(--gray-800);
+  color: #000000;
   font-size: 16px;
   line-height: 1;
   display: inline-flex;
@@ -978,8 +1004,18 @@
   justify-content: center;
 }
 
+.product-detail__units-carousel-btn--active {
+  background: #000000;
+  color: #ffffff;
+}
+
+.product-detail__units-carousel-btn--inactive {
+  border-color: var(--gray-300);
+  background: #ffffff;
+  color: var(--gray-400);
+}
+
 .product-detail__units-carousel-btn:disabled {
-  opacity: 0.45;
   cursor: not-allowed;
 }
 
@@ -1401,7 +1437,7 @@
 .product-detail__unit-card--selected {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(38, 72, 192, 0.16);
-  transform: translateY(-1px);
+  transform: none;
 }
 
 @media (min-width: 640px) {

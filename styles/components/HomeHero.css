@@ -15,6 +15,17 @@
   overflow-x: hidden;
 }
 
+/* Promo carousel only: break out of horizontal padding to span full viewport below header */
+@media (max-width: 1023px) {
+  .home-hero__promo-carousel {
+    margin-left: -16px;
+    margin-right: -16px;
+    width: calc(100% + 32px);
+    max-width: none;
+    box-sizing: border-box;
+  }
+}
+
 /* Single grid: row1 = track, row2 = nav, row3 = search (30px below nav), row4 = banner, row5 = card */
 .home-hero__main-grid {
   display: flex;

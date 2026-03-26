@@ -48,7 +48,7 @@
   right: 8px;
   bottom: 8px;
   z-index: 6;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   width: 40px;
@@ -65,13 +65,6 @@
 
 .home-product-videos__sound-btn svg {
   display: block;
-}
-
-/* Mobile-only sound toggle (match "mobile" breakpoint). */
-@media (max-width: 639px) {
-  .home-product-videos__sound-btn {
-    display: flex;
-  }
 }
 
 .home-product-videos__sound-btn:hover {

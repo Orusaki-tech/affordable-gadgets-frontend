@@ -57,6 +57,12 @@
   transform: scale(1.02);
 }
 
+@media (max-width: 767px) {
+  .special-offers-carousel__promo {
+    padding: 2px;
+  }
+}
+
 @media (min-width: 768px) {
   .special-offers-carousel__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));

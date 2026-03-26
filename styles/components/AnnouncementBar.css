@@ -21,21 +21,32 @@
 .announcement-bar__bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: center;
+  gap: 10px;
 }
 
-/* Left: margin from container edge (country wide delivery icon) */
-.announcement-bar__bar > .announcement-bar__item:first-child {
-  margin-left: 50px;
+.announcement-bar__items {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-/* Right: margin from container edge (trade in) */
+.announcement-bar__item-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.announcement-bar__mobile-item {
+  display: none;
+}
+
 .announcement-bar__right {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-right: 50px;
+  gap: 6px;
 }
 
 .announcement-bar__item {
@@ -47,6 +58,11 @@
   letter-spacing: 0.02em;
 }
 
+.announcement-bar__separator {
+  font-size: 10px;
+  opacity: 0.5;
+}
+
 .announcement-bar__item-icon {
   flex-shrink: 0;
   color: inherit; /* SVG uses stroke="currentColor" */
@@ -55,21 +71,6 @@
 .announcement-bar__item-text {
   margin: 0;
 }
-
-.announcement-bar__item--link {
-  color: inherit;
-  text-decoration: none;
-  transition: opacity 0.2s ease;
-}
-
-.announcement-bar__item--link:hover {
-  opacity: 0.9;
-}
-
-.announcement-bar__item--link .announcement-bar__item-icon {
-  color: inherit;
-}
-
 
 .announcement-bar__close {
   background: none;
@@ -106,8 +107,26 @@
     padding: 3px 16px;
   }
 
+  .announcement-bar__bar {
+    justify-content: space-between;
+  }
+
+  .announcement-bar__items {
+    display: none;
+  }
+
+  .announcement-bar__mobile-item {
+    display: flex;
+    align-items: center;
+    min-height: 20px;
+  }
+
   .announcement-bar__item {
     font-size: 10px;
+  }
+
+  .announcement-bar__separator {
+    display: none;
   }
 
   .announcement-bar__item-icon {

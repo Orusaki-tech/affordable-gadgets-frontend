@@ -48,7 +48,7 @@
   right: 8px;
   bottom: 8px;
   z-index: 6;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   width: 40px;
@@ -63,6 +63,17 @@
   pointer-events: auto;
 }
 
+.home-product-videos__sound-btn svg {
+  display: block;
+}
+
+/* Mobile-only sound toggle (match "mobile" breakpoint). */
+@media (max-width: 639px) {
+  .home-product-videos__sound-btn {
+    display: flex;
+  }
+}
+
 .home-product-videos__sound-btn:hover {
   background: #fff;
 }
@@ -70,15 +81,6 @@
 .home-product-videos__sound-btn:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
-}
-
-@media (min-width: 640px) {
-  .home-product-videos__sound-btn {
-    width: 44px;
-    height: 44px;
-    right: 10px;
-    bottom: 10px;
-  }
 }
 
 .home-product-videos__poster {

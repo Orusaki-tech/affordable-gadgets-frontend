@@ -16,6 +16,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getPlaceholderProductImage, getPlaceholderUnitImage, getPlaceholderVideoUrl, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
 import { getAndClearProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
 import { PRICING_MODE } from '@/lib/constants/apiEnums';
+import { useProducts } from '@/lib/hooks/useProducts';
+import { PromotionVideosDrawer } from '@/components/PromotionVideosDrawer';
+import type { PromotionVideoProduct } from '@/components/ProductVideoReel';
 
 interface ProductDetailProps {
   slug: string;
@@ -210,6 +213,45 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const { data: bundlesData, isLoading: bundlesLoading } = useBundles({ productId: product?.id });
   const { addToCart, addBundleToCart } = useCart();
   const router = useRouter();
+
+  const [isPromoVideosOpen, setIsPromoVideosOpen] = useState(false);
+  const promoId = typeof promotion?.id === 'number' ? promotion.id : null;
+  const { data: promoProducts, isLoading: promoProductsLoading } = useProducts({
+    promotion: promoId ?? undefined,
+    page: 1,
+    page_size: 24,
+    enabled: Boolean(isPromoVideosOpen && promoId),
+  });
+
+  const promoDrawerProducts = useMemo<PromotionVideoProduct[]>(() => {
+    const results = promoProducts?.results ?? [];
+    if (results.length > 0) {
+      return results.flatMap((p) => {
+        const id = (p as any)?.id;
+        if (typeof id !== 'number') return [];
+        const row: PromotionVideoProduct = {
+          id,
+          slug: (p as any).slug,
+          product_name: (p as any).product_name,
+          primary_image: (p as any).primary_image,
+          product_video_url: (p as any).product_video_url,
+          product_video_file_url: (p as any).product_video_file_url,
+        };
+        return [row];
+      });
+    }
+    if (!product) return [];
+    return [
+      {
+        id: product.id as number,
+        slug: (product as any).slug,
+        product_name: product.product_name,
+        primary_image: product.primary_image,
+        product_video_url: (product as any).product_video_url,
+        product_video_file_url: (product as any).product_video_file_url,
+      },
+    ];
+  }, [promoProducts?.results, product]);
   
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
   const productId = product?.id;
@@ -896,11 +938,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       type="button"
                       className="product-detail__promo-cta"
                       onClick={() => {
-                        if (promotion.id) {
-                          router.push(`/products?promotion=${promotion.id}`);
-                          return;
-                        }
-                        router.push('/promotions');
+                        setIsPromoVideosOpen(true);
                       }}
                     >
                       View
@@ -1666,6 +1704,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           </Suspense>
         </div>
       )}
+
+      <PromotionVideosDrawer
+        open={isPromoVideosOpen}
+        title={promotion?.title || 'Offer'}
+        subtitle={promoProductsLoading ? 'Loading videos…' : promoBannerDetails}
+        products={promoDrawerProducts}
+        onClose={() => setIsPromoVideosOpen(false)}
+      />
     </div>
   );
 }

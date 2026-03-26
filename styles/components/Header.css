@@ -1,6 +1,4 @@
 .site-header {
-  position: sticky;
-  top: 0;
   z-index: 50;
   background: var(--ui-white);
   border-bottom: 1px solid var(--ui-gray-200);

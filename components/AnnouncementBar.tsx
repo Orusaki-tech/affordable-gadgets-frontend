@@ -102,7 +102,24 @@ export function AnnouncementBar(props?: Partial<AnnouncementBarProps>) {
     setIsVisible(false);
   };
 
-  if (isVisible === null || !isVisible) return null;
+  // Prevent layout shift: render a height-reserving placeholder until we know visibility.
+  if (isVisible === null) {
+    return (
+      <div
+        className="announcement-bar announcement-bar--placeholder"
+        aria-hidden="true"
+      />
+    );
+  }
+
+  if (!isVisible) {
+    return (
+      <div
+        className="announcement-bar announcement-bar--placeholder"
+        aria-hidden="true"
+      />
+    );
+  }
   const mobileItem = announcementItems[mobileItemIndex];
 
   return (

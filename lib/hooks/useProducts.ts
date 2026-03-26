@@ -3,7 +3,7 @@
  */
 'use client';
 
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 import {
   ApiService,
@@ -124,6 +124,29 @@ export function useProducts(params?: ProductsQueryParams) {
     enabled: params?.enabled ?? true,
     staleTime: 30000, // 30 seconds
     placeholderData: keepPreviousData, // Keep showing list when refetching (e.g. back from detail)
+  });
+}
+
+export function useInfiniteProducts(params?: Omit<ProductsQueryParams, 'page'> & { enabled?: boolean }) {
+  return useInfiniteQuery<PaginatedPublicProductList>({
+    queryKey: ['products', 'infinite', params],
+    queryFn: ({ pageParam }) =>
+      ApiService.apiV1PublicProductsList(
+        params?.brand_filter,
+        params?.max_price,
+        params?.min_price,
+        params?.ordering,
+        (pageParam as number | undefined) ?? 1,
+        params?.page_size,
+        params?.promotion,
+        params?.search,
+        undefined,
+        params?.type
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => (lastPage?.next ? allPages.length + 1 : undefined),
+    enabled: params?.enabled ?? true,
+    staleTime: 30000,
   });
 }
 

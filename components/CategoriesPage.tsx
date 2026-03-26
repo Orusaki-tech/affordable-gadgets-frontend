@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { CATEGORY_CARDS, type CategoryCard } from '@/lib/config/categories';
-import { useProducts } from '@/lib/hooks/useProducts';
+import { useInfiniteProducts, useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from './ProductCard';
 
 export function CategoriesPage() {
@@ -41,23 +41,38 @@ export function CategoriesPage() {
 
 function CategoryProducts({ category }: { category: CategoryCard }) {
   const isAccessories = category.code === 'AC';
-  const INITIAL_ACCESSORIES_COUNT = 12;
-  const ACCESSORIES_LOAD_MORE_COUNT = 12;
-  const [accessoriesVisibleCount, setAccessoriesVisibleCount] = useState(INITIAL_ACCESSORIES_COUNT);
+  const ACCESSORIES_PAGE_SIZE = 24;
+  const [accessoriesVisibleCount, setAccessoriesVisibleCount] = useState(12);
   const loadMoreTriggerRef = useRef<HTMLDivElement | null>(null);
   const isLoadingMoreRef = useRef(false);
-  const requestedPageSize = isAccessories ? accessoriesVisibleCount : 4;
 
-  const { data, isLoading, isFetching } = useProducts({ type: category.code, page_size: requestedPageSize });
-  const filteredResults = (data?.results ?? []).filter(
+  const infiniteAccessories = useInfiniteProducts(
+    isAccessories
+      ? { type: category.code, page_size: ACCESSORIES_PAGE_SIZE }
+      : { enabled: false }
+  );
+  const pagedProducts = useProducts({ type: category.code, page_size: 4, enabled: !isAccessories });
+
+  const allAccessories = isAccessories
+    ? (infiniteAccessories.data?.pages ?? []).flatMap((p) => p.results ?? [])
+    : [];
+
+  const data = isAccessories ? undefined : pagedProducts.data;
+  const isLoading = isAccessories ? infiniteAccessories.isLoading : pagedProducts.isLoading;
+  const isFetching = isAccessories ? infiniteAccessories.isFetching : pagedProducts.isFetching;
+
+  const filteredResults = (isAccessories ? allAccessories : (data?.results ?? [])).filter(
     (product) => product.product_type === category.code
   );
   const visibleProducts = isAccessories
     ? filteredResults.slice(0, accessoriesVisibleCount)
     : filteredResults;
-  const totalCount = data?.count ?? filteredResults.length;
-  const hasMoreAccessories = isAccessories && accessoriesVisibleCount < totalCount;
-  const isFetchingMoreAccessories = isAccessories && isFetching && !isLoading;
+  const hasNextAccessoriesPage = isAccessories && !!infiniteAccessories.hasNextPage;
+  const hasMoreAccessories =
+    isAccessories && (accessoriesVisibleCount < filteredResults.length || hasNextAccessoriesPage);
+  const isFetchingMoreAccessories =
+    isAccessories &&
+    (infiniteAccessories.isFetchingNextPage || (isFetching && !isLoading));
 
   const sectionId = category.name.toLowerCase().replace(/\s*\/\s*/g, '-');
 
@@ -73,14 +88,17 @@ function CategoryProducts({ category }: { category: CategoryCard }) {
         if (!firstEntry?.isIntersecting) return;
         if (isLoadingMoreRef.current) return;
         isLoadingMoreRef.current = true;
-        setAccessoriesVisibleCount((currentCount) => currentCount + ACCESSORIES_LOAD_MORE_COUNT);
+        setAccessoriesVisibleCount((currentCount) => currentCount + 12);
+        if (infiniteAccessories.hasNextPage) {
+          infiniteAccessories.fetchNextPage();
+        }
       },
       { rootMargin: '300px 0px' }
     );
 
     observer.observe(triggerElement);
     return () => observer.disconnect();
-  }, [isAccessories, hasMoreAccessories]);
+  }, [isAccessories, hasMoreAccessories, infiniteAccessories]);
 
   useEffect(() => {
     if (!isFetchingMoreAccessories) {
@@ -101,7 +119,7 @@ function CategoryProducts({ category }: { category: CategoryCard }) {
     );
   }
 
-  if (!data || filteredResults.length === 0) {
+  if ((!isAccessories && !data) || filteredResults.length === 0) {
     return null;
   }
 

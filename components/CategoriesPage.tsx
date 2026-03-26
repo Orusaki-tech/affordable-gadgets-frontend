@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { CATEGORY_CARDS, type CategoryCard } from '@/lib/config/categories';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from './ProductCard';
@@ -39,12 +40,53 @@ export function CategoriesPage() {
 }
 
 function CategoryProducts({ category }: { category: CategoryCard }) {
-  const { data, isLoading } = useProducts({ type: category.code, page_size: 4 });
+  const isAccessories = category.code === 'AC';
+  const INITIAL_ACCESSORIES_COUNT = 12;
+  const ACCESSORIES_LOAD_MORE_COUNT = 12;
+  const [accessoriesVisibleCount, setAccessoriesVisibleCount] = useState(INITIAL_ACCESSORIES_COUNT);
+  const loadMoreTriggerRef = useRef<HTMLDivElement | null>(null);
+  const isLoadingMoreRef = useRef(false);
+  const requestedPageSize = isAccessories ? accessoriesVisibleCount : 4;
+
+  const { data, isLoading, isFetching } = useProducts({ type: category.code, page_size: requestedPageSize });
   const filteredResults = (data?.results ?? []).filter(
     (product) => product.product_type === category.code
   );
+  const visibleProducts = isAccessories
+    ? filteredResults.slice(0, accessoriesVisibleCount)
+    : filteredResults;
+  const totalCount = data?.count ?? filteredResults.length;
+  const hasMoreAccessories = isAccessories && accessoriesVisibleCount < totalCount;
+  const isFetchingMoreAccessories = isAccessories && isFetching && !isLoading;
 
   const sectionId = category.name.toLowerCase().replace(/\s*\/\s*/g, '-');
+
+  useEffect(() => {
+    if (!isAccessories) return;
+    if (!hasMoreAccessories) return;
+    const triggerElement = loadMoreTriggerRef.current;
+    if (!triggerElement) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const firstEntry = entries[0];
+        if (!firstEntry?.isIntersecting) return;
+        if (isLoadingMoreRef.current) return;
+        isLoadingMoreRef.current = true;
+        setAccessoriesVisibleCount((currentCount) => currentCount + ACCESSORIES_LOAD_MORE_COUNT);
+      },
+      { rootMargin: '300px 0px' }
+    );
+
+    observer.observe(triggerElement);
+    return () => observer.disconnect();
+  }, [isAccessories, hasMoreAccessories]);
+
+  useEffect(() => {
+    if (!isFetchingMoreAccessories) {
+      isLoadingMoreRef.current = false;
+    }
+  }, [isFetchingMoreAccessories]);
 
   if (isLoading) {
     return (
@@ -67,19 +109,35 @@ function CategoryProducts({ category }: { category: CategoryCard }) {
     <div id={sectionId} className="categories-page__section">
       <div className="categories-page__section-header">
         <h2 className="categories-page__section-title section-label">{category.name}</h2>
-        <Link
-          href={category.href}
-          className="categories-page__section-link"
-          prefetch={false}
-        >
-          View All →
-        </Link>
+        {!isAccessories && (
+          <Link
+            href={category.href}
+            className="categories-page__section-link"
+            prefetch={false}
+          >
+            View All →
+          </Link>
+        )}
       </div>
       <div className="categories-page__products">
-        {filteredResults.map((product) => (
+        {visibleProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </div>
+      {isAccessories && (
+        <div className="categories-page__infinite-scroll">
+          {hasMoreAccessories ? (
+            <>
+              <div ref={loadMoreTriggerRef} className="categories-page__load-trigger" aria-hidden />
+              {isFetchingMoreAccessories && (
+                <p className="categories-page__loading-text">Loading more accessories...</p>
+              )}
+            </>
+          ) : (
+            <p className="categories-page__loading-text">All accessories loaded</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

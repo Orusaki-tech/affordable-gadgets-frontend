@@ -104,6 +104,26 @@
   gap: 24px;
 }
 
+.categories-page__infinite-scroll {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+}
+
+.categories-page__load-trigger {
+  width: 100%;
+  height: 1px;
+}
+
+.categories-page__loading-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--secondary);
+}
+
 .categories-page__skeleton {
   background: var(--ui-gray-200);
   border-radius: 12px;

@@ -106,8 +106,8 @@ export function Header() {
               <Image 
                 src="/affordlogo1.svg" 
                 alt={`${brandConfig.name} logo`}
-                width={80}
-                height={80}
+                width={60}
+                height={60}
                 className="site-header__logo"
                 priority
               /> 

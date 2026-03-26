@@ -39,6 +39,22 @@ export function CategoriesPage() {
   );
 }
 
+function CategoryProductsSkeleton({ title, sectionId }: { title: string; sectionId: string }) {
+  return (
+    <div id={sectionId} className="categories-page__section categories-page__section--skeleton" aria-hidden="true">
+      <div className="categories-page__section-header">
+        <h2 className="categories-page__section-title section-label">{title}</h2>
+        <span className="categories-page__section-link categories-page__section-link--placeholder">View All →</span>
+      </div>
+      <div className="categories-page__products">
+        {[...Array(4)].map((_, i) => (
+          <div key={`cat-skel-${sectionId}-${i}`} className="categories-page__product-skeleton" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function CategoryProducts({ category }: { category: CategoryCard }) {
   const isAccessories = category.code === 'AC';
   const ACCESSORIES_PAGE_SIZE = 24;
@@ -106,21 +122,23 @@ function CategoryProducts({ category }: { category: CategoryCard }) {
     }
   }, [isFetchingMoreAccessories]);
 
-  if (isLoading) {
-    return (
-      <div id={sectionId} className="categories-page__section">
-        <h2 className="categories-page__section-heading">{category.name}</h2>
-        <div className="categories-page__products">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="categories-page__skeleton" />
-          ))}
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <CategoryProductsSkeleton title={category.name} sectionId={sectionId} />;
 
   if ((!isAccessories && !data) || filteredResults.length === 0) {
-    return null;
+    // Keep section mounted to avoid layout shift when queries settle (or when a category has no products).
+    return (
+      <div id={sectionId} className="categories-page__section categories-page__section--empty" aria-live="polite">
+        <div className="categories-page__section-header">
+          <h2 className="categories-page__section-title section-label">{category.name}</h2>
+          {!isAccessories && (
+            <Link href={category.href} className="categories-page__section-link" prefetch={false}>
+              View All →
+            </Link>
+          )}
+        </div>
+        <p className="categories-page__empty-text">No products available in this category yet.</p>
+      </div>
+    );
   }
 
   return (

@@ -104,6 +104,25 @@
   gap: 24px;
 }
 
+.categories-page__product-skeleton {
+  height: 24rem;
+  border-radius: 16px;
+  background: var(--ui-gray-200);
+  animation: categories-page-pulse 1.6s ease-in-out infinite;
+}
+
+.categories-page__section-link--placeholder {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.categories-page__empty-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--secondary);
+  min-height: 24px;
+}
+
 .categories-page__infinite-scroll {
   margin-top: 24px;
   display: flex;

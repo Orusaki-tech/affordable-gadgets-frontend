@@ -13,6 +13,28 @@
   margin-bottom: 24px;
 }
 
+.product-recommendations__title-skel {
+  height: 28px;
+  width: min(320px, 70%);
+  border-radius: 10px;
+  background: var(--ui-gray-200);
+  margin-bottom: 24px;
+}
+
+.product-recommendations__card-skel {
+  border-radius: 16px;
+  background: var(--ui-gray-200);
+  aspect-ratio: 4 / 5;
+  min-height: 260px;
+  animation: product-recommendations-pulse 1.6s ease-in-out infinite;
+}
+
+.product-recommendations__empty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ui-gray-600);
+}
+
 .product-recommendations__grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -46,5 +68,15 @@
 @media (min-width: 1441px) {
   .section-label {
     font-size: 64px;
+  }
+}
+
+@keyframes product-recommendations-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
   }
 }

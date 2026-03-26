@@ -103,6 +103,15 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
     initialData: initialPromotionsData,
   });
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
   const promotions = useMemo(() => {
     return getHeroPromotions(promotionsData);
   }, [promotionsData]);
@@ -186,82 +195,121 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
     'contain'
   );
 
-  const carouselContent: ReactNode[] = promosLoading && promotions.length === 0
-    ? Array.from({ length: HERO_PLACEHOLDER_COUNT }).map((_, i) => (
-        <div key={i} className="home-hero__promo-skeleton" />
-      ))
-    : promotions.length > 0
-      ? promotions.map((promotion) => {
-          const id = typeof promotion.id === 'number' ? promotion.id : null;
-          const isActive = id !== null && id === activePromotionId;
-          const promoCard = promotion.promo_card ?? null;
-          const thumbSrc = promoCard?.product_image_url || promotion.banner_image_url || promotion.banner_image || null;
-          const cardTitle = promoCard?.product_name || promotion.title;
-          const optionSummary = promoCard?.option_summary?.trim() || null;
-          const originalPrice = promoCard?.original_price ? Number(promoCard.original_price) : null;
-          const promotionalPrice = promoCard?.promotional_price ? Number(promoCard.promotional_price) : null;
-          const hasPromoPrice =
-            originalPrice !== null &&
-            Number.isFinite(originalPrice) &&
-            promotionalPrice !== null &&
-            Number.isFinite(promotionalPrice) &&
-            promotionalPrice < originalPrice;
-          return (
-            <button
-              key={id ?? promotion.title}
-              type="button"
-              className={`home-hero__promo-card ${isActive ? 'home-hero__promo-card--active' : ''}`}
-              onMouseEnter={() => { if (id !== null) selectPromotion(id); }}
-              onFocus={() => { if (id !== null) selectPromotion(id); }}
-              onClick={() => { if (id !== null) selectPromotion(id); }}
-              aria-pressed={isActive}
-            >
-              <div className="home-hero__promo-media">
-                {thumbSrc ? (
-                  <Image
-                    src={getCloudinarySizedImageUrl(thumbSrc, PROMO_THUMB_SIZE, 'contain')}
-                    alt={cardTitle}
-                    width={PROMO_THUMB_SIZE}
-                    height={PROMO_THUMB_SIZE}
-                    className="home-hero__promo-image"
-                    unoptimized={thumbSrc.includes('localhost') || thumbSrc.includes('127.0.0.1') || thumbSrc.includes('placehold.co')}
-                  />
-                ) : (
-                  <div className="home-hero__promo-image home-hero__promo-image--placeholder" />
-                )}
-              </div>
-              <div className="home-hero__promo-info">
-                <p className="home-hero__promo-title">{cardTitle}</p>
-                {optionSummary ? (
-                  <p className="home-hero__promo-options">{optionSummary}</p>
-                ) : promotion.discount_display ? (
-                  <p className="home-hero__promo-subtitle">{promotion.discount_display}</p>
-                ) : promotion.description ? (
-                  <p className="home-hero__promo-subtitle">{promotion.description}</p>
-                ) : (
-                  <p className="home-hero__promo-subtitle">View offer</p>
-                )}
-                {hasPromoPrice && (
-                  <div className="home-hero__promo-price-row">
-                    <span className="home-hero__promo-price-old">{formatPrice(originalPrice)}</span>
-                    <span className="home-hero__promo-price-new">{formatPrice(promotionalPrice)}</span>
-                  </div>
-                )}
-              </div>
-            </button>
-          );
-        })
-      : Array.from({ length: HERO_PLACEHOLDER_COUNT }).map((_, index) => (
-          <div key={index} className="home-hero__promo-empty-card" aria-label="Promotions coming soon">
-            <div className="home-hero__promo-empty-media" />
-            <div className="home-hero__promo-empty-body">
-              <p className="home-hero__promo-empty-title">Coming soon</p>
-              <p className="home-hero__promo-empty-copy">
-                Future deals and stories will appear here.
-              </p>
+  const renderPromotionCard = (promotion: HomeHeroPromotion): ReactNode => {
+    const id = typeof promotion.id === 'number' ? promotion.id : null;
+    const isActive = id !== null && id === activePromotionId;
+    const promoCard = promotion.promo_card ?? null;
+    const thumbSrc = promoCard?.product_image_url || promotion.banner_image_url || promotion.banner_image || null;
+    const cardTitle = promoCard?.product_name || promotion.title;
+    const optionSummary = promoCard?.option_summary?.trim() || null;
+    const originalPrice = promoCard?.original_price ? Number(promoCard.original_price) : null;
+    const promotionalPrice = promoCard?.promotional_price ? Number(promoCard.promotional_price) : null;
+    const hasPromoPrice =
+      originalPrice !== null &&
+      Number.isFinite(originalPrice) &&
+      promotionalPrice !== null &&
+      Number.isFinite(promotionalPrice) &&
+      promotionalPrice < originalPrice;
+
+    const className = `home-hero__promo-card ${isActive ? 'home-hero__promo-card--active' : ''}`;
+    const key = id ?? promotion.title;
+
+    const inner = (
+      <>
+        <div className="home-hero__promo-media">
+          {thumbSrc ? (
+            <Image
+              src={getCloudinarySizedImageUrl(thumbSrc, PROMO_THUMB_SIZE, 'contain')}
+              alt={cardTitle}
+              width={PROMO_THUMB_SIZE}
+              height={PROMO_THUMB_SIZE}
+              className="home-hero__promo-image"
+              unoptimized={
+                thumbSrc.includes('localhost') ||
+                thumbSrc.includes('127.0.0.1') ||
+                thumbSrc.includes('placehold.co')
+              }
+            />
+          ) : (
+            <div className="home-hero__promo-image home-hero__promo-image--placeholder" />
+          )}
+        </div>
+        <div className="home-hero__promo-info">
+          <p className="home-hero__promo-title">{cardTitle}</p>
+          {optionSummary ? (
+            <p className="home-hero__promo-options">{optionSummary}</p>
+          ) : promotion.discount_display ? (
+            <p className="home-hero__promo-subtitle">{promotion.discount_display}</p>
+          ) : promotion.description ? (
+            <p className="home-hero__promo-subtitle">{promotion.description}</p>
+          ) : (
+            <p className="home-hero__promo-subtitle">View offer</p>
+          )}
+          {hasPromoPrice && (
+            <div className="home-hero__promo-price-row">
+              <span className="home-hero__promo-price-old">{formatPrice(originalPrice)}</span>
+              <span className="home-hero__promo-price-new">{formatPrice(promotionalPrice)}</span>
             </div>
-          </div>
-        ));
+          )}
+        </div>
+      </>
+    );
+
+    // Mobile: promo card behaves as a link to the product details page.
+    if (isMobile) {
+      return (
+        <Link key={key} href={getPromotionHref(promotion)} className={className} aria-label={cardTitle}>
+          {inner}
+        </Link>
+      );
+    }
+
+    // Tablet/Desktop: promo card selects the active banner/promo.
+    return (
+      <button
+        key={key}
+        type="button"
+        className={className}
+        onMouseEnter={() => {
+          if (id !== null) selectPromotion(id);
+        }}
+        onFocus={() => {
+          if (id !== null) selectPromotion(id);
+        }}
+        onClick={() => {
+          if (id !== null) selectPromotion(id);
+        }}
+        aria-pressed={isActive}
+      >
+        {inner}
+      </button>
+    );
+  };
+
+  const carouselContent: ReactNode[] =
+    promosLoading && promotions.length === 0
+      ? Array.from({ length: HERO_PLACEHOLDER_COUNT }).map((_, i) => (
+          <div key={i} className="home-hero__promo-skeleton" />
+        ))
+      : promotions.length > 0
+        ? isMobile
+          ? [renderPromotionCard(activePromotion ?? promotions[0]!)]
+          : promotions.map((promotion) => renderPromotionCard(promotion))
+        : Array.from({ length: HERO_PLACEHOLDER_COUNT }).map((_, index) => (
+            <div
+              key={index}
+              className="home-hero__promo-empty-card"
+              aria-label="Promotions coming soon"
+            >
+              <div className="home-hero__promo-empty-media" />
+              <div className="home-hero__promo-empty-body">
+                <p className="home-hero__promo-empty-title">Coming soon</p>
+                <p className="home-hero__promo-empty-copy">
+                  Future deals and stories will appear here.
+                </p>
+              </div>
+            </div>
+          ));
 
   return (
     <section className="home-hero" aria-label="Homepage hero">
@@ -272,8 +320,8 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
             // Keep the promo cards visible (do not collapse to a single card).
             // Banner rotation is handled by `activePromotionId` + timer.
             itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
-            showNavigation
-            alwaysShowNavigation
+            showNavigation={!isMobile}
+            alwaysShowNavigation={!isMobile}
             splitNav
             showPagination={false}
             className="home-hero__promo-carousel"

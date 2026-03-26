@@ -44,6 +44,23 @@
   box-sizing: border-box;
 }
 
+/* Mobile: single promo card should be full width with 20px side gutters */
+@media (max-width: 639px) {
+  .home-hero__promo-carousel .product-carousel__track {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .home-hero__promo-carousel .product-carousel__item {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .home-hero__promo-card {
+    width: 100%;
+  }
+}
+
 /* Hero carousel: progress bar on top, then circular arrow buttons below (match reference) */
 .home-hero__promo-carousel .samsung-progressbar {
   margin-top: 12px;

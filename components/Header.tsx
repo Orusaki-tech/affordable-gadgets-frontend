@@ -104,7 +104,7 @@ export function Header() {
           >
             <div className="site-header__logo-wrap">
               <Image 
-                src="/affordablelogo.png" 
+                src="/affordlogo1.svg" 
                 alt={`${brandConfig.name} logo`}
                 width={80}
                 height={80}

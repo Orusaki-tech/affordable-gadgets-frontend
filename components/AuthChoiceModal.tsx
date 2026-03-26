@@ -210,7 +210,7 @@ export function AuthChoiceModal({ onClose, onGuestProceed, onAuthSuccess, initia
 
         <div className="checkout-modal__logo checkout-modal__logo--small">
           <Image
-            src="/affordablegadgetslogo.png"
+            src="/affordlogo1.svg"
             alt={`${brandConfig.name} logo`}
             width={100}
             height={100}

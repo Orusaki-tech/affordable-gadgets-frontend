@@ -589,7 +589,7 @@ export function CartPage() {
                         const imageUrl =
                           inventoryUnit?.images?.[0]?.thumbnail_url ||
                           inventoryUnit?.images?.[0]?.image_url ||
-                          '/affordablelogo.png';
+                          '/affordlogo1.svg';
                       return (
                           <div key={item.id} className="cart-page__bundle-item">
                             <div className="cart-page__bundle-item-media">
@@ -678,7 +678,7 @@ export function CartPage() {
                 const imageUrl =
                   inventoryUnit?.images?.[0]?.thumbnail_url ||
                   inventoryUnit?.images?.[0]?.image_url ||
-                  '/affordablelogo.png';
+                  '/affordlogo1.svg';
               return (
                 <div
                   key={item.id}

@@ -145,7 +145,7 @@ export function PaymentSuccessClient() {
         <div className="mb-6">
           <div className="flex justify-center mb-4">
             <Image
-              src="/affordablelogo.png"
+              src="/affordlogo1.svg"
               alt={`${brandConfig.name} logo`}
               width={100}
               height={100}

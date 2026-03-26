@@ -46,14 +46,14 @@ export function StructuredData({
   itemList,
   faqs,
 }: StructuredDataProps) {
-  const brandImageUrl = `${brandConfig.siteUrl}/affordablelogo.png`;
+  const brandImageUrl = `${brandConfig.siteUrl}/affordlogo1.svg`;
 
   const getOrganizationSchema = () => ({
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: brandConfig.business.name,
     url: brandConfig.siteUrl,
-    logo: `${brandConfig.siteUrl}/affordablelogo.png`,
+    logo: `${brandConfig.siteUrl}/affordlogo1.svg`,
     image: [brandImageUrl],
     description: brandConfig.business.description,
     email: brandConfig.business.email,
@@ -176,7 +176,7 @@ export function StructuredData({
       name: brandConfig.business.name,
       logo: {
         '@type': 'ImageObject',
-        url: `${brandConfig.siteUrl}/affordablelogo.png`,
+        url: `${brandConfig.siteUrl}/affordlogo1.svg`,
       },
     },
     potentialAction: {

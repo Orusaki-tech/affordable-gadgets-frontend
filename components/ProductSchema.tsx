@@ -75,7 +75,7 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
         '@type': 'VideoObject' as const,
         name: product.meta_title || `${product.product_name} - Product Video`,
         description: product.meta_description || product.product_description || `Watch ${product.product_name} product video`,
-        thumbnailUrl: product.primary_image || `${brandConfig.siteUrl}/affordablelogo.png`,
+        thumbnailUrl: product.primary_image || `${brandConfig.siteUrl}/affordlogo1.svg`,
         uploadDate: new Date().toISOString(),
         contentUrl: product.product_video_url,
         embedUrl: product.product_video_url.includes('youtube.com') || product.product_video_url.includes('youtu.be')
@@ -92,7 +92,7 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
     description: product.meta_description || product.product_description || product.long_description || `${product.product_name} - Available at ${brandConfig.business.name}`,
     image: product.primary_image
       ? [product.primary_image]
-      : [`${brandConfig.siteUrl}/affordablelogo.png`],
+      : [`${brandConfig.siteUrl}/affordlogo1.svg`],
     sku: product.id?.toString(),
     mpn: product.model_series || undefined,
     gtin: undefined, // Add if you have GTIN/EAN codes

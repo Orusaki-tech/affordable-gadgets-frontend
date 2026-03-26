@@ -188,7 +188,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
             <div className="payment-page__section">
               <div className="payment-page__logo">
                 <Image 
-                  src="/affordablelogo.png" 
+                  src="/affordlogo1.svg" 
                   alt={`${brandConfig.name} logo`}
                   width={100}
                   height={100}
@@ -245,7 +245,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
           <div className="payment-page__section">
             <div className="payment-page__logo">
               <Image 
-                src="/affordablelogo.png" 
+                src="/affordlogo1.svg" 
                 alt={`${brandConfig.name} logo`}
                 width={100}
                 height={100}
@@ -297,7 +297,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
           <div className="payment-page__section">
             <div className="payment-page__logo">
               <Image 
-                src="/affordablelogo.png" 
+                src="/affordlogo1.svg" 
                 alt={`${brandConfig.name} logo`}
                 width={100}
                 height={100}
@@ -347,7 +347,7 @@ export function PaymentPage({ orderId, totalAmount, callbackUrl }: PaymentPagePr
           <div className="payment-page__section">
             <div className="payment-page__logo">
               <Image 
-                src="/affordablelogo.png" 
+                src="/affordlogo1.svg" 
                 alt={`${brandConfig.name} logo`}
                 width={100}
                 height={100}

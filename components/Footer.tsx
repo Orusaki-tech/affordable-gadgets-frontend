@@ -13,7 +13,7 @@ export function Footer() {
           <div className="site-footer__about">
             <Link href="/" className="site-footer__logo-link">
               <Image 
-                src="/affordablelogo.png" 
+                src="/affordlogo1.svg" 
                 alt={`${brandConfig.name} logo`}
                 width={120}
                 height={120}

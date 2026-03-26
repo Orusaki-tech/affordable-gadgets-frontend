@@ -514,7 +514,7 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
           <div className="checkout-modal__section">
             <div className="checkout-modal__logo">
               <Image 
-                src="/affordablelogo.png" 
+                src="/affordlogo1.svg" 
                 alt={`${brandConfig.name} logo`}
                 width={100}
                 height={100}
@@ -602,7 +602,7 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
         </button>
         <div className="checkout-modal__logo checkout-modal__logo--small">
           <Image 
-            src="/affordablegadgetslogo.png" 
+            src="/affordlogo1.svg" 
             alt={`${brandConfig.name} logo`}
             width={100}
             height={100}

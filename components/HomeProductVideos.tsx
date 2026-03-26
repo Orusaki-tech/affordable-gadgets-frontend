@@ -163,7 +163,7 @@ function HomepageVideoSlide({
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const youtubeIframeRef = useRef<HTMLIFrameElement | null>(null);
-  const [youtubeIsMuted, setYoutubeIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
   const resolved = resolveProductVideoMedia(product);
   const name = product.product_name ?? 'Product';
   const href = getProductHref(product);
@@ -180,12 +180,20 @@ function HomepageVideoSlide({
   );
 
   useEffect(() => {
-    if (!isPlaying) setYoutubeIsMuted(true);
+    if (!isPlaying) {
+      setIsMuted(true);
+      const el = videoRef.current;
+      if (el) el.muted = true;
+      if (isYoutubeEmbedSrc(resolved?.src ?? '')) {
+        sendYoutubeIframeCommand(youtubeIframeRef.current, 'mute');
+      }
+    }
   }, [isPlaying]);
 
   const setRef = useCallback(
     (el: HTMLVideoElement | null) => {
       videoRef.current = el;
+      if (el) el.muted = true;
       if (resolved?.mode === 'file') registerVideo(slideKey, el);
       else registerVideo(slideKey, null);
     },
@@ -193,6 +201,9 @@ function HomepageVideoSlide({
   );
 
   if (!resolved) return null;
+  // Prevent TS control-flow narrowing from treating `resolved` as embed-only
+  // inside unrelated JSX branches.
+  const resolvedVideo: ResolvedProductVideo = resolved;
 
   const toggle = () => {
     if (resolved.mode === 'embed') {
@@ -210,16 +221,23 @@ function HomepageVideoSlide({
     }
   };
 
-  const onSoundToggleClick = (e: MouseEvent<HTMLButtonElement>) => {
+  const onSoundToggle = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     e.preventDefault();
-    if (youtubeIsMuted) {
-      sendYoutubeIframeCommand(youtubeIframeRef.current, 'unMute');
-      setYoutubeIsMuted(false);
-    } else {
-      sendYoutubeIframeCommand(youtubeIframeRef.current, 'mute');
-      setYoutubeIsMuted(true);
+
+    if (resolved.mode === 'file') {
+      const el = videoRef.current;
+      if (!el) return;
+      const nextMuted = !el.muted;
+      el.muted = nextMuted;
+      setIsMuted(nextMuted);
+      return;
     }
+
+    if (!isYoutubeEmbedSrc(resolved.src)) return;
+    if (isMuted) sendYoutubeIframeCommand(youtubeIframeRef.current, 'unMute');
+    else sendYoutubeIframeCommand(youtubeIframeRef.current, 'mute');
+    setIsMuted((m) => !m);
   };
 
   const mediaActivate = () => {
@@ -268,6 +286,7 @@ function HomepageVideoSlide({
                 playsInline
                 disablePictureInPicture
                 disableRemotePlayback
+                muted={isMuted}
                 controls={isPlaying}
                 onClick={(ev) => {
                   if (isPlaying) ev.stopPropagation();
@@ -275,6 +294,10 @@ function HomepageVideoSlide({
                 onPlay={() => setPlayingKey(slideKey)}
                 onPause={() => setPlayingKey((prev) => (prev === slideKey ? null : prev))}
                 onEnded={() => setPlayingKey(null)}
+                onVolumeChange={(ev) => {
+                  const el = ev.currentTarget;
+                  setIsMuted(el.muted);
+                }}
               />
             )}
 
@@ -298,31 +321,40 @@ function HomepageVideoSlide({
                       onLoad={() => {
                         // keep autoplay compliant; start muted until user explicitly unmutes
                         sendYoutubeIframeCommand(youtubeIframeRef.current, 'mute');
-                        setYoutubeIsMuted(true);
+                        setIsMuted(true);
                       }}
                     />
-                    {isYoutubePlaying ? (
-                      <button
-                        type="button"
-                        className="home-product-videos__sound-btn"
-                        onClick={onSoundToggleClick}
-                        aria-label={youtubeIsMuted ? 'Unmute video' : 'Mute video'}
-                      >
-                        {youtubeIsMuted ? (
-                          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                            <path d="M3 10v4h4l5 5V5L7 10H3zm13.59 2L19 14.41 20.41 13 18 10.59 20.41 8.17 19 6.76 16.59 9.17 14.17 6.76 12.76 8.17 15.17 10.59 12.76 13 14.17 14.41 16.59 12z" />
-                          </svg>
-                        ) : (
-                          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                            <path d="M3 10v4h4l5 5V5L7 10H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-                          </svg>
-                        )}
-                      </button>
-                    ) : null}
                   </>
                 ) : null}
               </>
             )}
+
+            {isPlaying &&
+            (resolvedVideo.mode === 'file' ||
+              (resolvedVideo.mode === 'embed' && isYoutubeEmbedSrc(resolvedVideo.src))) ? (
+              <button
+                type="button"
+                className="home-product-videos__sound-btn"
+                onClick={onSoundToggle}
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                }}
+                onTouchStart={(e) => {
+                  e.stopPropagation();
+                }}
+                aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+              >
+                {isMuted ? (
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M3 10v4h4l5 5V5L7 10H3zm13.59 2L19 14.41 20.41 13 18 10.59 20.41 8.17 19 6.76 16.59 9.17 14.17 6.76 12.76 8.17 15.17 10.59 12.76 13 14.17 14.41 16.59 12z" />
+                  </svg>
+                ) : (
+                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                    <path d="M3 10v4h4l5 5V5L7 10H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                  </svg>
+                )}
+              </button>
+            ) : null}
           </div>
         </div>
       </div>

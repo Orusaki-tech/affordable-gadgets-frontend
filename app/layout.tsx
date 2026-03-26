@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     url: brandConfig.siteUrl,
     images: [
       {
-        url: "/affordablegadgetslogo.png",
+        url: "/affordable-social-share.png",
         width: 1200,
         height: 630,
         alt: `${brandConfig.name} logo`,
@@ -46,11 +46,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: brandConfig.name,
     description: "Shop quality phones, laptops, tablets, and accessories at great prices",
-    images: ["/affordablegadgetslogo.png"],
+    images: ["/affordable-social-share.png"],
   },
   icons: {
-    icon: "/favicon.ico",
-    apple: "/affordablegadgetslogo.png",
+    icon: [
+      { url: "/affordlogo1.svg", type: "image/svg+xml" },
+      { url: "/affordable-social-share.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/affordable-social-share.png",
   },
 };
 

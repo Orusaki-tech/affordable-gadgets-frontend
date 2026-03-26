@@ -149,7 +149,7 @@ export const metadata: Metadata = {
     url: '/',
     images: [
       {
-        url: '/affordablegadgetslogo.png',
+        url: '/affordable-social-share.png',
         width: 1200,
         height: 630,
         alt: 'Affordable Gadgets Kenya',
@@ -161,7 +161,7 @@ export const metadata: Metadata = {
     title: 'Affordable Gadgets Ke | Premium Affordable Smartphones, Laptops and iPads in Kenya',
     description:
       'Your dream phone is waiting Upgrade with us. Best Deals on Ex-UK | Phones|Buy Latest Iphones,Samsung,Sony,Google Pixel,OnePlus at crazy good prices Kimathi House 4th Floor Suite 409. Call us on 0717881573.',
-    images: ['/affordablegadgetslogo.png'],
+    images: ['/affordable-social-share.png'],
   },
 };
 

@@ -18,7 +18,7 @@ interface ProductPageProps {
 
 const resolveProductImage = (product?: PublicProduct | null) => {
   if (!product?.primary_image) {
-    return "/affordablegadgetslogo.png";
+    return "/affordable-social-share.png";
   }
   if (product.primary_image.startsWith("http")) {
     return product.primary_image;

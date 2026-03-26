@@ -51,8 +51,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", type: "image/x-icon" },
-      { url: "/affordlogo1.svg", type: "image/svg+xml" },
-      { url: "/affordable-social-share.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
     apple: "/affordable-social-share.png",
   },

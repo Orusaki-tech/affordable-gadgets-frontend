@@ -7,6 +7,8 @@ import {
   useRef,
   useState,
   type Dispatch,
+  type KeyboardEvent,
+  type MouseEvent,
   type SetStateAction,
 } from 'react';
 import Image from 'next/image';
@@ -16,10 +18,11 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { ApiService } from '@/lib/api/generated';
 import type { PublicProductList } from '@/lib/api/generated';
+import { brandConfig } from '@/lib/config/brand';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import {
   resolveProductVideoMedia,
-  youtubePosterUrlFromLink,
+  youtubePosterCandidatesFromLink,
   type ResolvedProductVideo,
 } from '@/lib/utils/productVideo';
 
@@ -27,6 +30,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 const HOMEPAGE_VIDEOS_PAGE_SIZE = 24;
+const IMAGE_SIZES = '(max-width:640px) 233px, 247px';
 
 async function fetchHomepageVideoProducts(): Promise<PublicProductList[]> {
   const res = await ApiService.apiV1PublicProductsList(
@@ -47,8 +51,23 @@ async function fetchHomepageVideoProducts(): Promise<PublicProductList[]> {
   return rows.filter((p) => resolveProductVideoMedia(p) !== null);
 }
 
+function isYoutubeEmbedSrc(src: string): boolean {
+  try {
+    const href = src.startsWith('//') ? `https:${src}` : src;
+    return new URL(href).hostname.includes('youtube.com');
+  } catch {
+    return src.includes('youtube.com');
+  }
+}
+
 function buildEmbedAutoplaySrc(resolved: ResolvedProductVideo): string {
   const u = resolved.src;
+  let siteOrigin = '';
+  try {
+    siteOrigin = new URL(brandConfig.siteUrl).origin;
+  } catch {
+    siteOrigin = '';
+  }
   try {
     const href = u.startsWith('//') ? `https:${u}` : u;
     const parsed = new URL(href);
@@ -58,6 +77,8 @@ function buildEmbedAutoplaySrc(resolved: ResolvedProductVideo): string {
       parsed.searchParams.set('mute', '1');
       parsed.searchParams.set('modestbranding', '1');
       parsed.searchParams.set('rel', '0');
+      parsed.searchParams.set('enablejsapi', '1');
+      if (siteOrigin) parsed.searchParams.set('origin', siteOrigin);
       return parsed.toString();
     }
     if (parsed.hostname.includes('vimeo.com')) {
@@ -69,6 +90,47 @@ function buildEmbedAutoplaySrc(resolved: ResolvedProductVideo): string {
   }
   if (u.includes('autoplay=1')) return u;
   return `${u}${u.includes('?') ? '&' : '?'}autoplay=1`;
+}
+
+function sendYoutubeIframeCommand(iframe: HTMLIFrameElement | null, func: string) {
+  if (!iframe?.contentWindow) return;
+  try {
+    iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: [] }), 'https://www.youtube.com');
+  } catch {
+    /* noop */
+  }
+}
+
+function PosterImageFallback({
+  urls,
+  className,
+}: {
+  urls: string[];
+  className: string;
+}) {
+  const [idx, setIdx] = useState(0);
+  if (urls.length === 0) return null;
+  const safeIdx = Math.min(idx, urls.length - 1);
+  const src = urls[safeIdx];
+  const unoptimized =
+    src.includes('ytimg.com') ||
+    src.includes('localhost') ||
+    src.includes('placehold.co') ||
+    src.includes('cloudinary') ||
+    src.includes('railway.app');
+  return (
+    <Image
+      src={src}
+      alt=""
+      fill
+      className={className}
+      sizes={IMAGE_SIZES}
+      unoptimized={unoptimized}
+      onError={() => {
+        if (safeIdx < urls.length - 1) setIdx((i) => i + 1);
+      }}
+    />
+  );
 }
 
 function ChevronNavIcon({ flip }: { flip?: boolean }) {
@@ -97,14 +159,21 @@ function HomepageVideoSlide({
   deckKey: string;
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const youtubeIframeRef = useRef<HTMLIFrameElement | null>(null);
   const resolved = resolveProductVideoMedia(product);
   const name = product.product_name ?? 'Product';
   const href = getProductHref(product);
   const slideKey = `${deckKey}-${product.id}`;
   const isPlaying = playingKey === slideKey;
-  const embedPosterUrl =
-    product.primary_image ||
-    (product.product_video_url ? youtubePosterUrlFromLink(product.product_video_url) : null);
+  const ytCandidates = product.product_video_url ? youtubePosterCandidatesFromLink(product.product_video_url) : [];
+  const posterUrls = [
+    ...ytCandidates,
+    ...(product.primary_image ? [product.primary_image] : []),
+  ];
+  const embedPosterUrls = posterUrls.length > 0 ? posterUrls : [];
+  const isYoutubePlaying = Boolean(
+    resolved?.mode === 'embed' && isPlaying && resolved.src && isYoutubeEmbedSrc(resolved.src)
+  );
 
   const setRef = useCallback(
     (el: HTMLVideoElement | null) => {
@@ -133,17 +202,37 @@ function HomepageVideoSlide({
     }
   };
 
+  const onUnmuteClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    sendYoutubeIframeCommand(youtubeIframeRef.current, 'unMute');
+  };
+
+  const mediaActivate = () => {
+    if (resolved.mode === 'embed' && isPlaying) return;
+    toggle();
+  };
+
   const showPlay = !isPlaying;
   const playClassMods = showPlay ? 'group-hover:hidden' : 'home-product-videos__play--hidden';
+
+  const onMediaKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      mediaActivate();
+    }
+  };
 
   return (
     <div className="home-product-videos__slide-stack w-[calc(700px/3)] shrink-0 sm:w-[calc(740px/3)]">
       <div className="home-product-videos__slide-inner">
-        <button
-          type="button"
-          className="group relative h-full w-full grow-0 cursor-pointer border-0 bg-transparent p-0 outline-none"
-          onClick={() => toggle()}
-          aria-label={`Play video: ${name}`}
+        <div
+          role="button"
+          tabIndex={0}
+          className="group relative h-full w-full grow-0 cursor-pointer outline-none"
+          onClick={mediaActivate}
+          onKeyDown={onMediaKeyDown}
+          aria-label={isPlaying ? `Video playing: ${name}` : `Play video: ${name}`}
         >
           <div className="home-product-videos__media-wrap">
             <span
@@ -177,36 +266,40 @@ function HomepageVideoSlide({
 
             {resolved.mode === 'embed' && (
               <>
-                {!isPlaying && embedPosterUrl ? (
-                  <Image
-                    src={embedPosterUrl}
-                    alt=""
-                    fill
-                    className="home-product-videos__poster rounded-xl"
-                    sizes="(max-width:640px) 233px, 247px"
-                    unoptimized={
-                      embedPosterUrl.includes('ytimg.com') ||
-                      embedPosterUrl.includes('localhost') ||
-                      embedPosterUrl.includes('placehold.co')
-                    }
-                  />
+                {!isPlaying && embedPosterUrls.length > 0 ? (
+                  <PosterImageFallback urls={embedPosterUrls} className="home-product-videos__poster rounded-xl" />
                 ) : null}
-                {!isPlaying && !embedPosterUrl ? (
+                {!isPlaying && embedPosterUrls.length === 0 ? (
                   <div className="absolute inset-0 rounded-xl bg-neutral-900" aria-hidden />
                 ) : null}
                 {isPlaying ? (
-                  <iframe
-                    title={name}
-                    className="home-product-videos__embed-frame"
-                    src={buildEmbedAutoplaySrc(resolved)}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  />
+                  <>
+                    <iframe
+                      ref={youtubeIframeRef}
+                      title={name}
+                      className="home-product-videos__embed-frame"
+                      src={buildEmbedAutoplaySrc(resolved)}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                    {isYoutubePlaying ? (
+                      <button
+                        type="button"
+                        className="home-product-videos__sound-btn"
+                        onClick={onUnmuteClick}
+                        aria-label="Unmute video"
+                      >
+                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                          <path d="M3 10v4h4l5 5V5L7 10H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                        </svg>
+                      </button>
+                    ) : null}
+                  </>
                 ) : null}
               </>
             )}
           </div>
-        </button>
+        </div>
       </div>
       <Link
         href={href}

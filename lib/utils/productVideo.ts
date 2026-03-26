@@ -51,11 +51,23 @@ export function youtubeVideoIdFromLink(url: string): string | null {
   return videoId.split('&')[0].split('?')[0] || null;
 }
 
-/** Static poster for carousel slides when the product has no primary image (9:16 frame uses object-cover). */
-export function youtubePosterUrlFromLink(url: string): string | null {
+/** Ordered YouTube stills: highest quality first (may 404 on some videos; fall through in UI). */
+export function youtubePosterCandidatesFromLink(url: string): string[] {
   const id = youtubeVideoIdFromLink(url);
-  if (!id) return null;
-  return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+  if (!id) return [];
+  const base = `https://i.ytimg.com/vi/${id}`;
+  return [
+    `${base}/maxresdefault.jpg`,
+    `${base}/sddefault.jpg`,
+    `${base}/hqdefault.jpg`,
+    `${base}/mqdefault.jpg`,
+  ];
+}
+
+/** First candidate only (legacy / simple call sites). */
+export function youtubePosterUrlFromLink(url: string): string | null {
+  const c = youtubePosterCandidatesFromLink(url);
+  return c[0] ?? null;
 }
 
 export function youtubeEmbedUrlFromLink(url: string, autoplay = false): string | null {

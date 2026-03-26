@@ -395,8 +395,9 @@
 
 @media (max-width: 639px) {
   .product-detail__promo-row {
-    min-height: 96px;
-    padding: 12px 14px;
+    align-items: flex-start;
+    min-height: 112px;
+    padding: 14px 14px;
   }
 }
 

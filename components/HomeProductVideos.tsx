@@ -137,7 +137,7 @@ function HomepageVideoSlide({
   const playClassMods = showPlay ? 'group-hover:hidden' : 'home-product-videos__play--hidden';
 
   return (
-    <div className="home-product-videos__slide-stack w-[175px] shrink-0 sm:w-[185px]">
+    <div className="home-product-videos__slide-stack w-[calc(700px/3)] shrink-0 sm:w-[calc(740px/3)]">
       <div className="home-product-videos__slide-inner">
         <button
           type="button"
@@ -150,7 +150,7 @@ function HomepageVideoSlide({
               className={`home-product-videos__play ${playClassMods}`}
               aria-hidden
             >
-              <svg className="ml-1 h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="ml-1 h-5 w-5 sm:h-6 sm:w-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
             </span>
@@ -158,7 +158,7 @@ function HomepageVideoSlide({
             {resolved.mode === 'file' && (
               <video
                 ref={setRef}
-                className="h-full max-h-[50vh] w-full rounded-xl object-cover"
+                className="h-full max-h-[min(calc(200vh/3),calc(2080px/3))] w-full rounded-xl object-cover"
                 src={resolved.src}
                 poster={product.primary_image ?? undefined}
                 preload="none"
@@ -183,7 +183,7 @@ function HomepageVideoSlide({
                     alt=""
                     fill
                     className="home-product-videos__poster rounded-xl"
-                    sizes="185px"
+                    sizes="(max-width:640px) 233px, 247px"
                     unoptimized={
                       embedPosterUrl.includes('ytimg.com') ||
                       embedPosterUrl.includes('localhost') ||
@@ -253,7 +253,7 @@ export function HomeProductVideos() {
             {[...Array(5)].map((_, i) => (
               <div
                 key={`hpv-skel-${i}`}
-                className="h-[min(50vh,520px)] w-[175px] shrink-0 animate-pulse rounded-xl bg-gray-200 sm:w-[185px]"
+                className="h-[min(calc(200vh/3),calc(2080px/3))] w-[calc(700px/3)] shrink-0 animate-pulse rounded-xl bg-gray-200 sm:w-[calc(740px/3)]"
               />
             ))}
           </div>

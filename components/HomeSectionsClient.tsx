@@ -43,7 +43,7 @@ export const HomeProductVideosClient = dynamic(
             {[...Array(5)].map((_, i) => (
               <div
                 key={`home-videos-skel-${i}`}
-                className="h-[min(50vh,520px)] w-[175px] shrink-0 animate-pulse rounded-xl bg-gray-200 sm:w-[185px]"
+                className="h-[min(calc(200vh/3),calc(2080px/3))] w-[calc(700px/3)] shrink-0 animate-pulse rounded-xl bg-gray-200 sm:w-[calc(740px/3)]"
               />
             ))}
           </div>

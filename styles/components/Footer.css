@@ -18,7 +18,9 @@
 }
 
 .site-footer__logo-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
@@ -26,6 +28,13 @@
   object-fit: contain;
   height: 64px;
   width: auto;
+}
+
+.site-footer__logo-text {
+  color: var(--ui-white);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
 }
 
 .site-footer__about-text {

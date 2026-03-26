@@ -12,14 +12,15 @@ export function Footer() {
           {/* About */}
           <div className="site-footer__about">
             <Link href="/" className="site-footer__logo-link">
-              <Image 
-                src="/affordlogo2.svg" 
+              <Image
+                src="/affordlogo2.svg"
                 alt={`${brandConfig.name} logo`}
-                width={120}
-                height={120}
+                width={100}
+                height={100}
                 className="site-footer__logo"
                 priority
               />
+              <span className="site-footer__logo-text">Affordable Gadgets KE</span>
             </Link>
             <p className="site-footer__about-text">
               Quality electronics at great prices. Shop phones, laptops, tablets, and accessories with confidence.

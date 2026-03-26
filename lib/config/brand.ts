@@ -70,13 +70,13 @@ const normalizeSiteUrl = (url: string | undefined): string => {
 
 export const brandConfig = {
   code: process.env.NEXT_PUBLIC_BRAND_CODE || 'AFFORDABLE_GADGETS',
-  name: process.env.NEXT_PUBLIC_BRAND_NAME || 'Affordable Gadgets Ke',
+  name: process.env.NEXT_PUBLIC_BRAND_NAME || 'Affordable Gadgets KE',
   apiBaseUrl: normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL),
   // Prefer an explicit public site URL; fall back to our canonical domain
   siteUrl: normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.affordable-gadgetske.com'),
   // Business information for LocalBusiness schema
   business: {
-    name: 'Affordable Gadgets Ke',
+    name: 'Affordable Gadgets KE',
     description: 'Your go to destination for affordable tech devices, PCs & accessories. Quality Gadgets at unbeatable prices!',
     address: {
       streetAddress: 'Kimathi House Room 409',

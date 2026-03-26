@@ -1,18 +1,115 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Affordable Gadgets favicon">
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  viewBox="0 0 1500 1499.999933"
+  role="img"
+  aria-label="Affordable Gadgets favicon"
+  preserveAspectRatio="xMidYMid meet"
+>
   <defs>
-    <clipPath id="clip">
-      <circle cx="32" cy="32" r="30" />
+    <clipPath id="clipOuter">
+      <path
+        d="M 131.585938 131.585938 L 1368.335938 131.585938 L 1368.335938 1368.335938 L 131.585938 1368.335938 Z M 131.585938 131.585938"
+        clip-rule="nonzero"
+      />
+    </clipPath>
+    <clipPath id="clipCircle">
+      <path
+        d="M 749.996094 131.585938 C 408.457031 131.585938 131.585938 408.457031 131.585938 749.996094 C 131.585938 1091.535156 408.457031 1368.40625 749.996094 1368.40625 C 1091.535156 1368.40625 1368.40625 1091.535156 1368.40625 749.996094 C 1368.40625 408.457031 1091.535156 131.585938 749.996094 131.585938 Z M 749.996094 131.585938"
+        clip-rule="nonzero"
+      />
+    </clipPath>
+    <clipPath id="clipPhoneOuter">
+      <path
+        d="M 521.5 374.214844 L 976.042969 374.214844 L 976.042969 1125.457031 L 521.5 1125.457031 Z M 521.5 374.214844"
+        clip-rule="nonzero"
+      />
+    </clipPath>
+    <clipPath id="clipPhoneBody">
+      <path
+        d="M 604.085938 374.214844 L 893.449219 374.214844 C 939.070312 374.214844 976.042969 411.1875 976.042969 456.800781 L 976.042969 1042.804688 C 976.042969 1088.417969 939.070312 1125.390625 893.449219 1125.390625 L 604.085938 1125.390625 C 558.472656 1125.390625 521.5 1088.417969 521.5 1042.804688 L 521.5 456.800781 C 521.5 411.1875 558.472656 374.214844 604.085938 374.214844 Z M 604.085938 374.214844"
+        clip-rule="nonzero"
+      />
+    </clipPath>
+    <clipPath id="clipDotBox">
+      <path
+        d="M 718.777344 1003.828125 L 783.191406 1003.828125 L 783.191406 1068.253906 L 718.777344 1068.253906 Z M 718.777344 1003.828125"
+        clip-rule="nonzero"
+      />
+    </clipPath>
+    <clipPath id="clipDotCircle">
+      <path
+        d="M 750.988281 1003.828125 C 733.199219 1003.828125 718.777344 1018.25 718.777344 1036.042969 C 718.777344 1053.832031 733.199219 1068.253906 750.988281 1068.253906 C 768.773438 1068.253906 783.191406 1053.832031 783.191406 1036.042969 C 783.191406 1018.25 768.773438 1003.828125 750.988281 1003.828125 Z M 750.988281 1003.828125"
+        clip-rule="nonzero"
+      />
+    </clipPath>
+    <clipPath id="clipPhoneScreen">
+      <path
+        d="M 570.210938 452.847656 L 931.769531 452.847656 L 931.769531 964.054688 L 570.210938 964.054688 Z M 570.210938 452.847656"
+        clip-rule="nonzero"
+      />
+    </clipPath>
+    <clipPath id="clipPhoneSpeaker">
+      <path
+        d="M 695.058594 399.101562 L 806.917969 399.101562 L 806.917969 426.070312 L 695.058594 426.070312 Z M 695.058594 399.101562"
+        clip-rule="nonzero"
+      />
     </clipPath>
   </defs>
 
-  <!-- Transparent background; draw within a circle -->
-  <g clip-path="url(#clip)">
-    <!-- Outer ring -->
-    <circle cx="32" cy="32" r="28" fill="none" stroke="#111827" stroke-width="4" />
+  <g clip-path="url(#clipOuter)">
+    <g clip-path="url(#clipCircle)">
+      <path
+        stroke-linecap="butt"
+        transform="matrix(0.75, 0, 0, 0.75, 131.586862, 131.586809)"
+        fill="none"
+        stroke-linejoin="miter"
+        d="M 824.545713 -0.00116155 C 369.160257 -0.00116155 -0.00123269 369.160329 -0.00123269 824.545784 C -0.00123269 1279.93124 369.160257 1649.09273 824.545713 1649.09273 C 1279.931169 1649.09273 1649.092659 1279.93124 1649.092659 824.545784 C 1649.092659 369.160329 1279.931169 -0.00116155 824.545713 -0.00116155 Z M 824.545713 -0.00116155"
+        stroke="#ffffff"
+        stroke-width="40"
+        stroke-opacity="1"
+        stroke-miterlimit="4"
+      />
+    </g>
+  </g>
 
-    <!-- Simple phone glyph -->
-    <rect x="24" y="14" width="16" height="36" rx="3.5" fill="none" stroke="#111827" stroke-width="3" />
-    <rect x="27.5" y="18" width="9" height="25" rx="1.5" fill="#111827" opacity="0.04" />
-    <circle cx="32" cy="46.5" r="1.6" fill="#111827" />
+  <g clip-path="url(#clipPhoneOuter)">
+    <g clip-path="url(#clipPhoneBody)">
+      <path
+        fill="#ffffff"
+        d="M 521.5 374.214844 L 976.042969 374.214844 L 976.042969 1125.273438 L 521.5 1125.273438 Z M 521.5 374.214844"
+        fill-opacity="1"
+        fill-rule="nonzero"
+      />
+    </g>
+  </g>
+
+  <g clip-path="url(#clipDotBox)">
+    <g clip-path="url(#clipDotCircle)">
+      <path
+        fill="#10131d"
+        d="M 718.777344 1003.828125 L 783.191406 1003.828125 L 783.191406 1068.253906 L 718.777344 1068.253906 Z M 718.777344 1003.828125"
+        fill-opacity="1"
+        fill-rule="nonzero"
+      />
+    </g>
+  </g>
+
+  <g clip-path="url(#clipPhoneScreen)">
+    <path
+      fill="#10131d"
+      d="M 570.210938 452.847656 L 931.769531 452.847656 L 931.769531 964.105469 L 570.210938 964.105469 Z M 570.210938 452.847656"
+      fill-opacity="1"
+      fill-rule="nonzero"
+    />
+  </g>
+
+  <g clip-path="url(#clipPhoneSpeaker)">
+    <path
+      fill="#10131d"
+      d="M 695.058594 399.101562 L 806.960938 399.101562 L 806.960938 426.070312 L 695.058594 426.070312 Z M 695.058594 399.101562"
+      fill-opacity="1"
+      fill-rule="nonzero"
+    />
   </g>
 </svg>

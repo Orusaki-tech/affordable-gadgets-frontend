@@ -16,7 +16,7 @@
   top: 0;
   right: 0;
   height: 100%;
-  width: min(520px, 100vw);
+  width: min(440px, 100vw);
   background: #fff;
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.18);
   display: flex;
@@ -77,6 +77,11 @@
 .promo-videos-drawer__body {
   padding: 14px 16px 18px 16px;
   overflow: auto;
+}
+
+/* In the offer drawer, always show the sound toggle (desktop + mobile). */
+.promo-videos-drawer .home-product-videos__sound-btn {
+  display: flex;
 }
 
 @media (max-width: 639px) {

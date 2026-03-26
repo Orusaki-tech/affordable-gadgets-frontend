@@ -1,5 +1,5 @@
 .site-footer {
-  background: linear-gradient(to bottom, var(--ui-gray-900), var(--ui-slate-950));
+  background: #10131f;
   color: var(--ui-gray-300);
   margin-top: 80px;
 }

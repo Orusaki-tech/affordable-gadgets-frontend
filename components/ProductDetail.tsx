@@ -5,7 +5,7 @@ import { usePromotion } from '@/lib/hooks/usePromotions';
 import { useBundles } from '@/lib/hooks/useBundles';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
-import type { PublicBundle, PublicBundleItem, PublicProduct, PublicInventoryUnitPublic, InventoryUnitImage } from '@/lib/api/generated';
+import { OpenAPI, type PublicBundle, type PublicBundleItem, type PublicProduct, type PublicInventoryUnitPublic, type InventoryUnitImage } from '@/lib/api/generated';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -214,6 +214,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const router = useRouter();
 
   const [isPromoVideosOpen, setIsPromoVideosOpen] = useState(false);
+  const [isFinancingOpen, setIsFinancingOpen] = useState(false);
   
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
   const productId = product?.id;
@@ -772,6 +773,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     return details.length > 0 ? details.join(' • ') : 'Check out our best offers';
   }, [promotion]);
 
+  const financingOffers = useMemo(() => {
+    const offers = (product as any)?.financing_offers;
+    return Array.isArray(offers) ? offers : [];
+  }, [product]);
+
+  const financingAvailable = Boolean((product as any)?.financing_available) || financingOffers.length > 0;
+
   if (!product && productLoading) {
     return (
       <div className="product-detail__loading">
@@ -932,6 +940,33 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               </div>
             )}
           </div>
+
+          {financingAvailable && (
+            <div className="product-detail__promo" style={{ marginTop: 12 }}>
+              <div className="product-detail__promo-row">
+                <span className="product-detail__promo-icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.75 6A3.25 3.25 0 0 1 6 2.75h12A3.25 3.25 0 0 1 21.25 6v12A3.25 3.25 0 0 1 18 21.25H6A3.25 3.25 0 0 1 2.75 18V6Zm3.25-.75A.75.75 0 0 0 5.25 6v.5h13.5V6a.75.75 0 0 0-.75-.75H6Zm12.75 4H5.25V18c0 .414.336.75.75.75h12a.75.75 0 0 0 .75-.75V9.25Zm-10.5 3a1.25 1.25 0 1 0 0 2.5h3.5a1.25 1.25 0 1 0 0-2.5h-3.5Z" />
+                  </svg>
+                </span>
+                <div className="product-detail__promo-body">
+                  <h3 className="product-detail__promo-title">Buy Now, Pay Later</h3>
+                  <p className="product-detail__promo-copy">
+                    Financing available for this product. View offers and request a call back.
+                  </p>
+                </div>
+                <div className="product-detail__promo-cta-wrap">
+                  <button
+                    type="button"
+                    className="product-detail__promo-cta"
+                    onClick={() => setIsFinancingOpen(true)}
+                  >
+                    View offers
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="product-detail__quick-tabs" role="navigation" aria-label="Jump to product sections">
             {(
@@ -1695,6 +1730,207 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         products={promoDrawerProducts}
         onClose={() => setIsPromoVideosOpen(false)}
       />
+
+      {isFinancingOpen && (
+        <FinancingModal
+          product={product}
+          offers={financingOffers}
+          onClose={() => setIsFinancingOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+function FinancingModal({
+  product,
+  offers,
+  onClose,
+}: {
+  product: PublicProduct;
+  offers: any[];
+  onClose: () => void;
+}) {
+  const [selectedOfferId, setSelectedOfferId] = useState<number | null>(
+    typeof offers?.[0]?.id === 'number' ? offers[0].id : null
+  );
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, any[]>();
+    for (const o of offers || []) {
+      const key = String(o.provider_name || 'Provider');
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(o);
+    }
+    return Array.from(map.entries()).map(([providerName, list]) => ({
+      providerName,
+      providerLogoUrl: list?.[0]?.provider_logo_url ?? null,
+      offers: list,
+    }));
+  }, [offers]);
+
+  const selectedOffer = useMemo(
+    () => (offers || []).find((o) => typeof o.id === 'number' && o.id === selectedOfferId) ?? null,
+    [offers, selectedOfferId]
+  );
+
+  const submitInquiry = async () => {
+    if (!name.trim() || !phone.trim() || !email.trim()) {
+      alert('Please fill in name, phone and email.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const base = OpenAPI.BASE.replace(/\/+$/, '');
+      const headers: Record<string, string> = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        ...(typeof OpenAPI.HEADERS === 'function'
+          ? await OpenAPI.HEADERS({} as never)
+          : (OpenAPI.HEADERS ?? {})),
+      };
+      const res = await fetch(`${base}/api/v1/public/financing/inquiry/`, {
+        method: 'POST',
+        credentials: 'omit',
+        headers,
+        body: JSON.stringify({
+          name: name.trim(),
+          phone: phone.trim(),
+          email: email.trim(),
+          product_id: product.id,
+          provider_id: selectedOffer?.provider ?? null,
+          offer_id: selectedOffer?.id ?? null,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = (data && (data.error || data.detail)) ? String(data.error || data.detail) : `Request failed (${res.status})`;
+        throw new Error(msg);
+      }
+      alert('Inquiry received. Our team will reach out shortly.');
+      onClose();
+    } catch (e: any) {
+      alert(e?.message || 'Failed to submit inquiry.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="product-card__modal" onClick={onClose}>
+      <div className="product-card__modal-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="product-card__modal-header">
+          <div>
+            <h4 className="product-card__modal-title">Financing offers</h4>
+            <p className="product-card__modal-subtitle">{product.product_name}</p>
+          </div>
+          <button type="button" onClick={onClose} className="product-card__modal-close" aria-label="Close">
+            ×
+          </button>
+        </div>
+        <div className="product-card__modal-body" style={{ gridTemplateColumns: '1fr', gap: 16 }}>
+          {grouped.length === 0 ? (
+            <div className="product-detail__loading-inline">No active financing offers.</div>
+          ) : (
+            <>
+              <div style={{ display: 'grid', gap: 12 }}>
+                {grouped.map((g) => (
+                  <div key={g.providerName} style={{ border: '1px solid var(--ui-gray-200)', borderRadius: 12, padding: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      {g.providerLogoUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={g.providerLogoUrl}
+                          alt={g.providerName}
+                          style={{ width: 28, height: 28, borderRadius: 8, objectFit: 'contain', background: 'var(--ui-white)' }}
+                        />
+                      ) : (
+                        <span style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--ui-gray-50)', display: 'inline-block' }} />
+                      )}
+                      <strong>{g.providerName}</strong>
+                    </div>
+                    <div style={{ display: 'grid', gap: 8 }}>
+                      {g.offers.map((o: any) => (
+                        <label
+                          key={o.id}
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: '18px 1fr',
+                            gap: 10,
+                            padding: 10,
+                            borderRadius: 10,
+                            border: '1px solid var(--ui-gray-200)',
+                            background: selectedOfferId === o.id ? 'var(--ui-gray-50)' : 'var(--ui-white)',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <input
+                            type="radio"
+                            name="financing-offer"
+                            checked={selectedOfferId === o.id}
+                            onChange={() => setSelectedOfferId(o.id)}
+                            style={{ marginTop: 3 }}
+                          />
+                          <div>
+                            <div style={{ fontWeight: 700 }}>
+                              Deposit {o.deposit_amount} • Retail {o.retail_amount}
+                            </div>
+                            <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>
+                              Daily {o.daily_payment} • Weekly {o.weekly_payment} • Monthly {o.monthly_payment}
+                              {(o.rom_gb || o.ram_gb) ? ` • ${o.rom_gb ? `${o.rom_gb}GB` : ''}${o.rom_gb && o.ram_gb ? ' / ' : ''}${o.ram_gb ? `${o.ram_gb}GB RAM` : ''}` : ''}
+                            </div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--ui-gray-200)', paddingTop: 12, display: 'grid', gap: 10 }}>
+                <div style={{ fontWeight: 700 }}>Request a callback</div>
+                <div style={{ display: 'grid', gap: 8 }}>
+                  <input
+                    className="products-page__search-input"
+                    placeholder="Your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    disabled={submitting}
+                  />
+                  <input
+                    className="products-page__search-input"
+                    placeholder="Phone number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    disabled={submitting}
+                  />
+                  <input
+                    className="products-page__search-input"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={submitting}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="products-page__search-button"
+                  onClick={submitInquiry}
+                  disabled={submitting}
+                  style={{ width: '100%' }}
+                >
+                  {submitting ? 'Submitting...' : 'Submit inquiry'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

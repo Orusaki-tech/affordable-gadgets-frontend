@@ -935,6 +935,10 @@
   background: var(--ui-amber-500);
 }
 
+.product-card__badge--financing {
+  background: var(--ui-emerald-600);
+}
+
 .product-card__badge--stock {
   position: absolute;
   top: 12px;

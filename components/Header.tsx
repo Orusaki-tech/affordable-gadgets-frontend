@@ -24,6 +24,7 @@ export function Header() {
     { href: '/', label: 'Home' },
     { href: '/categories', label: 'Categories' },
     { href: '/categories#accessories', label: 'Accessories' },
+    { href: '/financing', label: 'Financing' },
   ];
 
   const productCategories = [

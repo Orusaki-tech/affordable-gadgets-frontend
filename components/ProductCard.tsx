@@ -91,6 +91,7 @@ export function ProductCard({
     ? rawTags.filter((tag) => /ship|delivery|shipping/i.test(tag)).slice(0, 1)
     : [];
   const lowStock = hasStock && availableCount > 0 && availableCount <= 3;
+  const financingAvailable = Boolean((product as any)?.financing_available);
 
   const queryClient = useQueryClient();
   const shouldLoadUnits = allowSwatches || allowQuickActions || allowQuickView || isFeaturedVariant;
@@ -572,6 +573,11 @@ export function ProductCard({
             {bundlePricePreview ? `Bundle from ${formatPrice(bundlePricePreview)}` : 'Bundle available'}
           </div>
         )}
+            {!isMinimal && financingAvailable && (
+              <div className="product-card__badge product-card__badge--financing">
+                Financing available
+              </div>
+            )}
             {isOnSale && (
               <div className="product-card__badge product-card__badge--sale">
                 {discountPercent ? `Save ${discountPercent}%` : 'Sale'}

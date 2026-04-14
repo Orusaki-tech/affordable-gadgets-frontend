@@ -7,23 +7,21 @@ export const revalidate = 3600;
 
 export default function FinancingPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="app-page">
       <Suspense
         fallback={
-          <div className="site-header-wrapper">
-            <HeaderWithAnnouncement />
-          </div>
+          <HeaderWithAnnouncement />
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="app-page__main page-container u-py-8">
         <Suspense
           fallback={
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="financing-page-skeleton-grid u-animate-pulse">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-96" />
+                <div key={i} className="financing-page-skeleton-card" />
               ))}
             </div>
           }

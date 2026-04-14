@@ -26,7 +26,7 @@ export default function Categories() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="app-page">
       <StructuredData type="LocalBusiness" />
       <StructuredData
         type="BreadcrumbList"
@@ -48,39 +48,35 @@ export default function Categories() {
       />
       <Suspense
         fallback={
-          <div className="site-header-wrapper">
-            <HeaderWithAnnouncement />
-          </div>
+          <HeaderWithAnnouncement />
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <section className="mx-auto mb-8 max-w-4xl rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--primary)]">
-            Explore categories
-          </p>
-          <p className="mt-3 text-base leading-7 text-gray-600 sm:text-lg">
+      <main className="app-page__main page-container u-py-8">
+        <section className="page-intro-block page-intro-block--4xl">
+          <p className="page-intro-block__kicker">Explore categories</p>
+          <p className="page-intro-block__copy page-intro-block__copy--after-kicker">
             Browse our collection by product type to quickly find smartphones, laptops, tablets, iPads,
             and everyday accessories. Each category links directly to relevant products so shoppers and
             search engines can discover the right section faster.
           </p>
-          <p className="mt-2 text-sm leading-6 text-gray-600 sm:text-base">
+          <p className="page-intro-block__copy--small">
             Use the quick links below to jump into the category that matches how you shop&mdash;whether
             you are upgrading your main phone, looking for a work laptop, or adding affordable accessories
             like earphones, chargers, and cases.
           </p>
-          <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
-            <Link href="/products?type=PH" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+          <div className="page-pill-links">
+            <Link href="/products?type=PH" className="page-pill-link">
               Phones
             </Link>
-            <Link href="/products?type=LT" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+            <Link href="/products?type=LT" className="page-pill-link">
               Laptops
             </Link>
-            <Link href="/products?type=TB" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+            <Link href="/products?type=TB" className="page-pill-link">
               Tablets & iPads
             </Link>
-            <Link href="/products?type=AC" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+            <Link href="/products?type=AC" className="page-pill-link">
               Accessories
             </Link>
           </div>

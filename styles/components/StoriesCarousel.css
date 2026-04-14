@@ -43,21 +43,21 @@
   border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 1px 3px var(--ui-black-10);
+  box-shadow: 0 1px 3px var(--alpha-black-900-10);
   transition: box-shadow 200ms, transform 200ms;
 }
 
 .stories-carousel__tile:hover {
-  box-shadow: 0 6px 16px var(--ui-black-12);
+  box-shadow: var(--shadow-lg-12);
 }
 
 .stories-carousel__tile--placeholder {
-  background: var(--ui-lime-400-60);
+  background: var(--alpha-secondary-400-60);
   cursor: default;
 }
 
 .stories-carousel__tile--placeholder:hover {
-  box-shadow: 0 1px 3px var(--ui-black-10);
+  box-shadow: 0 1px 3px var(--alpha-black-900-10);
 }
 
 .stories-carousel__media-wrap {
@@ -93,7 +93,7 @@
 
 .stories-carousel__skeleton-banner,
 .stories-carousel__skeleton-tile {
-  background: var(--ui-gray-100);
+  background: var(--surface-action);
   border-radius: 16px;
   animation: stories-carousel-pulse 1.6s ease-in-out infinite;
 }
@@ -111,7 +111,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ui-black-80);
+  background: var(--alpha-black-900-80);
   backdrop-filter: blur(6px);
   padding: 16px;
 }
@@ -121,10 +121,10 @@
   width: 100%;
   max-width: 64rem;
   aspect-ratio: 16 / 9;
-  background: var(--ui-black);
+  background: var(--text-color-title);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 20px 40px var(--ui-black-40);
+  box-shadow: var(--shadow-drawer-40);
 }
 
 .stories-carousel__modal-close {
@@ -135,8 +135,8 @@
   width: 40px;
   height: 40px;
   border-radius: 9999px;
-  background: var(--ui-white-10);
-  color: var(--ui-white);
+  background: var(--alpha-neutral-2-50-10);
+  color: var(--surface-default);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -146,7 +146,7 @@
 }
 
 .stories-carousel__modal-close:hover {
-  background: var(--ui-white-20);
+  background: var(--alpha-neutral-2-50-20);
 }
 
 .stories-carousel__modal-close-icon {
@@ -166,11 +166,11 @@
   right: 0;
   bottom: 0;
   padding: 16px;
-  background: linear-gradient(to top, var(--ui-black-60), transparent);
+  background: linear-gradient(to top, var(--alpha-black-900-60), transparent);
 }
 
 .stories-carousel__modal-title {
-  color: var(--ui-white);
+  color: var(--surface-default);
   font-weight: 600;
 }
 

@@ -2,9 +2,9 @@
 
 /* Match collection header banner placeholder color (gray) */
 .announcement-bar {
-  background-color: #f2f3f7;
+  background-color: var(--surface-action);
   /* Dark text for strong contrast on the light background */
-  color: #3e3e3e;
+  color: var(--text-color-body);
   box-sizing: border-box;
   width: 100%;
   /* Reserve height to avoid CLS during hydration. */
@@ -13,7 +13,7 @@
 
 .announcement-bar--placeholder {
   /* Keep the same background so the header stack looks stable. */
-  background-color: #f2f3f7;
+  background-color: var(--surface-action);
 }
 
 /* Same container as site-header for vertical alignment */
@@ -92,12 +92,11 @@
 }
 
 .announcement-bar__close:hover {
-  color: var(--foreground);
-  background-color: var(--ui-black-10);
+  background-color: var(--alpha-black-900-10);
 }
 
 .announcement-bar__close:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--border-focus, var(--text-color-title));
   outline-offset: 2px;
 }
 

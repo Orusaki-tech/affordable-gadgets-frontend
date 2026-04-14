@@ -7,7 +7,7 @@
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
-  color: var(--ui-gray-800);
+  color: var(--text-color-title);
   margin-bottom: 16px;
   text-align: center;
 }
@@ -34,17 +34,17 @@
   gap: 8px;
   min-width: 88px;
   padding: 16px 12px;
-  background: var(--ui-white);
-  border: 1px solid var(--ui-gray-200);
-  color: var(--ui-gray-700);
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  color: var(--text-color-heading);
   border-radius: 8px;
   transition: color 200ms, border-color 200ms;
   text-decoration: none;
 }
 
 .quick-access__item:hover {
-  border-color: var(--ui-gray-300);
-  color: var(--ui-gray-900);
+  border-color: var(--border-action-hover);
+  color: var(--text-color-title);
 }
 
 .quick-access__icon {

@@ -129,7 +129,7 @@ function PosterImageFallback({
 
 function ChevronNavIcon({ flip }: { flip?: boolean }) {
   return (
-    <svg className="block h-3 w-3 fill-current" viewBox="0 0 100 100" aria-hidden>
+    <svg className="home-product-videos__chevron-svg" viewBox="0 0 100 100" aria-hidden>
       <path
         fill="currentColor"
         d="M 10,50 L 60,100 L 70,90 L 30,50 L 70,10 L 60,0 Z"
@@ -223,8 +223,9 @@ function VideoSlide({
     setIsMuted((m) => !m);
   };
 
-  const showPlay = !isPlaying;
-  const playClassMods = showPlay ? 'group-hover:hidden' : 'home-product-videos__play--hidden';
+  const playClassMods = !isPlaying
+    ? 'home-product-videos__play--hide-on-hover'
+    : 'home-product-videos__play--hidden';
 
   const onMediaKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -234,19 +235,19 @@ function VideoSlide({
   };
 
   return (
-    <div className="home-product-videos__slide-stack w-[calc(700px/3)] shrink-0 sm:w-[calc(740px/3)]">
+    <div className="home-product-videos__slide-stack">
       <div className="home-product-videos__slide-inner">
         <div
           role="button"
           tabIndex={0}
-          className="group relative h-full w-full grow-0 cursor-pointer outline-none"
+          className="home-product-videos__media-hit"
           onClick={toggle}
           onKeyDown={onMediaKeyDown}
           aria-label={isPlaying ? `Video playing: ${name}` : `Play video: ${name}`}
         >
           <div className="home-product-videos__media-wrap">
             <span className={`home-product-videos__play ${playClassMods}`} aria-hidden>
-              <svg className="ml-1 h-5 w-5 sm:h-6 sm:w-6" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="home-product-videos__play-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
             </span>
@@ -254,7 +255,7 @@ function VideoSlide({
             {resolvedVideo.mode === 'file' && (
               <video
                 ref={setRef}
-                className="h-full max-h-[min(calc(200vh/3),calc(2080px/3))] w-full rounded-xl object-cover"
+                className="home-product-videos__video-el"
                 src={resolvedVideo.src}
                 poster={product.primary_image ?? undefined}
                 preload="none"
@@ -279,10 +280,10 @@ function VideoSlide({
             {resolvedVideo.mode === 'embed' && (
               <>
                 {!isPlaying && embedPosterUrls.length > 0 ? (
-                  <PosterImageFallback urls={embedPosterUrls} className="home-product-videos__poster rounded-xl" />
+                  <PosterImageFallback urls={embedPosterUrls} className="home-product-videos__poster" />
                 ) : null}
                 {!isPlaying && embedPosterUrls.length === 0 ? (
-                  <div className="absolute inset-0 rounded-xl bg-neutral-900" aria-hidden />
+                  <div className="home-product-videos__embed-backdrop" aria-hidden />
                 ) : null}
                 {isPlaying ? (
                   <iframe
@@ -313,11 +314,11 @@ function VideoSlide({
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
                 {isMuted ? (
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <svg className="home-product-videos__icon-20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M3 10v4h4l5 5V5L7 10H3zm13.59 2L19 14.41 20.41 13 18 10.59 20.41 8.17 19 6.76 16.59 9.17 14.17 6.76 12.76 8.17 15.17 10.59 12.76 13 14.17 14.41 16.59 12z" />
                   </svg>
                 ) : (
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <svg className="home-product-videos__icon-20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M3 10v4h4l5 5V5L7 10H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
                   </svg>
                 )}
@@ -326,10 +327,7 @@ function VideoSlide({
           </div>
         </div>
       </div>
-      <Link
-        href={href}
-        className="home-product-videos__caption mt-2 block text-[11px] font-bold leading-snug text-gray-900 sm:text-xs"
-      >
+      <Link href={href} className="home-product-videos__caption-link">
         {name}
       </Link>
     </div>
@@ -364,15 +362,11 @@ export function ProductVideoReel({
   }, [playingKey]);
 
   if (playable.length === 0) {
-    return (
-      <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-700">
-        No offer videos available yet.
-      </div>
-    );
+    return <div className="home-product-videos__empty-card">No offer videos available yet.</div>;
   }
 
   return (
-    <div className="relative">
+    <div className="u-relative">
       <button id={prevNavSelector.slice(1)} className="home-product-videos__nav home-product-videos__nav--prev" aria-label="Previous">
         <ChevronNavIcon flip />
       </button>
@@ -381,7 +375,7 @@ export function ProductVideoReel({
       </button>
 
       <Swiper
-        className="home-product-videos__swiper"
+        className="home-product-videos__swiper home-product-videos__swiper--overflow-visible"
         modules={[Navigation]}
         spaceBetween={15}
         slidesPerView="auto"
@@ -391,7 +385,7 @@ export function ProductVideoReel({
         }}
       >
         {playable.map((product) => (
-          <SwiperSlide key={product.id ?? product.product_name} className="!w-auto">
+          <SwiperSlide key={product.id ?? product.product_name} className="home-product-videos__swiper-slide--auto">
             <VideoSlide
               product={product}
               playingKey={playingKey}

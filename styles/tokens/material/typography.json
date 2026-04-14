@@ -1,0 +1,33 @@
+{
+  "fontFamilies": {
+    "brand": "Roboto",
+    "display": "Roboto"
+  },
+  "roles": {
+    "display": {
+      "small": { "fontWeight": 400, "fontSize": 36, "lineHeight": 44, "letterSpacing": 0 },
+      "medium": { "fontWeight": 400, "fontSize": 45, "lineHeight": 52, "letterSpacing": 0 },
+      "large": { "fontWeight": 400, "fontSize": 57, "lineHeight": 64, "letterSpacing": 0 }
+    },
+    "headline": {
+      "small": { "fontWeight": 500, "fontSize": 24, "lineHeight": 32, "letterSpacing": 0 },
+      "medium": { "fontWeight": 500, "fontSize": 28, "lineHeight": 36, "letterSpacing": 0 },
+      "large": { "fontWeight": 500, "fontSize": 32, "lineHeight": 40, "letterSpacing": 0 }
+    },
+    "title": {
+      "small": { "fontWeight": 500, "fontSize": 22, "lineHeight": 28, "letterSpacing": 0 },
+      "medium": { "fontWeight": 500, "fontSize": 24, "lineHeight": 32, "letterSpacing": 0 },
+      "large": { "fontWeight": 500, "fontSize": 28, "lineHeight": 36, "letterSpacing": 0 }
+    },
+    "body": {
+      "small": { "fontWeight": 400, "fontSize": 12, "lineHeight": 16, "letterSpacing": 0.2 },
+      "medium": { "fontWeight": 400, "fontSize": 14, "lineHeight": 20, "letterSpacing": 0.25 },
+      "large": { "fontWeight": 400, "fontSize": 16, "lineHeight": 24, "letterSpacing": 0.5 }
+    },
+    "label": {
+      "small": { "fontWeight": 500, "fontSize": 11, "lineHeight": 16, "letterSpacing": 0.5 },
+      "medium": { "fontWeight": 500, "fontSize": 12, "lineHeight": 16, "letterSpacing": 0.5 },
+      "large": { "fontWeight": 500, "fontSize": 14, "lineHeight": 20, "letterSpacing": 0.1 }
+    }
+  }
+}

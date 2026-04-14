@@ -155,7 +155,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     Number(product?.available_units_count ?? 0) > 0 ? 'InStock' : 'OutOfStock';
   
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#ffffff' }}>
+    <div className="app-page app-page--bg-white">
       <StructuredData
         type="BreadcrumbList"
         breadcrumbs={[
@@ -183,26 +183,26 @@ export default async function ProductPage({ params }: ProductPageProps) {
       )}
       <Suspense
         fallback={
-          <div className="site-header-wrapper">
-            <HeaderWithAnnouncement />
-          </div>
+          <HeaderWithAnnouncement />
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
-      <main className="flex-1 min-w-0 py-8">
-        <Suspense fallback={
-          <div className="container mx-auto px-4">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-              <div className="h-64 bg-gray-200 rounded mb-4"></div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="h-96 bg-gray-200 rounded"></div>
-                <div className="h-96 bg-gray-200 rounded"></div>
+      <main className="app-page__main u-min-w-0 u-py-8">
+        <Suspense
+          fallback={
+            <div className="page-container">
+              <div className="u-animate-pulse">
+                <div className="u-skeleton-line u-skeleton-line--h8 u-skeleton-line--w-3-4 u-mb-4" />
+                <div className="u-skeleton-line u-skeleton-line--h64 u-w-full u-mb-4 u-rounded-lg" />
+                <div className="u-grid-2-responsive">
+                  <div className="u-skeleton-line u-skeleton-line--h96 u-w-full u-rounded-lg" />
+                  <div className="u-skeleton-line u-skeleton-line--h96 u-w-full u-rounded-lg" />
+                </div>
               </div>
             </div>
-          </div>
-        }>
+          }
+        >
           <ProductDetail slug={slug} />
         </Suspense>
       </main>

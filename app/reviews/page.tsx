@@ -20,53 +20,51 @@ export const metadata: Metadata = {
 
 export default function ReviewsPage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="app-page">
       <Suspense
         fallback={
-          <div className="site-header-wrapper">
-            <HeaderWithAnnouncement />
-          </div>
+          <HeaderWithAnnouncement />
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
       
-      <main className="flex-1">
-        <section className="container mx-auto px-4 pt-8">
-          <div className="mx-auto max-w-5xl rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Customer Reviews</h1>
-            <p className="mt-3 text-base leading-7 text-gray-600 sm:text-lg">
+      <main className="app-page__main">
+        <section className="page-container u-pt-8">
+          <div className="page-card-elevated page-card-elevated--5xl">
+            <h1 className="page-heading-3xl">Customer Reviews</h1>
+            <p className="page-lead">
               Read recent feedback from customers who purchased from Affordable Gadgets Ke. These reviews
               highlight product quality, condition, delivery experience, and real-life usage for popular devices.
             </p>
-            <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
-              <Link href="/products" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+            <div className="page-pill-links">
+              <Link href="/products" className="page-pill-link">
                 Shop products
               </Link>
-              <Link href="/videos" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+              <Link href="/videos" className="page-pill-link">
                 Watch product videos
               </Link>
             </div>
           </div>
         </section>
         {/* Stories Carousel */}
-        <section className="container mx-auto px-4 py-6">
+        <section className="page-container u-py-6">
           <StoriesCarousel autoAdvanceDuration={5} />
         </section>
 
         {/* Reviews Showcase */}
-        <section className="container mx-auto px-4 py-8">
+        <section className="page-container u-py-8">
           <ReviewsShowcase />
         </section>
 
         {/* Special Offers */}
-        <section className="container mx-auto px-4 py-8">
+        <section className="page-container u-py-8">
           <SpecialOffers pageSize={12} />
         </section>
 
         {/* Featured Products */}
-        <section className="container mx-auto px-4 py-8">
-          <h2 className="text-3xl font-bold mb-6">Featured Products</h2>
+        <section className="page-container u-py-8">
+          <h2 className="page-section-heading">Featured Products</h2>
           <ProductGrid pageSize={8} showPagination={false} />
         </section>
       </main>

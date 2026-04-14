@@ -7,22 +7,20 @@ export const dynamic = 'force-dynamic';
 
 export default function VerifyEmailPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="app-page">
       <Suspense
         fallback={
-          <div className="site-header-wrapper">
-            <HeaderWithAnnouncement />
-          </div>
+          <HeaderWithAnnouncement />
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
-      <main className="flex-1 container mx-auto px-4 py-16">
+      <main className="app-page__main page-container u-py-16">
         <Suspense
           fallback={
-            <div className="max-w-lg mx-auto bg-white rounded-2xl shadow p-8 text-center">
-              <h1 className="text-2xl font-bold mb-4">Email Verification</h1>
-              <p className="mb-6 text-gray-700">Verifying your email...</p>
+            <div className="verify-email-card">
+              <h1 className="verify-email-card__title">Email Verification</h1>
+              <p className="verify-email-card__message">Verifying your email...</p>
             </div>
           }
         >

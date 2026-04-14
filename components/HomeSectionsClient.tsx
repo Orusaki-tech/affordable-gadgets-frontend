@@ -35,16 +35,13 @@ export const HomeProductVideosClient = dynamic(
   {
     ssr: false,
     loading: () => (
-      <section className="bg-[#F9F9F9] py-8" aria-hidden>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="h-6 w-48 animate-pulse rounded bg-gray-200" />
-          <div className="mt-3 h-4 max-w-lg animate-pulse rounded bg-gray-100" />
-          <div className="mt-5 flex gap-[15px]">
+      <section className="home-sections__videos-skel" aria-hidden>
+        <div className="page-container">
+          <div className="home-sections__videos-skel-bar" />
+          <div className="home-sections__videos-skel-line" />
+          <div className="home-sections__videos-skel-row">
             {[...Array(5)].map((_, i) => (
-              <div
-                key={`home-videos-skel-${i}`}
-                className="h-[min(calc(200vh/3),calc(2080px/3))] w-[calc(700px/3)] shrink-0 animate-pulse rounded-xl bg-gray-200 sm:w-[calc(740px/3)]"
-              />
+              <div key={`home-videos-skel-${i}`} className="home-sections__videos-skel-card" />
             ))}
           </div>
         </div>

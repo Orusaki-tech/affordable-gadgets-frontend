@@ -14,6 +14,7 @@ interface ProductCarouselProps {
   alwaysShowNavigation?: boolean;
   /** When true, track and nav render as separate sibling elements for grid placement (e.g. hero: track full width, nav in left column). */
   splitNav?: boolean;
+  /** Kept for backwards compatibility with older call sites; pagination UI is not implemented in this carousel yet. */
   showPagination?: boolean;
   autoPlay?: boolean;
   autoPlayInterval?: number;
@@ -26,7 +27,6 @@ export function ProductCarousel({
   showNavigation = true,
   alwaysShowNavigation = false,
   splitNav = false,
-  showPagination = false,
   autoPlay = false,
   autoPlayInterval = 3000,
   className = '',
@@ -110,14 +110,6 @@ export function ProductCarousel({
         : container.scrollLeft + scrollAmount;
 
     container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
-  };
-
-  const scrollToIndex = (index: number) => {
-    if (!scrollContainerRef.current) return;
-    const container = scrollContainerRef.current;
-    const scrollAmount = (container.scrollWidth / children.length) * index * itemsPerSlide;
-    container.scrollTo({ left: scrollAmount, behavior: 'smooth' });
-    setCurrentIndex(index);
   };
 
   // Handle scroll to update current index

@@ -3,17 +3,17 @@
 }
 
 .recently-viewed__placeholder {
-  background: var(--ui-white);
+  background: var(--surface-default);
   border-radius: 12px;
-  box-shadow: 0 1px 2px var(--ui-black-05);
+  box-shadow: var(--shadow-sm-05);
   overflow: hidden;
   opacity: 0.6;
-  border: 2px solid var(--ui-gray-100);
+  border: 2px solid var(--surface-action);
 }
 
 .recently-viewed__placeholder-media {
   aspect-ratio: 1 / 1;
-  background: linear-gradient(135deg, var(--ui-gray-100), var(--ui-gray-200));
+  background: linear-gradient(135deg, var(--surface-action), var(--border-default));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,7 +29,7 @@
 }
 
 .recently-viewed__placeholder-line {
-  background: var(--ui-gray-200);
+  background: var(--border-default);
   border-radius: 9999px;
   animation: recently-viewed-pulse 1.6s ease-in-out infinite;
 }

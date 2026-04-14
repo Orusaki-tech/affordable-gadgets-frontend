@@ -47,27 +47,25 @@ export function VerifyEmailClient() {
   }, [searchParams]);
 
   return (
-    <div className="max-w-lg mx-auto bg-white rounded-2xl shadow p-8 text-center">
-      <h1 className="text-2xl font-bold mb-4">Email Verification</h1>
-      <p className={`mb-6 ${status === 'error' ? 'text-red-600' : 'text-gray-700'}`}>
+    <div className="verify-email-card">
+      <h1 className="verify-email-card__title">Email Verification</h1>
+      <p
+        className={
+          status === 'error'
+            ? 'verify-email-card__message verify-email-card__message--error'
+            : 'verify-email-card__message'
+        }
+      >
         {message}
       </p>
       {status === 'success' && (
-        <p className="text-sm text-gray-500 mb-6">
-          You can now sign in from the account icon.
-        </p>
+        <p className="verify-email-card__hint">You can now sign in from the account icon.</p>
       )}
-      <div className="space-y-3">
-        <Link
-          href="/cart"
-          className="block w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)] font-semibold"
-        >
+      <div className="u-space-y-3">
+        <Link href="/cart" className="u-btn u-btn--primary">
           Go to Cart
         </Link>
-        <Link
-          href="/products"
-          className="block w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 font-semibold"
-        >
+        <Link href="/products" className="u-btn u-btn--neutral">
           Continue Shopping
         </Link>
       </div>

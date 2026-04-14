@@ -3,14 +3,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ui-gray-50);
+  background: var(--surface-default);
   padding: 16px;
 }
 
 .payment-page__card {
-  background: var(--ui-white);
+  background: var(--surface-default);
   border-radius: 12px;
-  box-shadow: 0 16px 32px var(--ui-black-12);
+  box-shadow: 0 16px 32px var(--alpha-black-900-12);
   max-width: 28rem;
   width: 100%;
   padding: 32px;
@@ -44,15 +44,15 @@
 }
 
 .payment-page__icon--success {
-  background: var(--ui-green-100);
+  background: var(--success-green-100);
 }
 
 .payment-page__icon--error {
-  background: var(--ui-red-100);
+  background: var(--error-red-100);
 }
 
 .payment-page__icon--neutral {
-  background: var(--ui-gray-100);
+  background: var(--surface-action);
 }
 
 .payment-page__icon-svg {
@@ -61,36 +61,36 @@
 }
 
 .payment-page__icon-svg--success {
-  color: var(--ui-green-600);
+  color: var(--success-green-600);
 }
 
 .payment-page__icon-svg--error {
-  color: var(--ui-red-600);
+  color: var(--error-red-600);
 }
 
 .payment-page__title {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: var(--ui-gray-900);
+  color: var(--text-color-title);
 }
 
 .payment-page__title--success {
-  color: var(--ui-green-600);
+  color: var(--success-green-600);
 }
 
 .payment-page__title--error {
-  color: var(--ui-red-600);
+  color: var(--error-red-600);
 }
 
 .payment-page__text {
-  color: var(--ui-gray-600);
+  color: var(--text-color-body);
   margin-bottom: 16px;
 }
 
 .payment-page__meta {
   font-size: 14px;
-  color: var(--ui-gray-500);
+  color: var(--text-color-subtitle);
 }
 
 .payment-page__meta-value {
@@ -106,8 +106,8 @@
 .payment-page__primary {
   display: block;
   width: 100%;
-  background: var(--primary);
-  color: var(--ui-white);
+  background: var(--text-color-title);
+  color: var(--surface-default);
   border-radius: 10px;
   padding: 10px 16px;
   border: none;
@@ -118,14 +118,14 @@
 }
 
 .payment-page__primary:hover {
-  background: var(--primary-dark);
+  background: var(--primary-900);
 }
 
 .payment-page__secondary {
   display: block;
   width: 100%;
-  background: var(--ui-gray-200);
-  color: var(--ui-gray-800);
+  background: var(--border-default);
+  color: var(--text-color-title);
   border-radius: 10px;
   padding: 10px 16px;
   font-weight: 600;
@@ -134,13 +134,13 @@
 }
 
 .payment-page__secondary:hover {
-  background: var(--ui-gray-300);
+  background: var(--border-action-hover);
 }
 
 .payment-page__spinner {
   width: 32px;
   height: 32px;
-  color: var(--primary);
+  color: var(--text-color-title);
   animation: payment-page-spin 1s linear infinite;
 }
 

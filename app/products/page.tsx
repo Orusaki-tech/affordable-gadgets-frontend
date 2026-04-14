@@ -119,7 +119,7 @@ export default async function ProductsListingPage({
     .filter(Boolean) as Array<{ name: string; url: string; image?: string | null; type: 'Product' }>;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="app-page">
       <StructuredData
         type="BreadcrumbList"
         breadcrumbs={[
@@ -139,49 +139,45 @@ export default async function ProductsListingPage({
       )}
       <Suspense
         fallback={
-          <div className="site-header-wrapper">
-            <HeaderWithAnnouncement />
-          </div>
+          <HeaderWithAnnouncement />
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
 
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <section className="mx-auto mb-8 max-w-5xl rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <header className="mb-4">
-            <h1 className="text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
-              Affordable Gadgets Products
-            </h1>
+      <main className="app-page__main page-container u-py-8">
+        <section className="page-intro-block page-intro-block--5xl">
+          <header className="page-intro-block__header">
+            <h1 className="page-intro-block__title">Affordable Gadgets Products</h1>
           </header>
-          <p className="text-base leading-7 text-gray-600 sm:text-lg">
+          <p className="page-intro-block__copy">
             Explore the full Affordable Gadgets Ke catalog with powerful search and smart filters. Compare
             the latest phones, laptops, tablets, iPads, and accessories side by side, then narrow results by
             brand, device type, storage, and price range to quickly discover the best fit for your budget in
             Kenya.
           </p>
-          <p className="mt-3 text-sm leading-6 text-gray-600 sm:text-base">
+          <p className="page-intro-block__copy--small">
             Start with the options below or jump straight into a specific category or budget range. Every
             product listing includes key specs, pricing, and payment options so you can make a confident
             choice before you checkout.
           </p>
-          <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
-            <Link href="/categories" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+          <div className="page-pill-links">
+            <Link href="/categories" className="page-pill-link">
               Browse categories
             </Link>
-            <Link href="/budget-search" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+            <Link href="/budget-search" className="page-pill-link">
               Shop by budget
             </Link>
-            <Link href="/match-score" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+            <Link href="/match-score" className="page-pill-link">
               Find your perfect match
             </Link>
           </div>
         </section>
         <Suspense
           fallback={
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="products-page-skeleton-grid">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-gray-200 animate-pulse rounded-lg h-96" />
+                <div key={i} className="products-page-skeleton-card" />
               ))}
             </div>
           }

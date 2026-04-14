@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -H 0.0.0.0",
+    "dev": "next dev -H 0.0.0.0 --webpack",
+    "tokens:build": "node scripts/generate-tokens-css.mjs",
     "generate:client": "npm --prefix packages/api-client install && npm --prefix packages/api-client run generate && npm --prefix packages/api-client run build",
-    "prebuild": "npm run generate:client",
+    "prebuild": "npm run tokens:build && npm run generate:client",
     "build": "node node_modules/next/dist/bin/next build --webpack",
     "start": "next start",
     "lint": "eslint"
@@ -22,13 +23,11 @@
     "swiper": "^11.2.10"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "^16.0.0",
-    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }

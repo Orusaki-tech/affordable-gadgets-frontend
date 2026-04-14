@@ -6,31 +6,27 @@ export const dynamic = 'force-dynamic';
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="app-page app-page--bg-white">
       <Suspense
         fallback={
-          <div className="site-header-wrapper">
-            <HeaderWithAnnouncement />
-          </div>
+          <HeaderWithAnnouncement />
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
 
-      <main className="flex-1 container mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold mb-4">Contact Us</h1>
-        <p className="text-gray-700 mb-4">
-          Reach us for product inquiries, availability, or support.
-        </p>
-        <div className="text-gray-700 space-y-2">
+      <main className="app-page__main page-container u-py-12">
+        <h1 className="simple-page-heading">Contact Us</h1>
+        <p className="u-text-gray-700 u-mb-4">Reach us for product inquiries, availability, or support.</p>
+        <div className="simple-page-contact-block">
           <p>
-            <span className="font-semibold">Phone:</span> +254717881573
+            <span className="u-font-semibold">Phone:</span> +254717881573
           </p>
           <p>
-            <span className="font-semibold">Email:</span> affordablegadgetske@gmail.com
+            <span className="u-font-semibold">Email:</span> affordablegadgetske@gmail.com
           </p>
           <p>
-            <span className="font-semibold">Location:</span> Kimathi House Room 409, Nairobi
+            <span className="u-font-semibold">Location:</span> Kimathi House Room 409, Nairobi
           </p>
         </div>
       </main>

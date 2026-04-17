@@ -17,13 +17,13 @@
   height: 28px;
   width: min(320px, 70%);
   border-radius: 10px;
-  background: var(--border-default);
+  background: var(--ui-gray-200);
   margin-bottom: 24px;
 }
 
 .product-recommendations__card-skel {
   border-radius: 16px;
-  background: var(--border-default);
+  background: var(--ui-gray-200);
   aspect-ratio: 4 / 5;
   min-height: 260px;
   animation: product-recommendations-pulse 1.6s ease-in-out infinite;
@@ -32,7 +32,7 @@
 .product-recommendations__empty {
   margin: 0;
   font-size: 14px;
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
 }
 
 .product-recommendations__grid {

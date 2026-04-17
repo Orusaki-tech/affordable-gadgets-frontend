@@ -31,51 +31,53 @@ export default async function PromotionsPage({ searchParams }: PromotionsPagePro
       : undefined;
 
   return (
-    <div className="app-page">
+    <div className="min-h-screen flex flex-col">
       <Suspense
         fallback={
-          <HeaderWithAnnouncement />
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
-      <main className="app-page__main">
-        <section className="page-container u-pt-8">
-          <div className="page-card-promotions">
-            <h1 className="page-heading-3xl">Latest Promotions</h1>
-            <p className="page-lead">
+      <main className="flex-1">
+        <section className="container mx-auto px-4 pt-8">
+          <div className="mx-auto max-w-5xl rounded-2xl border border-red-100 bg-gradient-to-r from-red-50 via-orange-50 to-yellow-50 p-6 shadow-sm">
+            <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Latest Promotions</h1>
+            <p className="mt-3 text-base leading-7 text-gray-600 sm:text-lg">
               Explore featured deals, seasonal discounts, flash sales, and limited-time offers across our
               electronics catalog. This page helps shoppers discover current promotions and jump straight
               to discounted products.
             </p>
-            <div className="page-pill-links">
-              <Link href="/products" className="page-pill-link page-pill-link--raised">
+            <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
+              <Link href="/products" className="rounded-full bg-white px-4 py-2 text-gray-700 shadow-sm">
                 View all products
               </Link>
-              <Link href="/reviews" className="page-pill-link page-pill-link--raised">
+              <Link href="/reviews" className="rounded-full bg-white px-4 py-2 text-gray-700 shadow-sm">
                 Read customer reviews
               </Link>
             </div>
           </div>
         </section>
         {/* Stories Carousel */}
-        <section className="page-container u-py-6">
+        <section className="container mx-auto px-4 py-6">
           <StoriesCarousel autoAdvanceDuration={5} />
         </section>
 
         {/* Special Offers / Flash Sales (filtered if filter param exists) */}
-        <section className="page-container u-py-8">
+        <section className="container mx-auto px-4 py-8">
           <SpecialOffersServer filter={filter} pageSize={100} />
         </section>
 
         {/* Featured Products */}
-        <section className="page-container u-py-8">
-          <h2 className="page-section-heading">Featured Products</h2>
+        <section className="container mx-auto px-4 py-8">
+          <h2 className="text-3xl font-bold mb-6">Featured Products</h2>
           <ProductGrid pageSize={8} showPagination={false} />
         </section>
 
         {/* Reviews Showcase */}
-        <section className="page-container u-py-8">
+        <section className="container mx-auto px-4 py-8">
           <ReviewsShowcase />
         </section>
       </main>

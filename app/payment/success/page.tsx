@@ -7,10 +7,12 @@ export const dynamic = 'force-dynamic';
 
 export default function PaymentSuccessPage() {
   return (
-    <div className="app-page">
+    <div className="min-h-screen flex flex-col">
       <Suspense
         fallback={
-          <HeaderWithAnnouncement />
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
         }
       >
         <HeaderWithAnnouncement />
@@ -18,11 +20,13 @@ export default function PaymentSuccessPage() {
 
       <Suspense
         fallback={
-          <main className="app-page__main app-centered-shell">
-            <div className="payment-result-card u-animate-pulse">
-              <div className="u-skeleton-circle u-skeleton-circle--16 u-mx-auto u-mb-4" />
-              <div className="u-skeleton-line u-skeleton-line--h8 u-skeleton-line--w-48 u-mx-auto u-mb-4" />
-              <div className="u-skeleton-line u-skeleton-line--h4 u-skeleton-line--w-64 u-mx-auto" />
+          <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
+              <div className="animate-pulse">
+                <div className="h-16 w-16 bg-gray-200 rounded-full mx-auto mb-4"></div>
+                <div className="h-8 bg-gray-200 rounded w-48 mx-auto mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-64 mx-auto"></div>
+              </div>
             </div>
           </main>
         }

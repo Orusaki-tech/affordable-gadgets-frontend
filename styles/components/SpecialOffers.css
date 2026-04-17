@@ -31,7 +31,7 @@
 
 .special-offers__card {
   border-radius: 16px;
-  background: var(--alpha-secondary-400-60);
+  background: var(--ui-lime-400-60);
   aspect-ratio: 1 / 1;
 }
 
@@ -45,12 +45,12 @@
 }
 
 .special-offers__empty-text {
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
   margin-bottom: 16px;
 }
 
 .special-offers__empty-link {
-  color: var(--text-color-title);
+  color: var(--primary);
   text-decoration: none;
 }
 
@@ -62,17 +62,17 @@
   position: relative;
   display: block;
   border-radius: 16px;
-  background: var(--alpha-secondary-400-80);
+  background: var(--ui-lime-400-80);
   padding: 24px;
   overflow: hidden;
-  box-shadow: var(--shadow-sm-05);
+  box-shadow: 0 1px 2px var(--ui-black-05);
   transition: box-shadow 200ms;
   cursor: pointer;
   aspect-ratio: 1 / 1;
 }
 
 .special-offers__promo:hover {
-  box-shadow: var(--shadow-lg-12);
+  box-shadow: 0 6px 16px var(--ui-black-12);
 }
 
 .special-offers__promo-media {

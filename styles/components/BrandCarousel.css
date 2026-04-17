@@ -39,12 +39,12 @@
   width: 100%;
   max-width: 400px;
   height: 2px;
-  background-color: var(--border-action-hover);
+  background-color: var(--ui-gray-300);
   border-radius: 2px;
 }
 
 .brand-carousel__carousel .samsung-progressbar-fill {
-  background-color: var(--text-color-heading);
+  background-color: var(--ui-gray-700);
 }
 
 .brand-carousel__carousel .samsung-progressbar-arrows {
@@ -54,14 +54,14 @@
 .brand-carousel__carousel .samsung-progressbar-arrow {
   width: 36px;
   height: 36px;
-  background-color: var(--border-default);
-  border: 1px solid var(--border-action-hover);
-  color: var(--text-color-heading);
+  background-color: var(--ui-gray-200);
+  border: 1px solid var(--ui-gray-300);
+  color: var(--ui-gray-700);
 }
 
 .brand-carousel__carousel .samsung-progressbar-arrow:hover:not(:disabled) {
-  background-color: var(--border-action-hover);
-  border-color: var(--border-focus);
+  background-color: var(--ui-gray-300);
+  border-color: var(--ui-gray-400);
 }
 
 .brand-carousel__carousel .samsung-progressbar-arrow:disabled {
@@ -85,8 +85,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-default);
-  border: 1px solid var(--surface-default);
+  background: #fff;
+  border: 1px solid #fff;
   border-radius: 10px;
   padding: 0 10px;
   overflow: hidden;
@@ -96,7 +96,7 @@
 }
 
 .brand-carousel__item:hover {
-  background: var(--surface-default);
+  background: #fff;
   transform: scale(1.02);
 }
 
@@ -111,5 +111,5 @@
   display: block;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--neutral-1-500);
+  color: var(--gray-500);
 }

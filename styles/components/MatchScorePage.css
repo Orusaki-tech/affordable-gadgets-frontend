@@ -7,10 +7,10 @@
 }
 
 .match-score__panel {
-  background: var(--surface-default);
+  background: var(--ui-white);
   padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 1px 2px var(--alpha-black-900-05);
+  box-shadow: 0 1px 2px var(--ui-black-05);
   margin-bottom: 32px;
 }
 
@@ -44,7 +44,7 @@
 .match-score__input {
   flex: 1;
   padding: 8px 16px;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--ui-gray-200);
   border-radius: 10px;
 }
 
@@ -57,15 +57,15 @@
 .match-score__chip {
   padding: 4px 12px;
   border-radius: 8px;
-  background: var(--border-default);
-  color: var(--text-color-heading);
+  background: var(--ui-gray-200);
+  color: var(--ui-gray-700);
   border: none;
   cursor: pointer;
 }
 
 .match-score__chip--active {
-  background: var(--text-color-title);
-  color: var(--surface-default);
+  background: var(--primary);
+  color: var(--ui-white);
 }
 
 .match-score__checkbox {
@@ -87,8 +87,8 @@
 .match-score__submit {
   margin-top: 24px;
   padding: 12px 24px;
-  background: var(--text-color-title);
-  color: var(--surface-default);
+  background: var(--primary);
+  color: var(--ui-white);
   border-radius: 10px;
   border: none;
   cursor: pointer;
@@ -97,7 +97,7 @@
 }
 
 .match-score__submit:hover {
-  background: var(--primary-900);
+  background: var(--primary-dark);
 }
 
 .match-score__results-title {
@@ -112,10 +112,10 @@
 }
 
 .match-score__card {
-  background: var(--surface-default);
+  background: var(--ui-white);
   padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 1px 2px var(--alpha-black-900-05);
+  box-shadow: 0 1px 2px var(--ui-black-05);
 }
 
 .match-score__card-header {
@@ -128,17 +128,17 @@
 .match-score__card-title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--text-color-title);
+  color: var(--ui-gray-900);
   text-decoration: none;
   transition: color 200ms;
 }
 
 .match-score__card-title:hover {
-  color: var(--text-color-title);
+  color: var(--primary);
 }
 
 .match-score__card-subtitle {
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
   margin-top: 4px;
 }
 
@@ -155,12 +155,12 @@
 .match-score__score-value {
   font-size: 30px;
   font-weight: 700;
-  color: var(--text-color-title);
+  color: var(--primary);
 }
 
 .match-score__score-label {
   font-size: 14px;
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
 }
 
 .match-score__breakdown {
@@ -172,7 +172,7 @@
 }
 
 .match-score__breakdown-label {
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
 }
 
 .match-score__breakdown-value {

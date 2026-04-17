@@ -1,7 +1,7 @@
 .payment-method-modal {
   position: fixed;
   inset: 0;
-  background: var(--alpha-black-900-60);
+  background: var(--ui-black-60);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -12,22 +12,22 @@
 
 .payment-method-modal__panel {
   position: relative;
-  background: var(--surface-default);
+  background: var(--ui-white);
   border-radius: 16px;
   max-width: 32rem;
   width: 100%;
   padding: 24px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 40px var(--alpha-black-900-20);
-  border: 1px solid var(--surface-action);
+  box-shadow: 0 20px 40px var(--ui-black-20);
+  border: 1px solid var(--ui-gray-100);
 }
 
 .payment-method-modal__close {
   position: absolute;
   top: 16px;
   right: 16px;
-  color: var(--border-focus);
+  color: var(--ui-gray-400);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -35,7 +35,7 @@
 }
 
 .payment-method-modal__close:hover {
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
 }
 
 .payment-method-modal__close-icon {
@@ -51,12 +51,12 @@
 .payment-method-modal__title {
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-color-title);
+  color: var(--ui-gray-900);
 }
 
 .payment-method-modal__subtitle {
   font-size: 14px;
-  color: var(--text-color-subtitle);
+  color: var(--ui-gray-500);
   margin-top: 8px;
 }
 
@@ -70,35 +70,35 @@
   display: flex;
   align-items: center;
   padding: 16px;
-  border: 2px solid var(--border-action-hover);
+  border: 2px solid var(--ui-gray-300);
   border-radius: 12px;
   cursor: pointer;
   transition: border-color 200ms, background 200ms;
 }
 
 .payment-method-modal__option:hover {
-  border-color: var(--border-focus);
-  background: var(--surface-default);
+  border-color: var(--ui-gray-400);
+  background: var(--ui-gray-50);
 }
 
 .payment-method-modal__option--active {
-  border-color: var(--text-color-title);
-  background: var(--surface-default);
+  border-color: var(--primary);
+  background: var(--ui-gray-50);
 }
 
 .payment-method-modal__option--mpesa.payment-method-modal__option--active {
-  border-color: var(--success-green-500);
-  background: var(--success-green-50);
+  border-color: var(--ui-green-500);
+  background: var(--ui-green-50);
 }
 
 .payment-method-modal__option--airtel.payment-method-modal__option--active {
-  border-color: var(--error-red-500);
-  background: var(--error-red-50);
+  border-color: var(--ui-red-500);
+  background: var(--ui-red-50);
 }
 
 .payment-method-modal__option--pesapal.payment-method-modal__option--active {
-  border-color: var(--warning-yellow-500);
-  background: var(--surface-default)7ed;
+  border-color: var(--ui-orange-500);
+  background: var(--ui-white)7ed;
 }
 
 .payment-method-modal__radio {
@@ -108,19 +108,19 @@
 }
 
 .payment-method-modal__radio--mpesa {
-  accent-color: var(--success-green-600);
+  accent-color: var(--ui-green-600);
 }
 
 .payment-method-modal__radio--airtel {
-  accent-color: var(--error-red-600);
+  accent-color: var(--ui-red-600);
 }
 
 .payment-method-modal__radio--card {
-  accent-color: var(--text-color-title);
+  accent-color: var(--primary);
 }
 
 .payment-method-modal__radio--pesapal {
-  accent-color: var(--warning-yellow-600);
+  accent-color: var(--ui-orange-600);
 }
 
 .payment-method-modal__option-content {
@@ -137,19 +137,19 @@
   align-items: center;
   justify-content: center;
   margin-right: 16px;
-  box-shadow: 0 1px 2px var(--alpha-black-900-10);
+  box-shadow: 0 1px 2px var(--ui-black-10);
 }
 
 .payment-method-modal__brand--mpesa {
-  background: linear-gradient(135deg, var(--success-green-500), var(--success-green-600));
+  background: linear-gradient(135deg, var(--ui-green-500), var(--ui-green-600));
 }
 
 .payment-method-modal__brand--airtel {
-  background: linear-gradient(135deg, var(--error-red-500), var(--error-red-600));
+  background: linear-gradient(135deg, var(--ui-red-500), var(--ui-red-600));
 }
 
 .payment-method-modal__brand-text {
-  color: var(--surface-default);
+  color: var(--ui-white);
   font-weight: 700;
   font-size: 20px;
 }
@@ -157,7 +157,7 @@
 .payment-method-modal__option-label {
   font-weight: 600;
   font-size: 18px;
-  color: var(--text-color-title);
+  color: var(--ui-gray-800);
 }
 
 .payment-method-modal__card-icons {
@@ -174,27 +174,27 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 2px var(--alpha-black-900-10);
+  box-shadow: 0 1px 2px var(--ui-black-10);
 }
 
 .payment-method-modal__card-icon--visa {
-  background: var(--text-color-title);
+  background: var(--primary);
 }
 
 .payment-method-modal__card-icon--mc {
-  background: var(--error-red-500);
+  background: var(--ui-red-500);
 }
 
 .payment-method-modal__card-icon--ae {
-  background: var(--primary-900);
+  background: var(--primary-dark);
 }
 
 .payment-method-modal__card-icon--wallet {
-  background: var(--warning-yellow-500);
+  background: var(--ui-orange-500);
 }
 
 .payment-method-modal__card-text {
-  color: var(--surface-default);
+  color: var(--ui-white);
   font-size: 10px;
   font-weight: 700;
 }
@@ -205,31 +205,31 @@
 }
 
 .payment-method-modal__summary {
-  background: var(--surface-default);
+  background: var(--ui-gray-50);
   padding: 20px;
   border-radius: 12px;
   margin-bottom: 24px;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--ui-gray-200);
 }
 
 .payment-method-modal__summary-text {
   text-align: center;
   font-weight: 600;
   font-size: 18px;
-  color: var(--text-color-title);
+  color: var(--ui-gray-800);
 }
 
 .payment-method-modal__summary-merchant {
   font-weight: 700;
-  color: var(--text-color-title);
+  color: var(--ui-gray-900);
 }
 
 .payment-method-modal__instructions {
   margin-bottom: 24px;
-  background: var(--surface-default);
+  background: var(--ui-gray-50);
   padding: 16px;
   border-radius: 12px;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--ui-gray-200);
   display: grid;
   gap: 16px;
 }
@@ -237,7 +237,7 @@
 .payment-method-modal__instructions-title {
   font-weight: 600;
   font-size: 16px;
-  color: var(--text-color-title);
+  color: var(--ui-gray-800);
 }
 
 .payment-method-modal__instructions-list {
@@ -245,7 +245,7 @@
   display: grid;
   gap: 10px;
   font-size: 14px;
-  color: var(--text-color-heading);
+  color: var(--ui-gray-700);
   line-height: 1.5;
 }
 
@@ -259,14 +259,14 @@
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 10px;
-  color: var(--text-color-heading);
+  color: var(--ui-gray-700);
 }
 
 .payment-method-modal__label-icon {
   width: 20px;
   height: 20px;
   margin-right: 8px;
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
 }
 
 .payment-method-modal__input-row {
@@ -276,9 +276,9 @@
 
 .payment-method-modal__select {
   padding: 10px 12px;
-  border: 2px solid var(--border-action-hover);
+  border: 2px solid var(--ui-gray-300);
   border-radius: 10px;
-  background: var(--surface-default);
+  background: var(--ui-white);
   font-size: 14px;
   font-weight: 500;
 }
@@ -286,7 +286,7 @@
 .payment-method-modal__input {
   flex: 1;
   padding: 10px 16px;
-  border: 2px solid var(--border-action-hover);
+  border: 2px solid var(--ui-gray-300);
   border-radius: 10px;
   font-size: 14px;
 }
@@ -294,18 +294,18 @@
 .payment-method-modal__input:focus,
 .payment-method-modal__select:focus {
   outline: none;
-  border-color: var(--text-color-title);
+  border-color: var(--primary);
 }
 
 .payment-method-modal__note {
   margin-bottom: 24px;
   font-size: 14px;
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
 }
 
 .payment-method-modal__regulatory {
   font-size: 12px;
-  color: var(--text-color-subtitle);
+  color: var(--ui-gray-500);
   text-align: center;
   margin-bottom: 24px;
 }
@@ -327,23 +327,23 @@
 }
 
 .payment-method-modal__button--secondary {
-  background: var(--surface-default);
-  color: var(--text-color-heading);
-  border: 2px solid var(--border-action-hover);
+  background: var(--ui-white);
+  color: var(--ui-gray-700);
+  border: 2px solid var(--ui-gray-300);
 }
 
 .payment-method-modal__button--secondary:hover {
-  background: var(--surface-default);
+  background: var(--ui-gray-50);
 }
 
 .payment-method-modal__button--primary {
-  background: var(--primary-700);
-  color: var(--surface-default);
-  box-shadow: 0 1px 2px var(--alpha-black-900-10);
+  background: var(--ui-brown-700);
+  color: var(--ui-white);
+  box-shadow: 0 1px 2px var(--ui-black-10);
 }
 
 .payment-method-modal__button--primary:hover {
-  background: var(--warning-yellow-900);
+  background: var(--ui-amber-900);
 }
 
 .payment-method-modal__button:disabled {

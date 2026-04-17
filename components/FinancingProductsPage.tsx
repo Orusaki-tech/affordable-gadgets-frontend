@@ -154,7 +154,7 @@ export function FinancingProductsPage() {
       <div className="products-page__header">
         <div>
           <h1 className="products-page__title section-label">Financing</h1>
-          <p className="products-page__lead">
+          <p className="text-sm text-gray-600" style={{ marginTop: 6 }}>
             Shop products with Buy Now Pay Later options. Look for the <strong>Financing available</strong> chip.
           </p>
         </div>

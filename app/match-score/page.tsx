@@ -21,30 +21,30 @@ export const metadata: Metadata = {
 
 export default function MatchScore() {
   return (
-    <div className="app-page">
+    <div className="min-h-screen flex flex-col">
       <Suspense
         fallback={
-          <HeaderWithAnnouncement />
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
 
-      <main className="app-page__main page-container u-py-8">
-        <section className="u-mb-8">
-          <div className="page-card-elevated page-card-elevated--4xl page-card-elevated--no-mb">
-            <p className="page-lead page-lead--first">
-              Use the match score tool to discover products that fit your budget and preferred specs. Choose
-              your ideal price range, storage, RAM, and condition to surface the best-fitting devices faster.
-            </p>
-            <div className="page-pill-links">
-              <Link href="/budget-search" className="page-pill-link">
-                Shop by budget
-              </Link>
-              <Link href="/products" className="page-pill-link">
-                Browse all products
-              </Link>
-            </div>
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <section className="mx-auto mb-8 max-w-4xl rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <p className="text-base leading-7 text-gray-600 sm:text-lg">
+            Use the match score tool to discover products that fit your budget and preferred specs. Choose
+            your ideal price range, storage, RAM, and condition to surface the best-fitting devices faster.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
+            <Link href="/budget-search" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+              Shop by budget
+            </Link>
+            <Link href="/products" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
+              Browse all products
+            </Link>
           </div>
         </section>
         <MatchScorePage />

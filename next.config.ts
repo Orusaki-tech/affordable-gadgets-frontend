@@ -81,15 +81,11 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BRAND_NAME: process.env.NEXT_PUBLIC_BRAND_NAME,
   },
 
+  // Ensure workspace package is transpiled for App Router client boundaries
   experimental: {
     externalDir: true,
   },
-  // NOTE: Do not also list `@shwari/api-client` in `transpilePackages` — Turbopack treats that as a
-  // conflicting configuration with `serverExternalPackages`.
-  //
-  // The generated OpenAPI client is CommonJS under `dist/` with nested `require()` paths. Keeping it
-  // external for SSR avoids intermittent `MODULE_NOT_FOUND` issues during dev bundling.
-  serverExternalPackages: ['@shwari/api-client'],
+  transpilePackages: ['@shwari/api-client'],
 };
 
 export default nextConfig;

@@ -8,11 +8,16 @@ export function PaymentCancelledClient() {
   const orderId = searchParams.get('order_id');
 
   return (
-    <main className="app-page__main app-centered-shell">
-      <div className="payment-result-card">
-        <div className="payment-result-section">
-          <div className="payment-status-icon-well payment-status-icon-well--caution">
-            <svg className="payment-status-icon payment-status-icon--caution" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
+      <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
+        <div className="mb-6">
+          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-4">
+            <svg
+              className="h-8 w-8 text-yellow-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -21,21 +26,27 @@ export function PaymentCancelledClient() {
               />
             </svg>
           </div>
-          <h2 className="payment-result-title payment-result-title--caution">Payment Cancelled</h2>
-          <p className="payment-result-body payment-result-body--spaced">
+          <h2 className="text-2xl font-bold mb-2 text-yellow-600">Payment Cancelled</h2>
+          <p className="text-gray-600 mb-4">
             Your payment was cancelled. No charges were made to your account.
           </p>
           {orderId && (
-            <p className="payment-result-meta payment-result-meta--mb-4">
-              Order ID: <span className="u-font-mono u-font-semibold">{orderId}</span>
+            <p className="text-sm text-gray-500 mb-4">
+              Order ID: <span className="font-mono font-semibold">{orderId}</span>
             </p>
           )}
         </div>
-        <div className="u-space-y-2">
-          <Link href="/cart" className="u-btn u-btn--primary">
+        <div className="space-y-2">
+          <Link
+            href="/cart"
+            className="block w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold"
+          >
             Return to Cart
           </Link>
-          <Link href="/products" className="u-btn u-btn--neutral">
+          <Link
+            href="/products"
+            className="block w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 font-semibold"
+          >
             Continue Shopping
           </Link>
         </div>

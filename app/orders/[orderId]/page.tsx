@@ -87,14 +87,14 @@ function OrderDetailContent() {
 
   if (loading) {
     return (
-      <main className="app-page__main app-centered-shell">
-        <div className="app-centered-card">
-          <div className="u-animate-pulse">
-            <div className="u-skeleton-line u-skeleton-line--h8 u-skeleton-line--w-half u-mb-4" />
-            <div className="u-skeleton-line u-skeleton-line--h4 u-skeleton-line--w-3-4 u-mb-8" />
-            <div className="u-space-y-4">
-              <div className="u-skeleton-line u-skeleton-line--h20 u-w-full u-rounded-lg" />
-              <div className="u-skeleton-line u-skeleton-line--h20 u-w-full u-rounded-lg" />
+      <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-8"></div>
+            <div className="space-y-4">
+              <div className="h-20 bg-gray-200 rounded"></div>
+              <div className="h-20 bg-gray-200 rounded"></div>
             </div>
           </div>
         </div>
@@ -104,11 +104,16 @@ function OrderDetailContent() {
 
   if (error) {
     return (
-      <main className="app-page__main app-centered-shell">
-        <div className="app-centered-card u-text-center">
-          <div className="u-mb-6">
-            <div className="order-error-icon-wrap">
-              <svg className="u-icon-8 u-text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
+        <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-8 text-center">
+          <div className="mb-6">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+              <svg
+                className="h-8 w-8 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -117,19 +122,25 @@ function OrderDetailContent() {
                 />
               </svg>
             </div>
-            <h2 className="u-text-2xl u-font-bold u-mb-2 u-text-error">Error Loading Order</h2>
-            <p className="u-text-gray-600 u-mb-4">{error}</p>
+            <h2 className="text-2xl font-bold mb-2 text-red-600">Error Loading Order</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
             {error.includes('authentication') || error.includes('permission') ? (
-              <p className="u-text-sm u-text-gray-500 u-mb-4">
+              <p className="text-sm text-gray-500 mb-4">
                 You may need to log in to view this order, or the order may not exist.
               </p>
             ) : null}
           </div>
-          <div className="u-space-y-2">
-            <Link href="/products" className="u-btn u-btn--primary">
+          <div className="space-y-2">
+            <Link
+              href="/products"
+              className="block w-full bg-[var(--primary)] text-white px-4 py-2 rounded-lg hover:bg-[var(--primary-dark)] font-semibold"
+            >
               Continue Shopping
             </Link>
-            <Link href="/payment/success" className="u-btn u-btn--neutral">
+            <Link
+              href="/payment/success"
+              className="block w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 font-semibold"
+            >
               Back to Payment Success
             </Link>
           </div>
@@ -142,18 +153,18 @@ function OrderDetailContent() {
     return null;
   }
 
-  const getStatusClass = (status?: string) => {
+  const getStatusColor = (status?: string) => {
     switch ((status ?? '').toLowerCase()) {
       case 'paid':
-        return 'order-status-pill order-status-pill--paid';
+        return 'bg-green-100 text-green-800';
       case 'pending':
-        return 'order-status-pill order-status-pill--pending';
+        return 'bg-yellow-100 text-yellow-800';
       case 'delivered':
-        return 'order-status-pill order-status-pill--delivered';
+        return 'bg-gray-100 text-[var(--primary-dark)]';
       case 'canceled':
-        return 'order-status-pill order-status-pill--canceled';
+        return 'bg-red-100 text-red-800';
       default:
-        return 'order-status-pill order-status-pill--default';
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -168,14 +179,14 @@ function OrderDetailContent() {
   };
 
   return (
-    <main className="app-page__main u-bg-surface-default u-py-8">
-      <div className="page-container page-container--medium">
-        <div className="order-detail-card">
+    <main className="flex-1 bg-gray-50 py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="bg-white rounded-lg shadow-lg p-8">
           {/* Header */}
-          <div className="u-mb-8">
-            <h1 className="u-text-3xl u-font-bold u-mb-2 u-text-title">Order Details</h1>
-            <p className="u-text-gray-600">
-              Order ID: <span className="u-font-mono u-font-semibold">{order.order_id}</span>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">Order Details</h1>
+            <p className="text-gray-600">
+              Order ID: <span className="font-mono font-semibold">{order.order_id}</span>
             </p>
           </div>
 
@@ -184,12 +195,14 @@ function OrderDetailContent() {
             const createdAt = order.created_at ?? '';
             return (
               <>
-          <div className="u-mb-6">
-            <div className="u-flex u-items-center u-gap-2">
-              <span className="u-text-sm u-font-medium u-text-gray-700">Status:</span>
-              <span className={getStatusClass(order.status)}>{order.status ?? 'Unknown'}</span>
+          <div className="mb-6">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Status:</span>
+              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
+                {order.status ?? 'Unknown'}
+              </span>
             </div>
-            <p className="u-text-sm u-text-gray-500 u-mt-2">
+            <p className="text-sm text-gray-500 mt-2">
               Ordered on:{' '}
               {createdAt
                 ? new Date(createdAt).toLocaleDateString('en-US', {
@@ -207,90 +220,89 @@ function OrderDetailContent() {
           })()}
 
           {/* Order Items */}
-          <div className="u-mb-8">
-            <h2 className="u-text-xl u-font-semibold u-mb-4 u-text-title">Order Items</h2>
-            <div className="u-space-y-4">
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Order Items</h2>
+            <div className="space-y-4">
               {order.order_items && order.order_items.length > 0 ? (
                 order.order_items.map((item) => (
-                  <div key={item.id} className="order-item-row">
+                  <div
+                    key={item.id}
+                    className="border border-gray-200 rounded-lg p-4 flex justify-between items-center"
+                  >
                     <div>
-                      <h3 className="u-font-semibold u-text-lg u-text-title">{getItemProductName(item)}</h3>
-                      <p className="u-text-sm u-text-gray-600">
+                      <h3 className="font-semibold text-lg">
+                        {getItemProductName(item)}
+                      </h3>
+                      <p className="text-sm text-gray-600">
                         Quantity: {item.quantity ?? 0} × {formatPrice(Number(item.unit_price_at_purchase ?? 0))}
                       </p>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <p className="u-font-semibold u-text-lg u-text-title">
+                    <div className="text-right">
+                      <p className="font-semibold text-lg">
                         {formatPrice(Number(item.unit_price_at_purchase ?? 0) * Number(item.quantity ?? 0))}
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="u-text-gray-500">No items found in this order.</p>
+                <p className="text-gray-500">No items found in this order.</p>
               )}
             </div>
           </div>
 
           {/* Order Summary */}
-          <div className="u-border-t u-pt-6 u-mb-8">
-            <div className="order-summary-row">
-              <span className="u-text-lg u-font-semibold u-text-title">Total Amount:</span>
-              <span className="u-text-2xl u-font-bold u-text-primary-900">
+          <div className="border-t border-gray-200 pt-6 mb-8">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-lg font-semibold">Total Amount:</span>
+              <span className="text-2xl font-bold text-[var(--primary)]">
                 {formatPrice(Number(order.total_amount ?? 0))}
               </span>
             </div>
-            <div className="order-summary-row">
-              <span className="u-text-sm u-text-gray-600">Delivery Fee:</span>
-              <span className="u-text-sm u-font-semibold u-text-title">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-gray-600">Delivery Fee:</span>
+              <span className="text-sm font-semibold">
                 {formatPrice(Number((order as any).delivery_fee ?? 0))}
               </span>
             </div>
             {order.customer_username && (
-              <p className="u-text-sm u-text-gray-600">Customer: {order.customer_username}</p>
+              <p className="text-sm text-gray-600">
+                Customer: {order.customer_username}
+              </p>
             )}
             {(order as any).delivery_address && (
-              <p className="u-text-sm u-text-gray-600 u-mt-2">Delivery Address: {(order as any).delivery_address}</p>
+              <p className="text-sm text-gray-600 mt-2">
+                Delivery Address: {(order as any).delivery_address}
+              </p>
             )}
             {((order as any).delivery_county || (order as any).delivery_ward) && (
-              <p className="u-text-sm u-text-gray-600">
-                Location: {(order as any).delivery_county || 'N/A'}
-                {(order as any).delivery_ward ? `, ${(order as any).delivery_ward}` : ''}
+              <p className="text-sm text-gray-600">
+                Location: {(order as any).delivery_county || 'N/A'}{(order as any).delivery_ward ? `, ${(order as any).delivery_ward}` : ''}
               </p>
             )}
             {((order as any).delivery_window_start || (order as any).delivery_window_end) && (
-              <p className="u-text-sm u-text-gray-600">
-                Delivery Window:{' '}
-                {(order as any).delivery_window_start
-                  ? new Date((order as any).delivery_window_start).toLocaleString()
-                  : 'N/A'}{' '}
-                -{' '}
-                {(order as any).delivery_window_end
-                  ? new Date((order as any).delivery_window_end).toLocaleString()
-                  : 'N/A'}
+              <p className="text-sm text-gray-600">
+                Delivery Window: {(order as any).delivery_window_start ? new Date((order as any).delivery_window_start).toLocaleString() : 'N/A'}{" "}
+                - {(order as any).delivery_window_end ? new Date((order as any).delivery_window_end).toLocaleString() : 'N/A'}
               </p>
             )}
           </div>
 
           {/* Actions */}
-          <div className="order-detail-actions">
+          <div className="flex gap-4">
             <button
               onClick={downloadReceipt}
               disabled={downloadingReceipt}
-              type="button"
-              className="u-btn u-btn--primary u-flex u-items-center u-justify-center u-gap-2"
+              className="flex-1 bg-[var(--primary)] text-white px-6 py-3 rounded-lg hover:bg-[var(--primary-dark)] font-semibold flex items-center justify-center gap-2"
             >
-              <svg className="home-product-videos__icon-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               {downloadingReceipt ? 'Downloading Receipt...' : 'Download Receipt'}
             </button>
-            <Link href="/products" className="u-btn u-btn--neutral u-text-center">
+            <Link
+              href="/products"
+              className="flex-1 bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 font-semibold text-center"
+            >
               Continue Shopping
             </Link>
           </div>
@@ -302,26 +314,26 @@ function OrderDetailContent() {
 
 export default function OrderDetailPage() {
   return (
-    <div className="app-page">
+    <div className="min-h-screen flex flex-col">
       <Suspense
         fallback={
-          <HeaderWithAnnouncement />
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
-      <Suspense
-        fallback={
-          <main className="app-page__main app-centered-shell">
-            <div className="app-centered-card">
-              <div className="u-animate-pulse">
-                <div className="u-skeleton-line u-skeleton-line--h8 u-skeleton-line--w-half u-mb-4" />
-                <div className="u-skeleton-line u-skeleton-line--h4 u-skeleton-line--w-3-4 u-mb-8" />
-              </div>
+      <Suspense fallback={
+        <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full p-8">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-8"></div>
             </div>
-          </main>
-        }
-      >
+          </div>
+        </main>
+      }>
         <OrderDetailContent />
       </Suspense>
       <Footer />

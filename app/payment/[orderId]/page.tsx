@@ -22,10 +22,12 @@ export default function PaymentRoute({ params, searchParams }: PaymentPageProps)
   const callbackUrl = searchParamsResolved.callback_url as string | undefined;
 
   return (
-    <div className="app-page">
+    <div className="min-h-screen flex flex-col">
       <Suspense
         fallback={
-          <HeaderWithAnnouncement />
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
         }
       >
         <HeaderWithAnnouncement />

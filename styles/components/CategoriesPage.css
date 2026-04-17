@@ -26,7 +26,7 @@
   flex-direction: column;
   gap: 12px; /* Space between the box and the text */
   text-decoration: none;
-  color: var(--text-color-body);
+  color: #333;
   width: 100%;
 }
 
@@ -34,7 +34,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1; /* Makes it a square like the screenshot */
-  background-color: var(--warning-yellow-400); /* role: warning/attention accent surface */
+  background-color: #E2F36E; /* That specific lime/yellow color */
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -89,13 +89,13 @@
 }
 
 .categories-page__section-link {
-  color: var(--text-color-title);
+  color: var(--primary);
   font-weight: 500;
   text-decoration: none;
 }
 
 .categories-page__section-link:hover {
-  color: var(--primary-900);
+  color: var(--primary-dark);
 }
 
 .categories-page__products {
@@ -107,7 +107,7 @@
 .categories-page__product-skeleton {
   height: 24rem;
   border-radius: 16px;
-  background: var(--border-default);
+  background: var(--ui-gray-200);
   animation: categories-page-pulse 1.6s ease-in-out infinite;
 }
 
@@ -119,7 +119,7 @@
 .categories-page__empty-text {
   margin: 0;
   font-size: 13px;
-  color: var(--text-color-subtitle);
+  color: var(--secondary);
   min-height: 24px;
 }
 
@@ -140,11 +140,11 @@
 .categories-page__loading-text {
   margin: 0;
   font-size: 13px;
-  color: var(--text-color-subtitle);
+  color: var(--secondary);
 }
 
 .categories-page__skeleton {
-  background: var(--border-default);
+  background: var(--ui-gray-200);
   border-radius: 12px;
   height: 24rem;
   animation: categories-page-pulse 1.6s ease-in-out infinite;

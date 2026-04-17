@@ -5,8 +5,8 @@
 .products-page__promo {
   margin-bottom: 24px;
   padding: 16px;
-  background: var(--surface-default);
-  border: 1px solid var(--border-default);
+  background: var(--ui-gray-50);
+  border: 1px solid var(--ui-gray-200);
   border-radius: 12px;
 }
 
@@ -23,18 +23,18 @@
 }
 
 .products-page__promo-description {
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
   max-width: 520px;
 }
 
 .products-page__promo-code {
   font-size: 14px;
-  color: var(--text-color-subtitle);
+  color: var(--ui-gray-500);
   margin-top: 8px;
 }
 
 .products-page__promo-code-value {
-  background: var(--surface-default);
+  background: var(--ui-white);
   padding: 4px 8px;
   border-radius: 6px;
 }
@@ -44,14 +44,6 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.products-page__lead {
-  margin: 0;
-  margin-top: 6px;
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: var(--text-color-body);
 }
 
 .products-page__title {
@@ -67,14 +59,14 @@
 .products-page__search-input {
   flex: 1;
   padding: 8px 16px;
-  border: 1px solid var(--border-default);
+  border: 1px solid var(--ui-gray-200);
   border-radius: 10px;
 }
 
 .products-page__search-button {
   padding: 8px 20px;
-  background: var(--text-color-title);
-  color: var(--surface-default);
+  background: var(--primary);
+  color: var(--ui-white);
   border-radius: 10px;
   border: none;
   cursor: pointer;
@@ -82,7 +74,7 @@
 }
 
 .products-page__search-button:hover {
-  background: var(--primary-900);
+  background: var(--primary-dark);
 }
 
 .products-page__layout {
@@ -108,7 +100,7 @@
 }
 
 .products-page__skeleton {
-  background: var(--border-default);
+  background: var(--ui-gray-200);
   border-radius: 12px;
   height: 24rem;
   animation: products-page-pulse 1.6s ease-in-out infinite;
@@ -120,22 +112,22 @@
 }
 
 .products-page__status--error {
-  color: var(--error-red-600);
+  color: var(--ui-red-600);
 }
 
 .products-page__status-text {
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
 }
 
 .products-page__summary {
-  color: var(--text-color-body);
+  color: var(--ui-gray-600);
   margin-bottom: 16px;
 }
 
 .products-page__summary-note {
   margin-left: 8px;
   font-size: 14px;
-  color: var(--text-color-title);
+  color: var(--primary);
 }
 
 .products-page__pagination {
@@ -147,7 +139,7 @@
 
 .products-page__pagination-button {
   padding: 8px 16px;
-  background: var(--border-default);
+  background: var(--ui-gray-200);
   border-radius: 8px;
   border: none;
   cursor: pointer;
@@ -155,7 +147,7 @@
 }
 
 .products-page__pagination-button:hover {
-  background: var(--border-action-hover);
+  background: var(--ui-gray-300);
 }
 
 .products-page__pagination-button:disabled {

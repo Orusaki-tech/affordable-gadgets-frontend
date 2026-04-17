@@ -24,8 +24,6 @@
 .product-carousel__item {
   flex-shrink: 0;
   scroll-snap-align: start;
-  box-sizing: border-box;
-  min-width: 0;
   padding-left: 0.75rem;
   padding-right: 0.75rem;
 }
@@ -53,11 +51,9 @@
 .samsung-progressbar-bar {
   position: relative;
   border-radius: 1000px;
-  /* Default: responsive width (562px was forcing horizontal overflow on <768px viewports). */
-  width: min(562px, 100%);
-  max-width: 100%;
+  width: 562px;
   height: 2px;
-  background-color: var(--alpha-black-900-10);
+  background-color: var(--ui-black-10);
   overflow: hidden;
 }
 
@@ -69,7 +65,7 @@
   border-radius: 1000px;
   width: 100%;
   height: 100%;
-  background-color: var(--text-color-title);
+  background-color: var(--ui-black);
   transform-origin: left top;
   transform: scaleX(0);
 }
@@ -87,12 +83,10 @@
   width: 40px;
   height: 40px;
   border-radius: 9999px;
-  border: 1px solid var(--alpha-black-900-20);
-  background: var(--surface-default);
-  color: var(--text-color-title);
+  border: 1px solid var(--ui-black-20);
+  background: var(--ui-white);
+  color: var(--ui-black);
   transition: border-color 0.2s ease, opacity 0.2s ease;
-  letter-spacing: normal;
-  font-family: inherit;
 }
 
 .samsung-progressbar-arrow:disabled {
@@ -104,18 +98,6 @@
 .samsung-progressbar-icon {
   width: 40px;
   height: 40px;
-}
-
-@media only screen and (max-width: 767px) {
-  .samsung-progressbar-inner {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .samsung-progressbar-bar {
-    width: 100%;
-    max-width: 562px;
-  }
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1440px) {
@@ -140,4 +122,3 @@
     height: 2.77777778vw;
   }
 }
-

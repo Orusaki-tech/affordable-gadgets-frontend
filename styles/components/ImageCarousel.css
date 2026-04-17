@@ -7,9 +7,9 @@
   aspect-ratio: 4 / 5;
   border-radius: 16px;
   overflow: hidden;
-  background: var(--surface-default);
-  box-shadow: 0 4px 12px var(--alpha-black-900-12);
-  border: 1px solid var(--alpha-black-900-05);
+  background: var(--ui-white);
+  box-shadow: 0 4px 12px var(--ui-black-12);
+  border: 1px solid var(--ui-black-05);
   cursor: default;
   pointer-events: none;
 }

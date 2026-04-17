@@ -7,17 +7,19 @@ import { Footer } from '@/components/Footer';
 
 export default function Cart() {
   return (
-    <div className="app-page">
+    <div className="min-h-screen flex flex-col">
       {/* Wrap header (which uses useSearchParams) in Suspense for CSR bailout */}
       <Suspense
         fallback={
-          <HeaderWithAnnouncement />
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
 
-      <main className="app-page__main page-container u-py-8">
+      <main className="flex-1 container mx-auto px-4 py-8">
         <CartPage />
       </main>
       <Footer />

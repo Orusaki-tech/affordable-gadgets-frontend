@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Roboto } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -15,14 +15,6 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
-
-/** Weights match our Material typography roles (Regular / Medium / Bold). */
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-roboto-loaded",
-  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -74,14 +66,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${roboto.variable} ${geistSans.variable} ${geistMono.variable} u-antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="site-route-shell">
-          <StructuredData type="Organization" />
-          <StructuredData type="WebSite" />
-          <StructuredData type="LocalBusiness" />
-          <Providers>{children}</Providers>
-        </div>
+        <StructuredData type="Organization" />
+        <StructuredData type="WebSite" />
+        <StructuredData type="LocalBusiness" />
+        <Providers>{children}</Providers>
         <GoogleCustomerReviewsBadge merchantId={5748422735} />
         <SpeedInsights />
       </body>

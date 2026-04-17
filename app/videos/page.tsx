@@ -20,51 +20,53 @@ export const metadata: Metadata = {
 
 export default function VideosPage() {
   return (
-    <div className="app-page">
+    <div className="min-h-screen flex flex-col">
       <Suspense
         fallback={
-          <HeaderWithAnnouncement />
+          <div className="site-header-wrapper">
+            <HeaderWithAnnouncement />
+          </div>
         }
       >
         <HeaderWithAnnouncement />
       </Suspense>
       
-      <main className="app-page__main">
-        <section className="page-container u-pt-8">
-          <div className="page-card-elevated page-card-elevated--5xl">
-            <h1 className="page-heading-3xl">Product Videos</h1>
-            <p className="page-lead">
+      <main className="flex-1">
+        <section className="container mx-auto px-4 pt-8">
+          <div className="mx-auto max-w-5xl rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">Product Videos</h1>
+            <p className="mt-3 text-base leading-7 text-gray-600 sm:text-lg">
               Browse product demos and video previews to get a closer look at devices before you buy. This
               page surfaces phones, laptops, tablets, and accessories with supporting video content so you
               can see condition, colour, and key features in real-world lighting.
             </p>
-            <p className="page-lead--compact">
+            <p className="mt-2 text-sm leading-6 text-gray-600 sm:text-base">
               Use these short clips to compare models, understand size and design, and hear how each device
               performs in everyday Kenyan use cases like mobile money, social media, work, and school.
             </p>
-            <div className="page-pill-links">
-              <Link href="/products" className="page-pill-link">
+            <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
+              <Link href="/products" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
                 Browse products
               </Link>
-              <Link href="/reviews" className="page-pill-link">
+              <Link href="/reviews" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
                 Read reviews
               </Link>
             </div>
           </div>
         </section>
         {/* Stories Carousel */}
-        <section className="page-container u-py-6">
+        <section className="container mx-auto px-4 py-6">
           <StoriesCarousel autoAdvanceDuration={5} />
         </section>
 
         {/* Product Videos Section */}
-        <section className="page-container u-py-8">
+        <section className="container mx-auto px-4 py-8">
           <Suspense fallback={
-            <div className="u-animate-pulse">
-              <div className="u-skeleton-line u-skeleton-line--h8 u-skeleton-line--w-48 u-mb-4" />
-              <div className="u-grid-3-responsive u-gap-4">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-48 mb-4"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="u-skeleton-line u-skeleton-line--h64 u-w-full u-rounded-lg" />
+                  <div key={i} className="h-64 bg-gray-200 rounded-lg" />
                 ))}
               </div>
             </div>
@@ -74,12 +76,12 @@ export default function VideosPage() {
         </section>
 
         {/* Special Offers */}
-        <section className="page-container u-py-8">
+        <section className="container mx-auto px-4 py-8">
           <SpecialOffers pageSize={12} />
         </section>
 
         {/* Reviews Showcase */}
-        <section className="page-container u-py-8">
+        <section className="container mx-auto px-4 py-8">
           <ReviewsShowcase />
         </section>
       </main>

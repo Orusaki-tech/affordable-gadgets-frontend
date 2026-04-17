@@ -18,11 +18,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="site-providers-inner">
-      <QueryClientProvider client={queryClient}>
-        <CartProvider>{children}</CartProvider>
-      </QueryClientProvider>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <CartProvider>{children}</CartProvider>
+    </QueryClientProvider>
   );
 }
 

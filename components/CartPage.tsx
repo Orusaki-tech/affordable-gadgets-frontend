@@ -10,6 +10,19 @@ import { apiBaseUrl, inventoryBaseUrl } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
 import { AuthChoiceModal } from './AuthChoiceModal';
 
+type PublicDeliveryRatesResponse = {
+  results?: Array<{ county: string; ward?: string | null; price: number }>;
+  next?: string | null;
+  previous?: string | null;
+};
+
+const resolveUrlAgainstApiBase = (nextUrl: string) => {
+  if (nextUrl.startsWith('http://') || nextUrl.startsWith('https://')) {
+    return nextUrl;
+  }
+  return new URL(nextUrl, `${apiBaseUrl}/`).toString();
+};
+
 export function CartPage() {
   const { cart, isLoading, removeFromCart, totalValue, itemCount, updateCart } = useCart();
   const [removingBundleGroup, setRemovingBundleGroup] = useState<string | null>(null);
@@ -56,20 +69,34 @@ export function CartPage() {
   useEffect(() => {
     const fetchDeliveryRates = async () => {
       try {
-        const response = await fetch(`${apiBaseUrl}/api/v1/public/delivery-rates/`, {
-          headers: {
-            'X-Brand-Code': brandConfig.code,
-            // Avoid ngrok interstitial HTML and force JSON response shape.
-            'ngrok-skip-browser-warning': '1',
-            Accept: 'application/json',
-          },
-        });
-        if (!response.ok) {
-          throw new Error('Failed to load delivery rates');
+        const collected: Array<{ county: string; ward?: string | null; price: number }> = [];
+        let url: string | null = `${apiBaseUrl}/api/v1/public/delivery-rates/`;
+
+        while (url) {
+          const response = await fetch(url, {
+            headers: {
+              'X-Brand-Code': brandConfig.code,
+              // Avoid ngrok interstitial HTML and force JSON response shape.
+              'ngrok-skip-browser-warning': '1',
+              Accept: 'application/json',
+            },
+          });
+          if (!response.ok) {
+            throw new Error('Failed to load delivery rates');
+          }
+
+          const data: unknown = await response.json();
+          if (Array.isArray(data)) {
+            collected.push(...data);
+            break;
+          }
+
+          const paged = data as PublicDeliveryRatesResponse;
+          collected.push(...(paged.results || []));
+          url = paged.next ? resolveUrlAgainstApiBase(paged.next) : null;
         }
-        const data = await response.json();
-        const rates = Array.isArray(data) ? data : data?.results || [];
-        setDeliveryRates(rates);
+
+        setDeliveryRates(collected);
       } catch (err: any) {
         console.error('Failed to fetch delivery rates:', err);
       }
@@ -151,10 +178,16 @@ export function CartPage() {
   }, [items]);
 
   const counties = useMemo(() => {
-    const unique = new Set(
-      deliveryRates.map((rate) => (rate.county || '').trim()).filter(Boolean)
-    );
-    return Array.from(unique).sort((a, b) => a.localeCompare(b));
+    const canonicalByKey = new Map<string, string>();
+    deliveryRates.forEach((rate) => {
+      const trimmed = (rate.county || '').trim();
+      if (!trimmed) return;
+      const key = trimmed.toLowerCase();
+      if (!canonicalByKey.has(key)) {
+        canonicalByKey.set(key, trimmed);
+      }
+    });
+    return Array.from(canonicalByKey.values()).sort((a, b) => a.localeCompare(b));
   }, [deliveryRates]);
 
   const wards = useMemo(() => {

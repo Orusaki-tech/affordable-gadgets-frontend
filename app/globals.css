@@ -40,3 +40,11 @@
 @import "../styles/components/SpecialOffersServer.css";
 @import "../styles/components/StoriesCarousel.css";
 @import "../styles/components/StructuredData.css";
+
+/* Product cards are <a class="product-card ...">. Wins over stale bundles that still ship
+   `.product-card--featured { border: none }` or gray-200 on `.product-card` (CDN / old deploy). */
+a.product-card.product-card--featured,
+a.product-card.product-card--default {
+  border: 1px solid #121212 !important;
+  box-sizing: border-box;
+}

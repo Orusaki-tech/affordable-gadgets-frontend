@@ -99,7 +99,7 @@
   display: block;
   background: var(--ui-white);
   overflow: hidden;
-  border: 1px solid var(--ui-gray-200);
+  border: 1px solid #000;
   transition: box-shadow 200ms, border-color 200ms, transform 200ms;
   height: 100%;
 }
@@ -107,7 +107,7 @@
 /* Min-height ensures footer + Add to Cart are never clipped in narrow columns (e.g. Products page grid) */
 .product-card--featured {
   border-radius: 16px;
-  border: none;
+  border: 1px solid #000;
   box-shadow: none;
   display: grid;
   grid-template-rows: 1fr;
@@ -136,7 +136,7 @@
 
 .product-card--minimal:hover {
   box-shadow: 0 4px 12px var(--ui-shadow-08);
-  border-color: var(--ui-gray-300);
+  border-color: #000;
 }
 
 .product-card--standard {
@@ -146,7 +146,7 @@
 
 .product-card--standard:hover {
   box-shadow: 0 10px 20px var(--ui-shadow-12);
-  border-color: var(--ui-gray-300);
+  border-color: #000;
 }
 
 .product-card__media {

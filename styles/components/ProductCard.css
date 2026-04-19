@@ -99,7 +99,9 @@
   display: block;
   background: var(--ui-white);
   overflow: hidden;
-  border: 1px solid #000;
+  /* 2px reads reliably on HiDPI; 1px often vanishes next to photos / subpixel rounding */
+  border: 2px solid #000;
+  box-sizing: border-box;
   transition: box-shadow 200ms, border-color 200ms, transform 200ms;
   height: 100%;
 }
@@ -107,7 +109,7 @@
 /* Min-height ensures footer + Add to Cart are never clipped in narrow columns (e.g. Products page grid) */
 .product-card--featured {
   border-radius: 16px;
-  border: 1px solid #000;
+  border: 2px solid #000;
   box-shadow: none;
   display: grid;
   grid-template-rows: 1fr;

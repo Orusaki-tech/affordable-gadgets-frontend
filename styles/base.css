@@ -5,8 +5,6 @@
 
   --primary: #1d1d1f;
   --primary-dark: #121212;
-  /* Same stroke as `.product-card__buy-btn--featured`; use everywhere the card frame must match the Buy pill */
-  --product-card-frame: 1px solid var(--primary-dark);
   --primary-light: #3a3a3c;
   --secondary: #6e6e73;
   --accent: #1d1d1f;

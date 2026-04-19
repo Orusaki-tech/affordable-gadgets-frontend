@@ -42,9 +42,9 @@
 @import "../styles/components/StructuredData.css";
 
 /* Product cards are <a class="product-card ...">. Wins over stale bundles that still ship
-   `.product-card--featured { border: none }`, gray-200 on `.product-card`, or hover border-color
-   tweaks — must stay aligned with `--product-card-frame` / Buy pill. */
-a.product-card {
-  border: var(--product-card-frame) !important;
+   `.product-card--featured { border: none }` or gray-200 on `.product-card` (CDN / old deploy). */
+a.product-card.product-card--featured,
+a.product-card.product-card--default {
+  border: 1px solid #121212 !important;
   box-sizing: border-box;
 }

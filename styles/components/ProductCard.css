@@ -99,7 +99,8 @@
   display: block;
   background: var(--ui-white);
   overflow: hidden;
-  border: var(--product-card-frame);
+  /* Same stroke as .product-card__buy-btn--featured */
+  border: 1px solid var(--primary-dark);
   box-sizing: border-box;
   transition: box-shadow 200ms, border-color 200ms, transform 200ms;
   height: 100%;
@@ -109,7 +110,7 @@
 .product-card--featured {
   border-radius: 16px;
   /* Must stay explicit: an older rule used `border: none` here, which removed the base .product-card stroke */
-  border: var(--product-card-frame);
+  border: 1px solid var(--primary-dark);
   box-shadow: none;
   display: grid;
   grid-template-rows: 1fr;
@@ -759,7 +760,7 @@
   font-weight: 600;
   color: var(--primary-dark);
   background: transparent;
-  border: var(--product-card-frame);
+  border: 1px solid var(--primary-dark);
   border-radius: 6px;
   flex-shrink: 0;
   transition: background 200ms, color 200ms, border-color 200ms;
@@ -1276,7 +1277,7 @@
 
 .product-card__cta {
   border-radius: 16px;
-  border: var(--product-card-frame);
+  border: 1px solid var(--primary-dark);
   background: var(--primary-dark);
   color: var(--ui-white);
   padding: 8px 18px;

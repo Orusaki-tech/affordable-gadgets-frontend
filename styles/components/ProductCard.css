@@ -109,6 +109,8 @@
 /* Min-height ensures footer + Add to Cart are never clipped in narrow columns (e.g. Products page grid) */
 .product-card--featured {
   border-radius: 16px;
+  /* Must stay explicit: an older rule used `border: none` here, which removed the base .product-card stroke */
+  border: 1px solid var(--primary-dark);
   box-shadow: none;
   display: grid;
   grid-template-rows: 1fr;

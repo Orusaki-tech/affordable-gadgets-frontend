@@ -105,61 +105,11 @@
   height: 100%;
 }
 
-/*
- * Border stroke lives on `.product-card-frame` (parent) so deployed bundles that still
- * contain `.product-card--featured { border: none }` cannot remove the outline.
- */
-.product-card-frame {
-  display: block;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  border: var(--product-card-frame);
-  overflow: hidden;
-  background: var(--ui-white);
-}
-
-.product-card-frame--featured {
-  border-radius: 16px;
-  min-height: 260px;
-}
-
-.product-card-frame--featured:hover {
-  box-shadow: 0 4px 12px var(--ui-shadow-08);
-}
-
-.product-card-frame--standard {
-  border-radius: 16px;
-  box-shadow: 0 4px 12px var(--ui-shadow-08);
-}
-
-.product-card-frame--standard:hover {
-  box-shadow: 0 10px 20px var(--ui-shadow-12);
-}
-
-.product-card-frame--minimal {
-  border-radius: 12px;
-  box-shadow: none;
-}
-
-.product-card-frame--minimal:hover {
-  box-shadow: 0 4px 12px var(--ui-shadow-08);
-}
-
-.product-card-frame .product-card--standard,
-.product-card-frame .product-card--standard:hover {
-  box-shadow: none !important;
-}
-
-.product-card-frame .product-card--minimal,
-.product-card-frame .product-card--minimal:hover {
-  box-shadow: none !important;
-}
-
 /* Min-height ensures footer + Add to Cart are never clipped in narrow columns (e.g. Products page grid) */
 .product-card--featured {
-  border-radius: 0;
-  border: none;
+  border-radius: 16px;
+  /* Must stay explicit: an older rule used `border: none` here, which removed the base .product-card stroke */
+  border: var(--product-card-frame);
   box-shadow: none;
   display: grid;
   grid-template-rows: 1fr;
@@ -171,9 +121,8 @@
   background: var(--ui-white);
 }
 
-.product-card-frame .product-card--featured,
-.product-card-frame .product-card--featured:hover {
-  box-shadow: none !important;
+.product-card--featured:hover {
+  box-shadow: 0 4px 12px var(--ui-shadow-08);
 }
 
 .product-card--default {

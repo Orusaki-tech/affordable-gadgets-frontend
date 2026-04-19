@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { PublicProduct, InventoryUnitImage } from '@/lib/api/generated';
 import { formatPrice, formatPriceRange } from '@/lib/utils/format';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
@@ -12,6 +12,12 @@ import { useProductUnits, prefetchProductDetail } from '@/lib/hooks/useProducts'
 import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
+
+/** Same stroke as `.product-card__buy-btn--featured`; on the Link so prod CSS order cannot drop it. */
+const productCardLinkFrameStyle: CSSProperties = {
+  border: '1px solid var(--primary-dark)',
+  boxSizing: 'border-box',
+};
 
 interface ProductCardProps {
   product: PublicProduct;
@@ -372,6 +378,7 @@ export function ProductCard({
       <Link
         href={getProductHref(product)}
         className="product-card product-card--featured"
+        style={productCardLinkFrameStyle}
         onClick={() => setProductDetailPlaceholder(product)}
         onMouseEnter={handlePrefetch}
         onFocus={handlePrefetch}
@@ -541,6 +548,7 @@ export function ProductCard({
     <Link
       href={getProductHref(product)}
       className={`product-card product-card--default ${isMinimal ? 'product-card--minimal' : 'product-card--standard'}`}
+      style={productCardLinkFrameStyle}
       onClick={() => setProductDetailPlaceholder(product)}
       onMouseEnter={handlePrefetch}
       onFocus={handlePrefetch}

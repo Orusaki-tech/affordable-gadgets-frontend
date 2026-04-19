@@ -13,9 +13,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
 
-/** Same stroke as `.product-card__buy-btn--featured`. Hex matches --primary-dark so it always paints (see DevTools). */
+/** Inline fallback: same as `--product-card-frame` / Buy pill; survives CSS order issues until globals.css loads. */
 const productCardLinkFrameStyle: CSSProperties = {
-  border: '1px solid #121212',
+  border: 'var(--product-card-frame)',
   boxSizing: 'border-box',
 };
 

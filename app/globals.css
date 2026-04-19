@@ -41,10 +41,14 @@
 @import "../styles/components/StoriesCarousel.css";
 @import "../styles/components/StructuredData.css";
 
-/* Product cards are <a class="product-card ...">. Wins over stale bundles that still ship
-   `.product-card--featured { border: none }`, gray-200 on `.product-card`, or hover border-color
-   tweaks — must stay aligned with `--product-card-frame` / Buy pill. */
+/* Product cards are <a class="product-card ..."> (often inside `.product-card-frame`).
+   Wins over stale bundles; inner links inside a frame rely on the frame for the stroke. */
 a.product-card {
   border: var(--product-card-frame) !important;
   box-sizing: border-box;
+}
+
+div.product-card-frame > a.product-card {
+  border: none !important;
+  border-radius: 0 !important;
 }

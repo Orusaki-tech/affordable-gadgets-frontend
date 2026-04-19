@@ -13,10 +13,18 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
 
-/** Inline fallback: same as `--product-card-frame` / Buy pill; survives CSS order issues until globals.css loads. */
-const productCardLinkFrameStyle: CSSProperties = {
-  border: 'var(--product-card-frame)',
+/** Stroke is on `.product-card-frame`; inner link stays borderless so stale `border:none` on featured cannot win. */
+const productCardInnerLinkStyle: CSSProperties = {
+  border: 'none',
   boxSizing: 'border-box',
+};
+
+/** Inline on the frame so the stroke still paints if an old CSS chunk is cached (frame is a new node old bundles never styled). */
+const productCardFeaturedFrameStyle: CSSProperties = {
+  border: '1px solid var(--primary-dark)',
+  borderRadius: 16,
+  boxSizing: 'border-box',
+  width: '100%',
 };
 
 interface ProductCardProps {
@@ -375,10 +383,14 @@ export function ProductCard({
   if (isFeaturedVariant) {
     const canAddToCart = Boolean(selectedUnit?.id) && !isAddingToCart && !unitsLoading;
     return (
+      <div
+        className="product-card-frame product-card-frame--featured"
+        style={productCardFeaturedFrameStyle}
+      >
       <Link
         href={getProductHref(product)}
         className="product-card product-card--featured"
-        style={productCardLinkFrameStyle}
+        style={productCardInnerLinkStyle}
         onClick={() => setProductDetailPlaceholder(product)}
         onMouseEnter={handlePrefetch}
         onFocus={handlePrefetch}
@@ -540,15 +552,25 @@ export function ProductCard({
           </div>
         </div>
       </Link>
+      </div>
     );
   }
 
   return (
     <>
+    <div
+      className={`product-card-frame product-card-frame--default ${isMinimal ? 'product-card-frame--minimal' : 'product-card-frame--standard'}`}
+      style={{
+        border: '1px solid var(--primary-dark)',
+        borderRadius: isMinimal ? 12 : 16,
+        boxSizing: 'border-box',
+        width: '100%',
+      }}
+    >
     <Link
       href={getProductHref(product)}
       className={`product-card product-card--default ${isMinimal ? 'product-card--minimal' : 'product-card--standard'}`}
-      style={productCardLinkFrameStyle}
+      style={productCardInnerLinkStyle}
       onClick={() => setProductDetailPlaceholder(product)}
       onMouseEnter={handlePrefetch}
       onFocus={handlePrefetch}
@@ -964,6 +986,7 @@ export function ProductCard({
         )}
       </div>
     </Link>
+    </div>
 
       {isQuickViewOpen && (
         <div

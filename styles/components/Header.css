@@ -97,7 +97,7 @@
 .site-header__nav {
   display: none;
   align-items: center;
-  gap: 24px;
+  gap: 14px;
   flex-shrink: 0;
 }
 

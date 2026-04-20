@@ -43,7 +43,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
       type: searchParams.get('type') || '',
       minPrice: searchParams.get('min_price') || '',
       maxPrice: searchParams.get('max_price') || '',
-      brand: searchParams.get('brand_filter') || '',
+      brand: searchParams.get('brand_filter') || searchParams.get('brand') || '',
     }),
     [searchParams]
   );
@@ -204,9 +204,14 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
 
   const filteredResults = useMemo(() => {
     if (!data?.results) return [];
-    if (!filters.type) return data.results;
-    return data.results.filter((product) => product.product_type === filters.type);
-  }, [data?.results, filters.type]);
+    const normalizedBrand = filters.brand.trim().toLowerCase();
+    return data.results.filter((product) => {
+      if (filters.type && product.product_type !== filters.type) return false;
+      if (!normalizedBrand) return true;
+      const productBrand = String(product.brand ?? '').trim().toLowerCase();
+      return productBrand.includes(normalizedBrand);
+    });
+  }, [data?.results, filters.brand, filters.type]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

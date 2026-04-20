@@ -21,10 +21,10 @@ export function Header() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/products?type=PH&brand=Apple', label: 'iPhone' },
-    { href: '/products?type=PH&brand=Samsung', label: 'Samsung' },
-    { href: '/products?type=PH&brand=Google', label: 'Google' },
-    { href: '/products?type=PH&brand=Sony', label: 'Sony' },
+    { href: '/products?type=PH&brand_filter=Apple', label: 'iPhone' },
+    { href: '/products?type=PH&brand_filter=Samsung', label: 'Samsung' },
+    { href: '/products?type=PH&brand_filter=Google', label: 'Google' },
+    { href: '/products?type=PH&brand_filter=Sony', label: 'Sony' },
     { href: '/products?type=AC', label: 'Accessories' },
     { href: '/financing', label: 'Financing' },
   ];

@@ -43,7 +43,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
       type: searchParams.get('type') || '',
       minPrice: searchParams.get('min_price') || '',
       maxPrice: searchParams.get('max_price') || '',
-      brand: searchParams.get('brand') || '',
+      brand: searchParams.get('brand_filter') || '',
     }),
     [searchParams]
   );
@@ -129,7 +129,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
 
     const filtersToApply = nextFilters ?? filters;
     updateParam('type', filtersToApply.type);
-    updateParam('brand', filtersToApply.brand);
+    updateParam('brand_filter', filtersToApply.brand);
     updateParam('min_price', filtersToApply.minPrice);
     updateParam('max_price', filtersToApply.maxPrice);
     updateParam('search', nextSearch ?? search);

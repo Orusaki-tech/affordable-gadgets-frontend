@@ -14,7 +14,7 @@ import {
 } from '@/lib/api/generated';
 
 /** Number of items to fetch for the first request (visible above the fold). Next page is prefetched after this loads. */
-export const PRODUCTS_VISIBLE_PAGE_SIZE = 12;
+export const PRODUCTS_VISIBLE_PAGE_SIZE = 20;
 
 /** Number of featured products to load on the homepage for fast first paint (under 3s). */
 export const FEATURED_PRODUCTS_PAGE_SIZE = 5;

@@ -94,7 +94,7 @@ export default async function ProductsListingPage({
       minPrice,
       ordering,
       page,
-      12,
+      20,
       promotion,
       search,
       undefined,

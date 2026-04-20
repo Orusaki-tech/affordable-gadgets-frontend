@@ -30,6 +30,7 @@ interface ProductsPageProps {
 export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const searchParamsRef = useRef<string>('');
   const promotionId = searchParams.get('promotion');
   const focusSearch = searchParams.get('focusSearch');
   const searchInputRef = useRef<HTMLInputElement | null>(null);
@@ -51,6 +52,10 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const [sort, setSort] = useState('');
   const [autoOpenFilters, setAutoOpenFilters] = useState(false);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    searchParamsRef.current = searchParams.toString();
+  }, [searchParams]);
 
   // Debounce search so we don't refetch on every keystroke (only after user pauses)
   const debouncedSearch = useDebouncedValue(search, 400);
@@ -232,8 +237,13 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   };
 
   useEffect(() => {
+    const params = new URLSearchParams(searchParamsRef.current);
+    const urlPage = Number(params.get('page') || 1);
+    const normalizedUrlPage =
+      Number.isFinite(urlPage) && urlPage > 0 ? Math.floor(urlPage) : 1;
+    if (normalizedUrlPage === page) return;
     updateQueryParams(undefined, undefined, page);
-  }, [page, searchParams]);
+  }, [page]);
 
   return (
     <div className="products-page">

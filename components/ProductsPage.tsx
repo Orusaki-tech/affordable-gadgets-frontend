@@ -10,6 +10,8 @@ import { PublicPromotion } from '@/lib/api/generated';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, FilterState } from './ProductFilters';
 import { getProductHref } from '@/lib/utils/productRoutes';
+import { CATEGORY_CARDS } from '@/lib/config/categories';
+import Link from 'next/link';
 
 type ProductCardOptions = {
   variant?: 'default' | 'minimal' | 'featured';
@@ -305,6 +307,26 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
             initialFilters={filters}
             autoOpen={autoOpenFilters}
           />
+
+          <div className="products-page__category-tiles" aria-label="Shop by category">
+            {CATEGORY_CARDS.map((category) => (
+              <Link
+                key={category.code}
+                href={category.href}
+                className="products-page__category-tile"
+                prefetch={false}
+              >
+                <div className="products-page__category-tile-image-wrap">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="products-page__category-tile-image"
+                  />
+                </div>
+                <p className="products-page__category-tile-title">{category.name}</p>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Results */}

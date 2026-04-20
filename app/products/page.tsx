@@ -166,9 +166,6 @@ export default async function ProductsListingPage({
             choice before you checkout.
           </p>
           <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
-            <Link href="/categories" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
-              Browse categories
-            </Link>
             <Link href="/budget-search" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
               Shop by budget
             </Link>

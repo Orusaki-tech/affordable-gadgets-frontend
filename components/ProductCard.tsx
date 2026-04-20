@@ -64,7 +64,7 @@ export function ProductCard({
   variant = 'featured',
   showInterestCount = true,
   showQuickActions = true,
-  showQuickView = true,
+  showQuickView = false,
   showRatings = true,
   showSwatches = true,
   showShippingBadges = true,
@@ -192,7 +192,6 @@ export function ProductCard({
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [selectedUnitId, setSelectedUnitId] = useState<number | null>(null);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
   // Auto-select first storage option on load
@@ -278,12 +277,6 @@ export function ProductCard({
     event.preventDefault();
     event.stopPropagation();
     toggle(product.id);
-  };
-
-  const handleQuickViewOpen = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    setIsQuickViewOpen(true);
   };
 
   const handleAddToCart = async (event: React.MouseEvent, qty?: number) => {
@@ -629,16 +622,7 @@ export function ProductCard({
                 </svg>
               </button>
               {allowQuickView && (
-                <button
-                  type="button"
-                  onClick={handleQuickViewOpen}
-                  className="product-card__quick-action"
-                  aria-label="Quick view"
-                >
-                  <svg className="product-card__quick-icon" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10 3c-4.5 0-8.268 2.943-9.5 7 1.232 4.057 5 7 9.5 7s8.268-2.943 9.5-7C18.268 5.943 14.5 3 10 3zm0 12a5 5 0 110-10 5 5 0 010 10zm0-8a3 3 0 100 6 3 3 0 000-6z" />
-                  </svg>
-                </button>
+                <></>
               )}
               <button
                 type="button"
@@ -965,149 +949,6 @@ export function ProductCard({
       </div>
     </Link>
 
-      {isQuickViewOpen && (
-        <div
-          className="product-card__modal"
-          onClick={() => setIsQuickViewOpen(false)}
-        >
-          <div
-            className="product-card__modal-panel"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="product-card__modal-header">
-              <div>
-                <h4 className="product-card__modal-title">{product.product_name}</h4>
-                <p className="product-card__modal-subtitle">{product.brand}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsQuickViewOpen(false)}
-                className="product-card__modal-close"
-                aria-label="Close"
-              >
-                ×
-              </button>
-            </div>
-            <div className="product-card__modal-body">
-              <div className="product-card__modal-media">
-                <Image
-                  src={primaryImage}
-                  alt={product.product_name}
-                  fill
-                  className="product-card__modal-image"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
-                />
-              </div>
-              <div className="product-card__modal-details">
-                <div>
-                  {hasPriceRange ? (
-                    showComparePrice ? (
-                      <div className="product-card__modal-price">
-                        <p className="product-card__modal-price-main">
-                          {formatPrice(product.min_price ?? null)}
-                        </p>
-                        <p className="product-card__modal-price-msrp">
-                          {formatPrice(compareAtDisplay ?? null)}
-                        </p>
-                      </div>
-                    ) : (
-                      <p className="product-card__modal-price-main">
-                        {formatPriceRange(product.min_price ?? null, product.max_price ?? null)}
-                      </p>
-                    )
-                  ) : (
-                    <p className="product-card__modal-price-request">Price on request</p>
-                  )}
-                </div>
-
-                <RatingStars rating={averageRating} count={reviewCount} />
-
-                {showSwatches && colorOptions.length > 0 && (
-                  <div className="product-card__modal-section">
-                    <p className="product-card__modal-section-title">Available colors</p>
-                    <div className="product-card__modal-swatches">
-                      {colorOptions.map((color) => (
-                        <span
-                          key={color.name}
-                          className="product-card__modal-swatch"
-                        >
-                          {color.name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {units.length > 0 && (
-                  <div className="product-card__modal-section">
-                    <p className="product-card__modal-section-title">Choose option</p>
-                    <div className="product-card__modal-options">
-                      {units.map((unit) => (
-                        <button
-                          key={unit.id}
-                          type="button"
-                          onClick={() => setSelectedUnitId(unit.id ?? null)}
-                          className={`product-card__modal-option ${unit.id === selectedUnitId ? 'product-card__modal-option--active' : ''}`}
-                        >
-                          {unit.color_name || unit.condition || 'Option'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="product-card__modal-actions">
-                  <div className="product-card__qty">
-                    <button
-                      type="button"
-                      onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                      className="product-card__qty-btn"
-                    >
-                      -
-                    </button>
-                    <span className="product-card__qty-value">{quantity}</span>
-                    <button
-                      type="button"
-                      onClick={() => setQuantity((prev) => prev + 1)}
-                      className="product-card__qty-btn"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={(event) => handleAddToCart(event, quantity)}
-                    disabled={!selectedUnit?.id || isAddingToCart}
-                    className="product-card__modal-add"
-                  >
-                    {isAddingToCart ? 'Adding...' : 'Add to cart'}
-                  </button>
-                </div>
-
-                <div className="product-card__modal-links">
-                  <button
-                    type="button"
-                    onClick={handleWishlistToggle}
-                    className="product-card__modal-link"
-                  >
-                    {isInWishlist(product.id) ? 'Saved' : 'Save to wishlist'}
-                  </button>
-                  <Link
-                    href={getProductHref(product)}
-                    className="product-card__modal-link product-card__modal-link--primary"
-                    onClick={() => setProductDetailPlaceholder(product)}
-                    onMouseEnter={handlePrefetch}
-                    onFocus={handlePrefetch}
-                  >
-                    View full details
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { brandConfig } from '@/lib/config/brand';
 import { clearAuthToken } from '@/lib/api/openapi';
@@ -22,41 +21,13 @@ export function Header() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/categories', label: 'Categories' },
-    { href: '/categories#accessories', label: 'Accessories' },
+    { href: '/products?type=PH&brand=Apple', label: 'iPhone' },
+    { href: '/products?type=PH&brand=Samsung', label: 'Samsung' },
+    { href: '/products?type=PH&brand=Google', label: 'Google' },
+    { href: '/products?type=PH&brand=Sony', label: 'Sony' },
+    { href: '/products?type=AC', label: 'Accessories' },
     { href: '/financing', label: 'Financing' },
   ];
-
-  const productCategories = [
-    { name: 'Phones', code: 'PH' },
-    { name: 'Laptops', code: 'LT' },
-    { name: 'Tablets/Ipads', code: 'TB' },
-    { name: 'Accessories', code: 'AC' },
-  ];
-
-  const { data: menuBrands, isLoading: isMenuBrandsLoading } = useQuery({
-    queryKey: ['menu-brands'],
-    queryFn: async () => {
-      const response = await fetch(
-        `${brandConfig.apiBaseUrl}/api/v1/public/products/brands/`,
-        {
-          credentials: 'omit',
-          headers: {
-            'X-Brand-Code': brandConfig.code,
-            'ngrok-skip-browser-warning': '1',
-          },
-        }
-      );
-
-      if (!response.ok) {
-        return { results: {} as Record<string, string[]> };
-      }
-
-      return (await response.json()) as { results: Record<string, string[]> };
-    },
-    staleTime: 1000 * 60 * 60 * 12, // 12 hours
-    gcTime: 1000 * 60 * 60 * 24, // 24 hours
-  });
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -132,73 +103,6 @@ export function Header() {
                 <span className="site-header__nav-underline"></span>
               </Link>
             ))}
-
-            <div className="site-header__products">
-              <Link
-                href="/products"
-                className="site-header__nav-link"
-              >
-                Products
-                <span className="site-header__nav-underline"></span>
-              </Link>
-
-              <div className="site-header__dropdown">
-                <div className="site-header__dropdown-container">
-                  <div className="site-header__dropdown-panel">
-                  <div className="site-header__dropdown-grid">
-                    {productCategories.map((category) => {
-                      const brands = menuBrands?.results?.[category.code] ?? [];
-                      return (
-                        <div key={category.code} className="site-header__dropdown-group">
-                          <Link
-                            href={`/products?type=${category.code}`}
-                            className="site-header__dropdown-title"
-                            prefetch={false}
-                          >
-                            {category.name}
-                          </Link>
-                          <div className="site-header__dropdown-list">
-                            {isMenuBrandsLoading ? (
-                              <p className="site-header__dropdown-muted">Loading brands...</p>
-                            ) : brands.length > 0 ? (
-                              brands.map((brand) => (
-                                <Link
-                                  key={brand}
-                                  href={`/products?type=${category.code}&brand=${encodeURIComponent(brand)}`}
-                                  className="site-header__dropdown-link"
-                                  prefetch={false}
-                                >
-                                  {brand}
-                                </Link>
-                              ))
-                            ) : (
-                              <Link
-                                href={`/products?type=${category.code}`}
-                                className="site-header__dropdown-link site-header__dropdown-link--muted"
-                                prefetch={false}
-                              >
-                                Browse all {category.name}
-                              </Link>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="site-header__dropdown-footer">
-                    <Link
-                      href="/products"
-                      className="site-header__dropdown-cta"
-                      prefetch={false}
-                    >
-                      View all products →
-                    </Link>
-                  </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </nav>
 
           {/* Search, Cart, Account – grouped after nav */}
@@ -353,48 +257,6 @@ export function Header() {
                   {link.label}
                 </Link>
               ))}
-
-              <details className="site-header__mobile-details">
-                <summary className="site-header__mobile-summary">
-                  Products
-                </summary>
-                <div className="site-header__mobile-submenu">
-                  {productCategories.map((category) => {
-                    const brands = menuBrands?.results?.[category.code] ?? [];
-                    return (
-                      <div key={category.code} className="site-header__mobile-group">
-                        <Link
-                          href={`/products?type=${category.code}`}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="site-header__mobile-title"
-                          prefetch={false}
-                        >
-                          {category.name}
-                        </Link>
-                        <div className="site-header__mobile-brands">
-                          {isMenuBrandsLoading ? (
-                            <p className="site-header__mobile-muted">Loading brands...</p>
-                          ) : brands.length > 0 ? (
-                            brands.map((brand) => (
-                              <Link
-                                key={brand}
-                                href={`/products?type=${category.code}&brand=${encodeURIComponent(brand)}`}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="site-header__mobile-brand"
-                                prefetch={false}
-                              >
-                                {brand}
-                              </Link>
-                            ))
-                          ) : (
-                            <p className="site-header__mobile-muted">No brands yet</p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </details>
             </div>
           </nav>
         )}

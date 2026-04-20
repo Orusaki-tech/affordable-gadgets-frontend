@@ -85,6 +85,53 @@
   margin-bottom: 24px;
 }
 
+.products-page__category-tiles {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.products-page__category-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: #333;
+  width: 100%;
+}
+
+.products-page__category-tile-image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: #E2F36E;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.products-page__category-tile-image {
+  object-fit: cover;
+  object-position: center;
+  width: 90%;
+  height: 90%;
+  border-radius: 16px;
+}
+
+.products-page__category-tile-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  padding-left: 4px;
+}
+
+.products-page__category-tile:hover .products-page__category-tile-image-wrap {
+  filter: brightness(0.95);
+}
+
 .products-page__results {
   width: 100%;
 }

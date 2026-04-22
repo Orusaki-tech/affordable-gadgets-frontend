@@ -163,9 +163,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     page_size: PRODUCTS_VISIBLE_PAGE_SIZE,
     type: filters.type || undefined,
     search: debouncedSearch || undefined,
-    // Always apply brand filtering client-side. The DB brand field isn't normalized enough
-    // to rely on strict backend brand_filter matching for navbar links (e.g. iPhone/Apple).
-    brand_filter: undefined,
+    brand_filter: filters.brand || undefined,
     min_price: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
     max_price: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
     ordering: sort || undefined,
@@ -211,31 +209,9 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
 
   const filteredResults = useMemo(() => {
     if (!data?.results) return [];
-    const normalizedBrand = filters.brand.trim().toLowerCase();
-    return data.results.filter((product) => {
-      if (filters.type && product.product_type !== filters.type) return false;
-      if (!normalizedBrand) return true;
-      const productBrand = String(product.brand ?? '').trim().toLowerCase();
-      const name = String(product.product_name ?? '').toLowerCase();
-      const series = String(product.model_series ?? '').toLowerCase();
-
-      // Match against brand field OR common naming fields.
-      // This avoids "no results" when backend brand strings aren't consistent.
-      if (productBrand.includes(normalizedBrand)) return true;
-      if (name.includes(normalizedBrand)) return true;
-      if (series.includes(normalizedBrand)) return true;
-
-      // Special-case: Apple link should also match iPhone naming.
-      if (normalizedBrand === 'apple') {
-        return name.includes('iphone') || series.includes('iphone');
-      }
-      if (normalizedBrand === 'iphone') {
-        return name.includes('iphone') || series.includes('iphone') || productBrand.includes('apple');
-      }
-
-      return false;
-    });
-  }, [data?.results, filters.brand, filters.type]);
+    if (!filters.type) return data.results;
+    return data.results.filter((product) => product.product_type === filters.type);
+  }, [data?.results, filters.type]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

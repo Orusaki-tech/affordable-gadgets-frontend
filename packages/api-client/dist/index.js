@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UtilsService = exports.UnitTransfersService = exports.UnitsService = exports.UnitImagesService = exports.TagsService = exports.StockAlertsService = exports.SourcesService = exports.ReviewsService = exports.ReturnRequestsService = exports.ReservationRequestsService = exports.ReportsService = exports.RegisterService = exports.PromotionTypesService = exports.PromotionsService = exports.ProfilesService = exports.ProductsService = exports.PhoneSearchService = exports.PesapalService = exports.OrdersService = exports.OrderItemsService = exports.NotificationsService = exports.LogoutService = exports.LoginService = exports.LeadsService = exports.ImagesService = exports.ColorsService = exports.BundlesService = exports.BundleItemsService = exports.BrandsService = exports.AuditLogsService = exports.ApiService = exports.AdminsService = exports.AdminRolesService = exports.AdminService = exports.AccessoriesLinkService = exports.OpenAPI = exports.CancelError = exports.CancelablePromise = exports.ApiError = void 0;
+exports.UtilsService = exports.UnitTransfersService = exports.UnitsService = exports.UnitImagesService = exports.TagsService = exports.StockAlertsService = exports.SourcesService = exports.ReviewsService = exports.ReturnRequestsService = exports.ReservationRequestsService = exports.ReportsService = exports.RegisterService = exports.PromotionTypesService = exports.PromotionsService = exports.ProfilesService = exports.ProductsService = exports.PhoneSearchService = exports.PesapalService = exports.OrdersService = exports.OrderItemsService = exports.NotificationsService = exports.LogoutService = exports.LoginService = exports.LeadsService = exports.ImagesService = exports.ColorsService = exports.BundlesService = exports.BundleItemsService = exports.BrandsService = exports.AuditLogsService = exports.ApiService = exports.AdminsService = exports.AdminRolesService = exports.AdminService = exports.AccessoriesLinkService = exports.InitiatePaymentRequestRequest = exports.OpenAPI = exports.CancelError = exports.CancelablePromise = exports.ApiError = void 0;
 /* generated using openapi-typescript-codegen -- do no edit */
 /* istanbul ignore file */
 /* tslint:disable */
@@ -12,6 +12,8 @@ Object.defineProperty(exports, "CancelablePromise", { enumerable: true, get: fun
 Object.defineProperty(exports, "CancelError", { enumerable: true, get: function () { return CancelablePromise_1.CancelError; } });
 var OpenAPI_1 = require("./core/OpenAPI");
 Object.defineProperty(exports, "OpenAPI", { enumerable: true, get: function () { return OpenAPI_1.OpenAPI; } });
+var InitiatePaymentRequestRequest_1 = require("./models/InitiatePaymentRequestRequest");
+Object.defineProperty(exports, "InitiatePaymentRequestRequest", { enumerable: true, get: function () { return InitiatePaymentRequestRequest_1.InitiatePaymentRequestRequest; } });
 var AccessoriesLinkService_1 = require("./services/AccessoriesLinkService");
 Object.defineProperty(exports, "AccessoriesLinkService", { enumerable: true, get: function () { return AccessoriesLinkService_1.AccessoriesLinkService; } });
 var AdminService_1 = require("./services/AdminService");

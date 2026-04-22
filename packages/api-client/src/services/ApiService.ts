@@ -492,8 +492,6 @@ export class ApiService {
             url: '/api/v1/public/products/',
             query: {
                 'brand_filter': brandFilter,
-                // Backward-compat: some deployments still expect `brand` instead of `brand_filter`
-                'brand': brandFilter,
                 'max_price': maxPrice,
                 'min_price': minPrice,
                 'ordering': ordering,

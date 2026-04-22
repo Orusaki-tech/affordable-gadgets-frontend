@@ -153,6 +153,19 @@ function OrderDetailContent() {
     return null;
   }
 
+  const itemsTotal = (order.order_items || []).reduce((sum, item) => {
+    const unitPrice = Number(item.unit_price_at_purchase ?? 0);
+    const qty = Number(item.quantity ?? 0);
+    return sum + unitPrice * qty;
+  }, 0);
+  const deliveryFee = Number((order as any).delivery_fee ?? 0);
+  const grandTotal = itemsTotal + deliveryFee;
+  const isItemsPaid = Boolean((order as any).is_items_paid);
+  const isDeliveryPaid = Boolean((order as any).is_delivery_paid);
+  const remainingItems = isItemsPaid ? 0 : itemsTotal;
+  const remainingDelivery = isDeliveryPaid ? 0 : deliveryFee;
+  const remainingTotal = remainingItems + remainingDelivery;
+
   const getStatusColor = (status?: string) => {
     switch ((status ?? '').toLowerCase()) {
       case 'paid':
@@ -252,8 +265,68 @@ function OrderDetailContent() {
 
           {/* Order Summary */}
           <div className="border-t border-gray-200 pt-6 mb-8">
+            <div className="mb-4 p-4 rounded-lg border border-gray-200 bg-gray-50">
+              <h3 className="text-lg font-semibold mb-3">Payment breakdown</h3>
+
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Items total</span>
+                  <span className="text-sm font-semibold">{formatPrice(itemsTotal)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Delivery fee</span>
+                  <span className="text-sm font-semibold">{formatPrice(deliveryFee)}</span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                  <span className="text-sm font-semibold">Grand total</span>
+                  <span className="text-sm font-bold text-[var(--primary)]">{formatPrice(grandTotal)}</span>
+                </div>
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="p-3 rounded-md bg-white border border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Items paid</span>
+                    <span
+                      className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                        isItemsPaid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                    >
+                      {isItemsPaid ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex justify-between text-sm">
+                    <span className="text-gray-600">Remaining</span>
+                    <span className="font-semibold">{formatPrice(remainingItems)}</span>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-md bg-white border border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Delivery paid</span>
+                    <span
+                      className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                        isDeliveryPaid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                    >
+                      {isDeliveryPaid ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex justify-between text-sm">
+                    <span className="text-gray-600">Remaining</span>
+                    <span className="font-semibold">{formatPrice(remainingDelivery)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex justify-between items-center">
+                <span className="text-sm font-semibold">Remaining balance</span>
+                <span className="text-lg font-bold">{formatPrice(remainingTotal)}</span>
+              </div>
+            </div>
+
             <div className="flex justify-between items-center mb-2">
-              <span className="text-lg font-semibold">Total Amount:</span>
+              <span className="text-lg font-semibold">Order total:</span>
               <span className="text-2xl font-bold text-[var(--primary)]">
                 {formatPrice(Number(order.total_amount ?? 0))}
               </span>
@@ -261,7 +334,7 @@ function OrderDetailContent() {
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-gray-600">Delivery Fee:</span>
               <span className="text-sm font-semibold">
-                {formatPrice(Number((order as any).delivery_fee ?? 0))}
+                {formatPrice(deliveryFee)}
               </span>
             </div>
             {order.customer_username && (

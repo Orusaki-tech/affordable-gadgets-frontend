@@ -28,6 +28,7 @@ export function CartPage() {
   const [removingBundleGroup, setRemovingBundleGroup] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fulfillment, setFulfillment] = useState<'DELIVERY' | 'PICKUP'>('DELIVERY');
   const [deliveryRates, setDeliveryRates] = useState<Array<{ county: string; ward?: string | null; price: number }>>([]);
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -53,6 +54,7 @@ export function CartPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [shouldStartPayment, setShouldStartPayment] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [paymentMode, setPaymentMode] = useState<'BOTH' | 'ITEMS_ONLY' | 'DELIVERY_ONLY'>('BOTH');
 
   // Periodically check if cart still exists (in case it was cleared after payment)
   useEffect(() => {
@@ -284,7 +286,13 @@ export function CartPage() {
     return countyRate ? Number(countyRate.price || 0) : 0;
   }, [deliveryRates, formData.delivery_county, formData.delivery_ward]);
 
-  const totalWithDelivery = Number(totalValue || 0) + deliveryFee;
+  const effectiveDeliveryFee = fulfillment === 'PICKUP' ? 0 : deliveryFee;
+  const totalWithDelivery = Number(totalValue || 0) + effectiveDeliveryFee;
+  const payableNow = useMemo(() => {
+    if (paymentMode === 'ITEMS_ONLY') return Number(totalValue || 0);
+    if (paymentMode === 'DELIVERY_ONLY') return Number(effectiveDeliveryFee || 0);
+    return Number(totalWithDelivery || 0);
+  }, [paymentMode, totalValue, effectiveDeliveryFee, totalWithDelivery]);
 
   const buildDeliveryDateTime = (date: string, time: string) => {
     if (!date || !time) return undefined;
@@ -350,7 +358,7 @@ export function CartPage() {
       setError('Cart is empty');
       return;
     }
-    if (!deliveryDetailsSaved) {
+    if (fulfillment === 'DELIVERY' && !deliveryDetailsSaved) {
       setError('Please save delivery details before proceeding.');
       setIsDeliveryModalOpen(true);
       return;
@@ -359,12 +367,21 @@ export function CartPage() {
       setError('Name and phone are required');
       return;
     }
-    if (!formData.delivery_county.trim()) {
+    if (fulfillment === 'DELIVERY' && !formData.delivery_county.trim()) {
       setError('Please select a delivery county');
       return;
     }
-    if (isWardRequired && !formData.delivery_ward.trim()) {
+    if (fulfillment === 'DELIVERY' && isWardRequired && !formData.delivery_ward.trim()) {
       setError('Please select a delivery ward');
+      return;
+    }
+    if (fulfillment === 'PICKUP' && paymentMode === 'DELIVERY_ONLY') {
+      setError('Delivery-only payment is not available for pickup.');
+      return;
+    }
+    if (paymentMode === 'DELIVERY_ONLY' && effectiveDeliveryFee <= 0) {
+      setError('Delivery fee is 0. Please choose your delivery location first.');
+      setIsDeliveryModalOpen(true);
       return;
     }
 
@@ -394,19 +411,21 @@ export function CartPage() {
 
       const previousBase = OpenAPI.BASE;
       OpenAPI.BASE = inventoryBaseUrl;
-      const orderPayload = {
+      const orderPayload: any = {
         order_items: orderItems,
         customer_name: formData.customer_name.trim(),
         customer_phone: formData.customer_phone.trim(),
         customer_email: formData.customer_email.trim() || undefined,
-        delivery_address: formData.delivery_address.trim() || undefined,
-        delivery_county: formData.delivery_county.trim(),
-        delivery_ward: formData.delivery_ward.trim() || undefined,
-        delivery_window_start: deliveryWindowStart,
-        delivery_window_end: deliveryWindowEnd,
-        delivery_notes: formData.delivery_notes.trim() || undefined,
         order_source: 'ONLINE',
-      } as any;
+      };
+      if (fulfillment === 'DELIVERY') {
+        orderPayload.delivery_address = formData.delivery_address.trim() || undefined;
+        orderPayload.delivery_county = formData.delivery_county.trim() || undefined;
+        orderPayload.delivery_ward = formData.delivery_ward.trim() || undefined;
+        orderPayload.delivery_window_start = deliveryWindowStart;
+        orderPayload.delivery_window_end = deliveryWindowEnd;
+        orderPayload.delivery_notes = formData.delivery_notes.trim() || undefined;
+      }
       const order = await OrdersService.ordersCreate(orderPayload);
 
       const callbackUrl = `${window.location.origin}/payment/callback`;
@@ -414,6 +433,7 @@ export function CartPage() {
       const paymentResult = await OrdersService.ordersInitiatePaymentCreate(order.order_id ?? '', {
         callback_url: callbackUrl,
         cancellation_url: cancellationUrl,
+        payment_mode: paymentMode,
         customer: {
           email: formData.customer_email.trim() || undefined,
           phone_number: formData.customer_phone.trim(),
@@ -970,6 +990,33 @@ export function CartPage() {
         <div className="cart-page__sidebar">
           <div className="cart-page__summary-card">
             <h2 className="cart-page__summary-title">Payment Summary</h2>
+          <div className="cart-page__summary-items" style={{ marginBottom: 12 }}>
+            <div className="cart-page__summary-row" style={{ alignItems: 'flex-start' }}>
+              <span>Fulfillment</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'right' }}>
+                <label style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                  <input
+                    type="radio"
+                    name="fulfillment"
+                    value="DELIVERY"
+                    checked={fulfillment === 'DELIVERY'}
+                    onChange={() => setFulfillment('DELIVERY')}
+                  />
+                  <span>Delivery</span>
+                </label>
+                <label style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                  <input
+                    type="radio"
+                    name="fulfillment"
+                    value="PICKUP"
+                    checked={fulfillment === 'PICKUP'}
+                    onChange={() => setFulfillment('PICKUP')}
+                  />
+                  <span>Pickup (collect in store)</span>
+                </label>
+              </div>
+            </div>
+          </div>
             <div className="cart-page__summary-items">
               <div className="cart-page__summary-row">
                 <span>Items ({itemCount})</span>
@@ -977,13 +1024,51 @@ export function CartPage() {
               </div>
               <div className="cart-page__summary-row">
                 <span>Shipping &amp; handling</span>
-                <span>{formatPrice(deliveryFee)}</span>
+              <span>{formatPrice(effectiveDeliveryFee)}</span>
               </div>
             </div>
+          <div className="cart-page__summary-items" style={{ marginTop: 12 }}>
+            <div className="cart-page__summary-row" style={{ alignItems: 'flex-start' }}>
+              <span>Pay for</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, textAlign: 'right' }}>
+                <label style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                  <input
+                    type="radio"
+                    name="paymentMode"
+                    value="BOTH"
+                    checked={paymentMode === 'BOTH'}
+                    onChange={() => setPaymentMode('BOTH')}
+                  />
+                  <span>Items + Delivery</span>
+                </label>
+                <label style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                  <input
+                    type="radio"
+                    name="paymentMode"
+                    value="ITEMS_ONLY"
+                    checked={paymentMode === 'ITEMS_ONLY'}
+                    onChange={() => setPaymentMode('ITEMS_ONLY')}
+                  />
+                  <span>Items only</span>
+                </label>
+                <label style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                  <input
+                    type="radio"
+                    name="paymentMode"
+                    value="DELIVERY_ONLY"
+                    checked={paymentMode === 'DELIVERY_ONLY'}
+                    onChange={() => setPaymentMode('DELIVERY_ONLY')}
+                    disabled={fulfillment === 'PICKUP'}
+                  />
+                  <span>Delivery only</span>
+                </label>
+              </div>
+            </div>
+          </div>
             <div className="cart-page__summary-total">
               <div className="cart-page__summary-total-row">
-                <span>Order total</span>
-                <span>{formatPrice(totalWithDelivery)}</span>
+              <span>{paymentMode === 'BOTH' ? 'Order total' : 'Payable now'}</span>
+              <span>{formatPrice(payableNow)}</span>
               </div>
             </div>
             <button

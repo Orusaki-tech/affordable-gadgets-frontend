@@ -209,9 +209,16 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
 
   const filteredResults = useMemo(() => {
     if (!data?.results) return [];
-    if (!filters.type) return data.results;
-    return data.results.filter((product) => product.product_type === filters.type);
-  }, [data?.results, filters.type]);
+    const normalize = (v?: string) => (v ?? '').trim().toLowerCase();
+    const type = normalize(filters.type);
+    const brand = normalize(filters.brand);
+
+    return data.results.filter((product) => {
+      const matchesType = !type || normalize(product.product_type) === type;
+      const matchesBrand = !brand || normalize(product.brand) === brand;
+      return matchesType && matchesBrand;
+    });
+  }, [data?.results, filters.brand, filters.type]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

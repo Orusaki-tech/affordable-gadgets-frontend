@@ -63,16 +63,6 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   // Fetch promotion details if promotion ID is in URL
   const { data: promotionData } = usePromotion(promotionId ? parseInt(promotionId) : 0);
 
-  const apiBrandFilter = useMemo(() => {
-    const raw = filters.brand.trim();
-    if (!raw) return undefined;
-    // iPhones may not have brand="Apple" in the DB; treat "Apple/iPhone" as a client-side filter.
-    if (raw.toLowerCase() === 'apple' || raw.toLowerCase() === 'iphone') {
-      return undefined;
-    }
-    return raw;
-  }, [filters.brand]);
-
   const singlePromotionProductId = useMemo(() => {
     if (!promotionData || !Array.isArray(promotionData.products)) return null;
     return promotionData.products.length === 1 ? promotionData.products[0] : null;
@@ -173,7 +163,9 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     page_size: PRODUCTS_VISIBLE_PAGE_SIZE,
     type: filters.type || undefined,
     search: debouncedSearch || undefined,
-    brand_filter: apiBrandFilter,
+    // Always apply brand filtering client-side. The DB brand field isn't normalized enough
+    // to rely on strict backend brand_filter matching for navbar links (e.g. iPhone/Apple).
+    brand_filter: undefined,
     min_price: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
     max_price: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
     ordering: sort || undefined,
@@ -224,13 +216,23 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
       if (filters.type && product.product_type !== filters.type) return false;
       if (!normalizedBrand) return true;
       const productBrand = String(product.brand ?? '').trim().toLowerCase();
+      const name = String(product.product_name ?? '').toLowerCase();
+      const series = String(product.model_series ?? '').toLowerCase();
+
+      // Match against brand field OR common naming fields.
+      // This avoids "no results" when backend brand strings aren't consistent.
       if (productBrand.includes(normalizedBrand)) return true;
-      // Compatibility: when filtering iPhone/Apple, also match product name/series.
-      if (normalizedBrand === 'apple' || normalizedBrand === 'iphone') {
-        const name = String(product.product_name ?? '').toLowerCase();
-        const series = String(product.model_series ?? '').toLowerCase();
+      if (name.includes(normalizedBrand)) return true;
+      if (series.includes(normalizedBrand)) return true;
+
+      // Special-case: Apple link should also match iPhone naming.
+      if (normalizedBrand === 'apple') {
+        return name.includes('iphone') || series.includes('iphone');
+      }
+      if (normalizedBrand === 'iphone') {
         return name.includes('iphone') || series.includes('iphone') || productBrand.includes('apple');
       }
+
       return false;
     });
   }, [data?.results, filters.brand, filters.type]);

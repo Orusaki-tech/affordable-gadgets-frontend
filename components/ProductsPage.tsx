@@ -63,6 +63,16 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   // Fetch promotion details if promotion ID is in URL
   const { data: promotionData } = usePromotion(promotionId ? parseInt(promotionId) : 0);
 
+  const apiBrandFilter = useMemo(() => {
+    const raw = filters.brand.trim();
+    if (!raw) return undefined;
+    // iPhones may not have brand="Apple" in the DB; treat "Apple/iPhone" as a client-side filter.
+    if (raw.toLowerCase() === 'apple' || raw.toLowerCase() === 'iphone') {
+      return undefined;
+    }
+    return raw;
+  }, [filters.brand]);
+
   const singlePromotionProductId = useMemo(() => {
     if (!promotionData || !Array.isArray(promotionData.products)) return null;
     return promotionData.products.length === 1 ? promotionData.products[0] : null;
@@ -163,7 +173,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     page_size: PRODUCTS_VISIBLE_PAGE_SIZE,
     type: filters.type || undefined,
     search: debouncedSearch || undefined,
-    brand_filter: filters.brand || undefined,
+    brand_filter: apiBrandFilter,
     min_price: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
     max_price: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
     ordering: sort || undefined,
@@ -214,7 +224,14 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
       if (filters.type && product.product_type !== filters.type) return false;
       if (!normalizedBrand) return true;
       const productBrand = String(product.brand ?? '').trim().toLowerCase();
-      return productBrand.includes(normalizedBrand);
+      if (productBrand.includes(normalizedBrand)) return true;
+      // Compatibility: when filtering iPhone/Apple, also match product name/series.
+      if (normalizedBrand === 'apple' || normalizedBrand === 'iphone') {
+        const name = String(product.product_name ?? '').toLowerCase();
+        const series = String(product.model_series ?? '').toLowerCase();
+        return name.includes('iphone') || series.includes('iphone') || productBrand.includes('apple');
+      }
+      return false;
     });
   }, [data?.results, filters.brand, filters.type]);
 

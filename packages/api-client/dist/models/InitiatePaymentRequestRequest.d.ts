@@ -4,13 +4,20 @@
 export type InitiatePaymentRequestRequest = {
     callback_url: string;
     cancellation_url?: string | null;
-    customer?: any;
-    billing_address?: any;
     /**
      * What to pay for on this order.
-     * - ITEMS_ONLY: pay for cart items only
-     * - DELIVERY_ONLY: pay for delivery only
-     * - BOTH: pay for items + delivery
      */
-    payment_mode?: 'ITEMS_ONLY' | 'DELIVERY_ONLY' | 'BOTH';
+    payment_mode?: InitiatePaymentRequestRequest.payment_mode;
+    customer?: any;
+    billing_address?: any;
 };
+export declare namespace InitiatePaymentRequestRequest {
+    /**
+     * What to pay for on this order.
+     */
+    enum payment_mode {
+        ITEMS_ONLY = "ITEMS_ONLY",
+        DELIVERY_ONLY = "DELIVERY_ONLY",
+        BOTH = "BOTH"
+    }
+}

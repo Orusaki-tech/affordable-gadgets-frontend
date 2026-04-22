@@ -7070,6 +7070,13 @@ components:
           type: string
           format: uri
           nullable: true
+        payment_mode:
+          type: string
+          description: What to pay for on this order.
+          enum:
+          - ITEMS_ONLY
+          - DELIVERY_ONLY
+          - BOTH
         customer: {}
         billing_address: {}
       required:

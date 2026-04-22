@@ -274,7 +274,7 @@ function OrderDetailContent() {
                   <span className="text-sm font-semibold">{formatPrice(itemsTotal)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Delivery fee</span>
+                  <span className="text-sm text-gray-600">Shipping fee</span>
                   <span className="text-sm font-semibold">{formatPrice(deliveryFee)}</span>
                 </div>
                 <div className="flex justify-between items-center pt-2 border-t border-gray-200">
@@ -303,7 +303,7 @@ function OrderDetailContent() {
 
                 <div className="p-3 rounded-md bg-white border border-gray-200">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Delivery paid</span>
+                    <span className="text-sm font-medium">Shipping paid</span>
                     <span
                       className={`text-xs font-semibold px-2 py-1 rounded-full ${
                         isDeliveryPaid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
@@ -332,7 +332,7 @@ function OrderDetailContent() {
               </span>
             </div>
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-gray-600">Delivery Fee:</span>
+              <span className="text-sm text-gray-600">Shipping Fee:</span>
               <span className="text-sm font-semibold">
                 {formatPrice(deliveryFee)}
               </span>
@@ -344,7 +344,7 @@ function OrderDetailContent() {
             )}
             {(order as any).delivery_address && (
               <p className="text-sm text-gray-600 mt-2">
-                Delivery Address: {(order as any).delivery_address}
+                Shipping Address: {(order as any).delivery_address}
               </p>
             )}
             {((order as any).delivery_county || (order as any).delivery_ward) && (
@@ -354,7 +354,7 @@ function OrderDetailContent() {
             )}
             {((order as any).delivery_window_start || (order as any).delivery_window_end) && (
               <p className="text-sm text-gray-600">
-                Delivery Window: {(order as any).delivery_window_start ? new Date((order as any).delivery_window_start).toLocaleString() : 'N/A'}{" "}
+                Shipping Window: {(order as any).delivery_window_start ? new Date((order as any).delivery_window_start).toLocaleString() : 'N/A'}{" "}
                 - {(order as any).delivery_window_end ? new Date((order as any).delivery_window_end).toLocaleString() : 'N/A'}
               </p>
             )}

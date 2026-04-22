@@ -1004,7 +1004,7 @@ export function CartPage() {
                     checked={fulfillment === 'DELIVERY'}
                     onChange={() => setFulfillment('DELIVERY')}
                   />
-                  <span>Delivery</span>
+                  <span>Shipping</span>
                 </label>
                 <label style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                   <input
@@ -1041,7 +1041,7 @@ export function CartPage() {
                     checked={paymentMode === InitiatePaymentRequestRequest.payment_mode.BOTH}
                     onChange={() => setPaymentMode(InitiatePaymentRequestRequest.payment_mode.BOTH)}
                   />
-                  <span>Items + Delivery</span>
+                  <span>Items + Shipping</span>
                 </label>
                 <label style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                   <input
@@ -1062,7 +1062,7 @@ export function CartPage() {
                     onChange={() => setPaymentMode(InitiatePaymentRequestRequest.payment_mode.DELIVERY_ONLY)}
                     disabled={fulfillment === 'PICKUP'}
                   />
-                  <span>Delivery only</span>
+                  <span>Shipping only</span>
                 </label>
               </div>
             </div>

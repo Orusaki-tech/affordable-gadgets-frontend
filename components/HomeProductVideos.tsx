@@ -403,7 +403,7 @@ export function HomeProductVideos() {
             {[...Array(5)].map((_, i) => (
               <div
                 key={`hpv-skel-${i}`}
-                className="h-[min(calc(200vh/3),calc(2080px/3))] w-[calc(700px/3)] shrink-0 animate-pulse rounded-xl bg-gray-200 sm:w-[calc(740px/3)]"
+                className="h-[clamp(260px,42vh,440px)] w-[calc(700px/3)] shrink-0 animate-pulse rounded-xl bg-gray-200 sm:w-[calc(740px/3)]"
               />
             ))}
           </div>

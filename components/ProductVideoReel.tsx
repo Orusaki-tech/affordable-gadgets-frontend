@@ -254,7 +254,7 @@ function VideoSlide({
             {resolvedVideo.mode === 'file' && (
               <video
                 ref={setRef}
-                className="h-full max-h-[min(calc(200vh/3),calc(2080px/3))] w-full rounded-xl object-cover"
+                className="h-full w-full rounded-xl object-cover"
                 src={resolvedVideo.src}
                 poster={product.primary_image ?? undefined}
                 preload="none"

@@ -23,8 +23,11 @@
   position: relative;
   width: 100%;
   aspect-ratio: 9 / 16;
-  /* ~4/3 larger than prior min(50vh, 520px) */
-  max-height: min(calc(200vh / 3), calc(2080px / 3));
+  /*
+   Keep portrait (Shorts/Reels) proportions without letting the card get too tall.
+   Height is capped responsively; media inside still covers the frame.
+  */
+  max-height: clamp(260px, 42vh, 440px);
   background: #111;
 }
 

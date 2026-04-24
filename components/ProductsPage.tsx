@@ -35,6 +35,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const focusSearch = searchParams.get('focusSearch');
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const categoryTilesRef = useRef<HTMLDivElement | null>(null);
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const [page, setPage] = useState(() => {
     const initial = Number(searchParams.get('page') || 1);
     return Number.isFinite(initial) && initial > 0 ? Math.floor(initial) : 1;
@@ -153,6 +154,64 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
 
     return () => window.clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const container = categoryTilesRef.current;
+    if (!container) return;
+    if (!CATEGORY_CARDS?.length) return;
+
+    const isMobile = () => window.matchMedia('(max-width: 639px)').matches;
+    if (!isMobile()) return;
+
+    let rafId = 0;
+    const updateActive = () => {
+      const tiles = Array.from(
+        container.querySelectorAll<HTMLElement>('[data-category-tile="true"]')
+      );
+      if (!tiles.length) return;
+
+      const left = container.scrollLeft;
+      let closestIndex = 0;
+      let closestDistance = Number.POSITIVE_INFINITY;
+      for (let i = 0; i < tiles.length; i++) {
+        const t = tiles[i];
+        const dist = Math.abs((t?.offsetLeft ?? 0) - left);
+        if (dist < closestDistance) {
+          closestDistance = dist;
+          closestIndex = i;
+        }
+      }
+      setActiveCategoryIndex((prev) => (prev === closestIndex ? prev : closestIndex));
+    };
+
+    const onScroll = () => {
+      if (!isMobile()) return;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(updateActive);
+    };
+
+    updateActive();
+    container.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      container.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  const scrollToCategoryIndex = (index: number) => {
+    const container = categoryTilesRef.current;
+    if (!container) return;
+    const tiles = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-category-tile="true"]')
+    );
+    const target = tiles[index];
+    if (!target) return;
+    container.scrollTo({
+      left: target.offsetLeft,
+      behavior: 'smooth',
+    });
+  };
 
   const updateQueryParams = (
     nextFilters?: FilterState,
@@ -385,6 +444,24 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
               </Link>
             ))}
           </div>
+
+          {CATEGORY_CARDS.length > 1 && (
+            <div
+              className="products-page__category-dots"
+              aria-label="Category carousel position"
+            >
+              {CATEGORY_CARDS.map((category, idx) => (
+                <button
+                  key={category.code}
+                  type="button"
+                  className="products-page__category-dot"
+                  aria-label={`Go to ${category.name}`}
+                  aria-current={idx === activeCategoryIndex ? 'true' : undefined}
+                  onClick={() => scrollToCategoryIndex(idx)}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Results */}

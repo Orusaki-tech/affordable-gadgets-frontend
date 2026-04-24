@@ -145,6 +145,30 @@
   filter: brightness(0.95);
 }
 
+.products-page__category-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.products-page__category-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 24, 39, 0.25);
+  background: rgba(17, 24, 39, 0.18);
+  padding: 0;
+  cursor: pointer;
+  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.products-page__category-dot[aria-current='true'] {
+  background: #E2F36E;
+  border-color: rgba(17, 24, 39, 0.35);
+  transform: scale(1.15);
+}
+
 .products-page__results {
   width: 100%;
 }
@@ -231,6 +255,10 @@
   .products-page__category-tile {
     width: 100%;
     max-width: none;
+  }
+
+  .products-page__category-dots {
+    display: none;
   }
 
   .products-page__grid {

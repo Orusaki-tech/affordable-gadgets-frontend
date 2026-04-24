@@ -1323,6 +1323,254 @@
   overflow: hidden;
 }
 
+/* Financing modal (Affirm-style) */
+.product-card__modal--financing {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.product-card__modal-panel--financing {
+  max-width: 42rem;
+  border-radius: 20px;
+  background: radial-gradient(1200px 800px at 50% -20%, rgba(255, 255, 255, 0.08), transparent 55%),
+    #0b0b0f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.financing-modal__header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 18px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.financing-modal__header-copy {
+  min-width: 0;
+}
+
+.financing-modal__title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.financing-modal__subtitle {
+  margin-top: 2px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 28rem;
+}
+
+.financing-modal__close {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.financing-modal__close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.financing-modal__body {
+  padding: 14px 18px 18px;
+  display: grid;
+  gap: 16px;
+}
+
+.financing-modal__providers {
+  display: grid;
+  gap: 12px;
+}
+
+.financing-modal__provider {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 12px;
+}
+
+.financing-modal__provider-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.financing-modal__provider-logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.financing-modal__provider-logo--placeholder {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.financing-modal__provider-name {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.financing-modal__offer-list {
+  display: grid;
+  gap: 10px;
+}
+
+.financing-modal__offer {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.financing-modal__offer:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.financing-modal__offer--selected {
+  border-color: rgba(139, 92, 246, 0.6);
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.financing-modal__offer-radio {
+  margin-top: 4px;
+  accent-color: rgb(139, 92, 246);
+}
+
+.financing-modal__offer-main {
+  min-width: 0;
+}
+
+.financing-modal__offer-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.financing-modal__offer-amount {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.financing-modal__offer-amount-value {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.financing-modal__offer-amount-suffix {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.financing-modal__offer-meta {
+  margin-top: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.financing-modal__offer-chips {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.financing-modal__chip {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.financing-modal__inquiry {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.financing-modal__inquiry-title {
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.financing-modal__inquiry-fields {
+  display: grid;
+  gap: 8px;
+}
+
+.financing-modal__input {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.92);
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+.financing-modal__input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.financing-modal__input:disabled {
+  opacity: 0.6;
+}
+
+.financing-modal__cta {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.95), rgba(124, 58, 237, 0.95));
+  color: #0b0b0f;
+  font-weight: 900;
+}
+
+.financing-modal__cta:hover {
+  filter: brightness(1.05);
+}
+
+.financing-modal__cta:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .product-card__modal-header {
   display: flex;
   align-items: center;

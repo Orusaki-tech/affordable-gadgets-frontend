@@ -1821,96 +1821,136 @@ function FinancingModal({
     }
   };
 
+  const formatMoney = (raw: unknown): string => {
+    const n = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw) : NaN;
+    if (!Number.isFinite(n)) return String(raw ?? '');
+    return formatPrice(n);
+  };
+
+  const getPrimaryPaymentLabel = (o: any): { label: string; value: unknown } | null => {
+    if (o?.monthly_payment != null && String(o.monthly_payment).trim() !== '') return { label: 'per month', value: o.monthly_payment };
+    if (o?.weekly_payment != null && String(o.weekly_payment).trim() !== '') return { label: 'per week', value: o.weekly_payment };
+    if (o?.daily_payment != null && String(o.daily_payment).trim() !== '') return { label: 'per day', value: o.daily_payment };
+    return null;
+  };
+
   return (
-    <div className="product-card__modal" onClick={onClose}>
-      <div className="product-card__modal-panel" onClick={(e) => e.stopPropagation()}>
-        <div className="product-card__modal-header">
-          <div>
-            <h4 className="product-card__modal-title">Financing offers</h4>
-            <p className="product-card__modal-subtitle">{product.product_name}</p>
+    <div className="product-card__modal product-card__modal--financing" onClick={onClose}>
+      <div className="product-card__modal-panel product-card__modal-panel--financing" onClick={(e) => e.stopPropagation()}>
+        <div className="financing-modal__header">
+          <div className="financing-modal__header-copy">
+            <h4 className="financing-modal__title">Buy now, pay over time</h4>
+            <p className="financing-modal__subtitle">{product.product_name}</p>
           </div>
-          <button type="button" onClick={onClose} className="product-card__modal-close" aria-label="Close">
+          <button type="button" onClick={onClose} className="financing-modal__close" aria-label="Close">
             ×
           </button>
         </div>
-        <div className="product-card__modal-body" style={{ gridTemplateColumns: '1fr', gap: 16 }}>
+        <div className="financing-modal__body">
           {grouped.length === 0 ? (
             <div className="product-detail__loading-inline">No active financing offers.</div>
           ) : (
             <>
-              <div style={{ display: 'grid', gap: 12 }}>
+              <div className="financing-modal__providers">
                 {grouped.map((g) => (
-                  <div key={g.providerName} style={{ border: '1px solid var(--ui-gray-200)', borderRadius: 12, padding: 12 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <div key={g.providerName} className="financing-modal__provider">
+                    <div className="financing-modal__provider-head">
                       {g.providerLogoUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={g.providerLogoUrl}
                           alt={g.providerName}
-                          style={{ width: 28, height: 28, borderRadius: 8, objectFit: 'contain', background: 'var(--ui-white)' }}
+                          className="financing-modal__provider-logo"
                         />
                       ) : (
-                        <span style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--ui-gray-50)', display: 'inline-block' }} />
+                        <span className="financing-modal__provider-logo financing-modal__provider-logo--placeholder" />
                       )}
-                      <strong>{g.providerName}</strong>
+                      <div className="financing-modal__provider-name">{g.providerName}</div>
                     </div>
-                    <div style={{ display: 'grid', gap: 8 }}>
+                    <div className="financing-modal__offer-list">
                       {g.offers.map((o: any) => (
+                        (() => {
+                          const primary = getPrimaryPaymentLabel(o);
+                          const isSelected = selectedOfferId === o.id;
+                          return (
                         <label
                           key={o.id}
-                          style={{
-                            display: 'grid',
-                            gridTemplateColumns: '18px 1fr',
-                            gap: 10,
-                            padding: 10,
-                            borderRadius: 10,
-                            border: '1px solid var(--ui-gray-200)',
-                            background: selectedOfferId === o.id ? 'var(--ui-gray-50)' : 'var(--ui-white)',
-                            cursor: 'pointer',
-                          }}
+                          className={`financing-modal__offer ${isSelected ? 'financing-modal__offer--selected' : ''}`}
                         >
                           <input
                             type="radio"
                             name="financing-offer"
                             checked={selectedOfferId === o.id}
                             onChange={() => setSelectedOfferId(o.id)}
-                            style={{ marginTop: 3 }}
+                            className="financing-modal__offer-radio"
                           />
-                          <div>
-                            <div style={{ fontWeight: 700 }}>
-                              Deposit {o.deposit_amount} • Retail {o.retail_amount}
+                          <div className="financing-modal__offer-main">
+                            <div className="financing-modal__offer-top">
+                              <div className="financing-modal__offer-amount">
+                                {primary ? (
+                                  <>
+                                    <span className="financing-modal__offer-amount-value">{formatMoney(primary.value)}</span>
+                                    <span className="financing-modal__offer-amount-suffix">{primary.label}</span>
+                                  </>
+                                ) : (
+                                  <span className="financing-modal__offer-amount-value">Custom terms</span>
+                                )}
+                              </div>
                             </div>
-                            <div style={{ fontSize: 12, opacity: 0.85, marginTop: 2 }}>
-                              Daily {o.daily_payment} • Weekly {o.weekly_payment} • Monthly {o.monthly_payment}
-                              {(o.rom_gb || o.ram_gb) ? ` • ${o.rom_gb ? `${o.rom_gb}GB` : ''}${o.rom_gb && o.ram_gb ? ' / ' : ''}${o.ram_gb ? `${o.ram_gb}GB RAM` : ''}` : ''}
+
+                            <div className="financing-modal__offer-meta">
+                              <span>Deposit {formatMoney(o.deposit_amount)}</span>
+                              <span aria-hidden>•</span>
+                              <span>Retail {formatMoney(o.retail_amount)}</span>
+                            </div>
+
+                            <div className="financing-modal__offer-chips">
+                              {o.daily_payment != null && String(o.daily_payment).trim() !== '' ? (
+                                <span className="financing-modal__chip">Daily {formatMoney(o.daily_payment)}</span>
+                              ) : null}
+                              {o.weekly_payment != null && String(o.weekly_payment).trim() !== '' ? (
+                                <span className="financing-modal__chip">Weekly {formatMoney(o.weekly_payment)}</span>
+                              ) : null}
+                              {o.monthly_payment != null && String(o.monthly_payment).trim() !== '' ? (
+                                <span className="financing-modal__chip">Monthly {formatMoney(o.monthly_payment)}</span>
+                              ) : null}
+                              {(o.rom_gb || o.ram_gb) ? (
+                                <span className="financing-modal__chip">
+                                  {o.rom_gb ? `${o.rom_gb}GB` : ''}
+                                  {o.rom_gb && o.ram_gb ? ' / ' : ''}
+                                  {o.ram_gb ? `${o.ram_gb}GB RAM` : ''}
+                                </span>
+                              ) : null}
                             </div>
                           </div>
                         </label>
+                          );
+                        })()
                       ))}
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div style={{ borderTop: '1px solid var(--ui-gray-200)', paddingTop: 12, display: 'grid', gap: 10 }}>
-                <div style={{ fontWeight: 700 }}>Request a callback</div>
-                <div style={{ display: 'grid', gap: 8 }}>
+              <div className="financing-modal__inquiry">
+                <div className="financing-modal__inquiry-title">Request a callback</div>
+                <div className="financing-modal__inquiry-fields">
                   <input
-                    className="products-page__search-input"
+                    className="financing-modal__input"
                     placeholder="Your name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     disabled={submitting}
                   />
                   <input
-                    className="products-page__search-input"
+                    className="financing-modal__input"
                     placeholder="Phone number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     disabled={submitting}
                   />
                   <input
-                    className="products-page__search-input"
+                    className="financing-modal__input"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -1919,10 +1959,9 @@ function FinancingModal({
                 </div>
                 <button
                   type="button"
-                  className="products-page__search-button"
+                  className="financing-modal__cta"
                   onClick={submitInquiry}
                   disabled={submitting}
-                  style={{ width: '100%' }}
                 >
                   {submitting ? 'Submitting...' : 'Submit inquiry'}
                 </button>

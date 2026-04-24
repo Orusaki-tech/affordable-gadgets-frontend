@@ -6,6 +6,7 @@ import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { StructuredData } from '@/components/StructuredData';
 import { brandConfig } from '@/lib/config/brand';
+import { CATEGORY_CARDS } from '@/lib/config/categories';
 import { ApiService } from '@/lib/api/generated';
 
 export const revalidate = 3600;
@@ -74,6 +75,15 @@ export default async function ProductsListingPage({
   const maxPrice = asNumber(sp.max_price);
   const promotion = asNumber(sp.promotion);
   const page = asNumber(sp.page) ?? 1;
+
+  const typeLabel =
+    type ? CATEGORY_CARDS.find((c) => c.code === type)?.name ?? 'Products' : '';
+  const heading =
+    brandFilter && typeLabel
+      ? `${brandFilter} ${typeLabel}`
+      : brandFilter
+        ? `${brandFilter} Products`
+        : typeLabel || 'Products';
 
   const qs = new URLSearchParams();
   for (const [key, value] of Object.entries(sp)) {
@@ -148,42 +158,12 @@ export default async function ProductsListingPage({
       </Suspense>
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <section className="mx-auto mb-8 max-w-5xl rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <header className="mb-4">
+        <section className="mx-auto mb-4 max-w-5xl">
+          <header>
             <h1 className="text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
-              Affordable Gadgets Products
+              {heading}
             </h1>
           </header>
-          <p className="text-base leading-7 text-gray-600 sm:text-lg">
-            <span className="sm:hidden">
-              Browse phones, laptops, tablets/iPads and accessories. Use search + filters to quickly find the
-              best fit for your budget.
-            </span>
-            <span className="hidden sm:inline">
-              Explore the full Affordable Gadgets Ke catalog with powerful search and smart filters. Compare
-              the latest phones, laptops, tablets, iPads, and accessories side by side, then narrow results by
-              brand, device type, storage, and price range to quickly discover the best fit for your budget in
-              Kenya.
-            </span>
-          </p>
-          <p className="mt-3 text-sm leading-6 text-gray-600 sm:text-base">
-            <span className="sm:hidden">
-              Start with a category or jump into the list below.
-            </span>
-            <span className="hidden sm:inline">
-              Start with the options below or jump straight into a specific category or budget range. Every
-              product listing includes key specs, pricing, and payment options so you can make a confident
-              choice before you checkout.
-            </span>
-          </p>
-          <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
-            <Link href="/budget-search" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
-              Shop by budget
-            </Link>
-            <Link href="/match-score" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">
-              Find your perfect match
-            </Link>
-          </div>
         </section>
         <Suspense
           fallback={

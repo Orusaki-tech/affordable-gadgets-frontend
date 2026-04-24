@@ -25,9 +25,10 @@ type ProductCardOptions = {
 
 interface ProductsPageProps {
   cardOptions?: ProductCardOptions;
+  heading?: string;
 }
 
-export function ProductsPage({ cardOptions }: ProductsPageProps) {
+export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const searchParamsRef = useRef<string>('');
@@ -387,7 +388,12 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
         </div>
       ) : (
         <div className="products-page__header">
-          <h1 className="products-page__title section-label">Products</h1>
+          <div className="products-page__header-titleRow">
+            <h1 className="products-page__title section-label">
+              {heading || 'Products'}
+            </h1>
+            <span className="products-page__header-subtitle">Products</span>
+          </div>
           <form
             onSubmit={handleSearch}
             className="products-page__search"

@@ -46,6 +46,19 @@
   gap: 16px;
 }
 
+.products-page__header-titleRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.products-page__header-subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ui-gray-700);
+}
+
 .products-page__title {
   margin: 0;
 }

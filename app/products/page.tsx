@@ -158,13 +158,6 @@ export default async function ProductsListingPage({
       </Suspense>
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <section className="mx-auto mb-4 max-w-5xl">
-          <header>
-            <h1 className="text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
-              {heading}
-            </h1>
-          </header>
-        </section>
         <Suspense
           fallback={
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -174,7 +167,7 @@ export default async function ProductsListingPage({
             </div>
           }
         >
-          <ProductsPage />
+          <ProductsPage heading={heading} />
         </Suspense>
       </main>
 

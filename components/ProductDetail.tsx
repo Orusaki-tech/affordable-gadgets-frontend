@@ -1827,10 +1827,39 @@ function FinancingModal({
     return formatPrice(n);
   };
 
-  const getPrimaryPaymentLabel = (o: any): { label: string; value: unknown } | null => {
-    if (o?.monthly_payment != null && String(o.monthly_payment).trim() !== '') return { label: 'per month', value: o.monthly_payment };
-    if (o?.weekly_payment != null && String(o.weekly_payment).trim() !== '') return { label: 'per week', value: o.weekly_payment };
-    if (o?.daily_payment != null && String(o.daily_payment).trim() !== '') return { label: 'per day', value: o.daily_payment };
+  type TermUnit = 'day' | 'week' | 'month';
+
+  const pluralize = (n: number, unit: string) => (n === 1 ? unit : `${unit}s`);
+
+  const getOfferPrimary = (
+    o: any
+  ): { unit: TermUnit; payment: unknown; count: number | null } | null => {
+    const unit = (o?.term_unit as TermUnit | null) ?? null;
+    const countRaw = o?.term_count;
+    const count =
+      typeof countRaw === 'number'
+        ? countRaw
+        : typeof countRaw === 'string' && countRaw.trim()
+          ? Number(countRaw)
+          : null;
+    const safeCount = Number.isFinite(count as number) ? (count as number) : null;
+
+    const pick = (u: TermUnit): unknown => {
+      if (u === 'month') return o?.monthly_payment;
+      if (u === 'week') return o?.weekly_payment;
+      return o?.daily_payment;
+    };
+
+    if (unit) {
+      const p = pick(unit);
+      if (p != null && String(p).trim() !== '') return { unit, payment: p, count: safeCount };
+      return { unit, payment: null, count: safeCount };
+    }
+
+    // Fallback for older offers without term_unit: prefer monthly > weekly > daily.
+    if (o?.monthly_payment != null && String(o.monthly_payment).trim() !== '') return { unit: 'month', payment: o.monthly_payment, count: safeCount };
+    if (o?.weekly_payment != null && String(o.weekly_payment).trim() !== '') return { unit: 'week', payment: o.weekly_payment, count: safeCount };
+    if (o?.daily_payment != null && String(o.daily_payment).trim() !== '') return { unit: 'day', payment: o.daily_payment, count: safeCount };
     return null;
   };
 
@@ -1870,8 +1899,27 @@ function FinancingModal({
                     <div className="financing-modal__offer-list">
                       {g.offers.map((o: any) => (
                         (() => {
-                          const primary = getPrimaryPaymentLabel(o);
+                          const primary = getOfferPrimary(o);
                           const isSelected = selectedOfferId === o.id;
+                          const termPill =
+                            primary?.count && primary.count > 0
+                              ? `${primary.count} ${pluralize(primary.count, primary.unit)}`
+                              : null;
+                          const paymentLabel =
+                            primary?.unit === 'month'
+                              ? 'every month'
+                              : primary?.unit === 'week'
+                                ? 'every week'
+                                : primary?.unit === 'day'
+                                  ? 'every day'
+                                  : '';
+                          const totalOfPayments =
+                            primary?.payment != null &&
+                            String(primary.payment).trim() !== '' &&
+                            primary?.count &&
+                            primary.count > 0
+                              ? Number(primary.payment) * primary.count
+                              : null;
                           return (
                         <label
                           key={o.id}
@@ -1887,15 +1935,21 @@ function FinancingModal({
                           <div className="financing-modal__offer-main">
                             <div className="financing-modal__offer-top">
                               <div className="financing-modal__offer-amount">
-                                {primary ? (
+                                {primary?.payment != null && String(primary.payment).trim() !== '' ? (
                                   <>
-                                    <span className="financing-modal__offer-amount-value">{formatMoney(primary.value)}</span>
-                                    <span className="financing-modal__offer-amount-suffix">{primary.label}</span>
+                                    <span className="financing-modal__offer-amount-value">{formatMoney(primary.payment)}</span>
+                                    <span className="financing-modal__offer-amount-suffix">{paymentLabel}</span>
                                   </>
                                 ) : (
                                   <span className="financing-modal__offer-amount-value">Custom terms</span>
                                 )}
                               </div>
+
+                              {termPill ? (
+                                <span className="financing-modal__term-pill" aria-label={`Term: ${termPill}`}>
+                                  {termPill}
+                                </span>
+                              ) : null}
                             </div>
 
                             <div className="financing-modal__offer-meta">
@@ -1903,6 +1957,12 @@ function FinancingModal({
                               <span aria-hidden>•</span>
                               <span>Retail {formatMoney(o.retail_amount)}</span>
                             </div>
+
+                            {totalOfPayments != null ? (
+                              <div className="financing-modal__offer-meta">
+                                <span>Total of payments {formatMoney(totalOfPayments)}</span>
+                              </div>
+                            ) : null}
 
                             <div className="financing-modal__offer-chips">
                               {o.daily_payment != null && String(o.daily_payment).trim() !== '' ? (

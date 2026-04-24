@@ -155,15 +155,26 @@ export default async function ProductsListingPage({
             </h1>
           </header>
           <p className="text-base leading-7 text-gray-600 sm:text-lg">
-            Explore the full Affordable Gadgets Ke catalog with powerful search and smart filters. Compare
-            the latest phones, laptops, tablets, iPads, and accessories side by side, then narrow results by
-            brand, device type, storage, and price range to quickly discover the best fit for your budget in
-            Kenya.
+            <span className="sm:hidden">
+              Browse phones, laptops, tablets/iPads and accessories. Use search + filters to quickly find the
+              best fit for your budget.
+            </span>
+            <span className="hidden sm:inline">
+              Explore the full Affordable Gadgets Ke catalog with powerful search and smart filters. Compare
+              the latest phones, laptops, tablets, iPads, and accessories side by side, then narrow results by
+              brand, device type, storage, and price range to quickly discover the best fit for your budget in
+              Kenya.
+            </span>
           </p>
           <p className="mt-3 text-sm leading-6 text-gray-600 sm:text-base">
-            Start with the options below or jump straight into a specific category or budget range. Every
-            product listing includes key specs, pricing, and payment options so you can make a confident
-            choice before you checkout.
+            <span className="sm:hidden">
+              Start with a category or jump into the list below.
+            </span>
+            <span className="hidden sm:inline">
+              Start with the options below or jump straight into a specific category or budget range. Every
+              product listing includes key specs, pricing, and payment options so you can make a confident
+              choice before you checkout.
+            </span>
           </p>
           <div className="mt-4 flex flex-wrap gap-3 text-sm font-medium">
             <Link href="/budget-search" className="rounded-full bg-gray-100 px-4 py-2 text-gray-700">

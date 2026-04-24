@@ -86,10 +86,21 @@
 }
 
 .products-page__category-tiles {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
   gap: 16px;
   margin-top: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 4px 8px;
+}
+
+.products-page__category-tiles::-webkit-scrollbar {
+  display: none;
+}
+
+.products-page__category-tiles {
+  scrollbar-width: none;
 }
 
 .products-page__category-tile {
@@ -98,7 +109,9 @@
   gap: 10px;
   text-decoration: none;
   color: #333;
-  width: 100%;
+  flex: 0 0 82%;
+  max-width: 360px;
+  scroll-snap-align: start;
 }
 
 .products-page__category-tile-image-wrap {
@@ -207,6 +220,19 @@
 }
 
 @media (min-width: 640px) {
+  .products-page__category-tiles {
+    display: grid;
+    grid-template-columns: 1fr;
+    overflow-x: visible;
+    scroll-snap-type: none;
+    padding: 0;
+  }
+
+  .products-page__category-tile {
+    width: 100%;
+    max-width: none;
+  }
+
   .products-page__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

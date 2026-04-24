@@ -34,6 +34,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const promotionId = searchParams.get('promotion');
   const focusSearch = searchParams.get('focusSearch');
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const categoryTilesRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(() => {
     const initial = Number(searchParams.get('page') || 1);
     return Number.isFinite(initial) && initial > 0 ? Math.floor(initial) : 1;
@@ -117,6 +118,41 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
       );
     }
   }, [initialFilters]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!categoryTilesRef.current) return;
+    if (!CATEGORY_CARDS?.length) return;
+
+    const isMobile = () => window.matchMedia('(max-width: 639px)').matches;
+    const prefersReducedMotion = () =>
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!isMobile() || prefersReducedMotion()) return;
+
+    let index = 0;
+    const interval = window.setInterval(() => {
+      const container = categoryTilesRef.current;
+      if (!container) return;
+      if (!isMobile()) return;
+
+      const tiles = Array.from(
+        container.querySelectorAll<HTMLElement>('[data-category-tile="true"]')
+      );
+      if (tiles.length <= 1) return;
+
+      index = (index + 1) % tiles.length;
+      const next = tiles[index];
+      if (!next) return;
+
+      container.scrollTo({
+        left: next.offsetLeft,
+        behavior: 'smooth',
+      });
+    }, 6000);
+
+    return () => window.clearInterval(interval);
+  }, []);
 
   const updateQueryParams = (
     nextFilters?: FilterState,
@@ -325,13 +361,18 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
             autoOpen={autoOpenFilters}
           />
 
-          <div className="products-page__category-tiles" aria-label="Shop by category">
+          <div
+            className="products-page__category-tiles"
+            aria-label="Shop by category"
+            ref={categoryTilesRef}
+          >
             {CATEGORY_CARDS.map((category) => (
               <Link
                 key={category.code}
                 href={category.href}
                 className="products-page__category-tile"
                 prefetch={false}
+                data-category-tile="true"
               >
                 <div className="products-page__category-tile-image-wrap">
                   <img

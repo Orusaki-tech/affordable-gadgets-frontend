@@ -37,6 +37,10 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const categoryTilesRef = useRef<HTMLDivElement | null>(null);
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+  const currentBrandFilter = (searchParams.get('brand_filter') || searchParams.get('brand') || '')
+    .trim()
+    .toLowerCase();
+  const showSamsungBanner = currentBrandFilter === 'samsung';
   const [page, setPage] = useState(() => {
     const initial = Number(searchParams.get('page') || 1);
     return Number.isFinite(initial) && initial > 0 ? Math.floor(initial) : 1;
@@ -397,20 +401,17 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
             <span className="products-page__header-subtitle">Products</span>
           </div>
 
-          {/* Banner above search bar */}
-          <Link
-            href="/products?brand_filter=Samsung"
-            prefetch={false}
-            className="products-page__header-banner"
-          >
-            <img
-              src="/images/banners/samsungbanner.png"
-              alt="Samsung deals banner"
-              loading="lazy"
-              decoding="async"
-              className="products-page__header-bannerImage"
-            />
-          </Link>
+          {showSamsungBanner && (
+            <div className="products-page__header-banner" aria-label="Samsung banner">
+              <img
+                src="/images/banners/samsungbanner.png"
+                alt="Samsung banner"
+                loading="lazy"
+                decoding="async"
+                className="products-page__header-bannerImage"
+              />
+            </div>
+          )}
 
           <form
             onSubmit={handleSearch}

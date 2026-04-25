@@ -56,18 +56,7 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
   const [autoOpenFilters, setAutoOpenFilters] = useState(false);
   const queryClient = useQueryClient();
 
-  const categoryCarouselItems = useMemo(() => {
-    return [
-      {
-        code: '__samsung-banner',
-        name: 'Samsung',
-        href: '/products?brand_filter=Samsung',
-        image: '/images/banners/samsungbanner.png',
-        isBanner: true as const,
-      },
-      ...CATEGORY_CARDS.map((c) => ({ ...c, isBanner: false as const })),
-    ];
-  }, []);
+  const categoryCarouselItems = useMemo(() => CATEGORY_CARDS, []);
 
   useEffect(() => {
     searchParamsRef.current = searchParams.toString();
@@ -408,7 +397,7 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
             <span className="products-page__header-subtitle">Products</span>
           </div>
 
-          {/* Desktop banner sits below H1 */}
+          {/* Banner above search bar */}
           <Link
             href="/products?brand_filter=Samsung"
             prefetch={false}
@@ -464,13 +453,7 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
               <Link
                 key={category.code}
                 href={category.href}
-                className={[
-                  'products-page__category-tile',
-                  category.isBanner ? 'products-page__category-tile--banner' : '',
-                  category.isBanner ? 'sm:hidden' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
+                className="products-page__category-tile"
                 prefetch={false}
                 data-category-tile="true"
               >
@@ -483,9 +466,7 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
                     decoding="async"
                   />
                 </div>
-                {!category.isBanner ? (
-                  <p className="products-page__category-tile-title">{category.name}</p>
-                ) : null}
+                <p className="products-page__category-tile-title">{category.name}</p>
               </Link>
             ))}
           </div>

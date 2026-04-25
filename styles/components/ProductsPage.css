@@ -59,6 +59,18 @@
   color: var(--ui-gray-700);
 }
 
+.products-page__header-banner {
+  display: none;
+  text-decoration: none;
+}
+
+.products-page__header-bannerImage {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid var(--ui-gray-200);
+}
+
 .products-page__title {
   margin: 0;
 }
@@ -144,6 +156,16 @@
   object-position: center;
   width: 90%;
   height: 90%;
+  border-radius: 16px;
+}
+
+.products-page__category-tile--banner .products-page__category-tile-image-wrap {
+  aspect-ratio: 16 / 9;
+}
+
+.products-page__category-tile--banner .products-page__category-tile-image {
+  width: 100%;
+  height: 100%;
   border-radius: 16px;
 }
 
@@ -257,6 +279,10 @@
 }
 
 @media (min-width: 640px) {
+  .products-page__header-banner {
+    display: block;
+  }
+
   .products-page__category-tiles {
     display: grid;
     grid-template-columns: 1fr;

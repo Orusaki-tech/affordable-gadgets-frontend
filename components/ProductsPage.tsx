@@ -56,6 +56,19 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
   const [autoOpenFilters, setAutoOpenFilters] = useState(false);
   const queryClient = useQueryClient();
 
+  const categoryCarouselItems = useMemo(() => {
+    return [
+      {
+        code: '__samsung-banner',
+        name: 'Samsung',
+        href: '/products?brand_filter=Samsung',
+        image: '/images/banners/samsungbanner.png',
+        isBanner: true as const,
+      },
+      ...CATEGORY_CARDS.map((c) => ({ ...c, isBanner: false as const })),
+    ];
+  }, []);
+
   useEffect(() => {
     searchParamsRef.current = searchParams.toString();
   }, [searchParams]);
@@ -394,6 +407,22 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
             </h1>
             <span className="products-page__header-subtitle">Products</span>
           </div>
+
+          {/* Desktop banner sits below H1 */}
+          <Link
+            href="/products?brand_filter=Samsung"
+            prefetch={false}
+            className="products-page__header-banner"
+          >
+            <img
+              src="/images/banners/samsungbanner.png"
+              alt="Samsung deals banner"
+              loading="lazy"
+              decoding="async"
+              className="products-page__header-bannerImage"
+            />
+          </Link>
+
           <form
             onSubmit={handleSearch}
             className="products-page__search"
@@ -431,11 +460,17 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
             aria-label="Shop by category"
             ref={categoryTilesRef}
           >
-            {CATEGORY_CARDS.map((category) => (
+            {categoryCarouselItems.map((category) => (
               <Link
                 key={category.code}
                 href={category.href}
-                className="products-page__category-tile"
+                className={[
+                  'products-page__category-tile',
+                  category.isBanner ? 'products-page__category-tile--banner' : '',
+                  category.isBanner ? 'sm:hidden' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 prefetch={false}
                 data-category-tile="true"
               >
@@ -444,19 +479,23 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
                     src={category.image}
                     alt={category.name}
                     className="products-page__category-tile-image"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
-                <p className="products-page__category-tile-title">{category.name}</p>
+                {!category.isBanner ? (
+                  <p className="products-page__category-tile-title">{category.name}</p>
+                ) : null}
               </Link>
             ))}
           </div>
 
-          {CATEGORY_CARDS.length > 1 && (
+          {categoryCarouselItems.length > 1 && (
             <div
               className="products-page__category-dots"
               aria-label="Category carousel position"
             >
-              {CATEGORY_CARDS.map((category, idx) => (
+              {categoryCarouselItems.map((category, idx) => (
                 <button
                   key={category.code}
                   type="button"

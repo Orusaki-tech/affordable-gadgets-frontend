@@ -410,11 +410,12 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
                 showNavigation={false}
                 showPagination={false}
                 autoPlay
-                autoPlayInterval={4500}
+                autoPlayInterval={4000}
               >
                 {[
                   { src: '/images/banners/samsung-1.png', alt: 'Samsung banner' },
                   { src: '/images/banners/samsung-2.png', alt: 'Samsung banner' },
+                  { src: '/images/banners/samsungbanner.png', alt: 'Samsung banner' },
                 ].map((banner) => (
                   <img
                     key={banner.src}

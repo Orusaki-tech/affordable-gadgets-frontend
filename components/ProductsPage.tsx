@@ -9,6 +9,7 @@ import { usePromotion, prefetchPromotion } from '@/lib/hooks/usePromotions';
 import { PublicPromotion } from '@/lib/api/generated';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, FilterState } from './ProductFilters';
+import { ProductCarousel } from './ProductCarousel';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { CATEGORY_CARDS } from '@/lib/config/categories';
 import Link from 'next/link';
@@ -41,6 +42,7 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
     .trim()
     .toLowerCase();
   const showSamsungBanner = currentBrandFilter === 'samsung';
+  const showAppleBanner = currentBrandFilter === 'apple';
   const [page, setPage] = useState(() => {
     const initial = Number(searchParams.get('page') || 1);
     return Number.isFinite(initial) && initial > 0 ? Math.floor(initial) : 1;
@@ -403,13 +405,50 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
 
           {showSamsungBanner && (
             <div className="products-page__header-banner" aria-label="Samsung banner">
-              <img
-                src="/images/banners/samsungbanner.png"
-                alt="Samsung banner"
-                loading="lazy"
-                decoding="async"
-                className="products-page__header-bannerImage"
-              />
+              <ProductCarousel
+                itemsPerView={{ mobile: 1, tablet: 1, desktop: 1 }}
+                showNavigation={false}
+                showPagination={false}
+                autoPlay
+                autoPlayInterval={4500}
+              >
+                {[
+                  { src: '/images/banners/samsung-1.png', alt: 'Samsung banner' },
+                  { src: '/images/banners/samsung-2.png', alt: 'Samsung banner' },
+                ].map((banner) => (
+                  <img
+                    key={banner.src}
+                    src={banner.src}
+                    alt={banner.alt}
+                    loading="lazy"
+                    decoding="async"
+                    className="products-page__header-bannerImage"
+                  />
+                ))}
+              </ProductCarousel>
+            </div>
+          )}
+
+          {showAppleBanner && (
+            <div className="products-page__header-banner" aria-label="Apple banner">
+              <ProductCarousel
+                itemsPerView={{ mobile: 1, tablet: 1, desktop: 1 }}
+                showNavigation={false}
+                showPagination={false}
+              >
+                {[
+                  { src: '/images/banners/apple-1.png', alt: 'Apple banner' },
+                ].map((banner) => (
+                  <img
+                    key={banner.src}
+                    src={banner.src}
+                    alt={banner.alt}
+                    loading="lazy"
+                    decoding="async"
+                    className="products-page__header-bannerImage"
+                  />
+                ))}
+              </ProductCarousel>
             </div>
           )}
 

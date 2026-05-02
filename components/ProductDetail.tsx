@@ -5,7 +5,15 @@ import { usePromotion } from '@/lib/hooks/usePromotions';
 import { useBundles } from '@/lib/hooks/useBundles';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
-import { OpenAPI, type PublicBundle, type PublicBundleItem, type PublicProduct, type PublicInventoryUnitPublic, type InventoryUnitImage } from '@/lib/api/generated';
+import {
+  OpenAPI,
+  type PublicBundle,
+  type PublicBundleItem,
+  type PublicProduct,
+  type PublicInventoryUnitPublic,
+  type InventoryUnitImage,
+  type ConditionEnum,
+} from '@/lib/api/generated';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo, useRef } from 'react';
@@ -459,10 +467,10 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   /** Only show condition chips for codes that appear on units still available under the current non-condition filters. */
   const conditionFilterChips = useMemo(() => {
     if (!unitsMatchingExceptCondition.length) return [] as { code: string; label: string }[];
-    const present = new Set(
+    const present = new Set<string>(
       unitsMatchingExceptCondition
         .map((u) => u.condition)
-        .filter((c): c is string => typeof c === 'string' && c.length > 0)
+        .filter((c): c is ConditionEnum => c !== undefined)
     );
     return CONDITION_CHIP_DEFINITIONS.filter(({ code }) => present.has(code));
   }, [unitsMatchingExceptCondition]);

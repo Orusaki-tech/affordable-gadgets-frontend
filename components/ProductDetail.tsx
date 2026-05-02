@@ -25,6 +25,14 @@ interface ProductDetailProps {
 
 type TabType = 'overview' | 'specs' | 'reviews' | 'videos' | 'compare';
 
+/** Matches admin unit condition codes (inventory condition dropdown). */
+const CONDITION_CHIP_DEFINITIONS: { code: string; label: string }[] = [
+  { code: 'N', label: 'New' },
+  { code: 'R', label: 'Refurbished' },
+  { code: 'P', label: 'Pre-owned' },
+  { code: 'D', label: 'Defective' },
+];
+
 function firstTruthyImageUrl(...urls: (string | null | undefined)[]): string {
   for (const raw of urls) {
     const s = typeof raw === 'string' ? raw.trim() : '';
@@ -434,6 +442,39 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       return true;
     });
   }, [units, selectedStorage, selectedRAM, selectedColor, selectedCondition, selectedGrade, selectedBattery]);
+
+  /** Units matching current variant filters except condition — used only to decide which condition chips exist. */
+  const unitsMatchingExceptCondition = useMemo(() => {
+    if (!units) return [];
+    return units.filter((unit) => {
+      if (selectedStorage !== null && unit.storage_gb !== selectedStorage) return false;
+      if (selectedRAM !== null && unit.ram_gb !== selectedRAM) return false;
+      if (selectedColor !== null && unit.color_name !== selectedColor) return false;
+      if (selectedGrade !== null && unit.grade !== selectedGrade) return false;
+      if (selectedBattery !== null && unit.battery_mah !== selectedBattery) return false;
+      return true;
+    });
+  }, [units, selectedStorage, selectedRAM, selectedColor, selectedGrade, selectedBattery]);
+
+  /** Only show condition chips for codes that appear on units still available under the current non-condition filters. */
+  const conditionFilterChips = useMemo(() => {
+    if (!unitsMatchingExceptCondition.length) return [] as { code: string; label: string }[];
+    const present = new Set(
+      unitsMatchingExceptCondition
+        .map((u) => u.condition)
+        .filter((c): c is string => typeof c === 'string' && c.length > 0)
+    );
+    return CONDITION_CHIP_DEFINITIONS.filter(({ code }) => present.has(code));
+  }, [unitsMatchingExceptCondition]);
+
+  useEffect(() => {
+    if (selectedCondition === null) return;
+    const stillValid = unitsMatchingExceptCondition.some((u) => u.condition === selectedCondition);
+    if (!stillValid) {
+      setSelectedCondition(null);
+      setSelectedUnit(null);
+    }
+  }, [unitsMatchingExceptCondition, selectedCondition]);
 
   const updateUnitsCarouselButtons = () => {
     const container = unitsCarouselRef.current;
@@ -1271,10 +1312,36 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           ) : null}
 
           {/* View All Available Units */}
-          {filteredUnits.length > 0 && (
+          {units && units.length > 0 && (
             <div className="product-detail__units">
               <div className="product-detail__units-toggle">
-                <span>View All Available Units ({filteredUnits.length})</span>
+                <span className="product-detail__units-heading">
+                  View All Available Units ({filteredUnits.length})
+                </span>
+                {conditionFilterChips.length > 0 && (
+                  <div
+                    className="product-detail__units-condition-chips"
+                    role="group"
+                    aria-label="Filter units by condition"
+                  >
+                    {conditionFilterChips.map(({ code, label }) => (
+                      <button
+                        key={code}
+                        type="button"
+                        aria-pressed={selectedCondition === code}
+                        onClick={() => {
+                          setSelectedCondition(selectedCondition === code ? null : code);
+                          setSelectedUnit(null);
+                        }}
+                        className={`product-detail__variant-option product-detail__units-condition-chip ${
+                          selectedCondition === code ? 'product-detail__variant-option--active' : ''
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div className="product-detail__units-carousel-nav">
                   <button
                     type="button"
@@ -1304,30 +1371,30 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   </button>
                 </div>
               </div>
-              <div ref={unitsCarouselRef} className="product-detail__units-list">
-                {filteredUnits.map((unit) => {
-                  const unitPromotionPrice = isEligibleForPromotion && promotion && unit.selling_price
-                    ? calculatePromotionPrice(Number(unit.selling_price))
-                    : null;
-                  
-                  return <UnitCard
-                    key={unit.id}
-                    unit={unit}
-                    isSelected={selectedUnit === unit.id}
-                    onSelect={setSelectedUnit}
-                    promotionPrice={unitPromotionPrice}
-                    onColorSelect={setSelectedColor}
-                  />;
-                })}
-              </div>
-            </div>
-          )}
+              {filteredUnits.length > 0 ? (
+                <div ref={unitsCarouselRef} className="product-detail__units-list">
+                  {filteredUnits.map((unit) => {
+                    const unitPromotionPrice = isEligibleForPromotion && promotion && unit.selling_price
+                      ? calculatePromotionPrice(Number(unit.selling_price))
+                      : null;
 
-          {filteredUnits.length === 0 && units && units.length > 0 && (
-            <div className="product-detail__units-empty">
-              <p className="product-detail__units-empty-text">
-                No units match the selected criteria. Please adjust your selection.
-              </p>
+                    return <UnitCard
+                      key={unit.id}
+                      unit={unit}
+                      isSelected={selectedUnit === unit.id}
+                      onSelect={setSelectedUnit}
+                      promotionPrice={unitPromotionPrice}
+                      onColorSelect={setSelectedColor}
+                    />;
+                  })}
+                </div>
+              ) : (
+                <div className="product-detail__units-empty product-detail__units-empty--inline">
+                  <p className="product-detail__units-empty-text">
+                    No units match the selected criteria. Please adjust your selection.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

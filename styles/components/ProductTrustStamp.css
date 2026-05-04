@@ -70,3 +70,11 @@
     opacity: 1;
   }
 }
+
+/*
+ * Featured card: footer + full-width CTA stack at the bottom of the tile.
+ * Lift the seal so it sits above that chrome (not on top of the price button).
+ */
+.product-card--featured .product-trust-stamp--card {
+  bottom: clamp(56px, 22%, 104px);
+}

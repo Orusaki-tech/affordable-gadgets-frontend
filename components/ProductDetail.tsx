@@ -25,6 +25,7 @@ import { getPlaceholderProductImage, getPlaceholderUnitImage, getPlaceholderVide
 import { getAndClearProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
 import { PRICING_MODE } from '@/lib/constants/apiEnums';
 import { PromotionVideosDrawer } from '@/components/PromotionVideosDrawer';
+import { ProductTrustStamp } from '@/components/ProductTrustStamp';
 import type { PromotionVideoProduct } from '@/components/ProductVideoReel';
 
 interface ProductDetailProps {
@@ -649,6 +650,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   };
 
   const selectedUnitData = units?.find(u => u.id === selectedUnit);
+  /** Stamp always matches the actively selected inventory unit (same as price / add-to-cart). */
+  const galleryStampCondition = selectedUnitData?.condition;
   const processorDetails = (selectedUnitData as { processor_details?: string } | undefined)?.processor_details;
 
   // Get main display image - show selected unit's image if available, otherwise product image
@@ -888,12 +891,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               }
               onError={() => setMainImageLoadFailed(true)}
             />
-            <div className="product-detail__gallery-certified" aria-label="Certified">
-              <svg className="product-detail__gallery-certified-icon" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span>Certified</span>
-            </div>
+            <ProductTrustStamp condition={galleryStampCondition} size="detail" />
           </div>
 
           {/* Thumbnail Gallery - show when we have at least one image (single image still shows as thumbnail) */}

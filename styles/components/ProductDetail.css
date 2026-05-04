@@ -145,31 +145,6 @@
   background-color: #ffffff;
 }
 
-.product-detail__gallery-certified {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--gray-800);
-  border: 1px solid var(--gray-200);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  z-index: 1;
-}
-
-.product-detail__gallery-certified-icon {
-  width: 14px;
-  height: 14px;
-  color: var(--ui-green-600);
-  flex-shrink: 0;
-}
-
 .product-detail__thumbnails {
   display: flex;
   gap: 6px;

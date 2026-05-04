@@ -1,0 +1,33 @@
+/* Back Market–style corner seal on product photos */
+.product-trust-stamp {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  pointer-events: none;
+  line-height: 0;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+}
+
+.product-trust-stamp__img {
+  display: block;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.product-trust-stamp--detail .product-trust-stamp__img {
+  width: clamp(56px, 18vw, 92px);
+  max-width: 28%;
+}
+
+.product-trust-stamp--card .product-trust-stamp__img {
+  width: clamp(44px, 14vw, 58px);
+  max-width: 32%;
+}
+
+@media (min-width: 1024px) {
+  .product-trust-stamp--detail .product-trust-stamp__img {
+    width: clamp(72px, 12vw, 96px);
+  }
+}

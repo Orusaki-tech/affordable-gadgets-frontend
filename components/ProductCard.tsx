@@ -8,6 +8,7 @@ import { formatPrice, formatPriceRange } from '@/lib/utils/format';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { setProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
+import { ProductTrustStamp } from '@/components/ProductTrustStamp';
 import { useProductUnits, prefetchProductDetail } from '@/lib/hooks/useProducts';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
@@ -263,6 +264,9 @@ export function ProductCard({
     }, activeUnits[0]);
   }, [activeUnits]);
 
+  const trustStampCondition =
+    effectiveCartUnit?.condition ?? selectedUnit?.condition ?? units[0]?.condition;
+
   useEffect(() => {
     setSelectedUnitId(effectiveCartUnit?.id ?? null);
   }, [effectiveCartUnit]);
@@ -385,6 +389,7 @@ export function ProductCard({
             className="product-card__image product-card__image--primary product-card__image--featured"
             unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
           />
+          <ProductTrustStamp condition={trustStampCondition} size="card" />
         </div>
         {/* Footer: default = bar (name + cart icon); hover = full overlay with storage, RAM, price range, reviews, cart icon */}
         <div className="product-card__footer product-card__footer--featured">
@@ -566,6 +571,8 @@ export function ProductCard({
               unoptimized={secondaryImage.includes('localhost') || secondaryImage.includes('127.0.0.1') || secondaryImage.includes('placehold.co')}
             />
           )}
+
+          <ProductTrustStamp condition={trustStampCondition} size="card" />
 
           {/* Badges */}
           <div className="product-card__badges">

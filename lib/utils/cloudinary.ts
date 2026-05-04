@@ -1,3 +1,5 @@
+const DEFAULT_CLOUDINARY_CLOUD_NAME = 'dhgaqa2gb';
+
 const CLOUDINARY_UPLOAD_SEGMENT = '/image/upload/';
 
 const TRANSFORM_KEYS = ['w_', 'h_', 'c_', 'g_', 'f_', 'q_', 'ar_', 'dpr_'];
@@ -28,4 +30,27 @@ export function getCloudinarySizedImageUrl(
     ? `f_auto,q_auto,c_fit,w_${size},h_${size}`
     : `f_auto,q_auto,c_fill,g_auto,w_${size},h_${size}`;
   return `${prefix}${CLOUDINARY_UPLOAD_SEGMENT}${transformation}/${remainingPath}`;
+}
+
+/**
+ * Cloudinary **fetch**: pull a publicly reachable image URL and deliver it with transformations
+ * (e.g. WebP resize). Enable for trust stamps via NEXT_PUBLIC_TRUST_STAMP_CLOUDINARY=1.
+ *
+ * @see https://cloudinary.com/documentation/fetch_remote_images
+ */
+export function getCloudinaryFetchUrl(
+  absoluteRemoteUrl: string,
+  opts: { width: number; height?: number; format?: 'webp' | 'auto' }
+): string {
+  const cloudName =
+    (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) ||
+    DEFAULT_CLOUDINARY_CLOUD_NAME;
+  const height = opts.height ?? opts.width;
+  const format = opts.format ?? 'webp';
+  const transform =
+    format === 'auto'
+      ? `f_auto,q_auto,c_fit,w_${opts.width},h_${height}`
+      : `f_${format},q_auto,c_fit,w_${opts.width},h_${height}`;
+  const encoded = encodeURIComponent(absoluteRemoteUrl);
+  return `https://res.cloudinary.com/${cloudName}/image/fetch/${transform}/${encoded}`;
 }

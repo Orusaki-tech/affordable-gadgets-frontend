@@ -1,7 +1,6 @@
 'use client';
 
-import Image from 'next/image';
-import { getTrustStampSrc } from '@/lib/utils/trustStamp';
+import { getTrustStampImageUrl } from '@/lib/utils/trustStamp';
 
 type ProductTrustStampProps = {
   condition: string | undefined | null;
@@ -16,11 +15,11 @@ function labelForCondition(condition: string | undefined | null): string {
 }
 
 export function ProductTrustStamp({ condition, size }: ProductTrustStampProps) {
-  const src = getTrustStampSrc(condition);
+  const pixelWidth = size === 'detail' ? 220 : 140;
+  const src = getTrustStampImageUrl(condition, pixelWidth);
   if (!src) return null;
 
   const label = labelForCondition(condition);
-  const intrinsic = 256;
 
   return (
     <div
@@ -28,14 +27,7 @@ export function ProductTrustStamp({ condition, size }: ProductTrustStampProps) {
       role="img"
       aria-label={label}
     >
-      <Image
-        src={src}
-        alt={label}
-        width={intrinsic}
-        height={intrinsic}
-        className="product-trust-stamp__img"
-        sizes={size === 'detail' ? '(max-width: 640px) 72px, 92px' : '56px'}
-      />
+      <img src={src} alt={label} className="product-trust-stamp__img" decoding="async" />
     </div>
   );
 }

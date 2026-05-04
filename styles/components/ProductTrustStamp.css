@@ -1,4 +1,4 @@
-/* Back Market–style corner seal: ~18–22% of typical PDP hero width, capped for very large viewports */
+/* PDP: top-right seal. Cards: bottom-right, hover-only, smaller (see .product-trust-stamp--card). */
 .product-trust-stamp {
   position: absolute;
   top: 12px;
@@ -16,36 +16,51 @@
   object-fit: contain;
 }
 
-/* PDP main gallery: prominent seal (approx. Back Market proportions vs product image) */
+/* PDP main gallery */
 .product-trust-stamp--detail {
-  width: clamp(118px, 22vw, 172px);
+  width: clamp(59px, 11vw, 86px);
 }
 
 @media (min-width: 640px) {
   .product-trust-stamp--detail {
-    width: clamp(128px, 19vw, 176px);
+    width: clamp(64px, 9.5vw, 88px);
   }
 }
 
 @media (min-width: 1024px) {
   .product-trust-stamp--detail {
-    width: clamp(136px, 17vw, 184px);
+    width: clamp(68px, 8.5vw, 92px);
   }
 }
 
 @media (min-width: 1280px) {
   .product-trust-stamp--detail {
-    width: clamp(140px, 15vw, 192px);
+    width: clamp(70px, 7.5vw, 96px);
   }
 }
 
-/* Product cards: readable at a glance without crowding thumbnails */
+/*
+ * Product cards: half prior card size, lower-right, visible only on card hover
+ * (sits above dim overlay / hover chrome; keyboard: focus-within).
+ */
 .product-trust-stamp--card {
-  width: clamp(76px, 28vw, 112px);
+  top: auto;
+  bottom: 10px;
+  right: 10px;
+  width: clamp(19px, 7vw, 28px);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 5;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
 }
 
 @media (min-width: 640px) {
   .product-trust-stamp--card {
-    width: clamp(84px, 22vw, 120px);
+    width: clamp(21px, 5.5vw, 30px);
   }
+}
+
+.product-card:hover .product-trust-stamp--card,
+.product-card:focus-within .product-trust-stamp--card {
+  opacity: 1;
 }

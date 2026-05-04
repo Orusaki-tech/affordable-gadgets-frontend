@@ -9,7 +9,8 @@
     "build": "node node_modules/next/dist/bin/next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "rasterize:trust-stamps": "node scripts/rasterize-trust-stamps.mjs"
+    "rasterize:trust-stamps": "node scripts/rasterize-trust-stamps.mjs",
+    "build:trust-stamps": "node scripts/build-trust-stamps-from-png.mjs"
   },
   "dependencies": {
     "@shwari/api-client": "file:./packages/api-client",

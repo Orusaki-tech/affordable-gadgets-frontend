@@ -1,33 +1,51 @@
-/* Back Market–style corner seal on product photos */
+/* Back Market–style corner seal: ~18–22% of typical PDP hero width, capped for very large viewports */
 .product-trust-stamp {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   z-index: 2;
   pointer-events: none;
   line-height: 0;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.18));
 }
 
 .product-trust-stamp__img {
   display: block;
-  width: auto;
+  width: 100%;
   height: auto;
   object-fit: contain;
 }
 
-.product-trust-stamp--detail .product-trust-stamp__img {
-  width: clamp(56px, 18vw, 92px);
-  max-width: 28%;
+/* PDP main gallery: prominent seal (approx. Back Market proportions vs product image) */
+.product-trust-stamp--detail {
+  width: clamp(118px, 22vw, 172px);
 }
 
-.product-trust-stamp--card .product-trust-stamp__img {
-  width: clamp(44px, 14vw, 58px);
-  max-width: 32%;
+@media (min-width: 640px) {
+  .product-trust-stamp--detail {
+    width: clamp(128px, 19vw, 176px);
+  }
 }
 
 @media (min-width: 1024px) {
-  .product-trust-stamp--detail .product-trust-stamp__img {
-    width: clamp(72px, 12vw, 96px);
+  .product-trust-stamp--detail {
+    width: clamp(136px, 17vw, 184px);
+  }
+}
+
+@media (min-width: 1280px) {
+  .product-trust-stamp--detail {
+    width: clamp(140px, 15vw, 192px);
+  }
+}
+
+/* Product cards: readable at a glance without crowding thumbnails */
+.product-trust-stamp--card {
+  width: clamp(76px, 28vw, 112px);
+}
+
+@media (min-width: 640px) {
+  .product-trust-stamp--card {
+    width: clamp(84px, 22vw, 120px);
   }
 }

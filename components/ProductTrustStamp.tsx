@@ -15,7 +15,8 @@ function labelForCondition(condition: string | undefined | null): string {
 }
 
 export function ProductTrustStamp({ condition, size }: ProductTrustStampProps) {
-  const pixelWidth = size === 'detail' ? 220 : 140;
+  /* Request ~2× CSS max width so Cloudinary/local bitmap stays sharp on retina */
+  const pixelWidth = size === 'detail' ? 400 : 240;
   const src = getTrustStampImageUrl(condition, pixelWidth);
   if (!src) return null;
 

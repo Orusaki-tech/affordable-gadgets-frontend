@@ -45,7 +45,8 @@
  */
 .product-trust-stamp--card {
   top: auto;
-  bottom: 10px;
+  /* Keep above bottom CTAs (hover add-to-cart / buy buttons) */
+  bottom: 56px;
   right: 10px;
   width: clamp(19px, 7vw, 28px);
   opacity: 1;
@@ -56,6 +57,7 @@
 
 @media (min-width: 640px) {
   .product-trust-stamp--card {
+    bottom: 60px;
     width: clamp(21px, 5.5vw, 30px);
   }
 }

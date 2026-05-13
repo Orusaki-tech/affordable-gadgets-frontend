@@ -1621,6 +1621,14 @@
   color: #4b5563;
 }
 
+.product-detail__variant-hint {
+  margin-bottom: 4px;
+}
+
+.product-detail__cta--inline .product-detail__variant-hint {
+  width: 100%;
+}
+
 .product-detail__cta-button--whatsapp {
   background: #128c7e;
   color: #fff;

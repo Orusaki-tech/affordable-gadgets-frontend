@@ -43,6 +43,60 @@ const CONDITION_CHIP_DEFINITIONS: { code: string; label: string }[] = [
   { code: 'D', label: 'Defective' },
 ];
 
+function humanizeUnitCondition(code: string | undefined): string {
+  if (!code) return '';
+  if (code === 'N') return 'New';
+  if (code === 'R') return 'Refurbished';
+  if (code === 'P') return 'Pre-owned';
+  if (code === 'D') return 'Defective';
+  return code;
+}
+
+/** Pre-filled WhatsApp text when a specific inventory unit is selected. */
+function buildWhatsAppUnitInquiryMessage(
+  product: PublicProduct,
+  unit: PublicInventoryUnitPublic,
+  effectivePrice?: number | null
+): string {
+  const lines: string[] = [];
+  lines.push("Hi, I'm interested in this unit:");
+  lines.push('');
+  lines.push(`Product: ${product.product_name?.trim() || 'Product'}`);
+  if (product.brand?.trim()) lines.push(`Brand: ${product.brand.trim()}`);
+  if (product.model_series?.trim()) lines.push(`Model: ${product.model_series.trim()}`);
+  if (typeof unit.id === 'number') lines.push(`Unit ID: ${unit.id}`);
+
+  const variantBits: string[] = [];
+  if (typeof unit.storage_gb === 'number') variantBits.push(`${unit.storage_gb}GB storage`);
+  if (typeof unit.ram_gb === 'number') variantBits.push(`${unit.ram_gb}GB RAM`);
+  if (unit.color_name?.trim()) variantBits.push(unit.color_name.trim());
+  const cond = humanizeUnitCondition(unit.condition as string | undefined);
+  if (cond) variantBits.push(cond);
+  if (unit.grade && typeof unit.grade === 'string' && unit.grade.trim()) {
+    variantBits.push(`Grade ${unit.grade.trim()}`);
+  }
+  if (variantBits.length) lines.push(`Variant: ${variantBits.join(' · ')}`);
+
+  const price =
+    effectivePrice != null && !Number.isNaN(Number(effectivePrice))
+      ? Number(effectivePrice)
+      : Number(unit.selling_price);
+  lines.push(`Listed price: ${formatPrice(price)}`);
+
+  if (typeof unit.battery_mah === 'number') lines.push(`Battery: ${unit.battery_mah}mAh`);
+
+  return lines.join('\n');
+}
+
+function buildWhatsAppProductOnlyMessage(product: PublicProduct): string {
+  const lines: string[] = [
+    `Hi, I'm interested in: ${product.product_name?.trim() || 'a product'}`,
+  ];
+  if (product.brand?.trim()) lines.push(`Brand: ${product.brand.trim()}`);
+  if (product.model_series?.trim()) lines.push(`Model: ${product.model_series.trim()}`);
+  return lines.join('\n');
+}
+
 function firstTruthyImageUrl(...urls: (string | null | undefined)[]): string {
   for (const raw of urls) {
     const s = typeof raw === 'string' ? raw.trim() : '';
@@ -1083,17 +1137,36 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             </div>
             {(() => {
               const hasStock = Number(product.available_units_count ?? 0) > 0;
+              const hasUnitOptions = (units?.length ?? 0) > 0;
+              const showWhatsAppForVariant = hasUnitOptions && Boolean(selectedUnitData);
+              const showWhatsAppFallback = !hasUnitOptions && !hasStock;
+              const showWhatsApp = showWhatsAppForVariant || showWhatsAppFallback;
+              const variantHint = hasUnitOptions && !selectedUnit;
+
               const openWhatsApp = () => {
-                const name = product.product_name?.trim();
-                window.open(
-                  getBusinessWhatsAppUrl(
-                    name ? `Hi, I'm interested in: ${name}` : undefined
-                  ),
-                  '_blank',
-                  'noopener,noreferrer'
-                );
+                if (showWhatsAppForVariant && selectedUnitData) {
+                  const effectivePrice =
+                    isEligibleForPromotion && promotionUnitPrice !== null
+                      ? promotionUnitPrice
+                      : null;
+                  const text = buildWhatsAppUnitInquiryMessage(
+                    product,
+                    selectedUnitData,
+                    effectivePrice ?? undefined
+                  );
+                  window.open(getBusinessWhatsAppUrl(text), '_blank', 'noopener,noreferrer');
+                  return;
+                }
+                if (showWhatsAppFallback) {
+                  window.open(
+                    getBusinessWhatsAppUrl(buildWhatsAppProductOnlyMessage(product)),
+                    '_blank',
+                    'noopener,noreferrer'
+                  );
+                }
               };
-              const whatsAppButton = (
+
+              const whatsAppButton = showWhatsApp ? (
                 <button
                   type="button"
                   className="product-detail__cta-button product-detail__cta-button--whatsapp"
@@ -1109,37 +1182,63 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   </svg>
                   Message on WhatsApp
                 </button>
-              );
-              return hasStock ? (
-                <div className="product-detail__cta product-detail__cta--inline">
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={!selectedUnit || isAddingToCart}
-                    className={`product-detail__cta-button ${
-                      !selectedUnit || isAddingToCart ? 'product-detail__cta-button--disabled' : ''
-                    }`}
-                  >
-                    {isAddingToCart ? (
-                      <span className="product-detail__cta-loading">
-                        <svg className="product-detail__cta-spinner" fill="none" viewBox="0 0 24 24">
-                          <circle className="product-detail__cta-spinner-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="product-detail__cta-spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Adding...
-                      </span>
-                    ) : selectedUnit ? (
-                      'Add to cart'
-                    ) : (
-                      'Select a Variant First'
+              ) : null;
+
+              if (hasStock) {
+                return (
+                  <div className="product-detail__cta product-detail__cta--inline">
+                    {variantHint && (
+                      <p className="product-detail__stock-note product-detail__variant-hint">
+                        Select a variant below before you add to cart or message us on WhatsApp.
+                      </p>
                     )}
-                  </button>
-                  {whatsAppButton}
-                </div>
-              ) : (
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={!selectedUnit || isAddingToCart}
+                      className={`product-detail__cta-button ${
+                        !selectedUnit || isAddingToCart ? 'product-detail__cta-button--disabled' : ''
+                      }`}
+                    >
+                      {isAddingToCart ? (
+                        <span className="product-detail__cta-loading">
+                          <svg className="product-detail__cta-spinner" fill="none" viewBox="0 0 24 24">
+                            <circle className="product-detail__cta-spinner-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="product-detail__cta-spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Adding...
+                        </span>
+                      ) : selectedUnit ? (
+                        'Add to cart'
+                      ) : (
+                        'Select a Variant First'
+                      )}
+                    </button>
+                    {whatsAppButton}
+                  </div>
+                );
+              }
+
+              return (
                 <div className="product-detail__cta product-detail__cta--inline product-detail__cta--whatsapp-block">
-                  <p className="product-detail__stock-note">
-                    Not in stock online. Message us on WhatsApp to check availability.
-                  </p>
+                  {hasUnitOptions ? (
+                    <>
+                      {variantHint && (
+                        <p className="product-detail__stock-note product-detail__variant-hint">
+                          Not in stock online. Select a variant below, then tap WhatsApp so we receive the exact unit
+                          details.
+                        </p>
+                      )}
+                      {!variantHint && (
+                        <p className="product-detail__stock-note">
+                          Not in stock online. Message us on WhatsApp to check availability for this unit.
+                        </p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="product-detail__stock-note">
+                      Not in stock online. Message us on WhatsApp to check availability.
+                    </p>
+                  )}
                   {whatsAppButton}
                 </div>
               );

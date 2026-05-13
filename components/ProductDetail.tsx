@@ -1141,7 +1141,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               const showWhatsAppForVariant = hasUnitOptions && Boolean(selectedUnitData);
               const showWhatsAppFallback = !hasUnitOptions && !hasStock;
               const showWhatsApp = showWhatsAppForVariant || showWhatsAppFallback;
-              const variantHint = hasUnitOptions && !selectedUnit;
 
               const openWhatsApp = () => {
                 if (showWhatsAppForVariant && selectedUnitData) {
@@ -1187,11 +1186,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               if (hasStock) {
                 return (
                   <div className="product-detail__cta product-detail__cta--inline">
-                    {variantHint && (
-                      <p className="product-detail__stock-note product-detail__variant-hint">
-                        Select a variant below before you add to cart or message us on WhatsApp.
-                      </p>
-                    )}
                     <button
                       onClick={handleAddToCart}
                       disabled={!selectedUnit || isAddingToCart}
@@ -1220,25 +1214,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
               return (
                 <div className="product-detail__cta product-detail__cta--inline product-detail__cta--whatsapp-block">
-                  {hasUnitOptions ? (
-                    <>
-                      {variantHint && (
-                        <p className="product-detail__stock-note product-detail__variant-hint">
-                          Not in stock online. Select a variant below, then tap WhatsApp so we receive the exact unit
-                          details.
-                        </p>
-                      )}
-                      {!variantHint && (
-                        <p className="product-detail__stock-note">
-                          Not in stock online. Message us on WhatsApp to check availability for this unit.
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <p className="product-detail__stock-note">
-                      Not in stock online. Message us on WhatsApp to check availability.
-                    </p>
-                  )}
+                  <p className="product-detail__stock-note">
+                    {hasUnitOptions
+                      ? 'Not in stock online. Message us on WhatsApp to check availability for this unit.'
+                      : 'Not in stock online. Message us on WhatsApp to check availability.'}
+                  </p>
                   {whatsAppButton}
                 </div>
               );

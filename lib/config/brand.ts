@@ -102,6 +102,15 @@ export const brandConfig = {
   },
 } as const;
 
+/** WhatsApp deep link for the configured business phone (digits only for wa.me). */
+export function getBusinessWhatsAppUrl(prefilledMessage?: string): string {
+  const digits = brandConfig.business.phone.replace(/\D/g, '');
+  const base = `https://wa.me/${digits}`;
+  const msg = prefilledMessage?.trim();
+  if (!msg) return base;
+  return `${base}?text=${encodeURIComponent(msg)}`;
+}
+
 
 
 

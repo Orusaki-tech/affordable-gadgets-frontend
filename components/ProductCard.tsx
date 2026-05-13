@@ -13,6 +13,7 @@ import { useProductUnits, prefetchProductDetail } from '@/lib/hooks/useProducts'
 import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
+import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 
 /** Same stroke as `.product-card__buy-btn--featured`. Hex matches --primary-dark so it always paints (see DevTools). */
 const productCardLinkFrameStyle: CSSProperties = {
@@ -369,6 +370,17 @@ export function ProductCard({
     </svg>
   );
 
+  const openBusinessWhatsAppForProduct = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const name = product.product_name?.trim();
+    window.open(
+      getBusinessWhatsAppUrl(name ? `Hi, I'm interested in: ${name}` : undefined),
+      '_blank',
+      'noopener,noreferrer'
+    );
+  };
+
   if (isFeaturedVariant) {
     const canAddToCart = Boolean(selectedUnit?.id) && !isAddingToCart && !unitsLoading;
     return (
@@ -400,21 +412,33 @@ export function ProductCard({
             >
               {product.product_name}
             </p>
-            <span className="product-card__buy-btn product-card__buy-btn--featured">Buy</span>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (!selectedUnit?.id) return;
-                handleAddToCart(event, 1);
-              }}
-              disabled={!canAddToCart || isAddingToCart}
-              className="product-card__cart-icon product-card__cart-icon--featured product-card__cart-icon--bar-hover"
-              aria-label="Add to cart"
-            >
-              {cartIconSvg}
-            </button>
+            {hasStock ? (
+              <>
+                <span className="product-card__buy-btn product-card__buy-btn--featured">Buy</span>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (!selectedUnit?.id) return;
+                    handleAddToCart(event, 1);
+                  }}
+                  disabled={!canAddToCart || isAddingToCart}
+                  className="product-card__cart-icon product-card__cart-icon--featured product-card__cart-icon--bar-hover"
+                  aria-label="Add to cart"
+                >
+                  {cartIconSvg}
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={openBusinessWhatsAppForProduct}
+                className="product-card__whatsapp-cta product-card__whatsapp-cta--featured-bar"
+              >
+                WhatsApp us
+              </button>
+            )}
           </div>
           <div className="product-card__footer-overlay">
             <div className="product-card__overlay-row">
@@ -517,7 +541,7 @@ export function ProductCard({
             </div>
             )}
             <div className="product-card__overlay-actions">
-              {showAddToCartSingleButton && (
+              {hasStock && showAddToCartSingleButton && (
                 <button
                   type="button"
                   onClick={(event) => {
@@ -532,6 +556,15 @@ export function ProductCard({
                 >
                   <span className="product-card__add-to-cart-btn-icon">{cartIconSvg}</span>
                   <span className="product-card__add-to-cart-btn-price">{addToCartButtonPriceText}</span>
+                </button>
+              )}
+              {!hasStock && (
+                <button
+                  type="button"
+                  onClick={openBusinessWhatsAppForProduct}
+                  className="product-card__whatsapp-cta product-card__whatsapp-cta--overlay"
+                >
+                  Check on WhatsApp
                 </button>
               )}
             </div>
@@ -867,6 +900,18 @@ export function ProductCard({
           )}
         </div>
 
+          {!hasStock && (
+            <div className="product-card__whatsapp-wrap">
+              <button
+                type="button"
+                className="product-card__whatsapp-btn"
+                onClick={openBusinessWhatsAppForProduct}
+              >
+                Message us on WhatsApp
+              </button>
+            </div>
+          )}
+
           {/* Quick Add */}
           {allowQuickActions && isQuickAddOpen && (
             <div
@@ -878,7 +923,12 @@ export function ProductCard({
             >
               {unitsLoading && <div className="product-card__quick-add-message">Loading options...</div>}
               {!unitsLoading && units.length === 0 && (
-                <div className="product-card__quick-add-message">No purchase options yet.</div>
+                <div className="product-card__quick-add-message product-card__quick-add-message--stack">
+                  <p className="product-card__quick-add-hint">None available online right now.</p>
+                  <button type="button" className="product-card__whatsapp-btn product-card__whatsapp-btn--compact" onClick={openBusinessWhatsAppForProduct}>
+                    Ask on WhatsApp
+                  </button>
+                </div>
               )}
               {!unitsLoading && units.length > 0 && (
                 <>

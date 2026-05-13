@@ -27,6 +27,7 @@ import { PRICING_MODE } from '@/lib/constants/apiEnums';
 import { PromotionVideosDrawer } from '@/components/PromotionVideosDrawer';
 import { ProductTrustStamp } from '@/components/ProductTrustStamp';
 import type { PromotionVideoProduct } from '@/components/ProductVideoReel';
+import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 
 interface ProductDetailProps {
   slug: string;
@@ -1080,8 +1081,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 </div>
               ) : null}
             </div>
-            {/* Add to Cart Button aligned beside price */}
-            {Number(product.available_units_count ?? 0) > 0 && (
+            {/* Add to Cart / WhatsApp when out of stock */}
+            {Number(product.available_units_count ?? 0) > 0 ? (
               <div className="product-detail__cta product-detail__cta--inline">
                 <button
                   onClick={handleAddToCart}
@@ -1103,6 +1104,28 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   ) : (
                     'Select a Variant First'
                   )}
+                </button>
+              </div>
+            ) : (
+              <div className="product-detail__cta product-detail__cta--inline product-detail__cta--whatsapp-block">
+                <p className="product-detail__stock-note">
+                  Not in stock online. Message us on WhatsApp to check availability.
+                </p>
+                <button
+                  type="button"
+                  className="product-detail__cta-button product-detail__cta-button--whatsapp"
+                  onClick={() => {
+                    const name = product.product_name?.trim();
+                    window.open(
+                      getBusinessWhatsAppUrl(
+                        name ? `Hi, I'm interested in: ${name}` : undefined
+                      ),
+                      '_blank',
+                      'noopener,noreferrer'
+                    );
+                  }}
+                >
+                  Message on WhatsApp
                 </button>
               </div>
             )}

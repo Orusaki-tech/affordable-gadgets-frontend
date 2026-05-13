@@ -1607,3 +1607,25 @@
     transform: rotate(360deg);
   }
 }
+
+.product-detail__cta--whatsapp-block {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.product-detail__stock-note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #4b5563;
+}
+
+.product-detail__cta-button--whatsapp {
+  background: #128c7e;
+  color: #fff;
+}
+
+.product-detail__cta-button--whatsapp:hover {
+  background: #0f7a6e;
+}

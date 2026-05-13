@@ -25,7 +25,13 @@ export function getPlaceholderImage(
  * @returns Placeholder product image URL
  */
 export function getPlaceholderProductImage(productName?: string): string {
-  const text = productName ? `Product: ${productName}` : 'Product Image';
+  const fallback = 'Photo coming soon';
+  if (!productName?.trim()) {
+    return getPlaceholderImage(400, 400, fallback);
+  }
+  const name = productName.trim();
+  const max = 32;
+  const text = name.length > max ? `${name.slice(0, max - 1)}…` : name;
   return getPlaceholderImage(400, 400, text);
 }
 

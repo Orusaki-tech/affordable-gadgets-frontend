@@ -301,6 +301,8 @@ export function ProductCard({
     product.min_price !== undefined &&
     product.max_price !== null &&
     product.max_price !== undefined;
+  const hasDefaultPriceOffer = !hasStock && hasPriceRange;
+  const hasListingOffer = hasStock || hasDefaultPriceOffer;
   const compareAtMin = product.compare_at_min_price ?? null;
   const compareAtMax = product.compare_at_max_price ?? null;
   const compareAtDisplay = compareAtMin ?? compareAtMax;
@@ -357,6 +359,7 @@ export function ProductCard({
 
   /** Show add-to-cart button (icon + price) on hover when at least one variant can be added; button shows single/max price */
   const showAddToCartSingleButton = activeUnits.length >= 1 && activeUnitsMaxPrice != null;
+  const showPriceCtaButton = showAddToCartSingleButton || hasDefaultPriceOffer;
   const addToCartButtonPriceText =
     activeUnitsMinPrice != null && activeUnitsMaxPrice != null
       ? activeUnitsMinPrice === activeUnitsMaxPrice
@@ -379,6 +382,14 @@ export function ProductCard({
       '_blank',
       'noopener,noreferrer'
     );
+  };
+
+  const handlePriceCtaClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (selectedUnit?.id) {
+      handleAddToCart(event, 1);
+      return;
+    }
+    setProductDetailPlaceholder(product);
   };
 
   if (isFeaturedVariant) {
@@ -412,23 +423,25 @@ export function ProductCard({
             >
               {product.product_name}
             </p>
-            {hasStock ? (
+            {hasListingOffer ? (
               <>
                 <span className="product-card__buy-btn product-card__buy-btn--featured">Buy</span>
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (!selectedUnit?.id) return;
-                    handleAddToCart(event, 1);
-                  }}
-                  disabled={!canAddToCart || isAddingToCart}
-                  className="product-card__cart-icon product-card__cart-icon--featured product-card__cart-icon--bar-hover"
-                  aria-label="Add to cart"
-                >
-                  {cartIconSvg}
-                </button>
+                {hasStock && (
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      if (!selectedUnit?.id) return;
+                      handleAddToCart(event, 1);
+                    }}
+                    disabled={!canAddToCart || isAddingToCart}
+                    className="product-card__cart-icon product-card__cart-icon--featured product-card__cart-icon--bar-hover"
+                    aria-label="Add to cart"
+                  >
+                    {cartIconSvg}
+                  </button>
+                )}
               </>
             ) : (
               <button
@@ -558,7 +571,18 @@ export function ProductCard({
                   <span className="product-card__add-to-cart-btn-price">{addToCartButtonPriceText}</span>
                 </button>
               )}
-              {!hasStock && (
+              {hasDefaultPriceOffer && (
+                <button
+                  type="button"
+                  onClick={handlePriceCtaClick}
+                  className="product-card__add-to-cart-btn product-card__add-to-cart-btn--overlay-single"
+                  aria-label="View product details"
+                >
+                  <span className="product-card__add-to-cart-btn-icon">{cartIconSvg}</span>
+                  <span className="product-card__add-to-cart-btn-price">{addToCartButtonPriceText}</span>
+                </button>
+              )}
+              {!hasListingOffer && (
                 <button
                   type="button"
                   onClick={openBusinessWhatsAppForProduct}
@@ -642,7 +666,7 @@ export function ProductCard({
           </div>
 
         {/* Stock Badge */}
-        {!hasStock && (
+        {!hasListingOffer && (
           <div className="product-card__badge product-card__badge--stock product-card__badge--out">
             Out of Stock
           </div>
@@ -683,19 +707,14 @@ export function ProductCard({
         )}
 
         {/* Hover-only add-to-cart (icon + price) when one variant left — same behaviour as featured */}
-        {!isMinimal && showAddToCartSingleButton && (
+        {!isMinimal && showPriceCtaButton && (
           <div className="product-card__hover-add">
             <button
               type="button"
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (!selectedUnit?.id) return;
-                handleAddToCart(event, 1);
-              }}
-              disabled={!selectedUnit?.id || isAddingToCart}
+              onClick={handlePriceCtaClick}
+              disabled={Boolean(selectedUnit?.id) && isAddingToCart}
               className="product-card__add-to-cart-btn product-card__add-to-cart-btn--overlay-single"
-              aria-label="Add to cart"
+              aria-label={selectedUnit?.id ? 'Add to cart' : 'View product details'}
             >
               <span className="product-card__add-to-cart-btn-icon">{cartIconSvg}</span>
               <span className="product-card__add-to-cart-btn-price">{addToCartButtonPriceText}</span>
@@ -900,7 +919,7 @@ export function ProductCard({
           )}
         </div>
 
-          {!hasStock && (
+          {!hasListingOffer && (
             <div className="product-card__whatsapp-wrap">
               <button
                 type="button"
@@ -972,7 +991,7 @@ export function ProductCard({
         {/* Stock & Interest Info */}
         {!isMinimal ? (
           <div className="product-card__meta">
-            <span className={`product-card__stock ${hasStock ? 'product-card__stock--in' : 'product-card__stock--out'}`}>
+            <span className={`product-card__stock ${hasListingOffer ? 'product-card__stock--in' : 'product-card__stock--out'}`}>
               {hasStock ? (
                 <span className="product-card__stock-info">
                   <svg className="product-card__stock-icon" fill="currentColor" viewBox="0 0 20 20">
@@ -980,6 +999,8 @@ export function ProductCard({
                   </svg>
                   {product.available_units_count} {product.available_units_count === 1 ? 'unit' : 'units'}
                 </span>
+              ) : hasDefaultPriceOffer ? (
+                'Available to order'
               ) : (
                 'Out of stock'
               )}
@@ -995,8 +1016,8 @@ export function ProductCard({
           </div>
         ) : (
           <div className="product-card__stock-note">
-            <span className={`product-card__stock ${hasStock ? 'product-card__stock--in' : 'product-card__stock--out'}`}>
-              {hasStock ? 'In stock' : 'Out of stock'}
+            <span className={`product-card__stock ${hasListingOffer ? 'product-card__stock--in' : 'product-card__stock--out'}`}>
+              {hasStock ? 'In stock' : hasDefaultPriceOffer ? 'Available to order' : 'Out of stock'}
             </span>
             {lowStock && hasStock && (
               <span className="product-card__low-stock">Low stock</span>

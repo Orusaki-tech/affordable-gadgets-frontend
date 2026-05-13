@@ -283,10 +283,10 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
 
   // Prefetch next page and first few product details when current page has loaded
   useEffect(() => {
-    if (!data?.results?.length || !data?.count) return;
-    const totalPages = Math.ceil(data.count / PRODUCTS_VISIBLE_PAGE_SIZE);
+    if (!data?.results?.length) return;
     const nextPage = page + 1;
-    if (nextPage <= totalPages) {
+    // Public list API omits total count; use `next` link to know if another page exists.
+    if (data.next) {
       queryClient.prefetchQuery({
         queryKey: [
           'products',
@@ -309,20 +309,12 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
     // Prefetch detail + units for first 4 visible products so first-row clicks are instant
     const firstFew = data.results.slice(0, 4);
     firstFew.forEach((product) => prefetchProductDetail(queryClient, product));
-  }, [data?.count, data?.results, page, filters, debouncedSearch, sort, promotionId, queryClient]);
+  }, [data?.next, data?.results, page, filters, debouncedSearch, sort, promotionId, queryClient]);
 
-  const filteredResults = useMemo(() => {
-    if (!data?.results) return [];
-    const normalize = (v?: string) => (v ?? '').trim().toLowerCase();
-    const type = normalize(filters.type);
-    const brand = normalize(filters.brand);
-
-    return data.results.filter((product) => {
-      const matchesType = !type || normalize(product.product_type) === type;
-      const matchesBrand = !brand || normalize(product.brand) === brand;
-      return matchesType && matchesBrand;
-    });
-  }, [data?.results, filters.brand, filters.type]);
+  // Do not re-filter by type/brand here: the list API already applies `type` and `brand_filter`
+  // (backend uses icontains for brand). Client-side exact brand matching hid valid rows
+  // (including out-of-stock templates whose `brand` text did not match the filter exactly).
+  const filteredResults = useMemo(() => data?.results ?? [], [data?.results]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

@@ -5,7 +5,12 @@ import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useMemo } from 'react';
-import { ApiService, InitiatePaymentRequestRequest, OpenAPI, OrdersService } from '@/lib/api/generated';
+import {
+  ApiService,
+  OpenAPI,
+  OrdersService,
+  PaymentModeEnum,
+} from '@/lib/api/generated';
 import { apiBaseUrl, inventoryBaseUrl } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
 import { AuthChoiceModal } from './AuthChoiceModal';
@@ -54,9 +59,7 @@ export function CartPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [shouldStartPayment, setShouldStartPayment] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [paymentMode, setPaymentMode] = useState<InitiatePaymentRequestRequest.payment_mode>(
-    InitiatePaymentRequestRequest.payment_mode.BOTH
-  );
+  const [paymentMode, setPaymentMode] = useState<PaymentModeEnum>(PaymentModeEnum.BOTH);
 
   // Periodically check if cart still exists (in case it was cleared after payment)
   useEffect(() => {
@@ -291,8 +294,8 @@ export function CartPage() {
   const effectiveDeliveryFee = fulfillment === 'PICKUP' ? 0 : deliveryFee;
   const totalWithDelivery = Number(totalValue || 0) + effectiveDeliveryFee;
   const payableNow = useMemo(() => {
-    if (paymentMode === InitiatePaymentRequestRequest.payment_mode.ITEMS_ONLY) return Number(totalValue || 0);
-    if (paymentMode === InitiatePaymentRequestRequest.payment_mode.DELIVERY_ONLY) return Number(effectiveDeliveryFee || 0);
+    if (paymentMode === PaymentModeEnum.ITEMS_ONLY) return Number(totalValue || 0);
+    if (paymentMode === PaymentModeEnum.DELIVERY_ONLY) return Number(effectiveDeliveryFee || 0);
     return Number(totalWithDelivery || 0);
   }, [paymentMode, totalValue, effectiveDeliveryFee, totalWithDelivery]);
 
@@ -377,11 +380,11 @@ export function CartPage() {
       setError('Please select a delivery ward');
       return;
     }
-    if (fulfillment === 'PICKUP' && paymentMode === InitiatePaymentRequestRequest.payment_mode.DELIVERY_ONLY) {
+    if (fulfillment === 'PICKUP' && paymentMode === PaymentModeEnum.DELIVERY_ONLY) {
       setError('Delivery-only payment is not available for pickup.');
       return;
     }
-    if (paymentMode === InitiatePaymentRequestRequest.payment_mode.DELIVERY_ONLY && effectiveDeliveryFee <= 0) {
+    if (paymentMode === PaymentModeEnum.DELIVERY_ONLY && effectiveDeliveryFee <= 0) {
       setError('Delivery fee is 0. Please choose your delivery location first.');
       setIsDeliveryModalOpen(true);
       return;
@@ -1038,8 +1041,8 @@ export function CartPage() {
                     type="radio"
                     name="paymentMode"
                     value="BOTH"
-                    checked={paymentMode === InitiatePaymentRequestRequest.payment_mode.BOTH}
-                    onChange={() => setPaymentMode(InitiatePaymentRequestRequest.payment_mode.BOTH)}
+                    checked={paymentMode === PaymentModeEnum.BOTH}
+                    onChange={() => setPaymentMode(PaymentModeEnum.BOTH)}
                   />
                   <span>Items + Shipping</span>
                 </label>
@@ -1048,8 +1051,8 @@ export function CartPage() {
                     type="radio"
                     name="paymentMode"
                     value="ITEMS_ONLY"
-                    checked={paymentMode === InitiatePaymentRequestRequest.payment_mode.ITEMS_ONLY}
-                    onChange={() => setPaymentMode(InitiatePaymentRequestRequest.payment_mode.ITEMS_ONLY)}
+                    checked={paymentMode === PaymentModeEnum.ITEMS_ONLY}
+                    onChange={() => setPaymentMode(PaymentModeEnum.ITEMS_ONLY)}
                   />
                   <span>Items only</span>
                 </label>
@@ -1058,8 +1061,8 @@ export function CartPage() {
                     type="radio"
                     name="paymentMode"
                     value="DELIVERY_ONLY"
-                    checked={paymentMode === InitiatePaymentRequestRequest.payment_mode.DELIVERY_ONLY}
-                    onChange={() => setPaymentMode(InitiatePaymentRequestRequest.payment_mode.DELIVERY_ONLY)}
+                    checked={paymentMode === PaymentModeEnum.DELIVERY_ONLY}
+                    onChange={() => setPaymentMode(PaymentModeEnum.DELIVERY_ONLY)}
                     disabled={fulfillment === 'PICKUP'}
                   />
                   <span>Shipping only</span>

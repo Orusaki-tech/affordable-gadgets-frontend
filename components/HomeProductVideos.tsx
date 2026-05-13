@@ -36,6 +36,8 @@ async function fetchHomepageVideoProducts(): Promise<PublicProductList[]> {
   const res = await ApiService.apiV1PublicProductsList(
     undefined,
     undefined,
+    true,
+    undefined,
     undefined,
     undefined,
     1,
@@ -43,9 +45,7 @@ async function fetchHomepageVideoProducts(): Promise<PublicProductList[]> {
     undefined,
     undefined,
     undefined,
-    undefined,
-    undefined,
-    true
+    undefined
   );
   const rows = (res.results ?? []) as PublicProductList[];
   return rows.filter((p) => resolveProductVideoMedia(p) !== null);

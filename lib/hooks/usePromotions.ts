@@ -30,9 +30,9 @@ export function usePromotions(params?: {
     queryKey: ['promotions', queryParams],
     queryFn: () =>
       ApiService.apiV1PublicPromotionsList(
+        displayLocationParam,
         queryParams.page,
-        queryParams.page_size,
-        displayLocationParam
+        queryParams.page_size
       ),
     initialData,
     staleTime: 60000, // 1 minute

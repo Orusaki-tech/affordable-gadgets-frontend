@@ -100,6 +100,8 @@ export default async function ProductsListingPage({
   try {
     const data = await ApiService.apiV1PublicProductsList(
       brandFilter,
+      undefined,
+      undefined,
       maxPrice,
       minPrice,
       ordering,

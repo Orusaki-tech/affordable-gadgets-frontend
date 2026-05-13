@@ -33,7 +33,7 @@ interface ProductDetailProps {
   slug: string;
 }
 
-type TabType = 'overview' | 'specs' | 'reviews' | 'videos' | 'compare';
+type TabType = 'overview' | 'specs' | 'reviews' | 'videos' | 'compare' | 'blog';
 
 /** Matches admin unit condition codes (inventory condition dropdown). */
 const CONDITION_CHIP_DEFINITIONS: { code: string; label: string }[] = [
@@ -290,6 +290,10 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
   const productId = product?.id;
+  const productBlogHref = useMemo(() => {
+    if (!product?.slug || !product.has_published_article) return null;
+    return `/products/${product.slug}/blog`;
+  }, [product?.slug, product?.has_published_article]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [mainImageLoadFailed, setMainImageLoadFailed] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -1077,6 +1081,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 { id: 'reviews' as TabType, label: 'Leave a review' },
                 { id: 'videos' as TabType, label: 'Videos' },
                 { id: 'compare' as TabType, label: 'Compare' },
+                { id: 'blog' as TabType, label: 'Blog' },
               ] as const
             ).map(({ id, label }) => (
               <button
@@ -1678,6 +1683,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               { id: 'reviews' as TabType, label: 'Reviews' },
               { id: 'videos' as TabType, label: 'Videos' },
               { id: 'compare' as TabType, label: 'Compare' },
+              { id: 'blog' as TabType, label: 'Blog' },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -1900,6 +1906,35 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <Suspense fallback={<div className="product-detail__loading-inline">Loading comparison...</div>}>
               <LazyComparisonPage />
             </Suspense>
+          )}
+
+          {activeTab === 'blog' && product && (
+            <div className="product-detail__section">
+              <div className="product-detail__section-block">
+                <h3 className="product-detail__section-title">Blog</h3>
+                {productBlogHref ? (
+                  <>
+                    {product.article_headline ? (
+                      <p className="product-detail__description-text">{product.article_headline}</p>
+                    ) : (
+                      <p className="product-detail__description-text">
+                        Read our full buying guide for {product.product_name?.trim() || 'this product'}.
+                      </p>
+                    )}
+                    <p className="product-detail__description-text" style={{ marginTop: 12 }}>
+                      <Link href={productBlogHref} className="product-detail__accessory-action">
+                        Open full article
+                      </Link>
+                    </p>
+                  </>
+                ) : (
+                  <p className="product-detail__description-text">
+                    A dedicated blog article for {product.product_name?.trim() || 'this product'} will appear here
+                    once published from the admin catalog.
+                  </p>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -45,6 +45,8 @@ const fetchProductBySlug = async (slug: string) => {
     undefined,
     undefined,
     undefined,
+    undefined,
+    undefined,
     1,
     1,
     undefined,

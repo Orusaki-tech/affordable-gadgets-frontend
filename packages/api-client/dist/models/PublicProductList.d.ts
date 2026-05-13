@@ -14,16 +14,17 @@ export type PublicProductList = {
      */
     model_series?: string;
     product_type?: ProductTypesEnum;
+    readonly financing_available?: boolean;
     /**
      * Count available units for current brand - use prefetched list for accurate brand filtering.
      */
     readonly available_units_count?: number;
     /**
-     * Get min price for available units - use prefetched list for accurate brand filtering.
+     * Get min price for available units - use annotation when present (list), else prefetched list or query.
      */
     readonly min_price?: number;
     /**
-     * Get max price for available units - use prefetched list for accurate brand filtering.
+     * Get max price for available units - use annotation when present (list), else prefetched list or query.
      */
     readonly max_price?: number;
     /**
@@ -34,17 +35,8 @@ export type PublicProductList = {
      * Get max compare-at price for available units.
      */
     readonly compare_at_max_price?: number;
-    /**
-     * Discount percent based on compare-at price.
-     */
     readonly discount_percent?: number;
-    /**
-     * Total review count for product.
-     */
     readonly review_count?: number;
-    /**
-     * Average rating for product.
-     */
     readonly average_rating?: number;
     readonly primary_image?: string | null;
     /**
@@ -55,13 +47,11 @@ export type PublicProductList = {
      * Link to product video (YouTube, Vimeo, etc.)
      */
     product_video_url?: string | null;
-    /**
-     * URL for uploaded product video file (e.g. Cloudinary), when present.
-     */
     readonly product_video_file_url?: string | null;
     readonly has_active_bundle?: boolean;
     /**
      * Return minimum effective bundle price for listings (if available).
      */
     readonly bundle_price_preview?: number;
+    readonly has_published_article?: boolean;
 };

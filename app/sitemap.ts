@@ -46,6 +46,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       undefined,
       undefined,
       undefined,
+      undefined,
+      undefined,
       1,
       PAGE_SIZE,
       undefined,
@@ -60,6 +62,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     for (let page = 2; page <= cappedTotalPages; page += 1) {
       const response = await ApiService.apiV1PublicProductsList(
+        undefined,
+        undefined,
         undefined,
         undefined,
         undefined,
@@ -84,6 +88,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "weekly",
         priority: 0.8,
       });
+      if (product.has_published_article) {
+        entries.push({
+          url: `${baseUrl}/products/${product.slug}/blog`,
+          lastModified: new Date(),
+          changeFrequency: "monthly",
+          priority: 0.75,
+        });
+      }
     }
   } catch {
     return entries;

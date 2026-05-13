@@ -9,8 +9,17 @@ interface StructuredDataProps {
     | 'Service'
     | 'Product'
     | 'ItemList'
-    | 'FAQPage';
+    | 'FAQPage'
+    | 'BlogPosting';
   breadcrumbs?: Array<{ name: string; url: string }>;
+  blogPosting?: {
+    headline: string;
+    description?: string | null;
+    url: string;
+    image?: string | null;
+    datePublished?: string | null;
+    dateModified?: string | null;
+  };
   product?: {
     name: string;
     description?: string | null;
@@ -45,6 +54,7 @@ export function StructuredData({
   product,
   itemList,
   faqs,
+  blogPosting,
 }: StructuredDataProps) {
   const brandImageUrl = `${brandConfig.siteUrl}/affordlogo1.svg`;
 
@@ -354,6 +364,38 @@ export function StructuredData({
     };
   };
 
+  const getBlogPostingSchema = () => {
+    const input = blogPosting ?? null;
+    if (!input || !input.headline?.trim() || !input.url?.trim()) return null;
+
+    const publisher = {
+      '@type': 'Organization',
+      name: brandConfig.business.name,
+      url: brandConfig.siteUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${brandConfig.siteUrl}/affordlogo1.svg`,
+      },
+    };
+
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: input.headline.trim(),
+      description: input.description?.trim() || undefined,
+      url: input.url,
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': input.url,
+      },
+      image: input.image ? [input.image] : undefined,
+      datePublished: input.datePublished ?? undefined,
+      dateModified: input.dateModified ?? undefined,
+      author: publisher,
+      publisher,
+    };
+  };
+
   const getSchema = () => {
     switch (type) {
       case 'LocalBusiness':
@@ -370,6 +412,8 @@ export function StructuredData({
         return getItemListSchema();
       case 'FAQPage':
         return getFaqSchema();
+      case 'BlogPosting':
+        return getBlogPostingSchema();
       default:
         return getOrganizationSchema();
     }

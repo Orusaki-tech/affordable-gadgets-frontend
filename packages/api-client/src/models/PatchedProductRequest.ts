@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ProductArticleRequest } from './ProductArticleRequest';
 import type { ProductTypesEnum } from './ProductTypesEnum';
 /**
  * Serializes the generic Product template.
@@ -38,9 +39,6 @@ export type PatchedProductRequest = {
      * SEO description (150-160 chars recommended)
      */
     meta_description?: string;
-    /**
-     * URL-friendly slug (auto-generated from product_name if not provided)
-     */
     slug?: string;
     /**
      * Comma-separated keywords for SEO
@@ -62,6 +60,7 @@ export type PatchedProductRequest = {
      * Whether product is published (visible on e-commerce site)
      */
     is_published?: boolean;
+    article?: ProductArticleRequest | null;
     /**
      * Link to product video (YouTube, Vimeo, etc.)
      */

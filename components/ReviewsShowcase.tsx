@@ -225,8 +225,14 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
           undefined,
           undefined,
           undefined,
+          undefined,
+          undefined,
           1,
-          100
+          100,
+          undefined,
+          undefined,
+          undefined,
+          undefined
         );
         const fallbackItems: EligibleReviewItem[] = (products?.results ?? [])
           .filter((product) => typeof product.id === 'number')

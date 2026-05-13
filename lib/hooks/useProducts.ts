@@ -105,6 +105,8 @@ export function productsQueryFn({
   } = params;
   return ApiService.apiV1PublicProductsList(
     brand_filter,
+    undefined,
+    undefined,
     max_price,
     min_price,
     ordering,
@@ -133,6 +135,8 @@ export function useInfiniteProducts(params?: Omit<ProductsQueryParams, 'page'> &
     queryFn: ({ pageParam }) =>
       ApiService.apiV1PublicProductsList(
         params?.brand_filter,
+        undefined,
+        undefined,
         params?.max_price,
         params?.min_price,
         params?.ordering,
@@ -174,6 +178,8 @@ export function useProductBySlug(slug: string, options?: { placeholderFromList?:
         undefined,
         undefined,
         undefined,
+        1,
+        1,
         undefined,
         undefined,
         slug,
@@ -253,6 +259,8 @@ export function prefetchProductDetail(queryClient: QueryClient, product: PublicP
           undefined,
           undefined,
           undefined,
+          1,
+          1,
           undefined,
           undefined,
           slug,

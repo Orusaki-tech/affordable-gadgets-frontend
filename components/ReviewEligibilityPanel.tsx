@@ -166,10 +166,14 @@ export function ReviewEligibilityPanel() {
               undefined,
               undefined,
               undefined,
+              undefined,
+              undefined,
               1,
               1,
               undefined,
-              item.product_name
+              item.product_name,
+              undefined,
+              undefined
             );
             const first = products?.results?.[0];
             if (!first?.id) return null;
@@ -274,8 +278,14 @@ export function ReviewEligibilityPanel() {
           undefined,
           undefined,
           undefined,
+          undefined,
+          undefined,
           1,
-          100
+          100,
+          undefined,
+          undefined,
+          undefined,
+          undefined
         );
         const fallbackItems: EligibleReviewItem[] = (products?.results ?? [])
           .filter((product) => typeof product.id === 'number')

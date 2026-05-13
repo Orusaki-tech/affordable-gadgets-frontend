@@ -13,7 +13,6 @@ import { useProductUnits, prefetchProductDetail } from '@/lib/hooks/useProducts'
 import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
-import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 
 /** Same stroke as `.product-card__buy-btn--featured`. Hex matches --primary-dark so it always paints (see DevTools). */
 const productCardLinkFrameStyle: CSSProperties = {
@@ -302,7 +301,6 @@ export function ProductCard({
     product.max_price !== null &&
     product.max_price !== undefined;
   const hasDefaultPriceOffer = !hasStock && hasPriceRange;
-  const hasListingOffer = hasStock || hasDefaultPriceOffer;
   const compareAtMin = product.compare_at_min_price ?? null;
   const compareAtMax = product.compare_at_max_price ?? null;
   const compareAtDisplay = compareAtMin ?? compareAtMax;
@@ -373,17 +371,6 @@ export function ProductCard({
     </svg>
   );
 
-  const openBusinessWhatsAppForProduct = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const name = product.product_name?.trim();
-    window.open(
-      getBusinessWhatsAppUrl(name ? `Hi, I'm interested in: ${name}` : undefined),
-      '_blank',
-      'noopener,noreferrer'
-    );
-  };
-
   const handlePriceCtaClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (selectedUnit?.id) {
       handleAddToCart(event, 1);
@@ -423,33 +410,21 @@ export function ProductCard({
             >
               {product.product_name}
             </p>
-            {hasListingOffer ? (
-              <>
-                <span className="product-card__buy-btn product-card__buy-btn--featured">Buy</span>
-                {hasStock && (
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      if (!selectedUnit?.id) return;
-                      handleAddToCart(event, 1);
-                    }}
-                    disabled={!canAddToCart || isAddingToCart}
-                    className="product-card__cart-icon product-card__cart-icon--featured product-card__cart-icon--bar-hover"
-                    aria-label="Add to cart"
-                  >
-                    {cartIconSvg}
-                  </button>
-                )}
-              </>
-            ) : (
+            <span className="product-card__buy-btn product-card__buy-btn--featured">Buy</span>
+            {hasStock && (
               <button
                 type="button"
-                onClick={openBusinessWhatsAppForProduct}
-                className="product-card__whatsapp-cta product-card__whatsapp-cta--featured-bar"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (!selectedUnit?.id) return;
+                  handleAddToCart(event, 1);
+                }}
+                disabled={!canAddToCart || isAddingToCart}
+                className="product-card__cart-icon product-card__cart-icon--featured product-card__cart-icon--bar-hover"
+                aria-label="Add to cart"
               >
-                WhatsApp us
+                {cartIconSvg}
               </button>
             )}
           </div>
@@ -582,15 +557,6 @@ export function ProductCard({
                   <span className="product-card__add-to-cart-btn-price">{addToCartButtonPriceText}</span>
                 </button>
               )}
-              {!hasListingOffer && (
-                <button
-                  type="button"
-                  onClick={openBusinessWhatsAppForProduct}
-                  className="product-card__whatsapp-cta product-card__whatsapp-cta--overlay"
-                >
-                  Check on WhatsApp
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -664,13 +630,6 @@ export function ProductCard({
               </div>
             )}
           </div>
-
-        {/* Stock Badge */}
-        {!hasListingOffer && (
-          <div className="product-card__badge product-card__badge--stock product-card__badge--out">
-            Out of Stock
-          </div>
-        )}
 
           {/* Quick Actions */}
           {allowQuickActions && (
@@ -919,18 +878,6 @@ export function ProductCard({
           )}
         </div>
 
-          {!hasListingOffer && (
-            <div className="product-card__whatsapp-wrap">
-              <button
-                type="button"
-                className="product-card__whatsapp-btn"
-                onClick={openBusinessWhatsAppForProduct}
-              >
-                Message us on WhatsApp
-              </button>
-            </div>
-          )}
-
           {/* Quick Add */}
           {allowQuickActions && isQuickAddOpen && (
             <div
@@ -944,9 +891,7 @@ export function ProductCard({
               {!unitsLoading && units.length === 0 && (
                 <div className="product-card__quick-add-message product-card__quick-add-message--stack">
                   <p className="product-card__quick-add-hint">None available online right now.</p>
-                  <button type="button" className="product-card__whatsapp-btn product-card__whatsapp-btn--compact" onClick={openBusinessWhatsAppForProduct}>
-                    Ask on WhatsApp
-                  </button>
+                  <span className="product-card__quick-add-link">View details</span>
                 </div>
               )}
               {!unitsLoading && units.length > 0 && (
@@ -991,7 +936,7 @@ export function ProductCard({
         {/* Stock & Interest Info */}
         {!isMinimal ? (
           <div className="product-card__meta">
-            <span className={`product-card__stock ${hasListingOffer ? 'product-card__stock--in' : 'product-card__stock--out'}`}>
+            <span className="product-card__stock product-card__stock--in">
               {hasStock ? (
                 <span className="product-card__stock-info">
                   <svg className="product-card__stock-icon" fill="currentColor" viewBox="0 0 20 20">
@@ -999,10 +944,8 @@ export function ProductCard({
                   </svg>
                   {product.available_units_count} {product.available_units_count === 1 ? 'unit' : 'units'}
                 </span>
-              ) : hasDefaultPriceOffer ? (
-                'Available to order'
               ) : (
-                'Out of stock'
+                'Available to order'
               )}
             </span>
             {allowInterestCount && interestText && (
@@ -1016,8 +959,8 @@ export function ProductCard({
           </div>
         ) : (
           <div className="product-card__stock-note">
-            <span className={`product-card__stock ${hasListingOffer ? 'product-card__stock--in' : 'product-card__stock--out'}`}>
-              {hasStock ? 'In stock' : hasDefaultPriceOffer ? 'Available to order' : 'Out of stock'}
+            <span className="product-card__stock product-card__stock--in">
+              {hasStock ? 'In stock' : 'Available to order'}
             </span>
             {lowStock && hasStock && (
               <span className="product-card__low-stock">Low stock</span>

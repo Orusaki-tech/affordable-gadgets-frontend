@@ -1624,8 +1624,18 @@
 .product-detail__cta-button--whatsapp {
   background: #128c7e;
   color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .product-detail__cta-button--whatsapp:hover {
   background: #0f7a6e;
+}
+
+.product-detail__cta-whatsapp-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }

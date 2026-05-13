@@ -1081,54 +1081,69 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 </div>
               ) : null}
             </div>
-            {/* Add to Cart / WhatsApp when out of stock */}
-            {Number(product.available_units_count ?? 0) > 0 ? (
-              <div className="product-detail__cta product-detail__cta--inline">
-                <button
-                  onClick={handleAddToCart}
-                  disabled={!selectedUnit || isAddingToCart}
-                  className={`product-detail__cta-button ${
-                    !selectedUnit || isAddingToCart ? 'product-detail__cta-button--disabled' : ''
-                  }`}
-                >
-                  {isAddingToCart ? (
-                    <span className="product-detail__cta-loading">
-                      <svg className="product-detail__cta-spinner" fill="none" viewBox="0 0 24 24">
-                        <circle className="product-detail__cta-spinner-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="product-detail__cta-spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Adding...
-                    </span>
-                  ) : selectedUnit ? (
-                    'Add to cart'
-                  ) : (
-                    'Select a Variant First'
-                  )}
-                </button>
-              </div>
-            ) : (
-              <div className="product-detail__cta product-detail__cta--inline product-detail__cta--whatsapp-block">
-                <p className="product-detail__stock-note">
-                  Not in stock online. Message us on WhatsApp to check availability.
-                </p>
+            {(() => {
+              const hasStock = Number(product.available_units_count ?? 0) > 0;
+              const openWhatsApp = () => {
+                const name = product.product_name?.trim();
+                window.open(
+                  getBusinessWhatsAppUrl(
+                    name ? `Hi, I'm interested in: ${name}` : undefined
+                  ),
+                  '_blank',
+                  'noopener,noreferrer'
+                );
+              };
+              const whatsAppButton = (
                 <button
                   type="button"
                   className="product-detail__cta-button product-detail__cta-button--whatsapp"
-                  onClick={() => {
-                    const name = product.product_name?.trim();
-                    window.open(
-                      getBusinessWhatsAppUrl(
-                        name ? `Hi, I'm interested in: ${name}` : undefined
-                      ),
-                      '_blank',
-                      'noopener,noreferrer'
-                    );
-                  }}
+                  onClick={openWhatsApp}
                 >
+                  <svg
+                    className="product-detail__cta-whatsapp-icon"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M19.05 4.91A10.05 10.05 0 0 0 12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.74.46 3.44 1.32 4.94L2 22l5.27-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01zM12.04 20.15h-.01a8.23 8.23 0 0 1-4.2-1.15l-.3-.18-3.13.82.83-3.05-.2-.31a8.22 8.22 0 0 1-1.27-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.21 8.24zm4.52-6.16c-.25-.12-1.47-.72-1.69-.8-.23-.08-.39-.12-.56.12-.16.25-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-2-1.24-.74-.66-1.24-1.48-1.39-1.73-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.16.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.49-.41-.42-.56-.43h-.48c-.16 0-.43.06-.66.31-.23.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.54.12.16 1.73 2.64 4.19 3.7.59.25 1.05.4 1.41.51.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29z" />
+                  </svg>
                   Message on WhatsApp
                 </button>
-              </div>
-            )}
+              );
+              return hasStock ? (
+                <div className="product-detail__cta product-detail__cta--inline">
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={!selectedUnit || isAddingToCart}
+                    className={`product-detail__cta-button ${
+                      !selectedUnit || isAddingToCart ? 'product-detail__cta-button--disabled' : ''
+                    }`}
+                  >
+                    {isAddingToCart ? (
+                      <span className="product-detail__cta-loading">
+                        <svg className="product-detail__cta-spinner" fill="none" viewBox="0 0 24 24">
+                          <circle className="product-detail__cta-spinner-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="product-detail__cta-spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Adding...
+                      </span>
+                    ) : selectedUnit ? (
+                      'Add to cart'
+                    ) : (
+                      'Select a Variant First'
+                    )}
+                  </button>
+                  {whatsAppButton}
+                </div>
+              ) : (
+                <div className="product-detail__cta product-detail__cta--inline product-detail__cta--whatsapp-block">
+                  <p className="product-detail__stock-note">
+                    Not in stock online. Message us on WhatsApp to check availability.
+                  </p>
+                  {whatsAppButton}
+                </div>
+              );
+            })()}
           </div>
           {showSuccessMessage && (
             <div className="product-detail__cta-alert">

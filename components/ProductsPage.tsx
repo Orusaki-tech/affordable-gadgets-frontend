@@ -26,10 +26,9 @@ type ProductCardOptions = {
 
 interface ProductsPageProps {
   cardOptions?: ProductCardOptions;
-  heading?: string;
 }
 
-export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
+export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const searchParamsRef = useRef<string>('');
@@ -388,13 +387,6 @@ export function ProductsPage({ cardOptions, heading }: ProductsPageProps) {
         </div>
       ) : (
         <div className="products-page__header">
-          <div className="products-page__header-titleRow">
-            <h1 className="products-page__title section-label">
-              {heading || 'Products'}
-            </h1>
-            <span className="products-page__header-subtitle">Products</span>
-          </div>
-
           {showSamsungBanner && (
             <div className="products-page__header-banner" aria-label="Samsung banner">
               <ProductCarousel

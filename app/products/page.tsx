@@ -6,7 +6,6 @@ import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { StructuredData } from '@/components/StructuredData';
 import { brandConfig } from '@/lib/config/brand';
-import { CATEGORY_CARDS } from '@/lib/config/categories';
 import { ApiService } from '@/lib/api/generated';
 
 export const revalidate = 3600;
@@ -75,15 +74,6 @@ export default async function ProductsListingPage({
   const maxPrice = asNumber(sp.max_price);
   const promotion = asNumber(sp.promotion);
   const page = asNumber(sp.page) ?? 1;
-
-  const typeLabel =
-    type ? CATEGORY_CARDS.find((c) => c.code === type)?.name ?? 'Products' : '';
-  const heading =
-    brandFilter && typeLabel
-      ? `${brandFilter} ${typeLabel}`
-      : brandFilter
-        ? `${brandFilter} Products`
-        : typeLabel || 'Products';
 
   const qs = new URLSearchParams();
   for (const [key, value] of Object.entries(sp)) {
@@ -169,7 +159,7 @@ export default async function ProductsListingPage({
             </div>
           }
         >
-          <ProductsPage heading={heading} />
+          <ProductsPage />
         </Suspense>
       </main>
 

@@ -8,7 +8,7 @@ import type { PublicProduct, PublicProductArticle } from '@/lib/api/generated';
 import { StructuredData } from '@/components/StructuredData';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
-import { ProductBlogMarkdown } from '@/components/ProductBlogMarkdown';
+import { ProductBlogBody } from '@/components/ProductBlogMarkdown';
 
 export const revalidate = 3600;
 
@@ -172,7 +172,7 @@ export default async function ProductBlogPage({ params }: ProductBlogPageProps) 
           </p>
           <h1 className="text-3xl font-bold text-gray-900 mb-6">{headline}</h1>
 
-          <ProductBlogMarkdown markdown={article.body || '_No content yet._'} />
+          <ProductBlogBody html={article.body || '<p><em>No content yet.</em></p>'} />
 
           <div className="mt-10 pt-6 border-t border-gray-200">
             <Link href={`/products/${slug}`} className="text-blue-600 font-semibold hover:underline">

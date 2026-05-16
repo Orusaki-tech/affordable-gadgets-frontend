@@ -1,0 +1,32 @@
+# Build Next.js on node:20-bookworm (avoids slim-image + single-stage Docker issues), then pack runtime image.
+steps:
+  - name: node:20-bookworm
+    entrypoint: bash
+    args:
+      - -lc
+      - |
+        set -euo pipefail
+        # Fetch latest schema from backend to ensure client is up to date
+        curl -sSL https://api.affordable-gadgetske.com/openapi.yaml -o openapi.yaml || echo "Warning: Could not fetch latest schema, using local copy"
+        npm ci --include=optional
+        npm install --no-save \
+          lightningcss-linux-x64-gnu@1.30.2 \
+          @tailwindcss/oxide-linux-x64-gnu@4.1.16
+        export NEXT_PUBLIC_API_BASE_URL=https://api.affordable-gadgetske.com
+        export NEXT_PUBLIC_BRAND_CODE=AFFORDABLE_GADGETS
+        export NEXT_PUBLIC_BRAND_NAME="Affordable Gadgets"
+        # Install devDeps above; Next must see production during `next build` only.
+        export NODE_ENV=production
+        npm run build
+        test -f .next/standalone/server.js
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - Dockerfile.runtime
+      - -t
+      - us-central1-docker.pkg.dev/gmail-486411/ag-shop/ag-shop:production-latest
+      - .
+images:
+  - us-central1-docker.pkg.dev/gmail-486411/ag-shop/ag-shop:production-latest
+timeout: 1200s

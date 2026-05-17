@@ -21,13 +21,16 @@ jobs:
           node-version: "20"
           cache: npm
 
-      - name: Install and build
+      - name: Install dependencies and build
         env:
           NEXT_PUBLIC_API_BASE_URL: https://api.affordable-gadgetske.com
           NEXT_PUBLIC_BRAND_CODE: AFFORDABLE_GADGETS
           NEXT_PUBLIC_BRAND_NAME: Affordable Gadgets
         run: |
           npm ci
+          npm install --no-save \
+            lightningcss-linux-x64-gnu@1.30.2 \
+            @tailwindcss/oxide-linux-x64-gnu@4.1.16
           npm run build
 
       - name: Docker build

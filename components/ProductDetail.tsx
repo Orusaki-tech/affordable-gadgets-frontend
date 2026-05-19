@@ -1148,7 +1148,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               const showWhatsApp = showWhatsAppForVariant || showWhatsAppFallback;
 
               const openWhatsApp = () => {
-                fetch('https://api.affordable-gadgetske.com/api/observability/record-event/', {
+                fetch('https://api.affordable-gadgetske.com/api/inventory/observability/record-event/', {
                   method: 'POST',
                   headers: {'Content-Type': 'application/json'},
                   body: JSON.stringify({event_type: 'whatsapp_click', product_id: product.id})

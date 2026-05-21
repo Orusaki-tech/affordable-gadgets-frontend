@@ -22,8 +22,8 @@ export const metadata: Metadata = {
     default: brandConfig.name,
     template: `%s | ${brandConfig.name}`,
   },
-  description: "Shop quality phones, laptops, tablets, and accessories at great prices",
-  keywords: ["phones", "laptops", "tablets", "electronics", "accessories"],
+  description: "Premium smartphones, laptops and accessories from Apple iPhone, Samsung, Google Pixel, Sony Xperia, OnePlus and more. Best deals in Kenya. Visit Kimathi St, Nairobi.",
+  keywords: ["iPhone", "Samsung", "Google Pixel", "Sony", "OnePlus", "phones", "laptops", "tablets", "accessories", "electronics", "Kenya"],
   metadataBase: new URL(brandConfig.siteUrl),
   alternates: {
     canonical: "/",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: brandConfig.name,
-    description: "Shop quality phones, laptops, tablets, and accessories at great prices",
+    description: "Premium smartphones, laptops and accessories from Apple iPhone, Samsung, Google Pixel, Sony Xperia, OnePlus and more. Best deals in Kenya.",
     images: ["/affordable-social-share.png"],
   },
   icons: {

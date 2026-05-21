@@ -2,10 +2,9 @@ import type { MetadataRoute } from "next";
 import { ApiService } from "@/lib/api/generated";
 import { brandConfig } from "@/lib/config/brand";
 
-const PAGE_SIZE = 200;
+const PAGE_SIZE = 100;
 const MAX_PAGES = Number(process.env.SITEMAP_MAX_PAGES || 20);
 
-export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 const staticPaths = [
@@ -18,6 +17,8 @@ const staticPaths = [
   "/faq",
   "/shipping",
   "/budget-search",
+  "/financing",
+  "/match-score",
   "/contact",
   "/privacy",
   "/terms",
@@ -41,26 +42,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [...buildStaticEntries()];
 
   try {
-    const firstPage = await ApiService.apiV1PublicProductsList(
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      1,
-      PAGE_SIZE,
-      undefined,
-      undefined,
-      undefined,
-      undefined
-    );
+    let page = 1;
+    let hasNext = true;
+    const allResults: Array<{ slug?: string; has_published_article?: boolean }> = [];
 
-    const totalPages = Math.max(1, Math.ceil(firstPage.count / PAGE_SIZE));
-    const cappedTotalPages = Math.min(totalPages, MAX_PAGES);
-    const allResults = [...(firstPage.results ?? [])];
-
-    for (let page = 2; page <= cappedTotalPages; page += 1) {
+    while (hasNext && page <= MAX_PAGES) {
       const response = await ApiService.apiV1PublicProductsList(
         undefined,
         undefined,
@@ -76,6 +62,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         undefined
       );
       allResults.push(...(response.results ?? []));
+      hasNext = response.next != null;
+      page += 1;
     }
 
     for (const product of allResults) {

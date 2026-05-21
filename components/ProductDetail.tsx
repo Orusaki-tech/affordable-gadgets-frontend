@@ -1935,7 +1935,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 {productBlogHref ? (
                   <>
                     {product.article_headline ? (
-                      <h1 className="product-detail__description-text">{product.article_headline}</h1>
+                      <h1 className="product-detail__blog-headline">{product.article_headline}</h1>
                     ) : (
                       <p className="product-detail__description-text">
                         Read our full buying guide for {product.product_name?.trim() || 'this product'}.

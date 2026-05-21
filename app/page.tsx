@@ -138,14 +138,14 @@ async function fetchFeaturedProductsForSchema(): Promise<
 export const metadata: Metadata = {
   title: { absolute: 'Affordable Gadgets Ke | Premium Affordable Smartphones, Laptops and iPads in Kenya' },
   description:
-    'Your dream phone is waiting Upgrade with us. Best Deals on Ex-UK | Phones|Buy Latest Iphones,Samsung,Sony,Google Pixel,OnePlus at crazy good prices Kimathi House 4th Floor Suite 409. Call us on 0717881573.',
+    'Apple iPhone, Samsung, Google Pixel, Sony, OnePlus & more — premium smartphones, laptops and accessories in Kenya. Shop ex-UK deals at Kimathi House 4th Floor Suite 409. Call 0717881573.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'Affordable Gadgets Ke | Premium Affordable Smartphones, Laptops and iPads in Kenya',
     description:
-      'Your dream phone is waiting Upgrade with us. Best Deals on Ex-UK | Phones|Buy Latest Iphones,Samsung,Sony,Google Pixel,OnePlus at crazy good prices Kimathi House 4th Floor Suite 409. Call us on 0717881573.',
+      'Apple iPhone, Samsung, Google Pixel, Sony, OnePlus & more — premium smartphones, laptops and accessories in Kenya. Shop ex-UK deals at Kimathi House 4th Floor Suite 409. Call 0717881573.',
     url: '/',
     images: [
       {
@@ -160,7 +160,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Affordable Gadgets Ke | Premium Affordable Smartphones, Laptops and iPads in Kenya',
     description:
-      'Your dream phone is waiting Upgrade with us. Best Deals on Ex-UK | Phones|Buy Latest Iphones,Samsung,Sony,Google Pixel,OnePlus at crazy good prices Kimathi House 4th Floor Suite 409. Call us on 0717881573.',
+      'Apple iPhone, Samsung, Google Pixel, Sony, OnePlus & more — premium smartphones, laptops and accessories in Kenya. Shop ex-UK deals at Kimathi House 4th Floor Suite 409. Call 0717881573.',
     images: ['/affordable-social-share.png'],
   },
 };

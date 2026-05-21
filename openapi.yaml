@@ -618,6 +618,194 @@ paths:
               schema:
                 $ref: '#/components/schemas/Admin'
           description: ''
+  /article-images/:
+    get:
+      operationId: article_images_list
+      description: |-
+        CRUD for images embedded within a product buying guide / article body.
+        Only Content Creators and Inventory Managers can add/manage images.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - article-images
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedArticleImageList'
+          description: ''
+    post:
+      operationId: article_images_create
+      description: |-
+        CRUD for images embedded within a product buying guide / article body.
+        Only Content Creators and Inventory Managers can add/manage images.
+      tags:
+      - article-images
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArticleImageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArticleImageRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleImage'
+          description: ''
+  /article-images/{id}/:
+    get:
+      operationId: article_images_retrieve
+      description: |-
+        CRUD for images embedded within a product buying guide / article body.
+        Only Content Creators and Inventory Managers can add/manage images.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this article image.
+        required: true
+      tags:
+      - article-images
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleImage'
+          description: ''
+    put:
+      operationId: article_images_update
+      description: |-
+        CRUD for images embedded within a product buying guide / article body.
+        Only Content Creators and Inventory Managers can add/manage images.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this article image.
+        required: true
+      tags:
+      - article-images
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArticleImageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArticleImageRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleImage'
+          description: ''
+    patch:
+      operationId: article_images_partial_update
+      description: |-
+        CRUD for images embedded within a product buying guide / article body.
+        Only Content Creators and Inventory Managers can add/manage images.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this article image.
+        required: true
+      tags:
+      - article-images
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedArticleImageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedArticleImageRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleImage'
+          description: ''
+    delete:
+      operationId: article_images_destroy
+      description: |-
+        CRUD for images embedded within a product buying guide / article body.
+        Only Content Creators and Inventory Managers can add/manage images.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this article image.
+        required: true
+      tags:
+      - article-images
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /article-images/upload/:
+    post:
+      operationId: article_images_upload_create
+      description: |-
+        Upload an image for embedding in a buying guide / article body.
+        Returns the Cloudinary URL. Does NOT create a persistent ArticleImage record.
+      tags:
+      - article-images
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ArticleImageUploadRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ArticleImageUploadRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleImageUpload'
+          description: ''
   /audit-logs/:
     get:
       operationId: audit_logs_list
@@ -3073,13 +3261,13 @@ paths:
       - products
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/ProductRequest'
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/ProductRequest'
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/ProductRequest'
         required: true
@@ -3137,13 +3325,13 @@ paths:
       - products
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/ProductRequest'
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/ProductRequest'
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/ProductRequest'
         required: true
@@ -3177,13 +3365,13 @@ paths:
       - products
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedProductRequest'
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/PatchedProductRequest'
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/PatchedProductRequest'
       security:
@@ -3264,13 +3452,13 @@ paths:
       - products
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/ProductRequest'
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/ProductRequest'
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/ProductRequest'
         required: true
@@ -3299,13 +3487,13 @@ paths:
       - products
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/ProductRequest'
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/ProductRequest'
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/ProductRequest'
         required: true
@@ -3407,13 +3595,13 @@ paths:
       - products
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedProductRequest'
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/PatchedProductRequest'
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/PatchedProductRequest'
       security:
@@ -3441,13 +3629,13 @@ paths:
       - products
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/ProductRequest'
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/ProductRequest'
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/ProductRequest'
         required: true
@@ -7364,6 +7552,81 @@ components:
       required:
       - display_name
       - name
+    ArticleImage:
+      type: object
+      description: Serializer for article images embedded in buying guide body.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        article:
+          type: integer
+        image_url:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+        alt_text:
+          type: string
+          description: Required for SEO and accessibility
+          maxLength: 255
+        caption:
+          type: string
+          description: Optional caption for the image
+          maxLength: 500
+        position:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: Order in which images should be displayed (lower numbers first)
+      required:
+      - article
+    ArticleImageRequest:
+      type: object
+      description: Serializer for article images embedded in buying guide body.
+      properties:
+        article:
+          type: integer
+        image:
+          type: string
+          format: binary
+          writeOnly: true
+        alt_text:
+          type: string
+          description: Required for SEO and accessibility
+          maxLength: 255
+        caption:
+          type: string
+          description: Optional caption for the image
+          maxLength: 500
+        position:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: Order in which images should be displayed (lower numbers first)
+      required:
+      - article
+      - image
+    ArticleImageUpload:
+      type: object
+      description: Lightweight serializer for uploading an article image and getting
+        back a URL.
+      properties:
+        image_url:
+          type: string
+          format: uri
+          readOnly: true
+    ArticleImageUploadRequest:
+      type: object
+      description: Lightweight serializer for uploading an article image and getting
+        back a URL.
+      properties:
+        image:
+          type: string
+          format: binary
+          writeOnly: true
+      required:
+      - image
     AuditLog:
       type: object
       description: Serializer for AuditLog model (read-only).
@@ -7835,6 +8098,18 @@ components:
           type: boolean
       required:
       - expires_at
+    CategoryEnum:
+      enum:
+      - buying_guide
+      - tech_tip
+      - news
+      - general
+      type: string
+      description: |-
+        * `buying_guide` - Buying Guide
+        * `tech_tip` - Tech Tip
+        * `news` - News
+        * `general` - General
     Color:
       type: object
       description: Serializes the Color model.
@@ -8426,7 +8701,7 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-          title: Current Selling Price
+          nullable: true
         compare_at_price:
           type: string
           format: decimal
@@ -8500,7 +8775,6 @@ components:
           readOnly: true
       required:
       - cost_of_unit
-      - selling_price
     InventoryUnitImage:
       type: object
       description: |-
@@ -8597,7 +8871,7 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-          title: Current Selling Price
+          nullable: true
         compare_at_price:
           type: string
           format: decimal
@@ -8645,7 +8919,6 @@ components:
       required:
       - cost_of_unit
       - product_template_id
-      - selling_price
     Lead:
       type: object
       description: Serializer for Lead model (admin).
@@ -9270,6 +9543,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Admin'
+    PaginatedArticleImageList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArticleImage'
     PaginatedAuditLogList:
       type: object
       required:
@@ -10051,6 +10347,29 @@ components:
             type: integer
             writeOnly: true
           writeOnly: true
+    PatchedArticleImageRequest:
+      type: object
+      description: Serializer for article images embedded in buying guide body.
+      properties:
+        article:
+          type: integer
+        image:
+          type: string
+          format: binary
+          writeOnly: true
+        alt_text:
+          type: string
+          description: Required for SEO and accessibility
+          maxLength: 255
+        caption:
+          type: string
+          description: Optional caption for the image
+          maxLength: 500
+        position:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: Order in which images should be displayed (lower numbers first)
     PatchedBrandRequest:
       type: object
       description: Serializer for Brand model.
@@ -10352,7 +10671,7 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-          title: Current Selling Price
+          nullable: true
         compare_at_price:
           type: string
           format: decimal
@@ -10599,6 +10918,13 @@ components:
           minimum: -2147483648
           nullable: true
           description: Stock level at which to reorder/restock
+        default_selling_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+          description: Shown on the storefront when no online/listable units have
+            a price; used when creating a unit if selling price is omitted.
         is_discontinued:
           type: boolean
           description: Mark product as discontinued (no longer in catalog)
@@ -10965,6 +11291,13 @@ components:
           minimum: -2147483648
           nullable: true
           description: Stock level at which to reorder/restock
+        default_selling_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+          description: Shown on the storefront when no online/listable units have
+            a price; used when creating a unit if selling price is omitted.
         is_discontinued:
           type: boolean
           description: Mark product as discontinued (no longer in catalog)
@@ -11138,10 +11471,18 @@ components:
       type: object
       description: Full product buying guide / blog (staff).
       properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
         headline:
           type: string
-          description: Public H1 for the article page
+          description: 'Public H1 for the article page (e.g. ''Galaxy A42 5G in Kenya:
+            who should buy it?'')'
           maxLength: 255
+        thumbnail_image:
+          type: string
+          format: uri
+          nullable: true
+          description: Featured image for blog lists and social sharing
         seo_title:
           type: string
           description: Article page title tag (50–60 chars recommended)
@@ -11152,9 +11493,10 @@ components:
           maxLength: 160
         body:
           type: string
-          description: Article body (Markdown)
+          description: Article body (Markdown supported)
         is_published:
           type: boolean
+          title: Published on storefront
         published_at:
           type: string
           format: date-time
@@ -11168,14 +11510,27 @@ components:
           type: string
           format: date-time
           readOnly: true
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArticleImage'
+          readOnly: true
     ProductArticleRequest:
       type: object
       description: Full product buying guide / blog (staff).
       properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
         headline:
           type: string
-          description: Public H1 for the article page
+          description: 'Public H1 for the article page (e.g. ''Galaxy A42 5G in Kenya:
+            who should buy it?'')'
           maxLength: 255
+        thumbnail_image:
+          type: string
+          format: binary
+          nullable: true
+          description: Featured image for blog lists and social sharing
         seo_title:
           type: string
           description: Article page title tag (50–60 chars recommended)
@@ -11186,9 +11541,10 @@ components:
           maxLength: 160
         body:
           type: string
-          description: Article body (Markdown)
+          description: Article body (Markdown supported)
         is_published:
           type: boolean
+          title: Published on storefront
     ProductArticleSummary:
       type: object
       description: Lightweight article payload for product list (no body).
@@ -11196,7 +11552,8 @@ components:
         headline:
           type: string
           readOnly: true
-          description: Public H1 for the article page
+          description: 'Public H1 for the article page (e.g. ''Galaxy A42 5G in Kenya:
+            who should buy it?'')'
         seo_title:
           type: string
           readOnly: true
@@ -11204,6 +11561,7 @@ components:
         is_published:
           type: boolean
           readOnly: true
+          title: Published on storefront
         published_at:
           type: string
           format: date-time
@@ -11323,6 +11681,13 @@ components:
           minimum: -2147483648
           nullable: true
           description: Stock level at which to reorder/restock
+        default_selling_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+          description: Shown on the storefront when no online/listable units have
+            a price; used when creating a unit if selling price is omitted.
         is_discontinued:
           type: boolean
           description: Mark product as discontinued (no longer in catalog)
@@ -11464,6 +11829,13 @@ components:
           minimum: -2147483648
           nullable: true
           description: Stock level at which to reorder/restock
+        default_selling_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+          description: Shown on the storefront when no online/listable units have
+            a price; used when creating a unit if selling price is omitted.
         is_discontinued:
           type: boolean
           description: Mark product as discontinued (no longer in catalog)
@@ -12224,13 +12596,13 @@ components:
           readOnly: true
         min_price:
           type: number
-          description: Get min price for available units - use annotation when present
-            (list), else prefetched list or query.
+          description: Get min price for available units; fall back to Product.default_selling_price
+            when none.
           readOnly: true
         max_price:
           type: number
-          description: Get max price for available units - use annotation when present
-            (list), else prefetched list or query.
+          description: Get max price for available units; fall back to Product.default_selling_price
+            when none.
           readOnly: true
         compare_at_min_price:
           type: number
@@ -12304,10 +12676,21 @@ components:
       type: object
       description: Published buying guide for storefront article page (public read-only).
       properties:
+        category:
+          allOf:
+          - $ref: '#/components/schemas/CategoryEnum'
+          readOnly: true
         headline:
           type: string
           readOnly: true
-          description: Public H1 for the article page
+          description: 'Public H1 for the article page (e.g. ''Galaxy A42 5G in Kenya:
+            who should buy it?'')'
+        thumbnail_image:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+          description: Featured image for blog lists and social sharing
         seo_title:
           type: string
           readOnly: true
@@ -12319,7 +12702,7 @@ components:
         body:
           type: string
           readOnly: true
-          description: Article body (Markdown)
+          description: Article body (Markdown supported)
         published_at:
           type: string
           format: date-time
@@ -12363,13 +12746,13 @@ components:
           readOnly: true
         min_price:
           type: number
-          description: Get min price for available units - use annotation when present
-            (list), else prefetched list or query.
+          description: Get min price for available units; fall back to Product.default_selling_price
+            when none.
           readOnly: true
         max_price:
           type: number
-          description: Get max price for available units - use annotation when present
-            (list), else prefetched list or query.
+          description: Get max price for available units; fall back to Product.default_selling_price
+            when none.
           readOnly: true
         compare_at_min_price:
           type: number

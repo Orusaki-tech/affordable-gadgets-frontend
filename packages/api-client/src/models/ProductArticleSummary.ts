@@ -7,7 +7,7 @@
  */
 export type ProductArticleSummary = {
     /**
-     * Public H1 for the article page
+     * Public H1 for the article page (e.g. 'Galaxy A42 5G in Kenya: who should buy it?')
      */
     readonly headline?: string;
     /**

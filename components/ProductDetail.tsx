@@ -1759,6 +1759,21 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 </div>
               )}
               
+              {/* Warranty Policy */}
+              <div className="product-detail__section-block">
+                <h3 className="product-detail__section-title">Warranty Policy</h3>
+                <div className="product-detail__warranty">
+                  <p className="product-detail__warranty-heading">6 Months Warranty</p>
+                  <ul className="product-detail__warranty-list">
+                    <li>6 months warranty on network, charging issues, earpiece, microphone, and speaker.</li>
+                    <li>6 months warranty on software malfunction that is not related to 3rd party software i.e apps not on Play Store or App Store.</li>
+                    <li>No warranty on screen upon testing at the shop or after delivery.</li>
+                    <li>3-months warranty on battery.</li>
+                    <li>1 month warranty on chargers and accessories.</li>
+                  </ul>
+                </div>
+              </div>
+
               {selectedUnitData && (
                 <div className="product-detail__section-block">
                   <h3 className="product-detail__section-title">Selected Variant Details</h3>
@@ -1920,7 +1935,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 {productBlogHref ? (
                   <>
                     {product.article_headline ? (
-                      <p className="product-detail__description-text">{product.article_headline}</p>
+                      <h1 className="product-detail__description-text">{product.article_headline}</h1>
                     ) : (
                       <p className="product-detail__description-text">
                         Read our full buying guide for {product.product_name?.trim() || 'this product'}.

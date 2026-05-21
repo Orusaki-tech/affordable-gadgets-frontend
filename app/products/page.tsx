@@ -1,12 +1,10 @@
 import { Suspense } from 'react';
-import Link from 'next/link';
 import { Metadata } from 'next';
 import { ProductsPage } from '@/components/ProductsPage';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { StructuredData } from '@/components/StructuredData';
 import { brandConfig } from '@/lib/config/brand';
-import { ApiService } from '@/lib/api/generated';
 
 export const revalidate = 3600;
 
@@ -60,65 +58,8 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductsListingPage({
-  searchParams,
-}: {
-  searchParams?: Promise<ProductsSearchParams>;
-}) {
-  const sp = (await searchParams) ?? {};
-  const brandFilter = asString(sp.brand_filter);
-  const search = asString(sp.search);
-  const ordering = asString(sp.ordering);
-  const type = asString(sp.type);
-  const minPrice = asNumber(sp.min_price);
-  const maxPrice = asNumber(sp.max_price);
-  const promotion = asNumber(sp.promotion);
-  const page = asNumber(sp.page) ?? 1;
-
-  const qs = new URLSearchParams();
-  for (const [key, value] of Object.entries(sp)) {
-    if (value === undefined) continue;
-    if (Array.isArray(value)) {
-      value.forEach((v) => qs.append(key, v));
-    } else {
-      qs.set(key, value);
-    }
-  }
-  const productsUrl = `${brandConfig.siteUrl}/products${qs.toString() ? `?${qs.toString()}` : ''}`;
-
-  let results: Array<{ product_name: string; slug?: string; primary_image?: string | null }> = [];
-  try {
-    const data = await ApiService.apiV1PublicProductsList(
-      brandFilter,
-      undefined,
-      undefined,
-      maxPrice,
-      minPrice,
-      ordering,
-      page,
-      20,
-      promotion,
-      search,
-      undefined,
-      type
-    );
-    results = Array.isArray(data?.results) ? (data.results as typeof results) : [];
-  } catch {
-    results = [];
-  }
-
-  const itemListItems = results
-    .map((p) => {
-      const slug = p.slug;
-      if (!slug) return null;
-      return {
-        name: p.product_name,
-        url: `${brandConfig.siteUrl}/products/${slug}`,
-        image: p.primary_image ?? null,
-        type: 'Product' as const,
-      };
-    })
-    .filter(Boolean) as Array<{ name: string; url: string; image?: string | null; type: 'Product' }>;
+export default function ProductsListingPage() {
+  // Product list is fetched once client-side (ProductsPage) to avoid duplicate API load.
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -129,16 +70,6 @@ export default async function ProductsListingPage({
           { name: 'Products', url: `${brandConfig.siteUrl}/products` },
         ]}
       />
-      {itemListItems.length > 0 && (
-        <StructuredData
-          type="ItemList"
-          itemList={{
-            name: `${brandConfig.name} products`,
-            url: productsUrl,
-            items: itemListItems,
-          }}
-        />
-      )}
       <Suspense
         fallback={
           <div className="site-header-wrapper">
@@ -167,10 +98,3 @@ export default async function ProductsListingPage({
     </div>
   );
 }
-
-
-
-
-
-
-

@@ -24,6 +24,10 @@
     "react-markdown": "^10.1.0",
     "swiper": "^11.2.10"
   },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react-dom"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

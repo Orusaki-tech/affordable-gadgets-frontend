@@ -35,16 +35,16 @@ class ProductsService {
      * - Content Creator: Can update content via update_content only (no create/delete)
      * - Salesperson: Read-only access
      * - Superuser: Full access
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsCreate(requestBody) {
+    static productsCreate(formData) {
         return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/products/',
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
@@ -70,19 +70,19 @@ class ProductsService {
      * - Salesperson: Read-only access
      * - Superuser: Full access
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsUpdate(id, requestBody) {
+    static productsUpdate(id, formData) {
         return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PUT',
             url: '/products/{id}/',
             path: {
                 'id': id,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
@@ -93,19 +93,19 @@ class ProductsService {
      * - Salesperson: Read-only access
      * - Superuser: Full access
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsPartialUpdate(id, requestBody) {
+    static productsPartialUpdate(id, formData) {
         return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/products/{id}/',
             path: {
                 'id': id,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
@@ -150,37 +150,37 @@ class ProductsService {
      * Body:
      * - image_ids: list[int]
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsImagesDeleteCreate(id, requestBody) {
+    static productsImagesDeleteCreate(id, formData) {
         return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/products/{id}/images/delete/',
             path: {
                 'id': id,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
      * Set a specific product image as primary.
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsImagesSetPrimaryCreate(id, requestBody) {
+    static productsImagesSetPrimaryCreate(id, formData) {
         return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/products/{id}/images/set-primary/',
             path: {
                 'id': id,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
@@ -234,19 +234,19 @@ class ProductsService {
      * Custom action for Content Creators to update only content fields.
      * This allows Content Creators to update product content without touching inventory fields.
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsUpdateContentPartialUpdate(id, requestBody) {
+    static productsUpdateContentPartialUpdate(id, formData) {
         return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'PATCH',
             url: '/products/{id}/update_content/',
             path: {
                 'id': id,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
@@ -257,16 +257,16 @@ class ProductsService {
      *
      * - To delete every product and all dependent data (orders, carts, units, etc.): POST with
      * {"delete_all": true}. Use only in dev/staging. Requires Inventory Manager or Superuser.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsBulkDestroyCreate(requestBody) {
+    static productsBulkDestroyCreate(formData) {
         return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'POST',
             url: '/products/bulk-destroy/',
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
 }

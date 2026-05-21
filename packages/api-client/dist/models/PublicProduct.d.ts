@@ -29,11 +29,11 @@ export type PublicProduct = {
      */
     readonly interest_count?: number;
     /**
-     * Get min price for available units - use annotation when present (list), else prefetched list or query.
+     * Get min price for available units; fall back to Product.default_selling_price when none.
      */
     readonly min_price?: number;
     /**
-     * Get max price for available units - use annotation when present (list), else prefetched list or query.
+     * Get max price for available units; fall back to Product.default_selling_price when none.
      */
     readonly max_price?: number;
     /**

@@ -45,18 +45,18 @@ export class ProductsService {
      * - Content Creator: Can update content via update_content only (no create/delete)
      * - Salesperson: Read-only access
      * - Superuser: Full access
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
     public static productsCreate(
-        requestBody: ProductRequest,
+        formData: ProductRequest,
     ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/products/',
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
@@ -84,13 +84,13 @@ export class ProductsService {
      * - Salesperson: Read-only access
      * - Superuser: Full access
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
     public static productsUpdate(
         id: number,
-        requestBody: ProductRequest,
+        formData: ProductRequest,
     ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'PUT',
@@ -98,8 +98,8 @@ export class ProductsService {
             path: {
                 'id': id,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
@@ -110,13 +110,13 @@ export class ProductsService {
      * - Salesperson: Read-only access
      * - Superuser: Full access
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
     public static productsPartialUpdate(
         id: number,
-        requestBody?: PatchedProductRequest,
+        formData?: PatchedProductRequest,
     ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'PATCH',
@@ -124,8 +124,8 @@ export class ProductsService {
             path: {
                 'id': id,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
@@ -174,13 +174,13 @@ export class ProductsService {
      * Body:
      * - image_ids: list[int]
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
     public static productsImagesDeleteCreate(
         id: number,
-        requestBody: ProductRequest,
+        formData: ProductRequest,
     ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -188,20 +188,20 @@ export class ProductsService {
             path: {
                 'id': id,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
      * Set a specific product image as primary.
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
     public static productsImagesSetPrimaryCreate(
         id: number,
-        requestBody: ProductRequest,
+        formData: ProductRequest,
     ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -209,8 +209,8 @@ export class ProductsService {
             path: {
                 'id': id,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
@@ -269,13 +269,13 @@ export class ProductsService {
      * Custom action for Content Creators to update only content fields.
      * This allows Content Creators to update product content without touching inventory fields.
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
     public static productsUpdateContentPartialUpdate(
         id: number,
-        requestBody?: PatchedProductRequest,
+        formData?: PatchedProductRequest,
     ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'PATCH',
@@ -283,8 +283,8 @@ export class ProductsService {
             path: {
                 'id': id,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
     /**
@@ -295,18 +295,18 @@ export class ProductsService {
      *
      * - To delete every product and all dependent data (orders, carts, units, etc.): POST with
      * {"delete_all": true}. Use only in dev/staging. Requires Inventory Manager or Superuser.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
     public static productsBulkDestroyCreate(
-        requestBody: ProductRequest,
+        formData: ProductRequest,
     ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/products/bulk-destroy/',
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
         });
     }
 }

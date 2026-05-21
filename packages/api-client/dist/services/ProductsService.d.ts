@@ -25,11 +25,11 @@ export declare class ProductsService {
      * - Content Creator: Can update content via update_content only (no create/delete)
      * - Salesperson: Read-only access
      * - Superuser: Full access
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsCreate(requestBody: ProductRequest): CancelablePromise<Product>;
+    static productsCreate(formData: ProductRequest): CancelablePromise<Product>;
     /**
      * Enforce brand access when using the fast-path queryset for single-product fetch.
      * @param id A unique integer value identifying this product.
@@ -45,11 +45,11 @@ export declare class ProductsService {
      * - Salesperson: Read-only access
      * - Superuser: Full access
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsUpdate(id: number, requestBody: ProductRequest): CancelablePromise<Product>;
+    static productsUpdate(id: number, formData: ProductRequest): CancelablePromise<Product>;
     /**
      * CRUD for Product Templates.
      * - Public: Read-only access
@@ -58,11 +58,11 @@ export declare class ProductsService {
      * - Salesperson: Read-only access
      * - Superuser: Full access
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsPartialUpdate(id: number, requestBody?: PatchedProductRequest): CancelablePromise<Product>;
+    static productsPartialUpdate(id: number, formData?: PatchedProductRequest): CancelablePromise<Product>;
     /**
      * CRUD for Product Templates.
      * - Public: Read-only access
@@ -89,19 +89,19 @@ export declare class ProductsService {
      * Body:
      * - image_ids: list[int]
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsImagesDeleteCreate(id: number, requestBody: ProductRequest): CancelablePromise<Product>;
+    static productsImagesDeleteCreate(id: number, formData: ProductRequest): CancelablePromise<Product>;
     /**
      * Set a specific product image as primary.
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsImagesSetPrimaryCreate(id: number, requestBody: ProductRequest): CancelablePromise<Product>;
+    static productsImagesSetPrimaryCreate(id: number, formData: ProductRequest): CancelablePromise<Product>;
     /**
      * Upload one or more images for a Product.
      *
@@ -135,11 +135,11 @@ export declare class ProductsService {
      * Custom action for Content Creators to update only content fields.
      * This allows Content Creators to update product content without touching inventory fields.
      * @param id A unique integer value identifying this product.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsUpdateContentPartialUpdate(id: number, requestBody?: PatchedProductRequest): CancelablePromise<Product>;
+    static productsUpdateContentPartialUpdate(id: number, formData?: PatchedProductRequest): CancelablePromise<Product>;
     /**
      * Delete products by ID list or delete all product-related data (full reset).
      *
@@ -148,9 +148,9 @@ export declare class ProductsService {
      *
      * - To delete every product and all dependent data (orders, carts, units, etc.): POST with
      * {"delete_all": true}. Use only in dev/staging. Requires Inventory Manager or Superuser.
-     * @param requestBody
+     * @param formData
      * @returns Product
      * @throws ApiError
      */
-    static productsBulkDestroyCreate(requestBody: ProductRequest): CancelablePromise<Product>;
+    static productsBulkDestroyCreate(formData: ProductRequest): CancelablePromise<Product>;
 }

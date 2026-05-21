@@ -52,14 +52,14 @@ const fetchArticle = async (slug: string): Promise<PublicProductArticle | null> 
   }
 };
 
+const resolveImageUrl = (path?: string | null, fallback?: string) => {
+  if (!path) return fallback;
+  if (path.startsWith('http')) return path;
+  return `${brandConfig.apiBaseUrl}${path}`;
+};
+
 const resolveProductImage = (product?: PublicProduct | null) => {
-  if (!product?.primary_image) {
-    return `${brandConfig.siteUrl}/affordable-social-share.png`;
-  }
-  if (product.primary_image.startsWith('http')) {
-    return product.primary_image;
-  }
-  return `${brandConfig.apiBaseUrl}${product.primary_image}`;
+  return resolveImageUrl(product?.primary_image, `${brandConfig.siteUrl}/affordable-social-share.png`) as string;
 };
 
 export async function generateMetadata({ params }: ProductBlogPageProps): Promise<Metadata> {
@@ -115,7 +115,8 @@ export default async function ProductBlogPage({ params }: ProductBlogPageProps) 
   const articleUrl = `${site}/products/${slug}/blog`;
   const productName = product.product_name ?? 'Product';
   const headline = article.headline?.trim() || article.seo_title?.trim() || `${productName} buying guide`;
-  const imageUrl = resolveProductImage(product);
+  const featuredImage = resolveImageUrl(article.thumbnail_image as string | undefined) || resolveProductImage(product);
+  const ogImageUrl = resolveProductImage(product);
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#ffffff' }}>
@@ -134,7 +135,7 @@ export default async function ProductBlogPage({ params }: ProductBlogPageProps) 
           headline,
           description: article.seo_description ?? product.meta_description ?? product.product_description ?? null,
           url: articleUrl,
-          image: imageUrl,
+          image: featuredImage,
           datePublished: article.published_at ?? null,
           dateModified: article.updated_at ?? null,
         }}
@@ -148,36 +149,77 @@ export default async function ProductBlogPage({ params }: ProductBlogPageProps) 
       >
         <HeaderWithAnnouncement />
       </Suspense>
-      <main className="flex-1 min-w-0 py-8">
+      <main className="flex-1 min-w-0 py-8 lg:py-12">
         <div className="container mx-auto px-4 max-w-3xl">
-          <nav className="text-sm text-gray-600 mb-6">
-            <Link href="/" className="hover:text-gray-900">
+          <nav className="text-sm text-gray-500 mb-8 flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
+            <Link href="/" className="hover:text-blue-600 transition-colors">
               Home
             </Link>
-            <span className="mx-2">/</span>
-            <Link href="/products" className="hover:text-gray-900">
+            <span className="text-gray-300">/</span>
+            <Link href="/products" className="hover:text-blue-600 transition-colors">
               Products
             </Link>
-            <span className="mx-2">/</span>
-            <Link href={`/products/${slug}`} className="hover:text-gray-900">
+            <span className="text-gray-300">/</span>
+            <Link href={`/products/${slug}`} className="hover:text-blue-600 transition-colors">
               {productName}
             </Link>
-            <span className="mx-2">/</span>
-            <span className="text-gray-900 font-medium">Blog</span>
+            <span className="text-gray-300">/</span>
+            <span className="text-gray-900 font-medium">Guide</span>
           </nav>
 
-          <p className="text-sm text-gray-500 mb-2">
-            {product.brand}
-            {product.model_series ? ` · ${product.model_series}` : ''}
-          </p>
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">{headline}</h1>
+          <header className="mb-10">
+            <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-blue-600 mb-4">
+              <span className="bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider text-[10px]">
+                {article.category?.replace('_', ' ') || 'Buying Guide'}
+              </span>
+              {article.published_at && (
+                <time className="text-gray-500 font-normal" dateTime={article.published_at}>
+                  {new Date(article.published_at).toLocaleDateString('en-KE', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </time>
+              )}
+            </div>
+            
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight leading-[1.1]">
+              {headline}
+            </h1>
+            
+            <p className="text-lg text-gray-600 leading-relaxed mb-8">
+              {article.seo_description || product.meta_description || `Everything you need to know about the ${productName} series.`}
+            </p>
 
-          <ProductBlogBody html={article.body || '<p><em>No content yet.</em></p>'} />
+            {featuredImage && (
+              <div className="relative aspect-video w-full mb-10 overflow-hidden rounded-2xl shadow-xl border border-gray-100">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img 
+                  src={featuredImage} 
+                  alt={headline}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+            )}
+          </header>
 
-          <div className="mt-10 pt-6 border-t border-gray-200">
-            <Link href={`/products/${slug}`} className="text-blue-600 font-semibold hover:underline">
-              ← Back to {productName}
-            </Link>
+          <article className="prose prose-blue max-w-none">
+            <ProductBlogBody html={article.body || '<p><em>No content yet.</em></p>'} />
+          </article>
+
+          <div className="mt-16 pt-10 border-t border-gray-100">
+            <div className="bg-gray-50 rounded-2xl p-8 flex flex-col md:flex-row items-center gap-6 justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Ready to upgrade?</h3>
+                <p className="text-gray-600">Check out our latest deals on the {productName}.</p>
+              </div>
+              <Link 
+                href={`/products/${slug}`} 
+                className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 text-center whitespace-nowrap"
+              >
+                View {productName}
+              </Link>
+            </div>
           </div>
         </div>
       </main>

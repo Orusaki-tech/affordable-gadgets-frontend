@@ -20,7 +20,7 @@ export function Footer() {
                 className="site-footer__logo"
                 priority
               />
-              <span className="site-footer__logo-text">Affordable Gadgets KE</span>
+              <span className="site-footer__logo-text">{brandConfig.name}</span>
             </Link>
             <p className="site-footer__about-text">
               Quality electronics at great prices. Shop phones, laptops, tablets, and accessories with confidence.

@@ -63,8 +63,24 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const apiOrigin = (() => {
+    try {
+      return new URL(brandConfig.apiBaseUrl).origin;
+    } catch {
+      return 'https://api.affordable-gadgetske.com';
+    }
+  })();
+
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://store.storeimages.cdn-apple.com" />
+        <link rel="preconnect" href={apiOrigin} />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://store.storeimages.cdn-apple.com" />
+        <link rel="dns-prefetch" href={apiOrigin} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

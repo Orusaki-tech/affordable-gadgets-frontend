@@ -1,41 +1,141 @@
+/* Browse promos — Apple tile typography + button scale from apple.com/home.built.css */
 .image-carousel {
   width: 100%;
+  font-family:
+    'SF Pro Display',
+    'SF Pro Text',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Helvetica Neue',
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
 .image-carousel__card {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   aspect-ratio: 4 / 5;
-  border-radius: 16px;
+  min-height: 400px;
+  border-radius: 18px;
   overflow: hidden;
-  background: var(--ui-white);
-  box-shadow: 0 4px 12px var(--ui-black-12);
-  border: 1px solid var(--ui-black-05);
-  cursor: default;
-  pointer-events: none;
+  text-decoration: none;
+  color: #1d1d1f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-@media (min-width: 640px) {
-  .image-carousel__card {
-    aspect-ratio: 4 / 5;
+.image-carousel__card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.image-carousel__card-copy {
+  padding: 40px 28px 12px;
+  text-align: left;
+  z-index: 1;
+}
+
+.image-carousel__card-title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.125;
+  font-weight: 600;
+  letter-spacing: 0.002em;
+}
+
+@media (min-width: 1069px) {
+  .image-carousel__card-title {
+    font-size: 40px;
+    line-height: 1.1;
+    letter-spacing: 0;
   }
 }
 
-@media (min-width: 1024px) {
-  .image-carousel__card {
-    aspect-ratio: 4 / 5;
+.image-carousel__card-subtitle {
+  margin: 4px 0 0;
+  font-size: 19px;
+  line-height: 1.2105263158;
+  font-weight: 400;
+  letter-spacing: 0.012em;
+}
+
+@media (min-width: 1069px) {
+  .image-carousel__card-subtitle {
+    font-size: 21px;
+    line-height: 1.1904761905;
+    letter-spacing: 0.011em;
   }
+}
+
+.image-carousel__card-subtitle--link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.image-carousel__card-body {
+  margin: 8px 0 0;
+  font-size: 14px;
+  line-height: 1.4285714286;
+  font-weight: 400;
+  letter-spacing: -0.016em;
+  max-width: 28ch;
 }
 
 .image-carousel__card-media {
   position: relative;
-  width: 100%;
-  height: 100%;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 12px 0;
+  margin-top: auto;
+  min-height: 0;
 }
 
 .image-carousel__card-image {
   display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  max-height: 72%;
+  height: auto;
+  object-fit: contain;
+  object-position: bottom center;
+}
+
+/* Variants aligned with Apple promo tiles */
+.image-carousel__card--dark {
+  background: #000;
+  color: #f5f5f7;
+}
+
+.image-carousel__card--dark .image-carousel__card-title,
+.image-carousel__card--dark .image-carousel__card-subtitle,
+.image-carousel__card--dark .image-carousel__card-body {
+  color: #f5f5f7;
+}
+
+.image-carousel__card--lavender {
+  background: linear-gradient(160deg, #e8e0f5 0%, #d4dcf5 45%, #c8d8f8 100%);
+}
+
+.image-carousel__card--peach {
+  background: linear-gradient(165deg, #fce8dc 0%, #f5d4c8 50%, #efd0c4 100%);
+}
+
+.image-carousel__card--peach .image-carousel__card-title {
+  color: #6e3b2e;
+}
+
+.image-carousel__card--light {
+  background: #f5f5f7;
+}
+
+@media (max-width: 734px) {
+  .image-carousel__card {
+    min-height: 500px;
+  }
+
+  .image-carousel__card-copy {
+    padding: 32px 24px 8px;
+  }
 }

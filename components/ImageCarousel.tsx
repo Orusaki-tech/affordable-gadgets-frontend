@@ -1,58 +1,54 @@
 'use client';
 
+import Link from 'next/link';
+import { COLLECTION_PROMO_CARDS, type CollectionPromoCard } from '@/lib/config/collection-promos';
 import { ProductCarousel } from './ProductCarousel';
 
-const COLLECTION_CARD_COUNT = 6;
-const COLLECTION_CARD_IMAGES = [
-  {
-    src: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773057672/iphoneban2_t40liv.png',
-    alt: 'Innovation phone banner',
-  },
-  {
-    src: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773058512/rhodeban1_ig82ln.png',
-    alt: 'Rhode banner',
-  },
-  {
-    src: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773059482/ipad_f1vrto.png',
-    alt: 'iPad banner',
-  },
-  {
-    src: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773060032/ipadkeyboard_miugjf.png',
-    alt: 'iPad keyboard banner',
-  },
-  {
-    src: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773060758/s26ultra_pspe1g.png',
-    alt: 'S26 Ultra banner',
-  },
-  {
-    src: 'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773061641/pixel10a_zno8vl.png',
-    alt: 'Pixel 10a banner',
-  },
-] as const;
+function CollectionPromoSlide({ promo }: { promo: CollectionPromoCard }) {
+  return (
+    <Link
+      href={promo.href}
+      className={`image-carousel__card image-carousel__card--${promo.variant}`}
+      prefetch={false}
+    >
+      <div className="image-carousel__card-copy">
+        <h3 className="image-carousel__card-title">{promo.title}</h3>
+        {promo.subtitle ? (
+          <p
+            className={`image-carousel__card-subtitle${
+              promo.subtitle === 'Coming Soon' ? ' image-carousel__card-subtitle--link' : ''
+            }`}
+          >
+            {promo.subtitle}
+          </p>
+        ) : null}
+        {promo.body ? <p className="image-carousel__card-body">{promo.body}</p> : null}
+      </div>
+      <div className="image-carousel__card-media">
+        <img
+          src={promo.image.src}
+          srcSet={promo.image.srcSet}
+          alt={promo.image.alt}
+          loading="lazy"
+          decoding="async"
+          className="image-carousel__card-image"
+        />
+      </div>
+    </Link>
+  );
+}
 
 export function ImageCarousel() {
   return (
     <div className="image-carousel">
       <ProductCarousel
         itemsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
-        showNavigation={true}
+        showNavigation
         showPagination={false}
         autoPlay
       >
-        {Array.from({ length: COLLECTION_CARD_COUNT }).map((_, index) => (
-          <div key={`collection-card-${index}`} className="image-carousel__card" aria-hidden>
-            <div className="image-carousel__card-media">
-              {COLLECTION_CARD_IMAGES[index] ? (
-                <img
-                  src={COLLECTION_CARD_IMAGES[index].src}
-                  alt={COLLECTION_CARD_IMAGES[index].alt}
-                  loading="lazy"
-                  decoding="async"
-                  className="image-carousel__card-image"
-                />
-              ) : null}
-            </div>
-          </div>
+        {COLLECTION_PROMO_CARDS.map((promo) => (
+          <CollectionPromoSlide key={promo.id} promo={promo} />
         ))}
       </ProductCarousel>
     </div>

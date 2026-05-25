@@ -10,6 +10,7 @@ import {
   RecentlyViewedClient,
 } from '@/components/HomeSectionsClient';
 import { ImageCarousel } from '@/components/ImageCarousel';
+import { CategoryDiscoverySection } from '@/components/CategoryDiscoverySection';
 import { CollectionHeaderBanner } from '@/components/CollectionHeaderBanner';
 import { BrandCarousel } from '@/components/BrandCarousel';
 import { brandConfig } from '@/lib/config/brand';
@@ -321,7 +322,22 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Image carousel – placeholder cards, not clickable */}
+        {/* Category discovery — Apple Store layout & imagery */}
+        <section id="category-discovery" className="bg-white scroll-mt-20">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+            <div className="text-left mb-6 lg:mb-8">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
+                <span className="bg-gradient-to-r from-gray-800 via-gray-900 to-black bg-clip-text text-transparent">
+                  Discover
+                </span>
+              </h2>
+              <p className="text-gray-600 text-lg sm:text-xl mb-2">What&apos;s new in our lineup</p>
+            </div>
+            <CategoryDiscoverySection />
+          </div>
+        </section>
+
+        {/* Browse collection carousel */}
         <section id="image-carousel" className="bg-gradient-to-b from-gray-50 to-white scroll-mt-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
             <div className="text-left mb-6 lg:mb-8">

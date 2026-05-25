@@ -1,4 +1,4 @@
-import { appleStoreImage } from '@/lib/utils/apple-store-image';
+const DISCOVERY_IMG = '/images/category-discovery';
 
 export type CollectionPromoVariant = 'dark' | 'lavender' | 'peach' | 'light';
 
@@ -16,7 +16,7 @@ export type CollectionPromoCard = {
   variant: CollectionPromoVariant;
 };
 
-/** Browse carousel — Apple CDN for Apple tiles; Cloudinary for Samsung/Pixel promos */
+/** Browse carousel — local Apple art on #f5f5f7 tiles; Cloudinary for Samsung/Pixel */
 export const COLLECTION_PROMO_CARDS: CollectionPromoCard[] = [
   {
     id: 'ipad-keyboard',
@@ -64,12 +64,7 @@ export const COLLECTION_PROMO_CARDS: CollectionPromoCard[] = [
     subtitle: 'Latest from Apple',
     href: '/products?type=PH&brand_filter=Apple',
     image: {
-      src: appleStoreImage('store-card-40-iphone-17-202509', {
-        width: 800,
-        height: 1000,
-        format: 'png-alpha',
-      }),
-      srcSet: `${appleStoreImage('store-card-40-iphone-17-202509', { width: 1600, height: 2000, format: 'png-alpha' })} 2x`,
+      src: `${DISCOVERY_IMG}/iphone.png`,
       alt: 'iPhone lineup',
     },
     variant: 'light',
@@ -80,13 +75,7 @@ export const COLLECTION_PROMO_CARDS: CollectionPromoCard[] = [
     subtitle: 'Work and play anywhere',
     href: '/products?type=TB&brand_filter=Apple',
     image: {
-      src: appleStoreImage('store-card-40-ipad-air-202603', {
-        width: 800,
-        height: 1000,
-        format: 'jpeg',
-        quality: 90,
-        version: 'UzBXQnlhUWdraTNvNU1Kb3pEQlpXR2xoVkNFSUF6ZStK',
-      }),
+      src: `${DISCOVERY_IMG}/ipad.jpg`,
       alt: 'iPad lineup',
     },
     variant: 'light',
@@ -97,13 +86,7 @@ export const COLLECTION_PROMO_CARDS: CollectionPromoCard[] = [
     subtitle: 'Immersive sound',
     href: '/products?type=AC&brand_filter=Apple&search=airpods',
     image: {
-      src: appleStoreImage('store-card-40-airpods-max-202409_GEO_US', {
-        width: 800,
-        height: 1000,
-        format: 'jpeg',
-        quality: 90,
-        version: 'WlczMnlkejNQakk5eW14MEJjQmdLd0hoakxSaUU2WUtGRGZ1cmhVSERsSFUvdWo0OXUzR2x0Z0haVDFBUVBIV3AwckMxbExydC8yeDhtUjlFVHdKVmx4TFU0OVFoVWdhN0VnWk1QaFFQYVZpZmNYV2ZGcUQ4by8rbTNjSFBvNDE',
-      }),
+      src: `${DISCOVERY_IMG}/airpods-max.jpg`,
       alt: 'AirPods Max',
     },
     variant: 'lavender',

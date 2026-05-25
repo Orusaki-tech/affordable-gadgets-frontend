@@ -30,7 +30,6 @@ export function CategoryDiscoverySection() {
               <img
                 key={image.src}
                 src={image.src}
-                srcSet={image.srcSet}
                 alt=""
                 className="category-discovery__hero-collage-item"
                 loading="lazy"
@@ -62,7 +61,6 @@ export function CategoryDiscoverySection() {
                 <div key={`${card.id}-${image.src}`} className="category-discovery__card-image-wrap">
                   <img
                     src={image.src}
-                    srcSet={image.srcSet}
                     alt={image.alt}
                     className="category-discovery__card-image"
                     loading="lazy"

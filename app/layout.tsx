@@ -75,10 +75,8 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" />
-        <link rel="preconnect" href="https://store.storeimages.cdn-apple.com" />
         <link rel="preconnect" href={apiOrigin} />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-        <link rel="dns-prefetch" href="https://store.storeimages.cdn-apple.com" />
         <link rel="dns-prefetch" href={apiOrigin} />
       </head>
       <body

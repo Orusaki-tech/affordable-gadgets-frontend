@@ -93,6 +93,10 @@
   min-height: 0;
 }
 
+.image-carousel__card--light .image-carousel__card-media {
+  background-color: #f5f5f7;
+}
+
 .image-carousel__card-image {
   display: block;
   width: 100%;

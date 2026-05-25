@@ -78,6 +78,7 @@
   min-height: 280px;
   padding: 24px 16px 0;
   overflow: hidden;
+  background-color: var(--apple-bg);
 }
 
 .category-discovery__hero-collage {
@@ -190,6 +191,7 @@
   padding: 8px 16px 0;
   margin-top: auto;
   min-height: 280px;
+  background-color: var(--apple-bg);
 }
 
 .category-discovery__card-media--multi {
@@ -202,6 +204,7 @@
   align-items: flex-end;
   justify-content: center;
   max-width: 100%;
+  background-color: var(--apple-bg);
 }
 
 .category-discovery__card-image {

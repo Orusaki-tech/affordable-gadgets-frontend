@@ -1,23 +1,12 @@
 /** Local product art — public/images/category-discovery (see README there) */
 const DISCOVERY_IMG = '/images/category-discovery';
 
-export type CategoryDiscoveryImage = {
-  src: string;
-  alt: string;
-};
-
 export type CategoryDiscoveryCard = {
   id: string;
   title: string;
   href: string;
-  /** Full-bleed card background; title + pill overlay on top */
-  backgroundImage?: string;
-  images?: CategoryDiscoveryImage[];
+  backgroundImage: string;
 };
-
-function discoveryImage(filename: string, alt: string): CategoryDiscoveryImage {
-  return { src: `${DISCOVERY_IMG}/${filename}`, alt };
-}
 
 export const CATEGORY_DISCOVERY_HERO = {
   title: "Discover what's new.",
@@ -61,6 +50,6 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     id: 'mac-desktops',
     title: 'Mac desktops',
     href: '/products?type=LT&brand_filter=Apple&search=imac',
-    images: [discoveryImage('mac-desktop.jpg', 'iMac and Studio Display')],
+    backgroundImage: `${DISCOVERY_IMG}/mac-desktops.jpg`,
   },
 ];

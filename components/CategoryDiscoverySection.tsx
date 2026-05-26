@@ -30,48 +30,20 @@ export function CategoryDiscoverySection() {
       </div>
 
       <div className="category-discovery__grid">
-        {CATEGORY_DISCOVERY_CARDS.map((card) => {
-          const images = card.images ?? [];
-          return (
+        {CATEGORY_DISCOVERY_CARDS.map((card) => (
           <Link
             key={card.id}
             href={card.href}
-            className={`category-discovery__card${
-              card.backgroundImage ? ' category-discovery__card--has-bg' : ''
-            }`}
-            style={
-              card.backgroundImage
-                ? { backgroundImage: `url(${card.backgroundImage})` }
-                : undefined
-            }
+            className="category-discovery__card category-discovery__card--has-bg"
+            style={{ backgroundImage: `url(${card.backgroundImage})` }}
             prefetch={false}
           >
             <div className="category-discovery__card-header">
               <h3 className="category-discovery__card-title">{card.title}</h3>
               <PillButton label="View all" />
             </div>
-            {images.length > 0 ? (
-            <div
-              className={`category-discovery__card-media${
-                images.length > 1 ? ' category-discovery__card-media--multi' : ''
-              }`}
-            >
-              {images.map((image) => (
-                <div key={`${card.id}-${image.src}`} className="category-discovery__card-image-wrap">
-                  <img
-                    src={image.src}
-                    alt={image.alt}
-                    className="category-discovery__card-image"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
-              ))}
-            </div>
-            ) : null}
           </Link>
-          );
-        })}
+        ))}
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
 # Category discovery images
 
-- **Hero:** `hero.jpg` — full-bleed background for the Discover hero tile (title + View all overlay).
-- **Hero:** `hero.jpg` — full-bleed Discover hero.
-- **Category cards (full-bleed):** `iphone.jpg`, `ipad.jpg`, `watch.jpg`, `airpods.jpg`, `mac-laptops.jpg`.
-- **Other cards:** product art images below the hero.
+Full-bleed posters for the homepage Discover section.
 
-Tiles use `#f5f5f7` in CSS behind card product art.
+- **Hero:** `hero.jpg`
+- **Cards:** `iphone.jpg`, `ipad.jpg`, `watch.jpg`, `airpods.jpg`, `mac-laptops.jpg`, `mac-desktops.jpg`
+
+Title and “View all” pill sit on top of each tile in CSS.

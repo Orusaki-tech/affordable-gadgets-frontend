@@ -13,18 +13,14 @@ type ProductsBrandBannerProps = {
 };
 
 export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
-  const hasImage = Boolean(config.backgroundImage);
+  const imageSrc = config.backgroundImage;
 
   return (
     <section
-      className={`products-brand-banner${hasImage ? ' products-brand-banner--has-image' : ''}`}
+      className={`products-brand-banner${imageSrc ? ' products-brand-banner--split' : ''}`}
       aria-label={`${config.title} collection`}
-      style={
-        hasImage ? { backgroundImage: `url(${config.backgroundImage})` } : undefined
-      }
     >
-      <div className="products-brand-banner__overlay" aria-hidden />
-      <div className="products-brand-banner__content">
+      <div className="products-brand-banner__copy">
         <h1 className="products-brand-banner__title">{config.title}</h1>
         <p className="products-brand-banner__subtitle">{config.subtitle}</p>
         {config.priceLine ? (
@@ -38,6 +34,16 @@ export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
           Buy Now
         </button>
       </div>
+      {imageSrc ? (
+        <div className="products-brand-banner__visual">
+          <img
+            src={imageSrc}
+            alt=""
+            className="products-brand-banner__image"
+            decoding="async"
+          />
+        </div>
+      ) : null}
     </section>
   );
 }

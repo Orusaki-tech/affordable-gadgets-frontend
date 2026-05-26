@@ -1,5 +1,7 @@
 /** Brand hero on /products — keys match URL `brand_filter` (case-insensitive). */
 const BANNERS_IMG = '/images/banners';
+/** Bust CDN/browser cache when banner files change */
+const BANNER_ASSET_VERSION = '2';
 
 export type ProductsBrandBannerConfig = {
   brandFilter: string;
@@ -16,14 +18,14 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     title: 'iPhone',
     subtitle: 'Just the right amount of everything.',
     priceLine: 'Compare prices on the latest models.',
-    backgroundImage: `${BANNERS_IMG}/iphone.jpg`,
+    backgroundImage: `${BANNERS_IMG}/iphone.jpg?v=${BANNER_ASSET_VERSION}`,
   },
   samsung: {
     brandFilter: 'Samsung',
     title: 'Samsung',
     subtitle: 'Galaxy phones built for every day.',
     priceLine: 'See current deals and trade-in options.',
-    backgroundImage: `${BANNERS_IMG}/samsung.jpg`,
+    backgroundImage: `${BANNERS_IMG}/samsung.jpg?v=${BANNER_ASSET_VERSION}`,
   },
   google: {
     brandFilter: 'Google',

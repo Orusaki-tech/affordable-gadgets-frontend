@@ -17,7 +17,6 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     brandFilter: 'Apple',
     title: 'iPhone',
     subtitle: 'Just the right amount of everything.',
-    priceLine: 'Compare prices on the latest models.',
     backgroundImage: `${BANNERS_IMG}/iphone.jpg?v=${BANNER_ASSET_VERSION}`,
   },
   samsung: {
@@ -31,13 +30,11 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     brandFilter: 'Google',
     title: 'Google',
     subtitle: 'Pixel cameras and clean Android.',
-    priceLine: 'Sharp photos and smooth performance.',
   },
   sony: {
     brandFilter: 'Sony',
     title: 'Sony',
     subtitle: 'Premium Xperia and audio gear.',
-    priceLine: 'Shop Sony phones and accessories.',
   },
 };
 

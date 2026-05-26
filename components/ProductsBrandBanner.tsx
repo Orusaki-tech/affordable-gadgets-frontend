@@ -13,19 +13,19 @@ type ProductsBrandBannerProps = {
 };
 
 export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
-  const imageSrc = config.backgroundImage;
-
   return (
     <section
-      className={`products-brand-banner${imageSrc ? ' products-brand-banner--split' : ''}`}
+      className="products-brand-banner"
       aria-label={`${config.title} collection`}
+      style={
+        config.backgroundImage
+          ? { backgroundImage: `url(${config.backgroundImage})` }
+          : undefined
+      }
     >
-      <div className="products-brand-banner__copy">
+      <div className="products-brand-banner__content">
         <h1 className="products-brand-banner__title">{config.title}</h1>
         <p className="products-brand-banner__subtitle">{config.subtitle}</p>
-        {config.priceLine ? (
-          <p className="products-brand-banner__price">{config.priceLine}</p>
-        ) : null}
         <button
           type="button"
           className="products-brand-banner__cta"
@@ -34,16 +34,6 @@ export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
           Buy Now
         </button>
       </div>
-      {imageSrc ? (
-        <div className="products-brand-banner__visual">
-          <img
-            src={imageSrc}
-            alt=""
-            className="products-brand-banner__image"
-            decoding="async"
-          />
-        </div>
-      ) : null}
     </section>
   );
 }

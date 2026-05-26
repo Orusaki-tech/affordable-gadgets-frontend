@@ -16,8 +16,7 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     title: 'iPhone',
     subtitle: 'Just the right amount of everything.',
     priceLine: 'Compare prices on the latest models.',
-    // Replace with iphone.jpg (text-free) when uploaded
-    backgroundImage: `${BANNERS_IMG}/apple-1.png`,
+    backgroundImage: `${BANNERS_IMG}/iphone.jpg`,
   },
   samsung: {
     brandFilter: 'Samsung',

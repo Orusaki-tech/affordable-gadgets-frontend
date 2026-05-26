@@ -132,13 +132,14 @@
 
   /* System-first typography (SF on Apple devices). */
   --font-sans:
-    system-ui,
     -apple-system,
     BlinkMacSystemFont,
     "SF Pro Display",
     "SF Pro Text",
     "Helvetica Neue",
     Helvetica,
+    var(--font-geist-sans),
+    system-ui,
     Arial,
     sans-serif;
 
@@ -148,6 +149,7 @@
     Menlo,
     Monaco,
     Consolas,
+    var(--font-geist-mono),
     "Liberation Mono",
     "Courier New",
     monospace;

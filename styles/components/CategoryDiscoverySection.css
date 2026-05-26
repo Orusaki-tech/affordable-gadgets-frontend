@@ -105,8 +105,8 @@
 }
 
 .category-discovery__card--has-bg {
-  background-size: cover;
-  background-position: center bottom;
+  background-size: 104% 104%;
+  background-position: center 46%;
   background-repeat: no-repeat;
 }
 

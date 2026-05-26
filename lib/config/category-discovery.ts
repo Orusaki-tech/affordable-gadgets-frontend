@@ -49,10 +49,7 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     id: 'airpods',
     title: 'AirPods',
     href: '/products?type=AC&brand_filter=Apple&search=airpods',
-    images: [
-      discoveryImage('airpods-pro.png', 'AirPods Pro'),
-      discoveryImage('airpods-max.jpg', 'AirPods Max'),
-    ],
+    backgroundImage: `${DISCOVERY_IMG}/airpods.jpg`,
   },
   {
     id: 'mac-laptops',

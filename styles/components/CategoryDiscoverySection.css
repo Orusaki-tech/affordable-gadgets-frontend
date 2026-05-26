@@ -17,15 +17,6 @@
   --apple-pill-pad-x: 11px;
   --apple-pill-radius: 980px;
   width: 100%;
-  font-family:
-    'SF Pro Display',
-    'SF Pro Text',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Helvetica Neue',
-    Helvetica,
-    Arial,
-    sans-serif;
   color: var(--apple-text);
 }
 

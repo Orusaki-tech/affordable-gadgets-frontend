@@ -37,7 +37,7 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     id: 'ipad',
     title: 'iPad',
     href: '/products?type=TB&brand_filter=Apple',
-    images: [discoveryImage('ipad.jpg', 'iPad Air lineup')],
+    backgroundImage: `${DISCOVERY_IMG}/ipad.jpg`,
   },
   {
     id: 'watch',

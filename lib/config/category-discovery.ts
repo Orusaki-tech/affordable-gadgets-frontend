@@ -55,10 +55,7 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     id: 'mac-laptops',
     title: 'Mac laptops',
     href: '/products?type=LT&brand_filter=Apple',
-    images: [
-      discoveryImage('macbook-air.jpg', 'MacBook Air'),
-      discoveryImage('macbook-pro.jpg', 'MacBook Pro'),
-    ],
+    backgroundImage: `${DISCOVERY_IMG}/mac-laptops.jpg`,
   },
   {
     id: 'mac-desktops',

@@ -26,4 +26,4 @@ jobs:
           MIG_NAME: ${{ secrets.PRODUCTION_SHOP_MIG_NAME }}
         run: |
           gcloud compute instance-groups managed rolling-action replace "${MIG_NAME}" \
-            --region=us-east1 --project="${PROJECT_ID}" --max-unavailable=0 --max-surge=1
+            --region=us-east1 --project="${PROJECT_ID}" --max-unavailable=0 --max-surge=2

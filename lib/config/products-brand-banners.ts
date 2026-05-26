@@ -23,21 +23,19 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     title: 'Samsung',
     subtitle: 'Galaxy phones built for every day.',
     priceLine: 'See current deals and trade-in options.',
-    backgroundImage: `${BANNERS_IMG}/samsung-1.png`,
+    backgroundImage: `${BANNERS_IMG}/samsung.jpg`,
   },
   google: {
     brandFilter: 'Google',
     title: 'Google',
     subtitle: 'Pixel cameras and clean Android.',
     priceLine: 'Sharp photos and smooth performance.',
-    backgroundImage: `${BANNERS_IMG}/google.jpg`,
   },
   sony: {
     brandFilter: 'Sony',
     title: 'Sony',
     subtitle: 'Premium Xperia and audio gear.',
     priceLine: 'Shop Sony phones and accessories.',
-    backgroundImage: `${BANNERS_IMG}/sony.jpg`,
   },
 };
 

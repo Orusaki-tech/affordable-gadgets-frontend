@@ -1,0 +1,103 @@
+.products-brand-banner {
+  position: relative;
+  width: 100%;
+  min-height: 220px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #f5f5f7;
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
+  border: 1px solid var(--ui-gray-200);
+}
+
+@media (min-width: 768px) {
+  .products-brand-banner {
+    min-height: 260px;
+  }
+}
+
+.products-brand-banner__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(245, 245, 247, 0.94) 0%,
+    rgba(245, 245, 247, 0.75) 42%,
+    rgba(245, 245, 247, 0.2) 70%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.products-brand-banner--has-image .products-brand-banner__overlay {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.7) 45%,
+    rgba(255, 255, 255, 0.15) 72%,
+    transparent 100%
+  );
+}
+
+.products-brand-banner__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 28px 24px 32px;
+  max-width: min(100%, 520px);
+}
+
+.products-brand-banner__title {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #1d1d1f;
+}
+
+.products-brand-banner__subtitle {
+  margin: 8px 0 0;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  line-height: 1.35;
+  font-weight: 400;
+  color: #1d1d1f;
+}
+
+.products-brand-banner__price {
+  margin: 6px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: #6e6e73;
+}
+
+.products-brand-banner__cta {
+  margin-top: 16px;
+  padding: 8px 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ui-white);
+  background: var(--primary);
+  border: none;
+  border-radius: 980px;
+  cursor: pointer;
+  transition: background 200ms ease;
+}
+
+.products-brand-banner__cta:hover {
+  background: var(--primary-dark);
+}
+
+.products-brand-banner__cta:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+#products-grid {
+  scroll-margin-top: 120px;
+}

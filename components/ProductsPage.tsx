@@ -9,7 +9,8 @@ import { usePromotion, prefetchPromotion } from '@/lib/hooks/usePromotions';
 import { PublicPromotion } from '@/lib/api/generated';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, FilterState } from './ProductFilters';
-import { ProductCarousel } from './ProductCarousel';
+import { ProductsBrandBanner } from './ProductsBrandBanner';
+import { getBrandBannerConfig } from '@/lib/config/products-brand-banners';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { CATEGORY_CARDS } from '@/lib/config/categories';
 import Link from 'next/link';
@@ -40,8 +41,10 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const currentBrandFilter = (searchParams.get('brand_filter') || searchParams.get('brand') || '')
     .trim()
     .toLowerCase();
-  const showSamsungBanner = currentBrandFilter === 'samsung';
-  const showAppleBanner = currentBrandFilter === 'apple';
+  const brandBannerConfig = useMemo(
+    () => getBrandBannerConfig(currentBrandFilter),
+    [currentBrandFilter]
+  );
   const [page, setPage] = useState(() => {
     const initial = Number(searchParams.get('page') || 1);
     return Number.isFinite(initial) && initial > 0 ? Math.floor(initial) : 1;
@@ -387,55 +390,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
         </div>
       ) : (
         <div className="products-page__header">
-          {showSamsungBanner && (
-            <div className="products-page__header-banner" aria-label="Samsung banner">
-              <ProductCarousel
-                itemsPerView={{ mobile: 1, tablet: 1, desktop: 1 }}
-                showNavigation={false}
-                showPagination={false}
-                autoPlay
-                autoPlayInterval={4000}
-              >
-                {[
-                  { src: '/images/banners/samsung-1.png', alt: 'Samsung banner' },
-                  { src: '/images/banners/samsung-2.png', alt: 'Samsung banner' },
-                  { src: '/images/banners/samsungbanner.png', alt: 'Samsung banner' },
-                ].map((banner) => (
-                  <img
-                    key={banner.src}
-                    src={banner.src}
-                    alt={banner.alt}
-                    loading="lazy"
-                    decoding="async"
-                    className="products-page__header-bannerImage"
-                  />
-                ))}
-              </ProductCarousel>
-            </div>
-          )}
-
-          {showAppleBanner && (
-            <div className="products-page__header-banner" aria-label="Apple banner">
-              <ProductCarousel
-                itemsPerView={{ mobile: 1, tablet: 1, desktop: 1 }}
-                showNavigation={false}
-                showPagination={false}
-              >
-                {[
-                  { src: '/images/banners/apple-1.png', alt: 'Apple banner' },
-                ].map((banner) => (
-                  <img
-                    key={banner.src}
-                    src={banner.src}
-                    alt={banner.alt}
-                    loading="lazy"
-                    decoding="async"
-                    className="products-page__header-bannerImage"
-                  />
-                ))}
-              </ProductCarousel>
-            </div>
-          )}
+          {brandBannerConfig ? <ProductsBrandBanner config={brandBannerConfig} /> : null}
 
           <form
             onSubmit={handleSearch}
@@ -537,7 +492,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
             </div>
           ) : (
             <>
-              <div className="products-page__grid">
+              <div id="products-grid" className="products-page__grid">
                 {filteredResults.map((product) => (
                   <ProductCard key={product.id} product={product} {...cardOptions} />
                 ))}

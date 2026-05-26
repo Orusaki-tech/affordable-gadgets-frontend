@@ -5,6 +5,7 @@ import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { StructuredData } from '@/components/StructuredData';
 import { brandConfig } from '@/lib/config/brand';
+import { getBrandBannerTitleForMetadata } from '@/lib/config/products-brand-banners';
 
 export const revalidate = 3600;
 
@@ -49,8 +50,14 @@ export async function generateMetadata({
   const sp = (await searchParams) ?? {};
   const page = asNumber(sp.page);
   const suffix = page && page > 1 ? ` (Page ${page})` : '';
+  const promotionId = asString(sp.promotion);
+  const brandFilter = asString(sp.brand_filter) || asString(sp.brand) || '';
+  const brandTitle = !promotionId ? getBrandBannerTitleForMetadata(brandFilter) : undefined;
+  const title = brandTitle
+    ? `${brandTitle} Deals in Kenya | Affordable Gadgets${suffix}`
+    : `${BASE_TITLE}${suffix}`;
   return {
-    title: `${BASE_TITLE}${suffix}`,
+    title,
     description: BASE_DESCRIPTION,
     alternates: {
       canonical: buildCanonicalFromSearchParams(sp),

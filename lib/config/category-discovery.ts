@@ -43,7 +43,7 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     id: 'watch',
     title: 'Apple Watch',
     href: '/products?type=AC&brand_filter=Apple&search=watch',
-    images: [discoveryImage('watch.jpg', 'Apple Watch Series 11 models')],
+    backgroundImage: `${DISCOVERY_IMG}/watch.jpg`,
   },
   {
     id: 'airpods',

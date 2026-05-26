@@ -10,24 +10,20 @@ export type CategoryDiscoveryCard = {
   id: string;
   title: string;
   href: string;
-  images: CategoryDiscoveryImage[];
+  /** Full-bleed card background; title + pill overlay on top */
+  backgroundImage?: string;
+  images?: CategoryDiscoveryImage[];
 };
 
 function discoveryImage(filename: string, alt: string): CategoryDiscoveryImage {
   return { src: `${DISCOVERY_IMG}/${filename}`, alt };
 }
 
-const HERO_COLLAGE_IMAGES: CategoryDiscoveryImage[] = [
-  discoveryImage('hero-iphone-pro.png', 'iPhone in Cosmic Orange case'),
-  discoveryImage('hero-watch.png', 'Apple Watch'),
-  discoveryImage('hero-airpods.png', 'AirPods Pro in charging case'),
-];
-
 export const CATEGORY_DISCOVERY_HERO = {
   title: "Discover what's new.",
   viewAllHref: '/products',
   viewAllLabel: 'View all',
-  collageImages: HERO_COLLAGE_IMAGES,
+  backgroundImage: `${DISCOVERY_IMG}/hero.jpg`,
 } as const;
 
 export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
@@ -35,7 +31,7 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     id: 'iphone',
     title: 'iPhone',
     href: '/products?type=PH&brand_filter=Apple',
-    images: [discoveryImage('iphone.png', 'iPhone 17 lineup')],
+    backgroundImage: `${DISCOVERY_IMG}/iphone.jpg`,
   },
   {
     id: 'ipad',

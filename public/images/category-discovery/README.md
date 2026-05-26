@@ -1,11 +1,7 @@
 # Category discovery images
 
-Product artwork for the homepage “Discover” grid. Files use the correct extension for their format (PNG or JPEG).
+- **Hero:** `hero.jpg` — full-bleed background for the Discover hero tile (title + View all overlay).
+- **iPhone card:** `iphone.jpg` — full-bleed background (title + View all on top).
+- **Other cards:** product art images below the hero.
 
-Re-download with correct extensions:
-
-```bash
-./scripts/download-category-discovery-images.sh
-```
-
-Tiles use `#f5f5f7` in CSS behind product art.
+Tiles use `#f5f5f7` in CSS behind card product art.

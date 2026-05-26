@@ -30,24 +30,22 @@
 }
 
 .category-discovery__hero {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--apple-grid-gap);
-  background: var(--apple-bg);
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  background-color: var(--apple-bg);
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
   border-radius: 18px;
   overflow: hidden;
   min-height: var(--apple-tile-min-height);
   margin-bottom: var(--apple-grid-gap);
 }
 
-@media (min-width: 768px) {
-  .category-discovery__hero {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-    align-items: stretch;
-  }
-}
-
 .category-discovery__hero-content {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -68,57 +66,6 @@
 .category-discovery__hero-link {
   margin-top: 14px;
   text-decoration: none;
-}
-
-.category-discovery__hero-media {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  min-height: 280px;
-  padding: 24px 16px 0;
-  overflow: hidden;
-  background-color: var(--apple-bg);
-}
-
-.category-discovery__hero-collage {
-  position: relative;
-  width: 100%;
-  max-width: 520px;
-  height: 100%;
-  min-height: 320px;
-}
-
-.category-discovery__hero-collage-item {
-  position: absolute;
-  display: block;
-  height: auto;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-.category-discovery__hero-collage-item:nth-child(1) {
-  left: 0;
-  bottom: 0;
-  width: 42%;
-  max-height: 88%;
-  z-index: 2;
-}
-
-.category-discovery__hero-collage-item:nth-child(2) {
-  right: 18%;
-  top: 8%;
-  width: 28%;
-  max-height: 55%;
-  z-index: 3;
-}
-
-.category-discovery__hero-collage-item:nth-child(3) {
-  right: 0;
-  bottom: 12%;
-  width: 32%;
-  max-height: 50%;
-  z-index: 1;
 }
 
 .category-discovery__pill {
@@ -166,13 +113,25 @@
   transition: box-shadow 0.2s ease;
 }
 
+.category-discovery__card--has-bg {
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
 .category-discovery__card:hover {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 .category-discovery__card-header {
+  position: relative;
+  z-index: 1;
   padding: 40px 32px 0;
   text-align: left;
+}
+
+.category-discovery__card--has-bg .category-discovery__card-header {
+  flex: 1;
 }
 
 .category-discovery__card-title {

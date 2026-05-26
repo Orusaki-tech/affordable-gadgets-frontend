@@ -13,7 +13,10 @@ function PillButton({ label }: { label: string }) {
 export function CategoryDiscoverySection() {
   return (
     <div className="category-discovery">
-      <div className="category-discovery__hero">
+      <div
+        className="category-discovery__hero"
+        style={{ backgroundImage: `url(${CATEGORY_DISCOVERY_HERO.backgroundImage})` }}
+      >
         <div className="category-discovery__hero-content">
           <h3 className="category-discovery__hero-title">{CATEGORY_DISCOVERY_HERO.title}</h3>
           <Link
@@ -24,40 +27,36 @@ export function CategoryDiscoverySection() {
             <PillButton label={CATEGORY_DISCOVERY_HERO.viewAllLabel} />
           </Link>
         </div>
-        <div className="category-discovery__hero-media">
-          <div className="category-discovery__hero-collage" aria-hidden>
-            {CATEGORY_DISCOVERY_HERO.collageImages.map((image) => (
-              <img
-                key={image.src}
-                src={image.src}
-                alt=""
-                className="category-discovery__hero-collage-item"
-                loading="lazy"
-                decoding="async"
-              />
-            ))}
-          </div>
-        </div>
       </div>
 
       <div className="category-discovery__grid">
-        {CATEGORY_DISCOVERY_CARDS.map((card) => (
+        {CATEGORY_DISCOVERY_CARDS.map((card) => {
+          const images = card.images ?? [];
+          return (
           <Link
             key={card.id}
             href={card.href}
-            className="category-discovery__card"
+            className={`category-discovery__card${
+              card.backgroundImage ? ' category-discovery__card--has-bg' : ''
+            }`}
+            style={
+              card.backgroundImage
+                ? { backgroundImage: `url(${card.backgroundImage})` }
+                : undefined
+            }
             prefetch={false}
           >
             <div className="category-discovery__card-header">
               <h3 className="category-discovery__card-title">{card.title}</h3>
               <PillButton label="View all" />
             </div>
+            {images.length > 0 ? (
             <div
               className={`category-discovery__card-media${
-                card.images.length > 1 ? ' category-discovery__card-media--multi' : ''
+                images.length > 1 ? ' category-discovery__card-media--multi' : ''
               }`}
             >
-              {card.images.map((image) => (
+              {images.map((image) => (
                 <div key={`${card.id}-${image.src}`} className="category-discovery__card-image-wrap">
                   <img
                     src={image.src}
@@ -69,8 +68,10 @@ export function CategoryDiscoverySection() {
                 </div>
               ))}
             </div>
+            ) : null}
           </Link>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

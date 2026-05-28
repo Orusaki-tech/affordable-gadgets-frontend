@@ -1,7 +1,7 @@
 /** Brand hero on /products — keys match URL `brand_filter` (case-insensitive). */
 const BANNERS_IMG = '/images/banners';
 /** Bust CDN/browser cache when banner files change */
-const BANNER_ASSET_VERSION = '2';
+const BANNER_ASSET_VERSION = '3';
 
 export type ProductsBrandBannerConfig = {
   brandFilter: string;
@@ -30,6 +30,7 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     brandFilter: 'Google',
     title: 'Google',
     subtitle: 'Pixel cameras and clean Android.',
+    backgroundImage: `${BANNERS_IMG}/google-pixel10.png?v=${BANNER_ASSET_VERSION}`,
   },
   sony: {
     brandFilter: 'Sony',

@@ -1,7 +1,7 @@
 /** Brand hero on /products — keys match URL `brand_filter` (case-insensitive). */
 const BANNERS_IMG = '/images/banners';
 /** Bust CDN/browser cache when banner files change */
-const BANNER_ASSET_VERSION = '5';
+const BANNER_ASSET_VERSION = '6';
 
 export type ProductsBrandBannerConfig = {
   brandFilter: string;

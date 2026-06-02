@@ -204,7 +204,7 @@ export default async function ProductBlogPage({ params }: ProductBlogPageProps) 
           </header>
 
           <article className="prose prose-blue max-w-none">
-            <ProductBlogBody html={article.body || '<p><em>No content yet.</em></p>'} />
+            <ProductBlogBody markdown={article.body || '*No content yet.*'} />
           </article>
 
           <div className="mt-16 pt-10 border-t border-gray-100">

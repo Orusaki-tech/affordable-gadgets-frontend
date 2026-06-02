@@ -7,6 +7,11 @@ interface ProductBlogBodyProps {
   markdown: string;
 }
 
+/** Batch 033+ articles often omit a blank line after bullet lists; fix before parse. */
+function normalizeBlogMarkdown(input: string): string {
+  return input.replace(/^((?:- .+\n)+)(?=[A-Z])/gm, '$1\n');
+}
+
 const markdownComponents: Components = {
   img: ({ src, alt }) =>
     src ? (
@@ -42,7 +47,9 @@ export function ProductBlogBody({ markdown }: ProductBlogBodyProps) {
         [&_th]:bg-gray-50 [&_th]:border [&_th]:border-gray-200 [&_th]:p-3 [&_th]:text-left [&_th]:font-semibold
         [&_td]:border [&_td]:border-gray-200 [&_td]:p-3"
     >
-      <ReactMarkdown components={markdownComponents}>{markdown}</ReactMarkdown>
+      <ReactMarkdown components={markdownComponents}>
+        {normalizeBlogMarkdown(markdown)}
+      </ReactMarkdown>
     </div>
   );
 }

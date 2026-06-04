@@ -116,6 +116,8 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
     return getHeroPromotions(promotionsData);
   }, [promotionsData]);
 
+  const showPromoCarousel = promotions.length >= 4;
+
   const promoIds = useMemo(() => {
     return promotions
       .map((p) => p.id)
@@ -316,18 +318,20 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
       <div className="home-hero__container">
         {/* Single layout: carousel on top, then two-column hero (left: search + card, right: banner) on desktop */}
         <div className="home-hero__main-grid" aria-label="Promotions">
-          <ProductCarousel
-            // Keep the promo cards visible (do not collapse to a single card).
-            // Banner rotation is handled by `activePromotionId` + timer.
-            itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
-            showNavigation={!isMobile}
-            alwaysShowNavigation={!isMobile}
-            splitNav
-            showPagination={false}
-            className="home-hero__promo-carousel"
-          >
-            {...carouselContent}
-          </ProductCarousel>
+          {showPromoCarousel && (
+            <ProductCarousel
+              // Keep the promo cards visible (do not collapse to a single card).
+              // Banner rotation is handled by `activePromotionId` + timer.
+              itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
+              showNavigation={!isMobile}
+              alwaysShowNavigation={!isMobile}
+              splitNav
+              showPagination={false}
+              className="home-hero__promo-carousel"
+            >
+              {...carouselContent}
+            </ProductCarousel>
+          )}
 
           <div className="home-hero__content-row">
             <div className="home-hero__left-column">

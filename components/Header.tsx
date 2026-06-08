@@ -7,6 +7,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCart } from '@/lib/hooks/useCart';
 import { brandConfig } from '@/lib/config/brand';
 import { clearAuthToken } from '@/lib/api/openapi';
+import { createClient } from '@/lib/supabase/client';
 import { AuthChoiceModal } from './AuthChoiceModal';
 
 export function Header() {
@@ -164,7 +165,9 @@ export function Header() {
                     <button
                       type="button"
                       className="site-header__account-item"
-                      onClick={() => {
+                      onClick={async () => {
+                        const supabase = createClient();
+                        await supabase.auth.signOut();
                         clearAuthToken();
                         setIsLoggedIn(false);
                         setIsAccountMenuOpen(false);

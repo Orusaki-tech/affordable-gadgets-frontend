@@ -17,7 +17,7 @@ import {
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { trackProductView } from '@/lib/tracking';
+import { trackProductView, trackWhatsAppClick, trackCartAdd } from '@/lib/tracking';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import Link from 'next/link';
@@ -622,6 +622,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         promoId,
         normalizedPromoPrice
       );
+      trackCartAdd(product.id);
       setShowSuccessMessage(true);
       setTimeout(() => setShowSuccessMessage(false), 3000);
     } catch (error: any) {
@@ -1150,11 +1151,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               const showWhatsApp = showWhatsAppForVariant || showWhatsAppFallback;
 
               const openWhatsApp = () => {
-                fetch('https://api.affordable-gadgetske.com/api/inventory/observability/record-event/', {
-                  method: 'POST',
-                  headers: {'Content-Type': 'application/json'},
-                  body: JSON.stringify({event_type: 'whatsapp_click', product_id: product.id})
-                }).catch(() => {});
+                trackWhatsAppClick(product.id);
                 if (showWhatsAppForVariant && selectedUnitData) {
                   const effectivePrice =
                     isEligibleForPromotion && promotionUnitPrice !== null

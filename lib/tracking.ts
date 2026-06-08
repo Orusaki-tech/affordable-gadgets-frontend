@@ -61,10 +61,48 @@ export function trackSearch(searchQuery: string) {
   sendEvent('search', { search_query: searchQuery });
 }
 
-export function trackProductView(productId: number | string) {
-  sendEvent('product_view', { product_id: productId });
+export async function trackProductView(productId: number | string) {
+  const token = getAuthToken();
+  const utm = getStoredUTMParams();
+  const metadata: Record<string, unknown> = {};
+  if (utm.utm_source) metadata.utm_source = utm.utm_source;
+  if (utm.utm_medium) metadata.utm_medium = utm.utm_medium;
+  if (utm.utm_campaign) metadata.utm_campaign = utm.utm_campaign;
+  if (utm.utm_content) metadata.utm_content = utm.utm_content;
+
+  const body: Record<string, unknown> = {
+    event_type: 'product_view',
+    product_id: typeof productId === 'string' ? parseInt(productId) || productId : productId,
+    session_key: getSessionKey(),
+    metadata,
+  };
+
+  try {
+    await fetch(EVENTS_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Brand-Code': brandConfig.code,
+        ...(token ? { Authorization: `Token ${token}` } : {}),
+      },
+      body: JSON.stringify(body),
+    });
+  } catch {
+  }
 }
 
 export function trackPageView(path?: string) {
   sendEvent('page_view', { path: path || (typeof window !== 'undefined' ? window.location.pathname : '') });
+}
+
+export function trackCartAdd(productId: number | string) {
+  sendEvent('cart_add', { product_id: productId });
+}
+
+export function trackWhatsAppClick(productId: number | string) {
+  sendEvent('whatsapp_click', { product_id: productId });
+}
+
+export function trackLogin() {
+  sendEvent('login');
 }

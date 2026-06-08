@@ -622,7 +622,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         promoId,
         normalizedPromoPrice
       );
-      trackCartAdd(product.id);
+      if (product?.id != null) trackCartAdd(product.id);
       setShowSuccessMessage(true);
       setTimeout(() => setShowSuccessMessage(false), 3000);
     } catch (error: any) {
@@ -1151,7 +1151,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               const showWhatsApp = showWhatsAppForVariant || showWhatsAppFallback;
 
               const openWhatsApp = () => {
-                trackWhatsAppClick(product.id);
+                if (product?.id != null) trackWhatsAppClick(product.id);
                 if (showWhatsAppForVariant && selectedUnitData) {
                   const effectivePrice =
                     isEligibleForPromotion && promotionUnitPrice !== null

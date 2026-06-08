@@ -291,7 +291,7 @@ export function ProductCard({
     try {
       setIsAddingToCart(true);
       await addToCart(selectedUnit.id, qty ?? 1);
-      trackCartAdd(product.id);
+      if (product.id != null) trackCartAdd(product.id);
     } finally {
       setIsAddingToCart(false);
     }

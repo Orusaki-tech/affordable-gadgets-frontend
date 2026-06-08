@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 import { brandConfig } from "@/lib/config/brand";
 import { StructuredData } from "@/components/StructuredData";
 import { GoogleCustomerReviewsBadge } from "@/components/GoogleCustomerReviewsBadge";
+import { AuthGate } from "@/components/AuthGate";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -87,7 +88,11 @@ export default function RootLayout({
         <StructuredData type="Organization" />
         <StructuredData type="WebSite" />
         <StructuredData type="LocalBusiness" />
-        <Providers>{children}</Providers>
+        <Providers>
+          <AuthGate>
+            {children}
+          </AuthGate>
+        </Providers>
         <GoogleCustomerReviewsBadge merchantId={5748422735} />
         <SpeedInsights />
       </body>

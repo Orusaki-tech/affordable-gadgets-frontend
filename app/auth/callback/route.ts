@@ -6,6 +6,14 @@ export async function GET(request: Request) {
   const code = searchParams.get('code');
   const next = searchParams.get('next') ?? '/';
 
+  // Preserve UTM params through the OAuth redirect cycle
+  const utmParams = new URLSearchParams();
+  for (const key of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content']) {
+    const val = searchParams.get(key);
+    if (val) utmParams.set(key, val);
+  }
+  const utmString = utmParams.toString();
+
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
@@ -13,15 +21,14 @@ export async function GET(request: Request) {
     if (!error) {
       const forwardedHost = request.headers.get('x-forwarded-host');
       const isLocalEnv = process.env.NODE_ENV === 'development';
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`);
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      } else {
-        return NextResponse.redirect(`${origin}${next}`);
-      }
+      const target = (() => {
+        const base = isLocalEnv ? `${origin}${next}` : forwardedHost ? `https://${forwardedHost}${next}` : `${origin}${next}`;
+        return utmString ? `${base}${base.includes('?') ? '&' : '?'}${utmString}` : base;
+      })();
+      return NextResponse.redirect(target);
     }
   }
 
-  return NextResponse.redirect(`${origin}?error=auth_callback_error`);
+  const fallbackTarget = utmString ? `${origin}?error=auth_callback_error&${utmString}` : `${origin}?error=auth_callback_error`;
+  return NextResponse.redirect(fallbackTarget);
 }

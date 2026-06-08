@@ -13,6 +13,7 @@ import { ProductsBrandBanner } from './ProductsBrandBanner';
 import { getBrandBannerConfig } from '@/lib/config/products-brand-banners';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { CATEGORY_CARDS } from '@/lib/config/categories';
+import { trackSearch } from '@/lib/tracking';
 import Link from 'next/link';
 
 type ProductCardOptions = {
@@ -320,6 +321,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    trackSearch(search);
     setPage(1);
     updateQueryParams(undefined, search, 1);
   };

@@ -7,14 +7,9 @@ import { brandConfig } from '@/lib/config/brand';
 import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
 import { createClient } from '@/lib/supabase/client';
 import { exchangeSupabaseToken } from '@/lib/supabase/auth-exchange';
+import { getStoredUTMParams } from '@/lib/utm';
 
-interface AuthChoiceModalProps {
-  onClose: () => void;
-  onAuthSuccess: () => void;
-  initialEmail?: string;
-}
-
-export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthChoiceModalProps) {
+export function AuthOverlay({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authNotice, setAuthNotice] = useState<string | null>(null);
@@ -23,6 +18,7 @@ export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthCh
   const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [authForm, setAuthForm] = useState({
     username_or_email: '',
     username: '',
@@ -30,71 +26,25 @@ export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthCh
     password: '',
   });
 
-  useEffect(() => {
-    if (!initialEmail) return;
-    setAuthForm((prev) => ({
-      ...prev,
-      username_or_email: prev.username_or_email || initialEmail,
-      email: prev.email || initialEmail,
-      username: prev.username || initialEmail.split('@')[0],
-    }));
-  }, [initialEmail]);
-
-  const openLogin = () => {
-    setAuthError(null);
-    setAuthNotice(null);
-    setPendingVerificationEmail(null);
-    setAuthFieldErrors({});
-    setAuthMode('login');
-  };
-
-  const openRegister = () => {
-    setAuthError(null);
-    setAuthNotice(null);
-    setPendingVerificationEmail(null);
-    setAuthFieldErrors({});
-    setAuthMode('register');
-  };
-
   const validateAuthForm = (mode: 'login' | 'register') => {
     const errors: Record<string, string> = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     if (mode === 'login') {
-      if (!authForm.username_or_email.trim()) {
-        errors.username_or_email = 'Email or username is required.';
-      }
-      if (!authForm.password.trim()) {
-        errors.password = 'Password is required.';
-      }
+      if (!authForm.username_or_email.trim()) errors.username_or_email = 'Email or username is required.';
+      if (!authForm.password.trim()) errors.password = 'Password is required.';
     } else {
-      if (!authForm.username.trim()) {
-        errors.username = 'Username is required.';
-      }
-      if (!authForm.email.trim() || !emailRegex.test(authForm.email)) {
-        errors.email = 'Valid email is required.';
-      }
-      if (!authForm.password.trim() || authForm.password.length < 8) {
-        errors.password = 'Password must be at least 8 characters.';
-      }
+      if (!authForm.username.trim()) errors.username = 'Username is required.';
+      if (!authForm.email.trim() || !emailRegex.test(authForm.email)) errors.email = 'Valid email is required.';
+      if (!authForm.password.trim() || authForm.password.length < 8) errors.password = 'Password must be at least 8 characters.';
     }
-
     setAuthFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  const isLoginReady = () => {
-    return !!authForm.username_or_email.trim() && !!authForm.password.trim();
-  };
-
+  const isLoginReady = () => !!authForm.username_or_email.trim() && !!authForm.password.trim();
   const isRegisterReady = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return (
-      !!authForm.username.trim() &&
-      !!authForm.email.trim() &&
-      emailRegex.test(authForm.email) &&
-      authForm.password.length >= 8
-    );
+    return !!authForm.username.trim() && !!authForm.email.trim() && emailRegex.test(authForm.email) && authForm.password.length >= 8;
   };
 
   const handleLogin = async () => {
@@ -115,8 +65,7 @@ export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthCh
         if (token) {
           setAuthToken(token);
         }
-        onAuthSuccess();
-        onClose();
+        onAuthSuccess?.();
       } finally {
         OpenAPI.BASE = previousBase;
       }
@@ -172,16 +121,11 @@ export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthCh
     try {
       const response = await fetch(`${inventoryBaseUrl}/verify-email/resend/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Brand-Code': brandConfig.code,
-        },
+        headers: { 'Content-Type': 'application/json', 'X-Brand-Code': brandConfig.code },
         body: JSON.stringify({ email: pendingVerificationEmail }),
       });
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.error || 'Failed to resend verification email.');
-      }
+      if (!response.ok) throw new Error(data?.error || 'Failed to resend verification email.');
       setAuthNotice(data?.message || 'Verification email sent.');
     } catch (err: any) {
       setAuthError(err?.message || 'Failed to resend verification email.');
@@ -190,18 +134,22 @@ export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthCh
     }
   };
 
-  const [googleLoading, setGoogleLoading] = useState(false);
-
   const handleGoogleSignIn = useCallback(async () => {
     setGoogleLoading(true);
     setAuthError(null);
     try {
       const supabase = createClient();
+      const utm = getStoredUTMParams();
+      const utmParams = new URLSearchParams();
+      if (utm.utm_source) utmParams.set('utm_source', utm.utm_source);
+      if (utm.utm_medium) utmParams.set('utm_medium', utm.utm_medium);
+      if (utm.utm_campaign) utmParams.set('utm_campaign', utm.utm_campaign);
+      if (utm.utm_content) utmParams.set('utm_content', utm.utm_content);
+      const nextParams = utmParams.toString();
+      const callbackUrl = `${window.location.origin}/auth/callback${nextParams ? `?${nextParams}` : ''}`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/checkout`,
-        },
+        options: { redirectTo: callbackUrl },
       });
       if (error) {
         setAuthError(error.message);
@@ -213,7 +161,6 @@ export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthCh
     }
   }, []);
 
-  // On mount, check if returning from Google OAuth callback
   useEffect(() => {
     const handleAuthCallback = async () => {
       const supabase = createClient();
@@ -222,8 +169,7 @@ export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthCh
         setGoogleLoading(true);
         const result = await exchangeSupabaseToken(session.access_token);
         if (result?.token) {
-          onAuthSuccess();
-          onClose();
+          onAuthSuccess?.();
         } else {
           setAuthError('Google sign in succeeded but could not complete authentication with the store.');
           setGoogleLoading(false);
@@ -231,53 +177,43 @@ export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthCh
       }
     };
     handleAuthCallback();
-  }, [onAuthSuccess, onClose]);
+  }, [onAuthSuccess]);
 
   return (
-    <div className="checkout-modal">
-      <div className="checkout-modal__panel">
-        <button
-          type="button"
-          onClick={onClose}
-          className="checkout-modal__close"
-          aria-label="Close authentication"
-        >
-          <svg className="checkout-modal__close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+    <div className="auth-overlay">
+      <div className="auth-overlay__backdrop" />
+      <div className="auth-overlay__container">
+        <div className="auth-overlay__panel">
+          <div className="auth-overlay__logo">
+            <Image
+              src="/affordlogo1.svg"
+              alt={`${brandConfig.name} logo`}
+              width={80}
+              height={80}
+              className="auth-overlay__logo-image"
+              priority
+            />
+          </div>
 
-        <div className="checkout-modal__logo checkout-modal__logo--small">
-          <Image
-            src="/affordlogo1.svg"
-            alt={`${brandConfig.name} logo`}
-            width={100}
-            height={100}
-            className="checkout-modal__logo-image"
-            priority
-          />
-        </div>
+          <h1 className="auth-overlay__heading">{brandConfig.name}</h1>
+          <p className="auth-overlay__text">
+            Sign in or create an account to start browsing
+          </p>
 
-        <h2 className="checkout-modal__heading">Continue to Payment</h2>
-        <p className="checkout-modal__text">
-          Sign in to your account to continue.
-        </p>
-
-        <div className="checkout-modal__auth">
           <button
             type="button"
-            className="checkout-modal__google"
+            className="auth-overlay__google"
             onClick={handleGoogleSignIn}
             disabled={googleLoading || isAuthSubmitting}
           >
             {googleLoading ? (
               <>
-                <span className="checkout-modal__spinner" />
+                <span className="auth-overlay__spinner" />
                 Signing in...
               </>
             ) : (
               <>
-                <svg className="checkout-modal__google-icon" viewBox="0 0 24 24" width="20" height="20">
+                <svg className="auth-overlay__google-icon" viewBox="0 0 24 24" width="20" height="20">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
                   <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -288,139 +224,116 @@ export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthCh
             )}
           </button>
 
-          <div className="checkout-modal__divider">
+          <div className="auth-overlay__divider">
             <span>or</span>
           </div>
 
-          <div className="checkout-modal__auth-actions">
-            <button type="button" className="checkout-modal__secondary" onClick={openLogin}>
+          <div className="auth-overlay__auth-toggle">
+            <button
+              type="button"
+              className={`auth-overlay__toggle-btn ${authMode === 'login' || !authMode ? 'auth-overlay__toggle-btn--active' : ''}`}
+              onClick={() => { setAuthMode('login'); setAuthError(null); setAuthNotice(null); }}
+            >
               Sign in
             </button>
-            <button type="button" className="checkout-modal__secondary" onClick={openRegister}>
+            <button
+              type="button"
+              className={`auth-overlay__toggle-btn ${authMode === 'register' ? 'auth-overlay__toggle-btn--active' : ''}`}
+              onClick={() => { setAuthMode('register'); setAuthError(null); setAuthNotice(null); }}
+            >
               Create account
             </button>
           </div>
 
           {authMode === 'login' && (
-            <div className="checkout-modal__auth-form">
+            <div className="auth-overlay__form">
               <input
                 type="text"
                 placeholder="Email or Username"
                 value={authForm.username_or_email}
                 onChange={(e) => setAuthForm({ ...authForm, username_or_email: e.target.value })}
-                className="checkout-modal__input"
+                className="auth-overlay__input"
               />
-              {authFieldErrors.username_or_email && (
-                <span className="checkout-modal__error">{authFieldErrors.username_or_email}</span>
-              )}
-              <input
-                type={showLoginPassword ? 'text' : 'password'}
-                placeholder="Password"
-                value={authForm.password}
-                onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-                className="checkout-modal__input"
-              />
+              {authFieldErrors.username_or_email && <span className="auth-overlay__error">{authFieldErrors.username_or_email}</span>}
+              <div className="auth-overlay__password-wrap">
+                <input
+                  type={showLoginPassword ? 'text' : 'password'}
+                  placeholder="Password"
+                  value={authForm.password}
+                  onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                  className="auth-overlay__input"
+                />
+                <button type="button" className="auth-overlay__ghost" onClick={() => setShowLoginPassword((p) => !p)}>
+                  {showLoginPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+              {authFieldErrors.password && <span className="auth-overlay__error">{authFieldErrors.password}</span>}
               <button
                 type="button"
-                className="checkout-modal__ghost"
-                onClick={() => setShowLoginPassword((prev) => !prev)}
-              >
-                {showLoginPassword ? 'Hide password' : 'Show password'}
-              </button>
-              {authFieldErrors.password && (
-                <span className="checkout-modal__error">{authFieldErrors.password}</span>
-              )}
-              <button
-                type="button"
-                className="checkout-modal__primary"
+                className="auth-overlay__submit"
                 onClick={handleLogin}
                 disabled={isAuthSubmitting || !isLoginReady()}
               >
-                {isAuthSubmitting ? (
-                  <>
-                    <span className="checkout-modal__spinner" />
-                    Signing in...
-                  </>
-                ) : (
-                  'Sign in'
-                )}
+                {isAuthSubmitting ? <><span className="auth-overlay__spinner" /> Signing in...</> : 'Sign in'}
               </button>
             </div>
           )}
 
           {authMode === 'register' && (
-            <div className="checkout-modal__auth-form">
+            <div className="auth-overlay__form">
               <input
                 type="text"
                 placeholder="Username"
                 value={authForm.username}
                 onChange={(e) => setAuthForm({ ...authForm, username: e.target.value })}
-                className="checkout-modal__input"
+                className="auth-overlay__input"
               />
-              {authFieldErrors.username && (
-                <span className="checkout-modal__error">{authFieldErrors.username}</span>
-              )}
+              {authFieldErrors.username && <span className="auth-overlay__error">{authFieldErrors.username}</span>}
               <input
                 type="email"
                 placeholder="Email"
                 value={authForm.email}
                 onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
-                className="checkout-modal__input"
+                className="auth-overlay__input"
               />
-              {authFieldErrors.email && <span className="checkout-modal__error">{authFieldErrors.email}</span>}
-              <input
-                type={showRegisterPassword ? 'text' : 'password'}
-                placeholder="Password"
-                value={authForm.password}
-                onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
-                className="checkout-modal__input"
-              />
+              {authFieldErrors.email && <span className="auth-overlay__error">{authFieldErrors.email}</span>}
+              <div className="auth-overlay__password-wrap">
+                <input
+                  type={showRegisterPassword ? 'text' : 'password'}
+                  placeholder="Password"
+                  value={authForm.password}
+                  onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                  className="auth-overlay__input"
+                />
+                <button type="button" className="auth-overlay__ghost" onClick={() => setShowRegisterPassword((p) => !p)}>
+                  {showRegisterPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+              {authFieldErrors.password && <span className="auth-overlay__error">{authFieldErrors.password}</span>}
               <button
                 type="button"
-                className="checkout-modal__ghost"
-                onClick={() => setShowRegisterPassword((prev) => !prev)}
-              >
-                {showRegisterPassword ? 'Hide password' : 'Show password'}
-              </button>
-              {authFieldErrors.password && (
-                <span className="checkout-modal__error">{authFieldErrors.password}</span>
-              )}
-              <button
-                type="button"
-                className="checkout-modal__primary"
+                className="auth-overlay__submit"
                 onClick={handleRegister}
                 disabled={isAuthSubmitting || !isRegisterReady()}
               >
-                {isAuthSubmitting ? (
-                  <>
-                    <span className="checkout-modal__spinner" />
-                    Creating account...
-                  </>
-                ) : (
-                  'Create account'
-                )}
+                {isAuthSubmitting ? <><span className="auth-overlay__spinner" /> Creating account...</> : 'Create account'}
               </button>
             </div>
           )}
 
           {authNotice && (
-            <div className="checkout-modal__alert checkout-modal__alert--success">
+            <div className="auth-overlay__alert auth-overlay__alert--success">
               {authNotice}
               {pendingVerificationEmail && (
-                <div className="checkout-modal__resend">
-                  <button
-                    type="button"
-                    className="checkout-modal__link"
-                    onClick={handleResendVerification}
-                    disabled={isAuthSubmitting}
-                  >
+                <div className="auth-overlay__resend">
+                  <button type="button" className="auth-overlay__link" onClick={handleResendVerification} disabled={isAuthSubmitting}>
                     Resend verification email
                   </button>
                 </div>
               )}
             </div>
           )}
-          {authError && <div className="checkout-modal__alert">{authError}</div>}
+          {authError && <div className="auth-overlay__alert">{authError}</div>}
         </div>
       </div>
     </div>

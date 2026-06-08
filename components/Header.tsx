@@ -229,13 +229,6 @@ export function Header() {
         {isAuthModalOpen && (
           <AuthChoiceModal
             onClose={() => setIsAuthModalOpen(false)}
-            onGuestProceed={() => {
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('guest_checkout', '1');
-              }
-              setIsAuthModalOpen(false);
-              router.push('/cart');
-            }}
             onAuthSuccess={() => {
               setIsLoggedIn(true);
               setIsAuthModalOpen(false);

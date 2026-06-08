@@ -1261,7 +1261,6 @@ export function CartPage() {
       {isAuthModalOpen && (
         <AuthChoiceModal
           onClose={() => setIsAuthModalOpen(false)}
-          onGuestProceed={handleGuestProceed}
           onAuthSuccess={handleAuthSuccess}
           initialEmail={formData.customer_email}
         />

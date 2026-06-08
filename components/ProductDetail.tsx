@@ -17,6 +17,7 @@ import {
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { trackProductView } from '@/lib/tracking';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import Link from 'next/link';
@@ -403,6 +404,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       ) as number[];
       const updated = [product.id, ...recentlyViewed.filter((id) => id !== product.id)].slice(0, 10);
       localStorage.setItem('recentlyViewed', JSON.stringify(updated));
+      trackProductView(product.id);
     }
   }, [product?.id]);
 

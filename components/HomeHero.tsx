@@ -406,7 +406,7 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
                   />
                   <div className="home-hero__product-actions">
                     <Link
-                      href={`/products?search=${encodeURIComponent(normalizedQuery)}&focusSearch=1`}
+                      href={`/products?search=${encodeURIComponent(normalizedQuery)}&openFilters=1`}
                       className="home-hero__view-all"
                     >
                       View all results

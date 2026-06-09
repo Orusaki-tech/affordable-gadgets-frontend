@@ -31,7 +31,7 @@ function buildCanonicalFromSearchParams(sp: ProductsSearchParams) {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(sp)) {
     if (value === undefined) continue;
-    if (key === 'focusSearch') continue;
+    if (key === 'focusSearch' || key === 'openFilters') continue;
     if (Array.isArray(value)) {
       value.forEach((v) => params.append(key, v));
     } else {
@@ -87,7 +87,7 @@ export default function ProductsListingPage() {
         <HeaderWithAnnouncement />
       </Suspense>
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 pb-8">
         <Suspense
           fallback={
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

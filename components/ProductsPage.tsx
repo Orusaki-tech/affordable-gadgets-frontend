@@ -35,8 +35,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const router = useRouter();
   const searchParamsRef = useRef<string>('');
   const promotionId = searchParams.get('promotion');
-  const focusSearch = searchParams.get('focusSearch');
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const openFilters = searchParams.get('openFilters');
   const categoryTilesRef = useRef<HTMLDivElement | null>(null);
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const currentBrandFilter = (searchParams.get('brand_filter') || searchParams.get('brand') || '')
@@ -62,7 +61,9 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   );
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [sort, setSort] = useState('');
-  const [autoOpenFilters, setAutoOpenFilters] = useState(false);
+  const [autoOpenFilters, setAutoOpenFilters] = useState(() => searchParams.get('openFilters') === '1');
+  const [focusFilterSearch, setFocusFilterSearch] = useState(false);
+  const searchTrackingReadyRef = useRef(false);
   const queryClient = useQueryClient();
 
   const categoryCarouselItems = useMemo(() => CATEGORY_CARDS, []);
@@ -109,19 +110,14 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   }, [searchParams]);
 
   useEffect(() => {
-    if (!focusSearch) return;
-    const raf = window.requestAnimationFrame(() => {
-      const el = searchInputRef.current;
-      if (!el) return;
-      el.focus();
-      try {
-        el.select();
-      } catch {
-        // ignore selection issues (e.g. mobile)
-      }
-    });
-    return () => window.cancelAnimationFrame(raf);
-  }, [focusSearch]);
+    if (openFilters !== '1') return;
+    setAutoOpenFilters(true);
+    setFocusFilterSearch(true);
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('openFilters');
+    const qs = params.toString();
+    router.replace(`/products${qs ? `?${qs}` : ''}`, { scroll: false });
+  }, [openFilters, router, searchParams]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -264,6 +260,19 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     router.replace(nextUrl, { scroll: false });
   };
 
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || '';
+    if (debouncedSearch === urlSearch) {
+      searchTrackingReadyRef.current = true;
+      return;
+    }
+    updateQueryParams(undefined, debouncedSearch, 1);
+    if (debouncedSearch && searchTrackingReadyRef.current) {
+      trackSearch(debouncedSearch);
+    }
+    searchTrackingReadyRef.current = true;
+  }, [debouncedSearch, searchParams]);
+
   // First request fetches only visible count; next page is prefetched after this succeeds
   const { data, isLoading, error } = useProducts({
     page,
@@ -319,11 +328,9 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   // (including out-of-stock templates whose `brand` text did not match the filter exactly).
   const filteredResults = useMemo(() => data?.results ?? [], [data?.results]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    trackSearch(search);
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
     setPage(1);
-    updateQueryParams(undefined, search, 1);
   };
 
   const handleFiltersChange = (newFilters: FilterState) => {
@@ -349,6 +356,13 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
 
   return (
     <div className="products-page">
+      {!promotionData && brandBannerConfig ? (
+        <div className="products-page__header products-page__header--fullbleed">
+          <ProductsBrandBanner config={brandBannerConfig} />
+        </div>
+      ) : null}
+
+      <div className="products-page__body container mx-auto px-4">
       {promotionData ? (
         <div className="products-page__promo">
           <div className="products-page__promo-header">
@@ -360,25 +374,6 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
                 </p>
               )}
             </div>
-            <form
-              onSubmit={handleSearch}
-              className="products-page__search"
-            >
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                ref={searchInputRef}
-                className="products-page__search-input"
-              />
-              <button
-                type="submit"
-                className="products-page__search-button"
-              >
-                Search
-              </button>
-            </form>
           </div>
           {/* Note: promotion_code is not in the Promotion interface, but keeping for backward compatibility */}
           {(promotionData as PublicPromotion & { promotion_code?: string }).promotion_code && (
@@ -390,31 +385,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
             </p>
           )}
         </div>
-      ) : (
-        <div className="products-page__header">
-          {brandBannerConfig ? <ProductsBrandBanner config={brandBannerConfig} /> : null}
-
-          <form
-            onSubmit={handleSearch}
-            className="products-page__search"
-          >
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              ref={searchInputRef}
-              className="products-page__search-input"
-            />
-            <button
-              type="submit"
-              className="products-page__search-button"
-            >
-              Search
-            </button>
-          </form>
-        </div>
-      )}
+      ) : null}
 
       <div className="products-page__layout">
         {/* Filters Sidebar */}
@@ -424,6 +395,10 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
             onSortChange={handleSortChange}
             initialFilters={filters}
             autoOpen={autoOpenFilters}
+            search={search}
+            onSearchChange={handleSearchChange}
+            focusSearch={focusFilterSearch}
+            onSearchFocused={() => setFocusFilterSearch(false)}
           />
 
           <div
@@ -530,6 +505,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

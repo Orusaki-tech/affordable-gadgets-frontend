@@ -17,7 +17,7 @@ const MOBILE_ROTATION_MS = 2600;
 const announcementItems = [
   {
     id: 'warranty',
-    text: '6 months warranty',
+    text: '6-12 months warranty',
     icon: (
       <>
         <circle cx="12" cy="12" r="9" />

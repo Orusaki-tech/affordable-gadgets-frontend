@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { OpenAPI, type PublicProduct } from '@/lib/api/generated';
@@ -66,7 +66,6 @@ export function FinancingProductsPage() {
     return Number.isFinite(initial) && initial > 0 ? Math.floor(initial) : 1;
   });
   const [search, setSearch] = useState(searchParams.get('search') || '');
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const initialFilters = useMemo<FilterState>(
     () => ({
@@ -133,11 +132,17 @@ export function FinancingProductsPage() {
     data.results.slice(0, 4).forEach((p) => prefetchProductDetail(queryClient, p));
   }, [data?.results, queryClient]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
     setPage(1);
-    updateQueryParams(undefined, search, 1);
   };
+
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || '';
+    if (debouncedSearch === urlSearch) return;
+    updateQueryParams(undefined, debouncedSearch, 1);
+  }, [debouncedSearch, searchParams]);
+
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
     setPage(1);
@@ -151,26 +156,13 @@ export function FinancingProductsPage() {
 
   return (
     <div className="products-page">
-      <div className="products-page__header">
+      <div className="products-page__header products-page__header--compact">
         <div>
           <h1 className="products-page__title section-label">Financing</h1>
           <p className="text-sm text-gray-600" style={{ marginTop: 6 }}>
             Shop products with Buy Now Pay Later options. Look for the <strong>Financing available</strong> chip.
           </p>
         </div>
-        <form onSubmit={handleSearch} className="products-page__search">
-          <input
-            type="text"
-            placeholder="Search financing products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            ref={searchInputRef}
-            className="products-page__search-input"
-          />
-          <button type="submit" className="products-page__search-button">
-            Search
-          </button>
-        </form>
       </div>
 
       <div className="products-page__layout">
@@ -179,6 +171,8 @@ export function FinancingProductsPage() {
             onFiltersChange={handleFiltersChange}
             onSortChange={handleSortChange}
             initialFilters={filters}
+            search={search}
+            onSearchChange={handleSearchChange}
           />
         </div>
 

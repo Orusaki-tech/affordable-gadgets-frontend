@@ -1,12 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ProductFiltersProps {
   onFiltersChange: (filters: FilterState) => void;
   onSortChange: (sort: string) => void;
   initialFilters?: FilterState;
   autoOpen?: boolean;
+  search?: string;
+  onSearchChange?: (value: string) => void;
+  focusSearch?: boolean;
+  onSearchFocused?: () => void;
 }
 
 export interface FilterState {
@@ -62,7 +66,12 @@ export function ProductFilters({
   onSortChange,
   initialFilters,
   autoOpen,
+  search = '',
+  onSearchChange,
+  focusSearch,
+  onSearchFocused,
 }: ProductFiltersProps) {
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [filters, setFilters] = useState<FilterState>(
     initialFilters ?? {
       type: '',
@@ -96,6 +105,23 @@ export function ProductFilters({
       setSidebarOpen(true);
     }
   }, [autoOpen]);
+
+  useEffect(() => {
+    if (!focusSearch) return;
+    setSidebarOpen(true);
+    const raf = window.requestAnimationFrame(() => {
+      const el = searchInputRef.current;
+      if (!el) return;
+      el.focus();
+      try {
+        el.select();
+      } catch {
+        // ignore selection issues (e.g. mobile)
+      }
+      onSearchFocused?.();
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [focusSearch]);
 
   const handleFilterChange = (key: keyof FilterState, value: string) => {
     const newFilters = { ...filters, [key]: value };
@@ -196,6 +222,26 @@ export function ProductFilters({
         </div>
 
         <div className="product-filters__sidebar-body">
+          {onSearchChange ? (
+            <div className="product-filters__field">
+              <label className="product-filters__label" htmlFor="product-filters-search">
+                Search
+              </label>
+              <div className="product-filters__input-wrap product-filters__input-wrap--search">
+                <SearchIcon />
+                <input
+                  id="product-filters-search"
+                  ref={searchInputRef}
+                  type="search"
+                  value={search}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  placeholder="Search products..."
+                  className="product-filters__input"
+                />
+              </div>
+            </div>
+          ) : null}
+
           <div className="product-filters__row">
             <div className="product-filters__field">
               <label className="product-filters__label">Sort by</label>

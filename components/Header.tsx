@@ -55,13 +55,13 @@ export function Header() {
     setCurrentSearch(window.location.search);
   }, [pathname]);
 
-  const focusProductsSearchHref = useMemo(() => {
+  const openProductsFiltersHref = useMemo(() => {
     const isOnProducts = pathname === '/products';
     if (!isOnProducts) {
-      return '/products?focusSearch=1';
+      return '/products?openFilters=1';
     }
     const params = new URLSearchParams(currentSearch);
-    params.set('focusSearch', '1');
+    params.set('openFilters', '1');
     const qs = params.toString();
     return `/products${qs ? `?${qs}` : ''}`;
   }, [currentSearch, pathname]);
@@ -109,7 +109,7 @@ export function Header() {
           {/* Search, Cart, Account – grouped after nav */}
           <div className="site-header__actions">
             <Link
-              href={focusProductsSearchHref}
+              href={openProductsFiltersHref}
               className="site-header__icon-button site-header__icon-button--search"
               aria-label="Search products"
               title="Search"

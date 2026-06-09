@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { OpenAPI, type PublicProduct } from '@/lib/api/generated';
 import { PRODUCTS_VISIBLE_PAGE_SIZE, prefetchProductDetail } from '@/lib/hooks/useProducts';
-import { useDebouncedValue } from '@/lib/hooks/useDebouncedValue';
+import { useDebouncedSearchParam } from '@/lib/hooks/useDebouncedSearchParam';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, type FilterState } from './ProductFilters';
 
@@ -65,7 +65,6 @@ export function FinancingProductsPage() {
     const initial = Number(searchParams.get('page') || 1);
     return Number.isFinite(initial) && initial > 0 ? Math.floor(initial) : 1;
   });
-  const [search, setSearch] = useState(searchParams.get('search') || '');
 
   const initialFilters = useMemo<FilterState>(
     () => ({
@@ -79,37 +78,50 @@ export function FinancingProductsPage() {
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [sort, setSort] = useState('');
 
-  const debouncedSearch = useDebouncedValue(search, 400);
-
   useEffect(() => setFilters(initialFilters), [initialFilters]);
-  useEffect(() => setSearch(searchParams.get('search') || ''), [searchParams]);
   useEffect(() => {
     const next = Number(searchParams.get('page') || 1);
     const normalized = Number.isFinite(next) && next > 0 ? Math.floor(next) : 1;
     setPage((prev) => (prev === normalized ? prev : normalized));
   }, [searchParams]);
 
-  const updateQueryParams = (nextFilters?: FilterState, nextSearch?: string, nextPage?: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const updateParam = (key: string, value?: string) => {
-      if (value) params.set(key, value);
-      else params.delete(key);
-    };
-    const f = nextFilters ?? filters;
-    updateParam('type', f.type);
-    updateParam('brand', f.brand);
-    updateParam('min_price', f.minPrice);
-    updateParam('max_price', f.maxPrice);
-    updateParam('search', nextSearch ?? search);
-    updateParam(
-      'page',
-      (typeof nextPage === 'number' ? nextPage : page) > 1
-        ? String(typeof nextPage === 'number' ? nextPage : page)
-        : undefined
-    );
-    const qs = params.toString();
-    router.replace(`/financing${qs ? `?${qs}` : ''}`, { scroll: false });
-  };
+  const updateQueryParams = useCallback(
+    (nextFilters?: FilterState, nextSearch?: string, nextPage?: number) => {
+      const params = new URLSearchParams(searchParams.toString());
+      const updateParam = (key: string, value?: string) => {
+        if (value) params.set(key, value);
+        else params.delete(key);
+      };
+      const f = nextFilters ?? filters;
+      updateParam('type', f.type);
+      updateParam('brand', f.brand);
+      updateParam('min_price', f.minPrice);
+      updateParam('max_price', f.maxPrice);
+      if (nextSearch !== undefined) {
+        updateParam('search', nextSearch);
+      }
+      updateParam(
+        'page',
+        (typeof nextPage === 'number' ? nextPage : page) > 1
+          ? String(typeof nextPage === 'number' ? nextPage : page)
+          : undefined
+      );
+      const qs = params.toString();
+      router.replace(`/financing${qs ? `?${qs}` : ''}`, { scroll: false });
+    },
+    [filters, page, router, searchParams]
+  );
+
+  const syncSearchToUrl = useCallback(
+    (debouncedSearch: string) => {
+      updateQueryParams(undefined, debouncedSearch, 1);
+    },
+    [updateQueryParams]
+  );
+
+  const { search, debouncedSearch, handleSearchChange: setSearchValue } = useDebouncedSearchParam({
+    onSyncToUrl: syncSearchToUrl,
+  });
 
   const { data, isLoading, error } = useQuery<PaginatedPublicProductList>({
     queryKey: ['products', 'financing', { page, filters, debouncedSearch, sort }],
@@ -133,15 +145,9 @@ export function FinancingProductsPage() {
   }, [data?.results, queryClient]);
 
   const handleSearchChange = (value: string) => {
-    setSearch(value);
+    setSearchValue(value);
     setPage(1);
   };
-
-  useEffect(() => {
-    const urlSearch = searchParams.get('search') || '';
-    if (debouncedSearch === urlSearch) return;
-    updateQueryParams(undefined, debouncedSearch, 1);
-  }, [debouncedSearch, searchParams]);
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
@@ -225,4 +231,3 @@ export function FinancingProductsPage() {
     </div>
   );
 }
-

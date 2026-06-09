@@ -1538,7 +1538,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 <svg className="product-detail__includes-icon product-detail__includes-icon--success" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span>6 months warranty</span>
+                <span>6-12 months warranty</span>
               </div>
               <div className="product-detail__includes-item">
                 <svg className="product-detail__includes-icon product-detail__includes-icon--primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1762,10 +1762,10 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               <div className="product-detail__section-block">
                 <h3 className="product-detail__section-title">Warranty Policy</h3>
                 <div className="product-detail__warranty">
-                  <p className="product-detail__warranty-heading">6 Months Warranty</p>
+                  <p className="product-detail__warranty-heading">6-12 Months Warranty</p>
                   <ul className="product-detail__warranty-list">
-                    <li>6 months warranty on network, charging issues, earpiece, microphone, and speaker.</li>
-                    <li>6 months warranty on software malfunction that is not related to 3rd party software i.e apps not on Play Store or App Store.</li>
+                    <li>6-12 months warranty on network, charging issues, earpiece, microphone, and speaker.</li>
+                    <li>6-12 months warranty on software malfunction that is not related to 3rd party software i.e apps not on Play Store or App Store.</li>
                     <li>No warranty on screen upon testing at the shop or after delivery.</li>
                     <li>3-months warranty on battery.</li>
                     <li>1 month warranty on chargers and accessories.</li>

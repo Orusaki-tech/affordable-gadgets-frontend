@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProducts, PRODUCTS_VISIBLE_PAGE_SIZE, productsQueryFn, prefetchProductDetail } from '@/lib/hooks/useProducts';
-import { useDebouncedValue } from '@/lib/hooks/useDebouncedValue';
+import { useDebouncedSearchParam } from '@/lib/hooks/useDebouncedSearchParam';
 import { usePromotion, prefetchPromotion } from '@/lib/hooks/usePromotions';
 import { PublicPromotion } from '@/lib/api/generated';
 import { ProductCard } from './ProductCard';
@@ -49,7 +49,6 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     const initial = Number(searchParams.get('page') || 1);
     return Number.isFinite(initial) && initial > 0 ? Math.floor(initial) : 1;
   });
-  const [search, setSearch] = useState(searchParams.get('search') || '');
   const initialFilters = useMemo<FilterState>(
     () => ({
       type: searchParams.get('type') || '',
@@ -63,7 +62,6 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const [sort, setSort] = useState('');
   const [autoOpenFilters, setAutoOpenFilters] = useState(() => searchParams.get('openFilters') === '1');
   const [focusFilterSearch, setFocusFilterSearch] = useState(false);
-  const searchTrackingReadyRef = useRef(false);
   const queryClient = useQueryClient();
 
   const categoryCarouselItems = useMemo(() => CATEGORY_CARDS, []);
@@ -72,8 +70,57 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     searchParamsRef.current = searchParams.toString();
   }, [searchParams]);
 
-  // Debounce search so we don't refetch on every keystroke (only after user pauses)
-  const debouncedSearch = useDebouncedValue(search, 400);
+  const updateQueryParams = useCallback(
+    (nextFilters?: FilterState, nextSearch?: string, nextPage?: number) => {
+      const params = new URLSearchParams(searchParams.toString());
+      const updateParam = (key: string, value?: string) => {
+        if (value) {
+          params.set(key, value);
+        } else {
+          params.delete(key);
+        }
+      };
+
+      const filtersToApply = nextFilters ?? filters;
+      updateParam('type', filtersToApply.type);
+      updateParam('brand_filter', filtersToApply.brand);
+      updateParam('min_price', filtersToApply.minPrice);
+      updateParam('max_price', filtersToApply.maxPrice);
+      if (nextSearch !== undefined) {
+        updateParam('search', nextSearch);
+      }
+      updateParam(
+        'page',
+        (typeof nextPage === 'number' ? nextPage : page) > 1
+          ? String(typeof nextPage === 'number' ? nextPage : page)
+          : undefined
+      );
+
+      const paramString = params.toString();
+      const hash = typeof window !== 'undefined' ? window.location.hash : '';
+      const nextUrl = `/products${paramString ? `?${paramString}` : ''}${hash}`;
+      if (typeof window !== 'undefined') {
+        const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+        if (currentUrl === nextUrl) {
+          return;
+        }
+      }
+      router.replace(nextUrl, { scroll: false });
+    },
+    [filters, page, router, searchParams]
+  );
+
+  const syncSearchToUrl = useCallback(
+    (debouncedSearch: string) => {
+      updateQueryParams(undefined, debouncedSearch, 1);
+    },
+    [updateQueryParams]
+  );
+
+  const { search, debouncedSearch, handleSearchChange: setSearchValue } = useDebouncedSearchParam({
+    onSyncToUrl: syncSearchToUrl,
+    onTrack: trackSearch,
+  });
 
   // Fetch promotion details if promotion ID is in URL
   const { data: promotionData } = usePromotion(promotionId ? parseInt(promotionId) : 0);
@@ -100,10 +147,6 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   }, [initialFilters]);
 
   useEffect(() => {
-    setSearch(searchParams.get('search') || '');
-  }, [searchParams]);
-
-  useEffect(() => {
     const next = Number(searchParams.get('page') || 1);
     const normalized = Number.isFinite(next) && next > 0 ? Math.floor(next) : 1;
     setPage((prev) => (prev === normalized ? prev : normalized));
@@ -113,11 +156,11 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     if (openFilters !== '1') return;
     setAutoOpenFilters(true);
     setFocusFilterSearch(true);
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(window.location.search);
     params.delete('openFilters');
     const qs = params.toString();
     router.replace(`/products${qs ? `?${qs}` : ''}`, { scroll: false });
-  }, [openFilters, router, searchParams]);
+  }, [openFilters, router]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -221,58 +264,6 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     });
   };
 
-  const updateQueryParams = (
-    nextFilters?: FilterState,
-    nextSearch?: string,
-    nextPage?: number
-  ) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const updateParam = (key: string, value?: string) => {
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-    };
-
-    const filtersToApply = nextFilters ?? filters;
-    updateParam('type', filtersToApply.type);
-    updateParam('brand_filter', filtersToApply.brand);
-    updateParam('min_price', filtersToApply.minPrice);
-    updateParam('max_price', filtersToApply.maxPrice);
-    updateParam('search', nextSearch ?? search);
-    updateParam(
-      'page',
-      (typeof nextPage === 'number' ? nextPage : page) > 1
-        ? String(typeof nextPage === 'number' ? nextPage : page)
-        : undefined
-    );
-
-    const paramString = params.toString();
-    const hash = typeof window !== 'undefined' ? window.location.hash : '';
-    const nextUrl = `/products${paramString ? `?${paramString}` : ''}${hash}`;
-    if (typeof window !== 'undefined') {
-      const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-      if (currentUrl === nextUrl) {
-        return;
-      }
-    }
-    router.replace(nextUrl, { scroll: false });
-  };
-
-  useEffect(() => {
-    const urlSearch = searchParams.get('search') || '';
-    if (debouncedSearch === urlSearch) {
-      searchTrackingReadyRef.current = true;
-      return;
-    }
-    updateQueryParams(undefined, debouncedSearch, 1);
-    if (debouncedSearch && searchTrackingReadyRef.current) {
-      trackSearch(debouncedSearch);
-    }
-    searchTrackingReadyRef.current = true;
-  }, [debouncedSearch, searchParams]);
-
   // First request fetches only visible count; next page is prefetched after this succeeds
   const { data, isLoading, error } = useProducts({
     page,
@@ -329,7 +320,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
   const filteredResults = useMemo(() => data?.results ?? [], [data?.results]);
 
   const handleSearchChange = (value: string) => {
-    setSearch(value);
+    setSearchValue(value);
     setPage(1);
   };
 

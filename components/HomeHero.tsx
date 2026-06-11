@@ -1,14 +1,13 @@
 'use client';
 
-import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductCarousel } from '@/components/ProductCarousel';
-import { getCloudinarySizedImageUrl } from '@/lib/utils/cloudinary';
 import { formatPrice } from '@/lib/utils/format';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
@@ -28,8 +27,6 @@ type HomeHeroPromotion = PublicPromotion & {
 
 const PROMOTIONS_PAGE_SIZE = 50;
 const PROMO_THUMB_SIZE = 320;
-const HERO_BANNER_SIZE = 1400;
-const HERO_LEFT_PLACEHOLDER_SIZE = 800;
 // Hero promo cards/banner rotation timing (user request).
 const HERO_AUTOPLAY_INTERVAL_MS = 6000;
 /** Number of placeholder/skeleton cards when there are no hero promotions (keep 4 visible to match itemsPerView). */
@@ -186,16 +183,6 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
 
   const activeBannerSrc =
     activePromotion?.banner_image_url || activePromotion?.banner_image || null;
-  const fallbackBannerSrc = getCloudinarySizedImageUrl(
-    HERO_PROMOTION_PLACEHOLDER_IMAGE,
-    HERO_BANNER_SIZE,
-    'contain'
-  );
-  const leftPlaceholderSrc = getCloudinarySizedImageUrl(
-    HERO_PROMOTION_PLACEHOLDER_IMAGE,
-    HERO_LEFT_PLACEHOLDER_SIZE,
-    'contain'
-  );
 
   const renderPromotionCard = (promotion: HomeHeroPromotion): ReactNode => {
     const id = typeof promotion.id === 'number' ? promotion.id : null;
@@ -220,17 +207,13 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
       <>
         <div className="home-hero__promo-media">
           {thumbSrc ? (
-            <Image
-              src={getCloudinarySizedImageUrl(thumbSrc, PROMO_THUMB_SIZE, 'contain')}
+            <CloudinaryImage
+              src={thumbSrc}
               alt={cardTitle}
+              preset="productThumb"
               width={PROMO_THUMB_SIZE}
               height={PROMO_THUMB_SIZE}
               className="home-hero__promo-image"
-              unoptimized={
-                thumbSrc.includes('localhost') ||
-                thumbSrc.includes('127.0.0.1') ||
-                thumbSrc.includes('placehold.co')
-              }
             />
           ) : (
             <div className="home-hero__promo-image home-hero__promo-image--placeholder" />
@@ -371,12 +354,13 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
                 <div className="home-hero__left-card" aria-live="polite">
                   <div className="home-hero__placeholder">
                     <div className="home-hero__placeholder-media" aria-hidden>
-                      <Image
-                        src={leftPlaceholderSrc}
+                      <CloudinaryImage
+                        src={HERO_PROMOTION_PLACEHOLDER_IMAGE}
                         alt=""
-                        fill
+                        preset="card"
                         sizes="(max-width: 1024px) 100vw, 420px"
                         className="home-hero__placeholder-image"
+                        fill
                       />
                     </div>
                     <div className="home-hero__placeholder-body">
@@ -428,27 +412,26 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
             <div className="home-hero__right">
               {activePromotion && activeBannerSrc ? (
                 <Link href={getPromotionHref(activePromotion)} className="home-hero__banner" aria-label={activePromotion.title}>
-                  <Image
-                    src={getCloudinarySizedImageUrl(activeBannerSrc, HERO_BANNER_SIZE, 'contain')}
+                  <CloudinaryImage
+                    src={activeBannerSrc}
                     alt={activePromotion.title}
-                    fill
+                    preset="card"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="home-hero__banner-image"
                     priority
-                    fetchPriority="high"
-                    unoptimized={activeBannerSrc.includes('localhost') || activeBannerSrc.includes('127.0.0.1') || activeBannerSrc.includes('placehold.co')}
+                    fill
                   />
                 </Link>
               ) : (
                 <div className="home-hero__banner home-hero__banner--placeholder" aria-label="Promotions placeholder">
-                  <Image
-                    src={fallbackBannerSrc}
+                  <CloudinaryImage
+                    src={HERO_PROMOTION_PLACEHOLDER_IMAGE}
                     alt="Promotions coming soon"
-                    fill
+                    preset="card"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="home-hero__banner-image"
                     priority
-                    fetchPriority="high"
+                    fill
                   />
                 </div>
               )}

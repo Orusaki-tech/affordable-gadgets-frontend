@@ -1,5 +1,6 @@
 'use client';
 
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { ProductCarousel } from './ProductCarousel';
 
 const COLLECTION_CARD_COUNT = 6;
@@ -43,11 +44,10 @@ export function ImageCarousel() {
           <div key={`collection-card-${index}`} className="image-carousel__card" aria-hidden>
             <div className="image-carousel__card-media">
               {COLLECTION_CARD_IMAGES[index] ? (
-                <img
+                <CloudinaryImage
                   src={COLLECTION_CARD_IMAGES[index].src}
                   alt={COLLECTION_CARD_IMAGES[index].alt}
-                  loading="lazy"
-                  decoding="async"
+                  preset="card"
                   className="image-carousel__card-image"
                 />
               ) : null}

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { CATEGORY_CARDS, type CategoryCard } from '@/lib/config/categories';
 import { useInfiniteProducts, useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from './ProductCard';
@@ -17,9 +18,10 @@ export function CategoriesPage() {
           <Link key={category.code} href={category.href} className="categories-page__card" prefetch={false}>
             {/* Wrap the image in its own container for the background color */}
             <div className="categories-page__card-image-wrapper">
-              <img
+              <CloudinaryImage
                 src={category.image}
                 alt={category.name}
+                preset="card"
                 className="categories-page__card-icon"
               />
             </div>

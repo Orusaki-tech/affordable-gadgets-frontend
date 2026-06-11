@@ -2,6 +2,10 @@ const DEFAULT_CLOUDINARY_CLOUD_NAME = 'dhgaqa2gb';
 
 const CLOUDINARY_UPLOAD_SEGMENT = '/image/upload/';
 
+export function isCloudinaryUrl(url: string): boolean {
+  return Boolean(url && url.includes(CLOUDINARY_UPLOAD_SEGMENT));
+}
+
 const TRANSFORM_KEYS = ['w_', 'h_', 'c_', 'g_', 'f_', 'q_', 'ar_', 'dpr_'];
 
 function hasTransformationSegment(segment: string): boolean {
@@ -64,6 +68,24 @@ export function getCloudinaryDensitySrcSet(
   const oneX = getCloudinaryBannerImageUrl(url, width1x, undefined, undefined, 'contain');
   const twoX = getCloudinaryBannerImageUrl(url, width2x, undefined, undefined, 'contain');
   return `${oneX}, ${twoX} 2x`;
+}
+
+/** Width-descriptor `srcset`: `url 300w, url 600w, …` */
+export function getCloudinaryWidthSrcSet(
+  url: string,
+  widths: readonly number[],
+  fit: 'cover' | 'contain' = 'contain'
+): string {
+  return widths
+    .map((width) => {
+      const optimized = isCloudinaryUrl(url)
+        ? fit === 'cover'
+          ? getCloudinarySizedImageUrl(url, width, 'cover')
+          : getCloudinaryBannerImageUrl(url, width, undefined, undefined, 'contain')
+        : url;
+      return `${optimized} ${width}w`;
+    })
+    .join(', ');
 }
 
 /**

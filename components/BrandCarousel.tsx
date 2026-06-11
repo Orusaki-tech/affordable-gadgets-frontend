@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { ProductCarousel } from '@/components/ProductCarousel';
 
 /**
@@ -54,9 +55,10 @@ export function BrandCarousel() {
             aria-label={item.label ?? `Brand ${index + 1}`}
           >
             {item.image ? (
-              <img
+              <CloudinaryImage
                 src={item.image}
                 alt=""
+                preset="logo"
                 width={480}
                 height={240}
                 className="brand-carousel__image"

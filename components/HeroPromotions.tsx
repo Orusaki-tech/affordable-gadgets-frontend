@@ -1,13 +1,10 @@
-import Image from 'next/image';
 import Link from 'next/link';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { brandConfig } from '@/lib/config/brand';
-import { getCloudinarySizedImageUrl } from '@/lib/utils/cloudinary';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 
 const PROMOTIONS_PAGE_SIZE = 12;
-const HERO_IMAGE_SIZE = 1200;
-const GRID_IMAGE_SIZE = 600;
 
 function normalizeLocations(value: unknown): string[] {
   if (Array.isArray(value)) {
@@ -35,7 +32,7 @@ function sortPromotions(promotions: PublicPromotion[]) {
     if (aHasPos) return -1;
     if (bHasPos) return 1;
 
-    return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+    return new Date(b.start_date).getTime() - new Date(b.start_date).getTime();
   });
 }
 
@@ -104,15 +101,15 @@ export async function HeroPromotions() {
           >
             {bannerItem && bannerImageSrc ? (
               <Link href={getPromotionHref(bannerItem)} className="hero-promotions__link">
-                <Image
-                  src={getCloudinarySizedImageUrl(bannerImageSrc, HERO_IMAGE_SIZE, 'cover')}
+                <CloudinaryImage
+                  src={bannerImageSrc}
                   alt={bannerItem.title}
-                  width={HERO_IMAGE_SIZE}
-                  height={HERO_IMAGE_SIZE}
-                  priority
-                  fetchPriority="high"
+                  preset="card"
+                  fit="cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="hero-promotions__image hero-promotions__image--cover"
+                  priority
+                  fill
                 />
               </Link>
             ) : (
@@ -132,13 +129,13 @@ export async function HeroPromotions() {
                     className="hero-promotions__tile"
                   >
                     {imageSrc ? (
-                      <Image
-                        src={getCloudinarySizedImageUrl(imageSrc, GRID_IMAGE_SIZE, 'contain')}
+                      <CloudinaryImage
+                        src={imageSrc}
                         alt={promotion.title}
-                        width={GRID_IMAGE_SIZE}
-                        height={GRID_IMAGE_SIZE}
+                        preset="card"
                         sizes="(max-width: 1024px) 50vw, 25vw"
                         className="hero-promotions__image hero-promotions__image--contain"
+                        fill
                       />
                     ) : (
                       <div className="hero-promotions__placeholder" />
@@ -161,15 +158,15 @@ export async function HeroPromotions() {
             href={getPromotionHref(bannerItem)}
             className="hero-promotions__tile hero-promotions__tile--banner"
           >
-            <Image
-              src={getCloudinarySizedImageUrl(bannerImageSrc, HERO_IMAGE_SIZE, 'cover')}
+            <CloudinaryImage
+              src={bannerImageSrc}
               alt={bannerItem.title}
-              width={HERO_IMAGE_SIZE}
-              height={HERO_IMAGE_SIZE}
-              priority
-              fetchPriority="high"
+              preset="card"
+              fit="cover"
               sizes="100vw"
               className="hero-promotions__image hero-promotions__image--cover"
+              priority
+              fill
             />
           </Link>
         ) : (
@@ -187,13 +184,13 @@ export async function HeroPromotions() {
                     className="hero-promotions__tile"
                   >
                     {imageSrc ? (
-                      <Image
-                        src={getCloudinarySizedImageUrl(imageSrc, GRID_IMAGE_SIZE, 'contain')}
+                      <CloudinaryImage
+                        src={imageSrc}
                         alt={promotion.title}
-                        width={GRID_IMAGE_SIZE}
-                        height={GRID_IMAGE_SIZE}
+                        preset="card"
                         sizes="50vw"
                         className="hero-promotions__image hero-promotions__image--contain"
+                        fill
                       />
                     ) : (
                       <div className="hero-promotions__placeholder" />

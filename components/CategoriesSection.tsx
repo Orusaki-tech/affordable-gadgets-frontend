@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { CATEGORY_CARDS } from '@/lib/config/categories';
 
 export function CategoriesSection() {
@@ -15,9 +16,10 @@ export function CategoriesSection() {
             prefetch={false}
           >
             <div className="categories-section__media">
-              <img
+              <CloudinaryImage
                 src={category.image}
                 alt={category.name}
+                preset="card"
                 className="categories-section__image"
               />
             </div>

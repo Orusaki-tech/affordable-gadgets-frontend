@@ -11,8 +11,8 @@ import {
   type MouseEvent,
   type SetStateAction,
 } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { useQuery } from '@tanstack/react-query';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -115,20 +115,14 @@ function PosterImageFallback({
   if (urls.length === 0) return null;
   const safeIdx = Math.min(idx, urls.length - 1);
   const src = urls[safeIdx];
-  const unoptimized =
-    src.includes('ytimg.com') ||
-    src.includes('localhost') ||
-    src.includes('placehold.co') ||
-    src.includes('cloudinary') ||
-    src.includes('railway.app');
   return (
-    <Image
+    <CloudinaryImage
       src={src}
       alt=""
-      fill
+      preset="card"
       className={className}
       sizes={IMAGE_SIZES}
-      unoptimized={unoptimized}
+      fill
       onError={() => {
         if (safeIdx < urls.length - 1) setIdx((i) => i + 1);
       }}

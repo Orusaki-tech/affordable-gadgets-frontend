@@ -15,6 +15,7 @@ import {
   type ConditionEnum,
 } from '@/lib/api/generated';
 import Image from 'next/image';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { trackProductView, trackWhatsAppClick, trackCartAdd } from '@/lib/tracking';
@@ -242,13 +243,13 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
               }}
               title={img.color_name || 'Unit image'}
             >
-              <Image
+              <CloudinaryImage
                 src={img.image_url || imageUrl || ''}
                 alt={`${unitTitle} image ${index + 1}`}
+                preset="productThumb"
                 width={28}
                 height={28}
                 className="product-detail__unit-thumb-image"
-                unoptimized={!img.image_url || img.image_url.includes('localhost') || img.image_url.includes('placehold.co')}
               />
             </button>
           ))}
@@ -935,22 +936,17 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         <div className="product-detail__gallery">
           {/* Main Image */}
           <div className="product-detail__gallery-main">
-            <Image
+            <CloudinaryImage
               src={
                 (mainImageLoadFailed ? getPlaceholderProductImage(product.product_name) : mainDisplayImage) ||
                 getPlaceholderProductImage(product.product_name)
               }
               alt={product.product_name}
-              fill
+              preset="productGallery"
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="product-detail__gallery-image"
               priority
-              unoptimized={
-                mainImageLoadFailed ||
-                !mainDisplayImage ||
-                mainDisplayImage.includes('localhost') ||
-                mainDisplayImage.includes('placehold.co')
-              }
+              fill
               onError={() => setMainImageLoadFailed(true)}
             />
             <ProductTrustStamp condition={galleryStampCondition} size="detail" />
@@ -981,13 +977,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   }`}
                     title={imageColor ? `Color: ${imageColor}` : undefined}
                 >
-                  <Image
+                  <CloudinaryImage
                     src={img}
                     alt={`${product.product_name} view ${index + 1}${imageColor ? ` - ${imageColor}` : ''}`}
-                    fill
+                    preset="productThumb"
                     sizes="64px"
                     className="product-detail__thumbnail-image"
-                    unoptimized={img.includes('localhost') || img.includes('placehold.co')}
+                    fill
                   />
                     {imageColor && (
                       <div className="product-detail__thumbnail-label">
@@ -1385,13 +1381,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         const itemContent = (
                           <>
                             <div className="product-detail__bundle-item-media">
-                              <Image
+                              <CloudinaryImage
                                 src={item.primary_image || getPlaceholderProductImage(itemName)}
                                 alt={itemName}
-                                fill
+                                preset="productThumb"
                                 className="product-detail__bundle-item-image"
                                 sizes="64px"
-                                unoptimized={!item.primary_image || item.primary_image.includes('placehold.co')}
+                                fill
                               />
                             </div>
                             <div className="product-detail__bundle-item-info">
@@ -1602,13 +1598,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     className="product-detail__accessory-link"
                   >
                     <div className="product-detail__accessory-media">
-                      <Image
+                      <CloudinaryImage
                         src={accessory.accessory_primary_image || getPlaceholderProductImage(accessory.accessory_name)}
                         alt={accessory.accessory_name ?? 'Accessory'}
-                        fill
+                        preset="productThumb"
                         className="product-detail__accessory-image"
                         sizes="56px"
-                        unoptimized={process.env.NODE_ENV === 'development'}
+                        fill
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           if (!target.src.includes('placehold.co')) {

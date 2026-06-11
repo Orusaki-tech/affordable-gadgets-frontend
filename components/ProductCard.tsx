@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { PublicProduct, InventoryUnitImage } from '@/lib/api/generated';
 import { formatPrice, formatPriceRange } from '@/lib/utils/format';
@@ -393,13 +393,13 @@ export function ProductCard({
         onFocus={handlePrefetch}
       >
         <div className="product-card__media product-card__media--square product-card__media--featured">
-          <Image
+          <CloudinaryImage
             src={primaryImage}
             alt={product.product_name}
-            fill
+            preset="productThumb"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="product-card__image product-card__image--primary product-card__image--featured"
-            unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
+            fill
           />
           <ProductTrustStamp condition={trustStampCondition} size="card" />
         </div>
@@ -433,13 +433,13 @@ export function ProductCard({
           <div className="product-card__footer-overlay">
             <div className="product-card__overlay-row">
               <div className="product-card__overlay-header">
-                <Image
+                <CloudinaryImage
                   src={primaryImage}
                   alt={product.product_name}
+                  preset="productThumb"
                   width={30}
                   height={30}
                   className="product-card__overlay-thumb"
-                  unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
                 />
                 <p className="product-card__name product-card__name--featured">{product.product_name}</p>
               </div>
@@ -578,22 +578,22 @@ export function ProductCard({
     >
       {/* Product Image */}
       <div className={`product-card__media ${isMinimal ? 'product-card__media--square' : 'product-card__media--wide'}`}>
-        <Image
+        <CloudinaryImage
             src={primaryImage}
           alt={product.product_name}
-          fill
+          preset="productThumb"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className={`product-card__image product-card__image--primary ${secondaryImage ? 'product-card__image--fade' : ''}`}
-          unoptimized={!product.primary_image || product.primary_image.includes('localhost') || product.primary_image.includes('127.0.0.1') || product.primary_image.includes('placehold.co')}
+          fill
         />
           {secondaryImage && (
-            <Image
+            <CloudinaryImage
               src={secondaryImage}
               alt={`${product.product_name} alternate`}
-              fill
+              preset="productThumb"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               className="product-card__image product-card__image--secondary"
-              unoptimized={secondaryImage.includes('localhost') || secondaryImage.includes('127.0.0.1') || secondaryImage.includes('placehold.co')}
+              fill
             />
           )}
 

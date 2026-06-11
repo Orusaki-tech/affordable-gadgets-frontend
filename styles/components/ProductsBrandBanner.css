@@ -8,11 +8,29 @@
   border-radius: 0;
   overflow: hidden;
   background-color: #f5f5f7;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   border: none;
   border-bottom: 1px solid var(--ui-gray-200);
+}
+
+.products-brand-banner__picture {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.products-brand-banner__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center right;
 }
 
 @media (min-width: 768px) {

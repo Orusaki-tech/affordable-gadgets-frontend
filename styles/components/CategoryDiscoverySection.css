@@ -189,6 +189,10 @@
   object-position: bottom center;
 }
 
+.category-discovery__card .category-discovery__card-image {
+  margin: 0 auto;
+}
+
 /* Mobile: swipeable product strip inside multi-image cards */
 @media (max-width: 767px) {
   .category-discovery {

@@ -6,7 +6,7 @@ import { useProducts } from '@/lib/hooks/useProducts';
 import { PublicPromotion, PublicProduct } from '@/lib/api/generated';
 import { useRouter } from 'next/navigation';
 import { getProductHref } from '@/lib/utils/productRoutes';
-import { getCloudinarySizedImageUrl } from '@/lib/utils/cloudinary';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { ProductCarousel } from './ProductCarousel';
 
 interface VideoModalProps {
@@ -69,7 +69,7 @@ interface StoryImageProps {
   sizes: string;
   fit?: 'contain' | 'cover';
   loading?: 'lazy' | 'eager';
-  fetchPriority?: 'high' | 'low' | 'auto';
+  priority?: boolean;
   className?: string;
 }
 
@@ -79,25 +79,21 @@ function StoryImage({
   sizes,
   fit = 'contain',
   loading = 'lazy',
-  fetchPriority = 'auto',
+  priority = false,
   className,
 }: StoryImageProps) {
-  const sizeCandidates = [150, 300, 600, 1200, 2400];
-  const src150 = getCloudinarySizedImageUrl(src, 150, fit);
-  const fitClassName = fit === 'cover' ? 'object-cover' : 'object-contain';
+  const fitClassName = fit === 'cover' ? 'stories-carousel__media--cover' : 'stories-carousel__media--contain';
 
   return (
-    <img
-      src={src150}
-      srcSet={sizeCandidates
-        .map((size) => `${getCloudinarySizedImageUrl(src, size, fit)} ${size}w`)
-        .join(', ')}
-      sizes={sizes}
+    <CloudinaryImage
+      src={src}
       alt={alt}
+      preset="card"
+      fit={fit}
+      sizes={sizes}
       loading={loading}
-      fetchPriority={fetchPriority}
-      decoding="async"
-      className={`stories-carousel__media ${fitClassName === 'object-cover' ? 'stories-carousel__media--cover' : 'stories-carousel__media--contain'}${className ? ` ${className}` : ''}`}
+      priority={priority}
+      className={`stories-carousel__media ${fitClassName}${className ? ` ${className}` : ''}`}
     />
   );
 }
@@ -405,7 +401,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
                             sizes="(max-width: 1024px) 100vw, 50vw"
                             fit="cover"
                             loading="eager"
-                            fetchPriority="high"
+                            priority
                           />
                         )}
                       </div>
@@ -429,7 +425,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
                       sizes="(max-width: 1024px) 100vw, 50vw"
                       fit="cover"
                       loading="eager"
-                      fetchPriority="high"
+                      priority
                     />
                   )}
                 </div>
@@ -562,7 +558,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
                             sizes="100vw"
                             fit="cover"
                             loading="eager"
-                            fetchPriority="high"
+                            priority
                           />
                         )}
                       </div>
@@ -585,7 +581,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
                   sizes="100vw"
                   fit="cover"
                   loading="eager"
-                  fetchPriority="high"
+                  priority
                 />
                 )}
               </div>

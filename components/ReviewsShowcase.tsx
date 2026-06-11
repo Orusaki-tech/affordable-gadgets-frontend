@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import Link from 'next/link';
 import { useAllReviews, useProductReviews } from '@/lib/hooks/useReviews';
 import type { Review, PublicProduct } from '@/lib/api/generated';
@@ -396,13 +396,13 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
               >
                 <div className="reviews-showcase__card-media">
                   {imageUrl ? (
-                    <Image
+                    <CloudinaryImage
                       src={imageUrl}
                       alt={review.product_name ?? 'Product review'}
-                      fill
+                      preset="card"
                       sizes="(max-width: 640px) 260px, (max-width: 1024px) 280px, 300px"
                       className="reviews-showcase__card-image"
-                      unoptimized={imageUrl.includes('localhost') || imageUrl.includes('placehold.co')}
+                      fill
                     />
                   ) : (
                     <div className="reviews-showcase__card-image-placeholder" />
@@ -457,12 +457,13 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                           className="reviews-showcase__tag"
                         >
                           <div className="reviews-showcase__tag-media">
-                            <Image
+                            <CloudinaryImage
                               src={productImage}
                               alt={productName}
-                              fill
+                              preset="productThumb"
                               className="reviews-showcase__tag-image"
                               sizes="28px"
+                              fill
                             />
                           </div>
                           <span className="reviews-showcase__tag-name">
@@ -540,16 +541,13 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                   <div className="reviews-showcase__viewer-image-wrap">
                     {selectedReview.review_image_url || selectedReview.review_image ? (
                       <div className="reviews-showcase__viewer-image">
-                        <Image
+                        <CloudinaryImage
                           src={selectedReview.review_image_url || selectedReview.review_image || ''}
                           alt={selectedReview.product_name ?? 'Product review'}
-                          fill
+                          preset="card"
                           sizes="(max-width: 768px) 90vw, 420px"
                           className="reviews-showcase__viewer-image-media"
-                          unoptimized={
-                            (selectedReview.review_image_url || selectedReview.review_image || '').includes('localhost') ||
-                            (selectedReview.review_image_url || selectedReview.review_image || '').includes('placehold.co')
-                          }
+                          fill
                         />
                       </div>
                     ) : (
@@ -638,12 +636,13 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
                         >
                           <div className="reviews-showcase__viewer-product-row">
                             <div className="reviews-showcase__viewer-product-media">
-                              <Image
+                              <CloudinaryImage
                                 src={productImage}
                                 alt={productName}
-                                fill
+                                preset="productThumb"
                                 className="reviews-showcase__viewer-product-image"
                                 sizes="48px"
+                                fill
                               />
                             </div>
                             <div className="reviews-showcase__viewer-product-info">

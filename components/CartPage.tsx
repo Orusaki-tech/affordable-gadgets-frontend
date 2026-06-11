@@ -4,6 +4,7 @@ import { useCart } from '@/lib/hooks/useCart';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
 import Image from 'next/image';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { useState, useEffect, useMemo } from 'react';
 import {
   ApiService,
@@ -651,9 +652,10 @@ export function CartPage() {
                       return (
                           <div key={item.id} className="cart-page__bundle-item">
                             <div className="cart-page__bundle-item-media">
-                              <Image
+                              <CloudinaryImage
                                 src={imageUrl}
                                 alt={inventoryUnit?.product_name ?? 'Product'}
+                                preset="productThumb"
                                 width={96}
                                 height={96}
                                 className="cart-page__bundle-item-image"
@@ -744,9 +746,10 @@ export function CartPage() {
                   >
                     <div className="cart-page__item-row">
                       <div className="cart-page__item-media">
-                        <Image
+                        <CloudinaryImage
                           src={imageUrl}
                           alt={inventoryUnit?.product_name ?? 'Product'}
+                          preset="productThumb"
                           width={96}
                           height={96}
                           className="cart-page__item-image"

@@ -1,5 +1,6 @@
 'use client';
 
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import type { ProductsBrandBannerConfig } from '@/lib/config/products-brand-banners';
 
 const PRODUCTS_GRID_ID = 'products-grid';
@@ -14,15 +15,7 @@ type ProductsBrandBannerProps = {
 
 export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
   return (
-    <section
-      className="products-brand-banner"
-      aria-label={`${config.title} collection`}
-      style={
-        config.backgroundImage
-          ? { backgroundImage: `url(${config.backgroundImage})` }
-          : undefined
-      }
-    >
+    <section className="products-brand-banner" aria-label={`${config.title} collection`}>
       <div className="products-brand-banner__content">
         <h1 className="products-brand-banner__title">{config.title}</h1>
         <p className="products-brand-banner__subtitle">{config.subtitle}</p>
@@ -34,6 +27,16 @@ export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
           Buy Now
         </button>
       </div>
+      {config.backgroundImage ? (
+        <CloudinaryImage
+          src={config.backgroundImage}
+          alt=""
+          preset="hero"
+          className="products-brand-banner__image"
+          pictureClassName="products-brand-banner__picture"
+          sizes="(max-width: 768px) 100vw, 1280px"
+        />
+      ) : null}
     </section>
   );
 }

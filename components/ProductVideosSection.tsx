@@ -2,7 +2,7 @@
 
 import { useProducts } from '@/lib/hooks/useProducts';
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { getPlaceholderVideoThumbnail, getPlaceholderVideoUrl, getPlaceholderVideoUrls, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
@@ -119,12 +119,12 @@ export function ProductVideosSection() {
           >
             {/* Product Image/Thumbnail */}
             <div className="product-videos__media">
-              <Image
+              <CloudinaryImage
                 src={product.primary_image || getPlaceholderVideoThumbnail(product.product_name)}
                 alt={product.product_name}
-                fill
+                preset="productThumb"
                 className="product-videos__media-image"
-                unoptimized={!product.primary_image || product.primary_image.includes('placehold.co')}
+                fill
               />
               
               {/* Play Button Overlay */}

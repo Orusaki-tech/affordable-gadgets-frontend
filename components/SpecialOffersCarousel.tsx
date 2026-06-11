@@ -2,7 +2,7 @@
 
 import { PublicPromotion } from '@/lib/api/generated';
 import Link from 'next/link';
-import Image from 'next/image';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { ProductCarousel } from './ProductCarousel';
 
@@ -54,15 +54,15 @@ export function SpecialOffersCarousel({ promotions, sectionTitle = 'Special Offe
             >
               <div className="special-offers-carousel__promo-media">
                 {promotionImageSrc && (
-                  <Image
+                  <CloudinaryImage
                     src={promotionImageSrc}
                     alt={promotion.title}
-                    fill
+                    preset="card"
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     priority={index === 0}
                     loading={index < 2 ? 'eager' : 'lazy'}
                     className="special-offers-carousel__promo-image"
-                    unoptimized={promotionImageSrc.includes('placehold.co')}
+                    fill
                   />
                 )}
               </div>

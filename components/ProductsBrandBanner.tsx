@@ -17,7 +17,12 @@ export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
   return (
     <section
       className="products-brand-banner"
-      style={config.backgroundColor ? { backgroundColor: config.backgroundColor } : undefined}
+      style={{
+        ...(config.backgroundColor ? { backgroundColor: config.backgroundColor } : {}),
+        ...(config.imageWidth && config.imageHeight
+          ? { aspectRatio: `${config.imageWidth} / ${config.imageHeight}` }
+          : {}),
+      }}
       aria-label={`${config.title} collection`}
     >
       <div className="products-brand-banner__content">

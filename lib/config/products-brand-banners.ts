@@ -26,8 +26,8 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
       'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781186774/products-banners/iphone.png',
     backgroundColor: '#d4e157',
     imageAlt: 'Apple devices including MacBook, iPad, iPhone, AirPods, and Apple Watch',
-    imageWidth: 2048,
-    imageHeight: 544,
+    imageWidth: 2364,
+    imageHeight: 630,
   },
   samsung: {
     brandFilter: 'Samsung',

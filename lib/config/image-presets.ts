@@ -20,7 +20,7 @@ export const IMAGE_PRESETS = {
   /** Full-viewport /products brand hero — width srcset up to 2048px master. */
   brandBanner: {
     type: 'srcset',
-    widths: [640, 1024, 1280, 1536, 1920, 2048],
+    widths: [640, 1024, 1280, 1536, 1920, 2364],
     sizes: '100vw',
     defaultWidth: 1280,
     fit: 'contain' as const,

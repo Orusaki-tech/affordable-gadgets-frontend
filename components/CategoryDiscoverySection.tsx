@@ -43,7 +43,6 @@ export function CategoryDiscoverySection() {
   return (
     <div className="category-discovery">
       <div className="category-discovery__hero">
-        <CategoryDiscoveryHeroImage />
         <div className="category-discovery__hero-content">
           <h3 className="category-discovery__hero-title">{CATEGORY_DISCOVERY_HERO.title}</h3>
           <Link
@@ -54,6 +53,7 @@ export function CategoryDiscoverySection() {
             <PillButton label={CATEGORY_DISCOVERY_HERO.viewAllLabel} />
           </Link>
         </div>
+        <CategoryDiscoveryHeroImage />
       </div>
 
       <div className="category-discovery__grid">

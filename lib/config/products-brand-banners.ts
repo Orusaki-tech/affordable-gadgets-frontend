@@ -21,10 +21,10 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     title: 'iPhone',
     subtitle: 'Just the right amount of everything.',
     backgroundImage:
-      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781185403/products-banners/iphone.jpg',
+      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781186774/products-banners/iphone.png',
     imageAlt: 'Apple devices including MacBook, iPad, iPhone, AirPods, and Apple Watch',
-    imageWidth: 1024,
-    imageHeight: 272,
+    imageWidth: 2048,
+    imageHeight: 544,
   },
   samsung: {
     brandFilter: 'Samsung',

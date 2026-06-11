@@ -17,14 +17,13 @@ export const IMAGE_PRESETS = {
     ],
     fallbackWidth: 1080,
   },
+  /** Full-viewport /products brand hero — width srcset up to 2048px master. */
   brandBanner: {
-    type: 'picture',
-    sources: [
-      { media: '(max-width: 734px)', width1x: 360, width2x: 720 },
-      { media: '(max-width: 1068px)', width1x: 784, width2x: 1568 },
-      { media: '(min-width: 0px)', width1x: 1024, width2x: 2048 },
-    ],
-    fallbackWidth: 1024,
+    type: 'srcset',
+    widths: [640, 1024, 1280, 1536, 1920, 2048],
+    sizes: '100vw',
+    defaultWidth: 1280,
+    fit: 'contain' as const,
   },
   card: {
     type: 'srcset',

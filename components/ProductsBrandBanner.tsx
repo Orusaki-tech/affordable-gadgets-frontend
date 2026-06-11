@@ -15,7 +15,10 @@ type ProductsBrandBannerProps = {
 
 export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
   return (
-    <section className="products-brand-banner" aria-label={`${config.title} collection`}>
+    <section
+      className={`products-brand-banner${config.backgroundImage ? ' products-brand-banner--has-art' : ''}`}
+      aria-label={`${config.title} collection`}
+    >
       <div className="products-brand-banner__content">
         <h1 className="products-brand-banner__title">{config.title}</h1>
         <p className="products-brand-banner__subtitle">{config.subtitle}</p>
@@ -28,16 +31,18 @@ export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
         </button>
       </div>
       {config.backgroundImage ? (
-        <CloudinaryImage
-          src={config.backgroundImage}
-          alt={config.imageAlt ?? ''}
-          preset="brandBanner"
-          width={config.imageWidth}
-          height={config.imageHeight}
-          className="products-brand-banner__image"
-          pictureClassName="products-brand-banner__picture"
-          priority
-        />
+        <div className="products-brand-banner__media" aria-hidden>
+          <CloudinaryImage
+            src={config.backgroundImage}
+            alt={config.imageAlt ?? ''}
+            preset="brandBanner"
+            width={config.imageWidth}
+            height={config.imageHeight}
+            className="products-brand-banner__image"
+            sizes="100vw"
+            priority
+          />
+        </div>
       ) : null}
     </section>
   );

@@ -3,13 +3,24 @@ const BANNERS_IMG = '/images/banners';
 /** Bust CDN/browser cache when banner files change */
 const BANNER_ASSET_VERSION = '6';
 
+export type ProductsBrandBannerImages = {
+  /** Shown below 768px */
+  mobile: string;
+  /** Shown at 768px and above */
+  tablet: string;
+  alt: string;
+};
+
 export type ProductsBrandBannerConfig = {
   brandFilter: string;
   /** Nav label and page h1 (e.g. iPhone for Apple) */
   title: string;
   subtitle: string;
   priceLine?: string;
+  /** Single master (legacy brands) */
   backgroundImage?: string;
+  /** Responsive masters on Cloudinary (mobile + tablet/desktop) */
+  backgroundImages?: ProductsBrandBannerImages;
 };
 
 const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
@@ -17,7 +28,13 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     brandFilter: 'Apple',
     title: 'iPhone',
     subtitle: 'Just the right amount of everything.',
-    backgroundImage: `${BANNERS_IMG}/iphone.jpg?v=${BANNER_ASSET_VERSION}`,
+    backgroundImages: {
+      mobile:
+        'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781183705/products-banners/iphone-mobile.jpg',
+      tablet:
+        'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781183706/products-banners/iphone-tablet.jpg',
+      alt: 'Person holding iPhone in cosmic orange and silver finishes',
+    },
   },
   samsung: {
     brandFilter: 'Samsung',

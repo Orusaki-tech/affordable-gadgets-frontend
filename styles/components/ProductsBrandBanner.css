@@ -33,6 +33,23 @@
   object-position: center right;
 }
 
+@media (max-width: 767px) {
+  .products-brand-banner {
+    min-height: 300px;
+  }
+
+  .products-brand-banner__picture {
+    left: 0;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .products-brand-banner__image {
+    object-position: bottom center;
+    max-height: 72%;
+  }
+}
+
 @media (min-width: 768px) {
   .products-brand-banner {
     min-height: 272px;

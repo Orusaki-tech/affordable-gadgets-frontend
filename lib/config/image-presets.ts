@@ -23,6 +23,14 @@ export const IMAGE_PRESETS = {
     defaultWidth: 600,
     fit: 'contain' as const,
   },
+  /** Compact Discover category tiles (~344px slot, Apple shop proportions). */
+  categoryCard: {
+    type: 'srcset',
+    widths: [344, 688, 1032],
+    sizes: '(max-width: 767px) 90vw, (max-width: 1067px) 45vw, 344px',
+    defaultWidth: 344,
+    fit: 'contain' as const,
+  },
   productThumb: {
     type: 'srcset',
     widths: [200, 400, 600, 800],

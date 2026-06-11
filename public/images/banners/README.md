@@ -6,7 +6,8 @@ Background images for `/products?brand_filter=…` hero banners. Headline and **
 
 | File | Brand (`brand_filter`) |
 |------|------------------------|
-| `iphone.jpg` | Apple (nav: iPhone) |
+| Cloudinary `products-banners/iphone-mobile` + `iphone-tablet` | Apple (nav: iPhone) |
+| `iphone.jpg` | Apple (legacy single asset) |
 | `samsung.jpg` | Samsung |
 
 Google and Sony use a gray fallback until you add `google.jpg` / `sony.jpg`.

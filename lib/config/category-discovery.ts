@@ -1,12 +1,27 @@
 /** Local product art — public/images/category-discovery (see README there) */
 const DISCOVERY_IMG = '/images/category-discovery';
 
+/** Cloudinary folder for card masters (see scripts/upload-category-discovery-cards.sh). */
+export const CATEGORY_DISCOVERY_CARD_CLOUDINARY_FOLDER = 'category-discovery/cards';
+
 export type CategoryDiscoveryCard = {
   id: string;
   title: string;
   href: string;
+  /** Cloudinary master URL — updated after running upload script. */
   backgroundImage: string;
+  alt: string;
 };
+
+/** Local filename stem → drop matching file in public/images/category-discovery/cards/ */
+export const CATEGORY_DISCOVERY_CARD_FILES = [
+  'iphone',
+  'ipad',
+  'watch',
+  'airpods',
+  'mac-laptops',
+  'mac-desktops',
+] as const;
 
 export const CATEGORY_DISCOVERY_HERO = {
   title: "Discover what's new.",
@@ -29,6 +44,7 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     href: '/products?type=PH&brand_filter=Apple',
     backgroundImage:
       'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781180550/category-discovery/cards/iphone.jpg',
+    alt: 'iPhone in cosmic orange finish, partial-screen display and side angle showing Action button, volume button, and side button',
   },
   {
     id: 'ipad',
@@ -36,6 +52,7 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     href: '/products?type=TB&brand_filter=Apple',
     backgroundImage:
       'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781180551/category-discovery/cards/ipad.jpg',
+    alt: 'iPad with colorful display',
   },
   {
     id: 'watch',
@@ -43,6 +60,7 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     href: '/products?type=AC&brand_filter=Apple&search=watch',
     backgroundImage:
       'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781180552/category-discovery/cards/watch.jpg',
+    alt: 'Apple Watch with watch face on display',
   },
   {
     id: 'airpods',
@@ -50,6 +68,7 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     href: '/products?type=AC&brand_filter=Apple&search=airpods',
     backgroundImage:
       'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781180554/category-discovery/cards/airpods.jpg',
+    alt: 'AirPods with charging case',
   },
   {
     id: 'mac-laptops',
@@ -57,6 +76,7 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     href: '/products?type=LT&brand_filter=Apple',
     backgroundImage:
       'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781180555/category-discovery/cards/mac-laptops.jpg',
+    alt: 'MacBook laptop open at an angle',
   },
   {
     id: 'mac-desktops',
@@ -64,5 +84,6 @@ export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
     href: '/products?type=LT&brand_filter=Apple&search=imac',
     backgroundImage:
       'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781180556/category-discovery/cards/mac-desktops.jpg',
+    alt: 'iMac desktop computer with display and accessories',
   },
 ];

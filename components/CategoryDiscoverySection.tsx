@@ -54,10 +54,9 @@ export function CategoryDiscoverySection() {
             <div className="category-discovery__card-media">
               <CloudinaryImage
                 src={card.backgroundImage}
-                alt={card.title}
-                preset="card"
+                alt={card.alt}
+                preset="categoryCard"
                 className="category-discovery__card-image"
-                sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
           </Link>

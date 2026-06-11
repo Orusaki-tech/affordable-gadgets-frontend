@@ -1,17 +1,12 @@
-/* Full-viewport brand hero — copy left, contained art right */
+/* Full-viewport brand hero — fixed height, copy left, contained art */
 .products-brand-banner {
   position: relative;
   width: 100%;
-  aspect-ratio: 2048 / 544;
-  min-height: 180px;
+  height: 220px;
   overflow: hidden;
   background-color: #f5f5f7;
   border: none;
   border-bottom: 1px solid var(--ui-gray-200);
-}
-
-.products-brand-banner--has-art {
-  background-color: #d4e157;
 }
 
 .products-brand-banner__media {
@@ -52,23 +47,9 @@
   pointer-events: auto;
 }
 
-@media (max-width: 767px) {
+@media (min-width: 768px) {
   .products-brand-banner {
-    aspect-ratio: 2048 / 640;
-    min-height: 200px;
-  }
-
-  .products-brand-banner__content {
-    top: 20px;
-    bottom: auto;
-    left: 16px;
-    right: 16px;
-    width: auto;
-    justify-content: flex-start;
-  }
-
-  .products-brand-banner__image {
-    object-position: center;
+    height: 272px;
   }
 }
 

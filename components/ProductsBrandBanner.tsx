@@ -16,7 +16,8 @@ type ProductsBrandBannerProps = {
 export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
   return (
     <section
-      className={`products-brand-banner${config.backgroundImage ? ' products-brand-banner--has-art' : ''}`}
+      className="products-brand-banner"
+      style={config.backgroundColor ? { backgroundColor: config.backgroundColor } : undefined}
       aria-label={`${config.title} collection`}
     >
       <div className="products-brand-banner__content">

@@ -1,15 +1,7 @@
 /** Brand hero on /products — keys match URL `brand_filter` (case-insensitive). */
 const BANNERS_IMG = '/images/banners';
 /** Bust CDN/browser cache when banner files change */
-const BANNER_ASSET_VERSION = '6';
-
-export type ProductsBrandBannerImages = {
-  /** Shown below 768px */
-  mobile: string;
-  /** Shown at 768px and above */
-  tablet: string;
-  alt: string;
-};
+const BANNER_ASSET_VERSION = '7';
 
 export type ProductsBrandBannerConfig = {
   brandFilter: string;
@@ -17,10 +9,10 @@ export type ProductsBrandBannerConfig = {
   title: string;
   subtitle: string;
   priceLine?: string;
-  /** Single master (legacy brands) */
   backgroundImage?: string;
-  /** Responsive masters on Cloudinary (mobile + tablet/desktop) */
-  backgroundImages?: ProductsBrandBannerImages;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 };
 
 const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
@@ -28,13 +20,11 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     brandFilter: 'Apple',
     title: 'iPhone',
     subtitle: 'Just the right amount of everything.',
-    backgroundImages: {
-      mobile:
-        'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781183705/products-banners/iphone-mobile.jpg',
-      tablet:
-        'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781183706/products-banners/iphone-tablet.jpg',
-      alt: 'Person holding iPhone in cosmic orange and silver finishes',
-    },
+    backgroundImage:
+      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781185403/products-banners/iphone.jpg',
+    imageAlt: 'Apple devices including MacBook, iPad, iPhone, AirPods, and Apple Watch',
+    imageWidth: 1024,
+    imageHeight: 272,
   },
   samsung: {
     brandFilter: 'Samsung',

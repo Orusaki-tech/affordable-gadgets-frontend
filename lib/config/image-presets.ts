@@ -2,6 +2,7 @@
  * Responsive image presets for CloudinaryImage.
  *
  * - hero: Apple-style <picture> + 734/1068px breakpoints + 1x/2x density
+ * - brandBanner: full-width /products brand hero (1024×272 master)
  * - card: width-based srcset for tiles, carousels, category cards
  * - productThumb: product grids, cart line items, checkout
  * - logo: small brand marks, single optimized URL
@@ -15,6 +16,15 @@ export const IMAGE_PRESETS = {
       { media: '(min-width: 0px)', width1x: 1080, width2x: 2160 },
     ],
     fallbackWidth: 1080,
+  },
+  brandBanner: {
+    type: 'picture',
+    sources: [
+      { media: '(max-width: 734px)', width1x: 360, width2x: 720 },
+      { media: '(max-width: 1068px)', width1x: 784, width2x: 1568 },
+      { media: '(min-width: 0px)', width1x: 1024, width2x: 2048 },
+    ],
+    fallbackWidth: 1024,
   },
   card: {
     type: 'srcset',

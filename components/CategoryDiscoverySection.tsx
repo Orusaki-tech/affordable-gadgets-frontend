@@ -4,19 +4,50 @@ import Link from 'next/link';
 import {
   CATEGORY_DISCOVERY_CARDS,
   CATEGORY_DISCOVERY_HERO,
+  CATEGORY_DISCOVERY_HERO_WIDTHS,
 } from '@/lib/config/category-discovery';
+import { getCloudinaryBannerImageUrl } from '@/lib/utils/cloudinary';
 
 function PillButton({ label }: { label: string }) {
   return <span className="category-discovery__pill">{label}</span>;
 }
 
+function CategoryDiscoveryHeroImage() {
+  const { imageUrl, fallbackImage, imageWidth, imageHeight } = CATEGORY_DISCOVERY_HERO;
+  const sourceUrl = imageUrl || fallbackImage;
+  const defaultWidth = 1280;
+  const heroSrc = getCloudinaryBannerImageUrl(
+    sourceUrl,
+    defaultWidth,
+    imageWidth,
+    imageHeight,
+    'contain'
+  );
+  const srcSet = CATEGORY_DISCOVERY_HERO_WIDTHS.map(
+    (width) =>
+      `${getCloudinaryBannerImageUrl(sourceUrl, width, imageWidth, imageHeight, 'contain')} ${width}w`
+  ).join(', ');
+
+  return (
+    <img
+      src={heroSrc}
+      srcSet={srcSet}
+      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 92vw, 1280px"
+      alt=""
+      className="category-discovery__hero-image"
+      width={imageWidth}
+      height={imageHeight}
+      fetchPriority="high"
+      decoding="async"
+    />
+  );
+}
+
 export function CategoryDiscoverySection() {
   return (
     <div className="category-discovery">
-      <div
-        className="category-discovery__hero"
-        style={{ backgroundImage: `url(${CATEGORY_DISCOVERY_HERO.backgroundImage})` }}
-      >
+      <div className="category-discovery__hero">
+        <CategoryDiscoveryHeroImage />
         <div className="category-discovery__hero-content">
           <h3 className="category-discovery__hero-title">{CATEGORY_DISCOVERY_HERO.title}</h3>
           <Link

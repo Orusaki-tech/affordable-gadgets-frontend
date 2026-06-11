@@ -12,8 +12,17 @@ export const CATEGORY_DISCOVERY_HERO = {
   title: "Discover what's new.",
   viewAllHref: '/products',
   viewAllLabel: 'View all',
-  backgroundImage: `${DISCOVERY_IMG}/hero.jpg`,
+  /** Cloudinary source — `f_auto` delivers AVIF/WebP at the edge. */
+  imageUrl:
+    'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781176420/category-discovery/discover-hero.jpg',
+  /** Local fallback if CDN is unreachable. */
+  fallbackImage: `${DISCOVERY_IMG}/hero.png`,
+  imageWidth: 1024,
+  imageHeight: 464,
 } as const;
+
+/** Responsive widths for hero srcset (capped at native source width). */
+export const CATEGORY_DISCOVERY_HERO_WIDTHS = [480, 640, 768, 1024] as const;
 
 export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
   {

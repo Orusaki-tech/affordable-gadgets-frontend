@@ -8,11 +8,7 @@ function hasTransformationSegment(segment: string): boolean {
   return TRANSFORM_KEYS.some((key) => segment.includes(key));
 }
 
-export function getCloudinarySizedImageUrl(
-  url: string,
-  size: number,
-  fit: 'cover' | 'contain' = 'cover'
-): string {
+function buildCloudinaryTransformedUrl(url: string, transformation: string): string {
   if (!url || !url.includes(CLOUDINARY_UPLOAD_SEGMENT)) {
     return url;
   }
@@ -25,11 +21,33 @@ export function getCloudinarySizedImageUrl(
   const [firstSegment, ...restSegments] = rest.split('/');
   const hasTransform = firstSegment ? hasTransformationSegment(firstSegment) : false;
   const remainingPath = hasTransform ? restSegments.join('/') : rest;
+  return `${prefix}${CLOUDINARY_UPLOAD_SEGMENT}${transformation}/${remainingPath}`;
+}
 
+export function getCloudinarySizedImageUrl(
+  url: string,
+  size: number,
+  fit: 'cover' | 'contain' = 'cover'
+): string {
   const transformation = fit === 'contain'
     ? `f_auto,q_auto,c_fit,w_${size},h_${size}`
     : `f_auto,q_auto,c_fill,g_auto,w_${size},h_${size}`;
-  return `${prefix}${CLOUDINARY_UPLOAD_SEGMENT}${transformation}/${remainingPath}`;
+  return buildCloudinaryTransformedUrl(url, transformation);
+}
+
+/** Wide banner / hero tiles — preserves aspect ratio, `f_auto` for AVIF/WebP. */
+export function getCloudinaryBannerImageUrl(
+  url: string,
+  width: number,
+  aspectWidth: number,
+  aspectHeight: number,
+  fit: 'cover' | 'contain' = 'cover'
+): string {
+  const height = Math.round((width * aspectHeight) / aspectWidth);
+  const crop = fit === 'contain' ? 'fit' : 'fill';
+  const gravity = fit === 'cover' ? 'east' : 'center';
+  const transformation = `f_auto,q_auto,c_${crop},g_${gravity},w_${width},h_${height}`;
+  return buildCloudinaryTransformedUrl(url, transformation);
 }
 
 /**

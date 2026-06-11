@@ -14,7 +14,7 @@ export const CATEGORY_DISCOVERY_HERO = {
   viewAllLabel: 'View all',
   /** Cloudinary source — `f_auto` delivers AVIF/WebP at the edge. */
   imageUrl:
-    'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781176420/category-discovery/discover-hero.jpg',
+    'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781176908/category-discovery/discover-hero.jpg',
   /** Local fallback if CDN is unreachable. */
   fallbackImage: `${DISCOVERY_IMG}/hero.png`,
   imageWidth: 1024,

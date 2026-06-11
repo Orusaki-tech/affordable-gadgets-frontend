@@ -52,7 +52,9 @@
 
 .products-page__header--fullbleed {
   width: 100%;
+  max-width: none;
   margin-bottom: 0;
+  padding: 0;
 }
 
 .products-page__body {

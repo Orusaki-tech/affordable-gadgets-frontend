@@ -49,7 +49,7 @@ function ResponsiveBrandBannerImage({
             ? getCloudinaryWidthSrcSet(tablet, tabletWidths, 'contain')
             : tablet
         }
-        sizes="(min-width: 768px) 70vw, 1280px"
+        sizes="100vw"
       />
       <img
         src={isCloudinaryUrl(tablet) ? tabletFallback : tablet}
@@ -67,7 +67,10 @@ export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
   const images = config.backgroundImages;
 
   return (
-    <section className="products-brand-banner" aria-label={`${config.title} collection`}>
+    <section
+      className={`products-brand-banner${images ? ' products-brand-banner--full-art' : ''}`}
+      aria-label={`${config.title} collection`}
+    >
       <div className="products-brand-banner__content">
         <h1 className="products-brand-banner__title">{config.title}</h1>
         <p className="products-brand-banner__subtitle">{config.subtitle}</p>

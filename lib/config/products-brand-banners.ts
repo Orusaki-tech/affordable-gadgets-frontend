@@ -1,7 +1,7 @@
 /** Brand hero on /products — keys match URL `brand_filter` (case-insensitive). */
 const BANNERS_IMG = '/images/banners';
 /** Bust CDN/browser cache when banner files change */
-const BANNER_ASSET_VERSION = '7';
+const BANNER_ASSET_VERSION = '9';
 
 export type ProductsBrandBannerConfig = {
   brandFilter: string;
@@ -13,7 +13,9 @@ export type ProductsBrandBannerConfig = {
   /** Banner field color behind contained art (e.g. #d4e157). */
   backgroundColor?: string;
   imageAlt?: string;
+  /** Canva / Cloudinary master width (reference: 1280 at 1×). */
   imageWidth?: number;
+  /** Canva / Cloudinary master height (Back Market min-h-72 = 288px at 1280). */
   imageHeight?: number;
 };
 
@@ -21,13 +23,13 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
   apple: {
     brandFilter: 'Apple',
     title: 'iPhone',
-    subtitle: 'Just the right amount of everything.',
+    subtitle: '',
     backgroundImage:
-      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781186774/products-banners/iphone.png',
-    backgroundColor: '#d4e157',
-    imageAlt: 'Apple devices including MacBook, iPad, iPhone, AirPods, and Apple Watch',
-    imageWidth: 2364,
-    imageHeight: 630,
+      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781191802/products-banners/iphone.png',
+    imageAlt:
+      'Latest Apple devices in Kenya — shop genuine new Apple products with trusted local support',
+    imageWidth: 8000,
+    imageHeight: 1800,
   },
   samsung: {
     brandFilter: 'Samsung',

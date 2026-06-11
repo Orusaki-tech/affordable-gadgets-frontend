@@ -35,19 +35,35 @@ export function getCloudinarySizedImageUrl(
   return buildCloudinaryTransformedUrl(url, transformation);
 }
 
-/** Wide banner / hero tiles — preserves aspect ratio, `f_auto` for AVIF/WebP. */
+/** Wide banner / hero tiles — width-only scaling, `f_auto` + `q_auto:best` for sharpness. */
 export function getCloudinaryBannerImageUrl(
   url: string,
   width: number,
-  aspectWidth: number,
-  aspectHeight: number,
-  fit: 'cover' | 'contain' = 'cover'
+  _aspectWidth?: number,
+  _aspectHeight?: number,
+  fit: 'cover' | 'contain' = 'contain'
 ): string {
+  if (fit === 'contain') {
+    return buildCloudinaryTransformedUrl(url, `f_auto,q_auto:best,c_limit,w_${width}`);
+  }
+  const aspectWidth = _aspectWidth ?? width;
+  const aspectHeight = _aspectHeight ?? width;
   const height = Math.round((width * aspectHeight) / aspectWidth);
-  const crop = fit === 'contain' ? 'fit' : 'fill';
-  const gravity = fit === 'cover' ? 'east' : 'center';
-  const transformation = `f_auto,q_auto,c_${crop},g_${gravity},w_${width},h_${height}`;
-  return buildCloudinaryTransformedUrl(url, transformation);
+  return buildCloudinaryTransformedUrl(
+    url,
+    `f_auto,q_auto:best,c_fill,g_east,w_${width},h_${height}`
+  );
+}
+
+/** Apple-style `srcset`: `image.jpg, image_2x.jpg 2x` */
+export function getCloudinaryDensitySrcSet(
+  url: string,
+  width1x: number,
+  width2x: number
+): string {
+  const oneX = getCloudinaryBannerImageUrl(url, width1x, undefined, undefined, 'contain');
+  const twoX = getCloudinaryBannerImageUrl(url, width2x, undefined, undefined, 'contain');
+  return `${oneX}, ${twoX} 2x`;
 }
 
 /**

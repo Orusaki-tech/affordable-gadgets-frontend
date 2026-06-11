@@ -4,42 +4,38 @@ import Link from 'next/link';
 import {
   CATEGORY_DISCOVERY_CARDS,
   CATEGORY_DISCOVERY_HERO,
-  CATEGORY_DISCOVERY_HERO_WIDTHS,
+  CATEGORY_DISCOVERY_HERO_PICTURE_SOURCES,
 } from '@/lib/config/category-discovery';
-import { getCloudinaryBannerImageUrl } from '@/lib/utils/cloudinary';
+import { getCloudinaryBannerImageUrl, getCloudinaryDensitySrcSet } from '@/lib/utils/cloudinary';
 
 function PillButton({ label }: { label: string }) {
   return <span className="category-discovery__pill">{label}</span>;
 }
 
 function CategoryDiscoveryHeroImage() {
-  const { imageUrl, fallbackImage, imageWidth, imageHeight } = CATEGORY_DISCOVERY_HERO;
+  const { imageUrl, fallbackImage, imageWidth, imageHeight, alt } = CATEGORY_DISCOVERY_HERO;
   const sourceUrl = imageUrl || fallbackImage;
-  const defaultWidth = 1280;
-  const heroSrc = getCloudinaryBannerImageUrl(
-    sourceUrl,
-    defaultWidth,
-    imageWidth,
-    imageHeight,
-    'contain'
-  );
-  const srcSet = CATEGORY_DISCOVERY_HERO_WIDTHS.map(
-    (width) =>
-      `${getCloudinaryBannerImageUrl(sourceUrl, width, imageWidth, imageHeight, 'contain')} ${width}w`
-  ).join(', ');
+  const fallbackSrc = getCloudinaryBannerImageUrl(sourceUrl, 1080, imageWidth, imageHeight, 'contain');
 
   return (
-    <img
-      src={heroSrc}
-      srcSet={srcSet}
-      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 92vw, 1280px"
-      alt=""
-      className="category-discovery__hero-image"
-      width={imageWidth}
-      height={imageHeight}
-      fetchPriority="high"
-      decoding="async"
-    />
+    <picture className="category-discovery__hero-picture">
+      {CATEGORY_DISCOVERY_HERO_PICTURE_SOURCES.map(({ media, width1x, width2x }) => (
+        <source
+          key={media}
+          media={media}
+          srcSet={getCloudinaryDensitySrcSet(sourceUrl, width1x, width2x)}
+        />
+      ))}
+      <img
+        src={fallbackSrc}
+        alt={alt}
+        className="category-discovery__hero-image"
+        width={imageWidth}
+        height={imageHeight}
+        fetchPriority="high"
+        decoding="async"
+      />
+    </picture>
   );
 }
 

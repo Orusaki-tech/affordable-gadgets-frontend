@@ -12,17 +12,22 @@ export const CATEGORY_DISCOVERY_HERO = {
   title: "Discover what's new.",
   viewAllHref: '/products',
   viewAllLabel: 'View all',
-  /** Cloudinary source — `f_auto` delivers AVIF/WebP at the edge. */
+  /** Cloudinary master — Apple large_2x (2160×752). */
   imageUrl:
-    'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781176908/category-discovery/discover-hero.jpg',
+    'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781178596/category-discovery/discover-hero.jpg',
   /** Local fallback if CDN is unreachable. */
   fallbackImage: `${DISCOVERY_IMG}/hero.png`,
-  imageWidth: 1024,
-  imageHeight: 464,
+  imageWidth: 2160,
+  imageHeight: 752,
+  alt: 'Apple devices showing the Home app',
 } as const;
 
-/** Responsive widths for hero srcset (capped at native source width). */
-export const CATEGORY_DISCOVERY_HERO_WIDTHS = [480, 640, 768, 1024] as const;
+/** Apple-style `<picture>` breakpoints — 1x + 2x density per viewport. */
+export const CATEGORY_DISCOVERY_HERO_PICTURE_SOURCES = [
+  { media: '(max-width: 734px)', width1x: 288, width2x: 576 },
+  { media: '(max-width: 1068px)', width1x: 784, width2x: 1568 },
+  { media: '(min-width: 0px)', width1x: 1080, width2x: 2160 },
+] as const;
 
 export const CATEGORY_DISCOVERY_CARDS: CategoryDiscoveryCard[] = [
   {

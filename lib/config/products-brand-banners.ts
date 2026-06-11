@@ -34,10 +34,12 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
   samsung: {
     brandFilter: 'Samsung',
     title: 'Samsung',
-    subtitle: 'Galaxy phones built for every day.',
-    priceLine: 'See current deals and trade-in options.',
-    backgroundImage: `${BANNERS_IMG}/samsung.jpg?v=${BANNER_ASSET_VERSION}`,
-    backgroundColor: '#d4e157',
+    subtitle: '',
+    backgroundImage:
+      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781195888/products-banners/samsung.jpg',
+    imageAlt: 'Samsung Galaxy S26 Ultra — shop now',
+    imageWidth: 1024,
+    imageHeight: 230,
   },
   google: {
     brandFilter: 'Google',

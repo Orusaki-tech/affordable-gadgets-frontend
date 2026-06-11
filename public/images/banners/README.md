@@ -7,7 +7,7 @@ Background images for `/products?brand_filter=…` hero banners. Headline and **
 | File | Brand (`brand_filter`) |
 |------|------------------------|
 | Cloudinary `products-banners/iphone` (8000×1800 master) | Apple (nav: iPhone) |
-| `samsung.jpg` | Samsung |
+| Cloudinary `products-banners/samsung` (1024×230) | Samsung |
 
 Google and Sony use a gray fallback until you add `google.jpg` / `sony.jpg`.
 

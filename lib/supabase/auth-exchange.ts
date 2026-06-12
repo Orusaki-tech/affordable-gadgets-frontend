@@ -1,4 +1,5 @@
 import { apiBaseUrl, setAuthToken } from '@/lib/api/openapi';
+import { getSessionKey } from '@/lib/tracking';
 import { getStoredUTMParams } from '@/lib/utm';
 
 /**
@@ -8,7 +9,10 @@ import { getStoredUTMParams } from '@/lib/utm';
 export async function exchangeSupabaseToken(accessToken: string): Promise<{ token: string } | null> {
   try {
     const utm = getStoredUTMParams();
-    const body: Record<string, unknown> = { access_token: accessToken };
+    const body: Record<string, unknown> = {
+      access_token: accessToken,
+      session_key: getSessionKey(),
+    };
     if (utm.utm_source) body.utm_source = utm.utm_source;
     if (utm.utm_medium) body.utm_medium = utm.utm_medium;
     if (utm.utm_campaign) body.utm_campaign = utm.utm_campaign;

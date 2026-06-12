@@ -23,6 +23,10 @@ OpenAPI.HEADERS = async () => {
     if (token) {
       headers['Authorization'] = `Token ${token}`;
     }
+    const sessionKey = localStorage.getItem('session_key');
+    if (sessionKey) {
+      headers['X-Session-Key'] = sessionKey;
+    }
   }
 
   return headers;

@@ -4,7 +4,7 @@ import { getStoredUTMParams } from '@/lib/utm';
 const API_BASE = brandConfig.apiBaseUrl.replace(/\/+$/, '');
 const EVENTS_URL = `${API_BASE}/api/v1/public/events/`;
 
-function getSessionKey(): string {
+export function getSessionKey(): string {
   if (typeof window === 'undefined') return '';
   try {
     let key = localStorage.getItem('session_key');
@@ -36,11 +36,15 @@ async function sendEvent(eventType: string, extra: Record<string, unknown> = {})
   if (utm.utm_campaign) metadata.utm_campaign = utm.utm_campaign;
   if (utm.utm_content) metadata.utm_content = utm.utm_content;
 
+  const { product_id, ...metadataRest } = metadata;
   const body: Record<string, unknown> = {
     event_type: eventType,
     session_key: getSessionKey(),
-    metadata,
+    metadata: metadataRest,
   };
+  if (product_id !== undefined) {
+    body.product_id = product_id;
+  }
 
   try {
     await fetch(EVENTS_URL, {

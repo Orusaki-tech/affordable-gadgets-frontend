@@ -13,7 +13,6 @@ import { useProductUnits, prefetchProductDetail } from '@/lib/hooks/useProducts'
 import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
-import { trackCartAdd } from '@/lib/tracking';
 
 /** Same stroke as `.product-card__buy-btn--featured`. Hex matches --primary-dark so it always paints (see DevTools). */
 const productCardLinkFrameStyle: CSSProperties = {
@@ -291,7 +290,6 @@ export function ProductCard({
     try {
       setIsAddingToCart(true);
       await addToCart(selectedUnit.id, qty ?? 1);
-      if (product.id != null) trackCartAdd(product.id);
     } finally {
       setIsAddingToCart(false);
     }

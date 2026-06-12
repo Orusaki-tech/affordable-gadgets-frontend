@@ -18,7 +18,7 @@ import Image from 'next/image';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { formatPrice } from '@/lib/utils/format';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { trackProductView, trackWhatsAppClick, trackCartAdd } from '@/lib/tracking';
+import { trackProductView, trackWhatsAppClick } from '@/lib/tracking';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import Link from 'next/link';
@@ -623,7 +623,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         promoId,
         normalizedPromoPrice
       );
-      if (product?.id != null) trackCartAdd(product.id);
       setShowSuccessMessage(true);
       setTimeout(() => setShowSuccessMessage(false), 3000);
     } catch (error: any) {

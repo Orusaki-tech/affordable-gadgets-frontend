@@ -8,7 +8,7 @@ import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
 import { createClient } from '@/lib/supabase/client';
 import { exchangeSupabaseToken } from '@/lib/supabase/auth-exchange';
 import { getStoredUTMParams } from '@/lib/utm';
-import { trackLogin } from '@/lib/tracking';
+import { getSessionKey, trackLogin } from '@/lib/tracking';
 
 export function AuthOverlay({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
@@ -60,6 +60,7 @@ export function AuthOverlay({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
         const res = await LoginService.loginCreate({
           username_or_email: authForm.username_or_email,
           password: authForm.password,
+          session_key: getSessionKey(),
         });
         setPendingVerificationEmail(null);
         const token = (res as { token?: string })?.token;

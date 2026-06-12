@@ -106,7 +106,3 @@ export function trackCartAdd(productId: number | string) {
 export function trackWhatsAppClick(productId: number | string) {
   sendEvent('whatsapp_click', { product_id: productId });
 }
-
-export function trackLogin() {
-  sendEvent('login');
-}

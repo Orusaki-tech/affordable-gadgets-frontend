@@ -8,7 +8,7 @@ import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
 import { createClient } from '@/lib/supabase/client';
 import { exchangeSupabaseToken } from '@/lib/supabase/auth-exchange';
 import { getStoredUTMParams } from '@/lib/utm';
-import { getSessionKey, trackLogin } from '@/lib/tracking';
+import { getSessionKey } from '@/lib/tracking';
 
 export function AuthOverlay({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
@@ -67,7 +67,6 @@ export function AuthOverlay({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
         if (token) {
           setAuthToken(token);
         }
-        trackLogin();
         onAuthSuccess?.();
       } finally {
         OpenAPI.BASE = previousBase;
@@ -172,7 +171,6 @@ export function AuthOverlay({ onAuthSuccess }: { onAuthSuccess?: () => void }) {
         setGoogleLoading(true);
         const result = await exchangeSupabaseToken(session.access_token);
         if (result?.token) {
-          trackLogin();
           onAuthSuccess?.();
         } else {
           setAuthError('Google sign in succeeded but could not complete authentication with the store.');

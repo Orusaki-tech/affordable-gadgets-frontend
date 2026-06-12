@@ -5,6 +5,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { ApiService, Cart, CartItemRequest, CartRequest } from '@/lib/api/generated';
+import { getSessionKey } from '@/lib/tracking';
 import { getApiErrorInfo } from '@/lib/utils/apiError';
 
 interface CartContextType {
@@ -50,13 +51,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         setError(null); // Clear any previous errors
         
-        const sessionKey = typeof window !== 'undefined' ? localStorage.getItem('session_key') || undefined : undefined;
-        
-        // Store session key if not exists
-        if (typeof window !== 'undefined' && !localStorage.getItem('session_key')) {
-          localStorage.setItem('session_key', `session_${Date.now()}`);
-        }
-        
+        const sessionKey = getSessionKey();
         console.log('Initializing cart with session key:', sessionKey);
         const newCart = await ApiService.apiV1PublicCartCreate({
           session_key: sessionKey,
@@ -139,10 +134,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // Create cart if it doesn't exist
       if (!currentCart) {
         console.log('Cart not found, creating new cart...');
-        const sessionKey = typeof window !== 'undefined' ? localStorage.getItem('session_key') || undefined : undefined;
         try {
           currentCart = await ApiService.apiV1PublicCartCreate({
-            session_key: sessionKey,
+            session_key: getSessionKey(),
           });
           setCart(currentCart);
           console.log('Cart created successfully:', currentCart.id);
@@ -197,9 +191,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       let currentCart = cart;
       if (!currentCart) {
-        const sessionKey = typeof window !== 'undefined' ? localStorage.getItem('session_key') || undefined : undefined;
         currentCart = await ApiService.apiV1PublicCartCreate({
-          session_key: sessionKey,
+          session_key: getSessionKey(),
         });
         setCart(currentCart);
       }

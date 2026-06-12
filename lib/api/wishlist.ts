@@ -2,8 +2,8 @@
 
 import { OpenAPI } from '@shwari/api-client';
 import { apiBaseUrl } from '@/lib/api/openapi';
+import { getSessionKey } from '@/lib/tracking';
 
-const SESSION_KEY_STORAGE = 'session_key';
 const CUSTOMER_PHONE_STORAGE = 'customer_phone';
 
 export type WishlistProductSummary = {
@@ -26,16 +26,6 @@ export type WishlistItem = {
   product_id?: number;
   created_at?: string;
 };
-
-function getOrCreateSessionKey() {
-  if (typeof window === 'undefined') return undefined;
-  let sessionKey = localStorage.getItem(SESSION_KEY_STORAGE);
-  if (!sessionKey) {
-    sessionKey = `session_${Date.now()}`;
-    localStorage.setItem(SESSION_KEY_STORAGE, sessionKey);
-  }
-  return sessionKey;
-}
 
 function getCustomerPhone() {
   if (typeof window === 'undefined') return undefined;

@@ -73,7 +73,7 @@ async function request<T>(path: string, options?: RequestInit) {
 }
 
 export async function fetchWishlist(): Promise<WishlistItem[]> {
-  const sessionKey = getOrCreateSessionKey();
+  const sessionKey = getSessionKey() || undefined;
   const customerPhone = getCustomerPhone();
   const params = new URLSearchParams();
   if (sessionKey) params.set('session_key', sessionKey);
@@ -83,7 +83,7 @@ export async function fetchWishlist(): Promise<WishlistItem[]> {
 }
 
 export async function addWishlistItem(productId: number): Promise<WishlistItem | undefined> {
-  const sessionKey = getOrCreateSessionKey();
+  const sessionKey = getSessionKey() || undefined;
   const customerPhone = getCustomerPhone();
   return request<WishlistItem>(`/api/v1/public/wishlist/`, {
     method: 'POST',
@@ -96,7 +96,7 @@ export async function addWishlistItem(productId: number): Promise<WishlistItem |
 }
 
 export async function removeWishlistItem(productId: number): Promise<void> {
-  const sessionKey = getOrCreateSessionKey();
+  const sessionKey = getSessionKey() || undefined;
   const customerPhone = getCustomerPhone();
   const params = new URLSearchParams();
   params.set('product_id', String(productId));

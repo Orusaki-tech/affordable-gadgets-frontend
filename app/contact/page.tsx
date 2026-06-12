@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
+import { brandConfig } from '@/lib/config/brand';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,7 @@ export default function ContactPage() {
         </p>
         <div className="text-gray-700 space-y-2">
           <p>
-            <span className="font-semibold">Phone:</span> +254717881573
+            <span className="font-semibold">Phone:</span> {brandConfig.business.phone}
           </p>
           <p>
             <span className="font-semibold">Email:</span> affordablegadgetske@gmail.com

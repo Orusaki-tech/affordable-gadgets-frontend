@@ -85,7 +85,7 @@ export const brandConfig = {
       postalCode: '00100',
       addressCountry: 'KE',
     },
-    phone: '+254717881573',
+    phone: '+254768431216',
     email: 'affordablegadgetske@gmail.com',
     priceRange: '$',
     openingHours: [

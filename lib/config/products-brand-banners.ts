@@ -36,10 +36,10 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     title: 'Samsung',
     subtitle: '',
     backgroundImage:
-      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781195888/products-banners/samsung.jpg',
+      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781265362/products-banners/samsung.jpg',
     imageAlt: 'Samsung Galaxy S26 Ultra — shop now',
-    imageWidth: 1024,
-    imageHeight: 230,
+    imageWidth: 6425,
+    imageHeight: 1453,
   },
   google: {
     brandFilter: 'Google',

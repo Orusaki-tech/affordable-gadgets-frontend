@@ -1,7 +1,4 @@
 /** Brand hero on /products — keys match URL `brand_filter` (case-insensitive). */
-const BANNERS_IMG = '/images/banners';
-/** Bust CDN/browser cache when banner files change */
-const BANNER_ASSET_VERSION = '9';
 
 export type ProductsBrandBannerConfig = {
   brandFilter: string;
@@ -45,8 +42,11 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     brandFilter: 'Google',
     title: 'Google',
     subtitle: 'Pixel cameras and clean Android.',
-    backgroundImage: `${BANNERS_IMG}/google-pixel10.png?v=${BANNER_ASSET_VERSION}`,
-    backgroundColor: '#d4e157',
+    backgroundImage:
+      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781354997/products-banners/google.png',
+    imageAlt: 'Google Pixel 9 and Pixel Buds bundle — shop now',
+    imageWidth: 8000,
+    imageHeight: 1800,
   },
   sony: {
     brandFilter: 'Sony',

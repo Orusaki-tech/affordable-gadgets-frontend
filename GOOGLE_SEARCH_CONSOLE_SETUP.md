@@ -91,7 +91,7 @@ To get the knowledge panel like "Phone Place Kenya" in search results:
 3. Enter your business name: **"Affordable Gadgets"** or **"Phone Place Kenya"**
 4. Select business category: **"Cell phone store"** or **"Electronics store"**
 5. Add your business address:
-   - **Street:** Kimathi House Room 409
+   - **Street:** Kimathi House Room 504
    - **City:** Nairobi
    - **Postal Code:** 00100
    - **Country:** Kenya

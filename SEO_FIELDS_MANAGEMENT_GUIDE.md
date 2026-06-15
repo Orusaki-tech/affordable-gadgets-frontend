@@ -70,7 +70,7 @@ This guide shows you exactly where to find and edit all the enhanced SEO fields.
 |-------|--------------|------|---------------|
 | `business.name` | 'Affordable Gadgets' | 38 | Edit line 38 |
 | `business.description` | 'Shop top smartphones...' | 39 | Edit line 39 |
-| `business.address.streetAddress` | 'Kimathi House Room 409' | 41 | Edit line 41 |
+| `business.address.streetAddress` | 'Kimathi House Room 504' | 41 | Edit line 41 |
 | `business.address.addressLocality` | 'Nairobi' | 42 | Edit line 42 |
 | `business.phone` | '+254717881573' | 47 | Edit line 47 |
 | `business.email` | 'affordablegadgetske@gmail.com' | 48 | Edit line 48 |
@@ -159,11 +159,11 @@ This guide shows you exactly where to find and edit all the enhanced SEO fields.
 
 ### Example 3: Change Business Address
 
-**Current:** `streetAddress: 'Kimathi House Room 409'`
+**Current:** `streetAddress: 'Kimathi House Room 504'`
 
 **Steps:**
 1. Open `affordable-gadgets-frontend/lib/config/brand.ts`
-2. Find line 41: `streetAddress: 'Kimathi House Room 409',`
+2. Find line 41: `streetAddress: 'Kimathi House Room 504',`
 3. Change to: `streetAddress: 'Your New Address',`
 4. Save the file
 5. Redeploy your frontend

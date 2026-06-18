@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { ApiService } from '@/lib/api/generated';
 import { BlogCard } from '@/components/BlogCard';
 import { ArticlesFilterBar } from '@/components/ArticlesFilterBar';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { getArticleHref } from '@/lib/utils/blogRoutes';
-
+import { fetchAllPublishedArticles, getArticleCardImageUrl } from '@/lib/blog/articlePage';
+import type { PublicArticleCard } from '@/lib/api/generated';
 
 export const revalidate = 3600;
 
@@ -20,37 +20,15 @@ interface PageProps {
   searchParams: Promise<Record<string, string | undefined>>;
 }
 
-async function fetchArticles(page: number, pageSize: number, search?: string, productSlug?: string) {
-  try {
-    const response = await ApiService.apiV1PublicArticlesList(
-      undefined,
-      undefined,
-      '-release_date',
-      page,
-      pageSize,
-      undefined,
-      productSlug,
-      search,
-    );
-    return response.results ?? [];
-  } catch {
-    return [];
-  }
-}
-
-async function fetchAllArticlesForProductList() {
-  try {
-    const response = await ApiService.apiV1PublicArticlesList(
-      undefined,
-      undefined,
-      '-release_date',
-      1,
-      200,
-    );
-    return response.results ?? [];
-  } catch {
-    return [];
-  }
+function buildProductOptions(articles: PublicArticleCard[]) {
+  return articles
+    .filter((a) => a.product_slug && a.product_name)
+    .reduce<Array<{ slug: string; name: string }>>((acc, a) => {
+      if (!acc.find((p) => p.slug === a.product_slug)) {
+        acc.push({ slug: a.product_slug!, name: a.product_name! });
+      }
+      return acc;
+    }, []);
 }
 
 export default async function ArticlesIndexPage({ searchParams }: PageProps) {
@@ -58,19 +36,14 @@ export default async function ArticlesIndexPage({ searchParams }: PageProps) {
   const search = sp.search || '';
   const productSlug = sp.product_slug || '';
 
-  const [articles, allArticles] = await Promise.all([
-    fetchArticles(1, 48, search, productSlug),
-    search || productSlug ? fetchAllArticlesForProductList() : Promise.resolve([] as any[]),
-  ]);
+  let articles: PublicArticleCard[] = [];
+  try {
+    articles = await fetchAllPublishedArticles(search || undefined, productSlug || undefined);
+  } catch {
+    articles = [];
+  }
 
-  const productOptions = (search || productSlug ? allArticles : articles)
-    .filter((a: any) => a.product_slug && a.product_name)
-    .reduce((acc: any[], a: any) => {
-      if (!acc.find((p) => p.slug === a.product_slug)) {
-        acc.push({ slug: a.product_slug, name: a.product_name });
-      }
-      return acc;
-    }, []);
+  const productOptions = buildProductOptions(articles);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f7f8]">
@@ -90,13 +63,13 @@ export default async function ArticlesIndexPage({ searchParams }: PageProps) {
             <p className="text-gray-600">No articles found{search ? ` for "${search}"` : ''}.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {articles.map((article: any) => {
+              {articles.map((article) => {
                 const href = getArticleHref(article.product_slug, article.slug);
                 if (!href || !article.headline) return null;
                 return (
                   <BlogCard
                     key={`${article.product_slug}-${article.slug}`}
-                    imageUrl={article.thumbnail_image || ''}
+                    imageUrl={getArticleCardImageUrl(article)}
                     category={article.category || 'buying_guide'}
                     title={article.headline}
                     href={href}

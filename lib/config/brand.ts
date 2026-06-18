@@ -3,9 +3,14 @@
  * This can be updated later when design system is provided
  */
 
+const PRODUCTION_API_BASE_URL = 'https://api.affordable-gadgetske.com';
+
 // Helper function to normalize API base URL
 const normalizeApiBaseUrl = (url: string | undefined): string => {
   if (!url || url.trim() === '') {
+    if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+      return PRODUCTION_API_BASE_URL;
+    }
     return 'http://localhost:8000';
   }
 

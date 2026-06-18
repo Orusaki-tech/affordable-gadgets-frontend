@@ -4,6 +4,7 @@ import type { PublicArticleCard } from '@/lib/api/generated';
 import { BlogCard } from '@/components/BlogCard';
 import { BlogArticlesCarousel } from '@/components/BlogArticlesCarousel';
 import { getArticleHref } from '@/lib/utils/blogRoutes';
+import { getArticleCardImageUrl } from '@/lib/blog/articlePage';
 
 interface BlogArticlesSectionProps {
   title?: string;
@@ -39,7 +40,7 @@ export async function BlogArticlesSection({
       return (
         <div key={`${article.product_slug}-${article.slug}`} className="blog-articles-section__slide">
           <BlogCard
-            imageUrl={article.thumbnail_image || ''}
+            imageUrl={getArticleCardImageUrl(article)}
             category={article.category || 'buying_guide'}
             title={article.headline}
             href={href}

@@ -20,6 +20,10 @@ export type PublicArticleCard = {
      * Featured image for blog lists and social sharing
      */
     readonly thumbnail_image?: string | null;
+    /**
+     * Product hero image fallback when article has no thumbnail
+     */
+    readonly product_primary_image?: string | null;
     readonly published_at?: string | null;
     readonly product_slug?: string;
     readonly product_name?: string;

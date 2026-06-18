@@ -103,6 +103,8 @@ export function trackCartAdd(productId: number | string) {
   sendEvent('cart_add', { product_id: productId });
 }
 
-export function trackWhatsAppClick(productId: number | string) {
-  sendEvent('whatsapp_click', { product_id: productId });
+export function trackWhatsAppClick(productId: number | string, phone?: string) {
+  const extra: Record<string, unknown> = { product_id: productId };
+  if (phone) extra.phone = phone;
+  sendEvent('whatsapp_click', extra);
 }

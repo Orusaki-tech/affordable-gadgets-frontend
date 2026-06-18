@@ -13,6 +13,7 @@ import { useProductUnits, prefetchProductDetail } from '@/lib/hooks/useProducts'
 import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
+import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
 
 /** Same stroke as `.product-card__buy-btn--featured`. Hex matches --primary-dark so it always paints (see DevTools). */
 const productCardLinkFrameStyle: CSSProperties = {
@@ -194,6 +195,7 @@ export function ProductCard({
   const [selectedUnitId, setSelectedUnitId] = useState<number | null>(null);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
 
   // Auto-select first storage option on load
   useEffect(() => {
@@ -956,6 +958,21 @@ export function ProductCard({
                 {interestText}
               </span>
             )}
+            <button
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                setIsWhatsAppModalOpen(true);
+              }}
+              className="product-card__whatsapp-btn"
+              aria-label="Message on WhatsApp"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style={{ marginRight: 4 }}>
+                <path d="M19.05 4.91A10.05 10.05 0 0 0 12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.74.46 3.44 1.32 4.94L2 22l5.27-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01z" />
+              </svg>
+              WhatsApp
+            </button>
           </div>
         ) : (
           <div className="product-card__stock-note">
@@ -970,6 +987,16 @@ export function ProductCard({
       </div>
     </Link>
 
+      {isWhatsAppModalOpen && (
+        <WhatsAppLeadModal
+          productId={product.id}
+          productName={product.product_name}
+          productBrand={product.brand}
+          productModel={product.model_series}
+          prefilledMessage={`Hi, I'm interested in: ${product.product_name?.trim() || 'a product'}${product.brand?.trim() ? '\nBrand: ' + product.brand.trim() : ''}${product.model_series?.trim() ? '\nModel: ' + product.model_series.trim() : ''}`}
+          onClose={() => setIsWhatsAppModalOpen(false)}
+        />
+      )}
     </>
   );
 }

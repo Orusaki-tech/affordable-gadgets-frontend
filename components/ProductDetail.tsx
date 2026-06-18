@@ -30,6 +30,7 @@ import { PromotionVideosDrawer } from '@/components/PromotionVideosDrawer';
 import { ProductTrustStamp } from '@/components/ProductTrustStamp';
 import type { PromotionVideoProduct } from '@/components/ProductVideoReel';
 import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
+import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
 
 interface ProductDetailProps {
   slug: string;
@@ -289,6 +290,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   const [isPromoVideosOpen, setIsPromoVideosOpen] = useState(false);
   const [isFinancingOpen, setIsFinancingOpen] = useState(false);
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
   const productId = product?.id;
@@ -1145,28 +1147,23 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               const showWhatsAppFallback = !hasUnitOptions && !hasStock;
               const showWhatsApp = showWhatsAppForVariant || showWhatsAppFallback;
 
-              const openWhatsApp = () => {
-                if (product?.id != null) trackWhatsAppClick(product.id);
+              const getWhatsAppPrefilledMessage = (): string => {
                 if (showWhatsAppForVariant && selectedUnitData) {
                   const effectivePrice =
                     isEligibleForPromotion && promotionUnitPrice !== null
                       ? promotionUnitPrice
                       : null;
-                  const text = buildWhatsAppUnitInquiryMessage(
+                  return buildWhatsAppUnitInquiryMessage(
                     product,
                     selectedUnitData,
                     effectivePrice ?? undefined
                   );
-                  window.open(getBusinessWhatsAppUrl(text), '_blank', 'noopener,noreferrer');
-                  return;
                 }
-                if (showWhatsAppFallback) {
-                  window.open(
-                    getBusinessWhatsAppUrl(buildWhatsAppProductOnlyMessage(product)),
-                    '_blank',
-                    'noopener,noreferrer'
-                  );
-                }
+                return buildWhatsAppProductOnlyMessage(product);
+              };
+
+              const openWhatsApp = () => {
+                setIsWhatsAppModalOpen(true);
               };
 
               const whatsAppButton = showWhatsApp ? (
@@ -1975,6 +1972,20 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           product={product}
           offers={financingOffers}
           onClose={() => setIsFinancingOpen(false)}
+        />
+      )}
+      {isWhatsAppModalOpen && product && (
+        <WhatsAppLeadModal
+          productId={product.id}
+          productName={product.product_name}
+          productBrand={product.brand}
+          productModel={product.model_series}
+          unitLabel={selectedUnitData ? (
+            [selectedUnitData.storage_gb ? `${selectedUnitData.storage_gb}GB` : '',
+             selectedUnitData.color_name || ''].filter(Boolean).join(' ')
+          ) : undefined}
+          prefilledMessage={getWhatsAppPrefilledMessage()}
+          onClose={() => setIsWhatsAppModalOpen(false)}
         />
       )}
     </div>

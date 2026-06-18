@@ -8,6 +8,7 @@ import type { OrderHistoryRequestRequest } from '../models/OrderHistoryRequestRe
 import type { OrderOtpRequestRequest } from '../models/OrderOtpRequestRequest';
 import type { PaginatedCartList } from '../models/PaginatedCartList';
 import type { PaginatedProductAccessoryList } from '../models/PaginatedProductAccessoryList';
+import type { PaginatedPublicArticleCardList } from '../models/PaginatedPublicArticleCardList';
 import type { PaginatedPublicBundleList } from '../models/PaginatedPublicBundleList';
 import type { PaginatedPublicDeliveryRateList } from '../models/PaginatedPublicDeliveryRateList';
 import type { PaginatedPublicInventoryUnitPublicList } from '../models/PaginatedPublicInventoryUnitPublicList';
@@ -35,6 +36,15 @@ import type { ReviewOtpRequestRequest } from '../models/ReviewOtpRequestRequest'
 import type { ReviewRequest } from '../models/ReviewRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
 export declare class ApiService {
+    /**
+     * POST: Authenticate via Supabase JWT (Google OAuth).
+     * Accepts a Supabase access_token, verifies it, and returns a Django Token.
+     * Maps Supabase user to existing Django user by supabase_uid or email.
+     * Supports both admin and customer users.
+     * @returns any No response body
+     * @throws ApiError
+     */
+    static apiAuthSupabaseCreate(): CancelablePromise<any>;
     /**
      * Custom token login view that updates last_login field.
      * Use this instead of the default obtain_auth_token for admin users.
@@ -92,6 +102,27 @@ export declare class ApiService {
      * @throws ApiError
      */
     static apiV1PublicAccessoriesLinkDestroy(id: number): CancelablePromise<void>;
+    /**
+     * Published articles for blog card carousels and article index pages.
+     * @param brand
+     * @param category
+     * @param ordering Sort by release_date, -release_date, published_at, or -published_at.
+     * @param page
+     * @param pageSize
+     * @param product
+     * @param productSlug
+     * @param search
+     * @returns PaginatedPublicArticleCardList
+     * @throws ApiError
+     */
+    static apiV1PublicArticlesList(brand?: string, category?: string, ordering?: string, page?: number, pageSize?: number, product?: number, productSlug?: string, search?: string): CancelablePromise<PaginatedPublicArticleCardList>;
+    /**
+     * Published articles for blog card carousels and article index pages.
+     * @param slug
+     * @returns PublicProductArticle
+     * @throws ApiError
+     */
+    static apiV1PublicArticlesRetrieve(slug: string): CancelablePromise<PublicProductArticle>;
     /**
      * Public bundle ViewSet.
      * @param page
@@ -205,6 +236,13 @@ export declare class ApiService {
      */
     static apiV1PublicDeliveryRatesRetrieve(id: number): CancelablePromise<PublicDeliveryRate>;
     /**
+     * Public endpoint to record user activity events.
+     * Accepts optional session_key for anonymous tracking before login.
+     * @returns any No response body
+     * @throws ApiError
+     */
+    static apiV1PublicEventsCreate(): CancelablePromise<any>;
+    /**
      * Create a BNPL inquiry which is routed to Leads (Sales team).
      * @param requestBody
      * @returns any
@@ -287,12 +325,31 @@ export declare class ApiService {
      */
     static apiV1PublicProductsBrandsRetrieve(): CancelablePromise<PublicProduct>;
     /**
-     * Published buying guide for a product (404 if missing or draft).
+     * Published primary buying guide for a product (404 if missing or draft).
      * @param productSlug
      * @returns PublicProductArticle
      * @throws ApiError
      */
     static apiV1PublicProductsBySlugArticleRetrieve(productSlug: string): CancelablePromise<PublicProductArticle>;
+    /**
+     * All published articles for a product.
+     * @param productSlug
+     * @param ordering Which field to use when ordering the results.
+     * @param page A page number within the paginated result set.
+     * @param pageSize Number of results to return per page.
+     * @param search A search term.
+     * @returns PaginatedPublicArticleCardList
+     * @throws ApiError
+     */
+    static apiV1PublicProductsBySlugArticlesList(productSlug: string, ordering?: string, page?: number, pageSize?: number, search?: string): CancelablePromise<PaginatedPublicArticleCardList>;
+    /**
+     * Single published article for a product.
+     * @param articleSlug
+     * @param productSlug
+     * @returns PublicProductArticle
+     * @throws ApiError
+     */
+    static apiV1PublicProductsBySlugArticlesRetrieve(articleSlug: string, productSlug: string): CancelablePromise<PublicProductArticle>;
     /**
      * Return review summary (count + average) for a list of product IDs.
      * @returns PublicProduct

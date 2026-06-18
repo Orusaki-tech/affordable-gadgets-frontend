@@ -54,4 +54,5 @@ export type PublicProductList = {
      */
     readonly bundle_price_preview?: number;
     readonly has_published_article?: boolean;
+    readonly published_article_count?: number;
 };

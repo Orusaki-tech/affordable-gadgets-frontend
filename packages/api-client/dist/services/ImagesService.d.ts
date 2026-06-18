@@ -10,10 +10,11 @@ export declare class ImagesService {
      * (which are nested in ProductViewSet).
      * Uses IsContentCreatorOrInventoryManagerOrReadOnly.
      * @param page A page number within the paginated result set.
+     * @param product
      * @returns PaginatedProductImageList
      * @throws ApiError
      */
-    static imagesList(page?: number): CancelablePromise<PaginatedProductImageList>;
+    static imagesList(page?: number, product?: number): CancelablePromise<PaginatedProductImageList>;
     /**
      * CRUD for individual product images.
      * Only Admins can add/manage images; everyone can view product images

@@ -249,7 +249,7 @@ export class ProductsService {
      * Custom action to retrieve the available inventory count, min price, and max price
      * for a specific Product (template). Accessible by staff users (read-only).
      *
-     * Example URL: /api/products/{product_id}/stock-summary/
+     * Example URL: /api/inventory/products/{product_id}/stock-summary/
      * @param id A unique integer value identifying this product.
      * @returns Product
      * @throws ApiError
@@ -269,13 +269,13 @@ export class ProductsService {
      * Custom action for Content Creators to update only content fields.
      * This allows Content Creators to update product content without touching inventory fields.
      * @param id A unique integer value identifying this product.
-     * @param formData
+     * @param requestBody
      * @returns Product
      * @throws ApiError
      */
     public static productsUpdateContentPartialUpdate(
         id: number,
-        formData?: PatchedProductRequest,
+        requestBody?: PatchedProductRequest,
     ): CancelablePromise<Product> {
         return __request(OpenAPI, {
             method: 'PATCH',
@@ -283,8 +283,8 @@ export class ProductsService {
             path: {
                 'id': id,
             },
-            formData: formData,
-            mediaType: 'multipart/form-data',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
     /**

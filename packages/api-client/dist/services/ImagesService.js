@@ -10,15 +10,17 @@ class ImagesService {
      * (which are nested in ProductViewSet).
      * Uses IsContentCreatorOrInventoryManagerOrReadOnly.
      * @param page A page number within the paginated result set.
+     * @param product
      * @returns PaginatedProductImageList
      * @throws ApiError
      */
-    static imagesList(page) {
+    static imagesList(page, product) {
         return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/images/',
             query: {
                 'page': page,
+                'product': product,
             },
         });
     }

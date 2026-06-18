@@ -28,6 +28,7 @@ import { getAndClearProductDetailPlaceholder } from '@/lib/utils/productDetailPl
 import { PRICING_MODE } from '@/lib/constants/apiEnums';
 import { PromotionVideosDrawer } from '@/components/PromotionVideosDrawer';
 import { ProductTrustStamp } from '@/components/ProductTrustStamp';
+import { ProductBlogTab } from '@/components/ProductBlogTab';
 import type { PromotionVideoProduct } from '@/components/ProductVideoReel';
 import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
@@ -294,10 +295,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
   const productId = product?.id;
-  const productBlogHref = useMemo(() => {
-    if (!product?.slug || !product.has_published_article) return null;
-    return `/products/${product.slug}/blog`;
-  }, [product?.slug, product?.has_published_article]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [mainImageLoadFailed, setMainImageLoadFailed] = useState(false);
   const [quantity, setQuantity] = useState(1);
@@ -1927,27 +1924,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <div className="product-detail__section">
               <div className="product-detail__section-block">
                 <h3 className="product-detail__section-title">Blog</h3>
-                {productBlogHref ? (
-                  <>
-                    {product.article_headline ? (
-                      <h1 className="product-detail__blog-headline">{product.article_headline}</h1>
-                    ) : (
-                      <p className="product-detail__description-text">
-                        Read our full buying guide for {product.product_name?.trim() || 'this product'}.
-                      </p>
-                    )}
-                    <p className="product-detail__description-text" style={{ marginTop: 12 }}>
-                      <Link href={productBlogHref} className="product-detail__accessory-action">
-                        Open full article
-                      </Link>
-                    </p>
-                  </>
-                ) : (
-                  <p className="product-detail__description-text">
-                    A dedicated blog article for {product.product_name?.trim() || 'this product'} will appear here
-                    once published from the admin catalog.
-                  </p>
-                )}
+                <ProductBlogTab
+                  productSlug={product.slug}
+                  productName={product.product_name}
+                  hasPublishedArticle={product.has_published_article}
+                />
               </div>
             </div>
           )}

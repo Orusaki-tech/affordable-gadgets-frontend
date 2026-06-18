@@ -4,6 +4,12 @@ import type { CategoryEnum } from './CategoryEnum';
  * Full product buying guide / blog (staff).
  */
 export type ProductArticle = {
+    readonly id?: number;
+    readonly product?: number;
+    /**
+     * URL segment under /products/{product-slug}/blog/{slug}/
+     */
+    slug?: string;
     category?: CategoryEnum;
     /**
      * Public H1 for the article page (e.g. 'Galaxy A42 5G in Kenya: who should buy it?')
@@ -26,6 +32,10 @@ export type ProductArticle = {
      */
     body?: string;
     is_published?: boolean;
+    /**
+     * Default article for legacy /products/{slug}/blog URLs
+     */
+    is_primary?: boolean;
     readonly published_at?: string | null;
     readonly created_at?: string;
     readonly updated_at?: string;

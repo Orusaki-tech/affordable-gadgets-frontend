@@ -5,8 +5,7 @@ const OpenAPI_1 = require("../core/OpenAPI");
 const request_1 = require("../core/request");
 class ColorsService {
     /**
-     * Color lookup table. Admin-only write, public read.
-     * Uses IsAdminOrReadOnly.
+     * Color lookup table. Inventory Manager write, all staff read.
      * @param page A page number within the paginated result set.
      * @returns PaginatedColorList
      * @throws ApiError
@@ -21,8 +20,7 @@ class ColorsService {
         });
     }
     /**
-     * Color lookup table. Admin-only write, public read.
-     * Uses IsAdminOrReadOnly.
+     * Color lookup table. Inventory Manager write, all staff read.
      * @param requestBody
      * @returns Color
      * @throws ApiError
@@ -36,8 +34,7 @@ class ColorsService {
         });
     }
     /**
-     * Color lookup table. Admin-only write, public read.
-     * Uses IsAdminOrReadOnly.
+     * Color lookup table. Inventory Manager write, all staff read.
      * @param id A unique integer value identifying this color.
      * @returns Color
      * @throws ApiError
@@ -52,8 +49,7 @@ class ColorsService {
         });
     }
     /**
-     * Color lookup table. Admin-only write, public read.
-     * Uses IsAdminOrReadOnly.
+     * Color lookup table. Inventory Manager write, all staff read.
      * @param id A unique integer value identifying this color.
      * @param requestBody
      * @returns Color
@@ -71,8 +67,7 @@ class ColorsService {
         });
     }
     /**
-     * Color lookup table. Admin-only write, public read.
-     * Uses IsAdminOrReadOnly.
+     * Color lookup table. Inventory Manager write, all staff read.
      * @param id A unique integer value identifying this color.
      * @param requestBody
      * @returns Color
@@ -90,8 +85,7 @@ class ColorsService {
         });
     }
     /**
-     * Color lookup table. Admin-only write, public read.
-     * Uses IsAdminOrReadOnly.
+     * Color lookup table. Inventory Manager write, all staff read.
      * @param id A unique integer value identifying this color.
      * @returns void
      * @throws ApiError

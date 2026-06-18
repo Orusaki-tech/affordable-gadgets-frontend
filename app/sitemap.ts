@@ -10,6 +10,7 @@ export const revalidate = 3600;
 const staticPaths = [
   "",
   "/products",
+  "/articles",
   "/categories",
   "/promotions",
   "/reviews",
@@ -84,6 +85,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           priority: 0.75,
         });
       }
+    }
+
+    let articlePage = 1;
+    let articlesHasNext = true;
+    while (articlesHasNext && articlePage <= MAX_PAGES) {
+      const articleResponse = await ApiService.apiV1PublicArticlesList(
+        undefined,
+        undefined,
+        undefined,
+        articlePage,
+        PAGE_SIZE,
+        "-published_at"
+      );
+      for (const article of articleResponse.results ?? []) {
+        if (!article.product_slug || !article.slug) continue;
+        entries.push({
+          url: `${baseUrl}/products/${article.product_slug}/blog/${article.slug}`,
+          lastModified: article.published_at ? new Date(article.published_at) : new Date(),
+          changeFrequency: "monthly",
+          priority: 0.74,
+        });
+      }
+      articlesHasNext = articleResponse.next != null;
+      articlePage += 1;
     }
   } catch {
     return entries;

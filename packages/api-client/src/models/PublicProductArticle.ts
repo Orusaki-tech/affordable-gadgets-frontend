@@ -7,6 +7,10 @@ import type { CategoryEnum } from './CategoryEnum';
  * Published buying guide for storefront article page (public read-only).
  */
 export type PublicProductArticle = {
+    /**
+     * URL segment under /products/{product-slug}/blog/{slug}/
+     */
+    readonly slug?: string;
     readonly category?: CategoryEnum;
     /**
      * Public H1 for the article page (e.g. 'Galaxy A42 5G in Kenya: who should buy it?')
@@ -30,5 +34,11 @@ export type PublicProductArticle = {
     readonly body?: string;
     readonly published_at?: string | null;
     readonly updated_at?: string;
+    /**
+     * Default article for legacy /products/{slug}/blog URLs
+     */
+    readonly is_primary?: boolean;
+    readonly product_slug?: string;
+    readonly product_name?: string;
 };
 

@@ -27,6 +27,7 @@ export function Header() {
     { href: '/products?type=PH&brand_filter=Google', label: 'Google' },
     { href: '/products?type=PH&brand_filter=Sony', label: 'Sony' },
     { href: '/products?type=AC', label: 'Accessories' },
+    { href: '/articles', label: 'Blog' },
     { href: '/financing', label: 'Financing' },
   ];
 

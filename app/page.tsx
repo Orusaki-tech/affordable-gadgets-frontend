@@ -13,6 +13,7 @@ import { ImageCarousel } from '@/components/ImageCarousel';
 import { CategoryDiscoverySection } from '@/components/CategoryDiscoverySection';
 import { CollectionHeaderBanner } from '@/components/CollectionHeaderBanner';
 import { BrandCarousel } from '@/components/BrandCarousel';
+import { BlogArticlesSection } from '@/components/BlogArticlesSection';
 import { brandConfig } from '@/lib/config/brand';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { Suspense } from 'react';
@@ -285,6 +286,8 @@ export default async function HomePage() {
             <ReviewsShowcaseClient />
           </div>
         </section>
+
+        <BlogArticlesSection />
 
         {/* Brand carousel – above Shop by Category (120×70px, last item followed by first) */}
         <section id="brands" className="scroll-mt-20" style={{ minHeight: '140px', backgroundColor: '#f5f5f7' }}>

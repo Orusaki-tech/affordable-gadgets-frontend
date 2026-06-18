@@ -73,4 +73,5 @@ export type PublicProduct = {
     meta_description?: string;
     readonly has_published_article?: boolean;
     readonly article_headline?: string | null;
+    readonly published_article_count?: number;
 };

@@ -25,10 +25,9 @@ async function fetchArticles(page: number, pageSize: number, search?: string, pr
     const response = await ApiService.apiV1PublicArticlesList(
       undefined,
       undefined,
-      undefined,
+      '-release_date',
       page,
       pageSize,
-      '-release_date',
       undefined,
       productSlug,
       search,
@@ -44,10 +43,9 @@ async function fetchAllArticlesForProductList() {
     const response = await ApiService.apiV1PublicArticlesList(
       undefined,
       undefined,
-      undefined,
+      '-release_date',
       1,
       200,
-      '-release_date',
     );
     return response.results ?? [];
   } catch {

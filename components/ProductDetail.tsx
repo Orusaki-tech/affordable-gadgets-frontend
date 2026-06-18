@@ -861,6 +861,25 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     return calculatePromotionPrice(Number(selectedUnitData.selling_price));
   }, [isEligibleForPromotion, selectedUnitData, calculatePromotionPrice]);
 
+  const whatsAppPrefilledMessage = useMemo(() => {
+    if (!product) return '';
+    const hasUnitOptions = (units?.length ?? 0) > 0;
+    const hasStock = Number(product.available_units_count ?? 0) > 0;
+    const showWhatsAppForVariant = hasUnitOptions && Boolean(selectedUnitData);
+    if (showWhatsAppForVariant && selectedUnitData) {
+      const effectivePrice =
+        isEligibleForPromotion && promotionUnitPrice !== null
+          ? promotionUnitPrice
+          : null;
+      return buildWhatsAppUnitInquiryMessage(
+        product,
+        selectedUnitData,
+        effectivePrice ?? undefined
+      );
+    }
+    return buildWhatsAppProductOnlyMessage(product);
+  }, [product, units, selectedUnitData, isEligibleForPromotion, promotionUnitPrice]);
+
   const promoBannerDetails = useMemo(() => {
     if (!promotion) return 'Check out our best offers';
 
@@ -1146,21 +1165,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               const showWhatsAppForVariant = hasUnitOptions && Boolean(selectedUnitData);
               const showWhatsAppFallback = !hasUnitOptions && !hasStock;
               const showWhatsApp = showWhatsAppForVariant || showWhatsAppFallback;
-
-              const getWhatsAppPrefilledMessage = (): string => {
-                if (showWhatsAppForVariant && selectedUnitData) {
-                  const effectivePrice =
-                    isEligibleForPromotion && promotionUnitPrice !== null
-                      ? promotionUnitPrice
-                      : null;
-                  return buildWhatsAppUnitInquiryMessage(
-                    product,
-                    selectedUnitData,
-                    effectivePrice ?? undefined
-                  );
-                }
-                return buildWhatsAppProductOnlyMessage(product);
-              };
 
               const openWhatsApp = () => {
                 setIsWhatsAppModalOpen(true);
@@ -1984,7 +1988,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             [selectedUnitData.storage_gb ? `${selectedUnitData.storage_gb}GB` : '',
              selectedUnitData.color_name || ''].filter(Boolean).join(' ')
           ) : undefined}
-          prefilledMessage={getWhatsAppPrefilledMessage()}
+          prefilledMessage={whatsAppPrefilledMessage}
           onClose={() => setIsWhatsAppModalOpen(false)}
         />
       )}

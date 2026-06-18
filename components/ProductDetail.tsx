@@ -1978,7 +1978,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           onClose={() => setIsFinancingOpen(false)}
         />
       )}
-      {isWhatsAppModalOpen && product && (
+      {isWhatsAppModalOpen && product?.id != null && (
         <WhatsAppLeadModal
           productId={product.id}
           productName={product.product_name}

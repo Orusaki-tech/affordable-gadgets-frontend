@@ -987,7 +987,7 @@ export function ProductCard({
       </div>
     </Link>
 
-      {isWhatsAppModalOpen && (
+      {isWhatsAppModalOpen && product.id != null && (
         <WhatsAppLeadModal
           productId={product.id}
           productName={product.product_name}

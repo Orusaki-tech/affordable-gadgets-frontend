@@ -7,9 +7,9 @@ import { ArticlesFilterBar } from '@/components/ArticlesFilterBar';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { getArticleHref } from '@/lib/utils/blogRoutes';
-import { BLOG_REVALIDATE } from '@/lib/blog/articlePage';
 
-export const revalidate = BLOG_REVALIDATE;
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Buying Guides & Articles',

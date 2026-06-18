@@ -58,7 +58,8 @@ export async function fetchArticleBySlugs(
 
 export async function fetchProductArticles(productSlug: string): Promise<PublicArticleCard[]> {
   try {
-    return await ApiService.apiV1PublicProductsBySlugArticlesList(productSlug);
+    const response = await ApiService.apiV1PublicProductsBySlugArticlesList(productSlug);
+    return response.results ?? [];
   } catch (e: unknown) {
     const status =
       typeof e === 'object' && e !== null && 'status' in e

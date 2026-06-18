@@ -9,14 +9,13 @@ import { Footer } from '@/components/Footer';
 import { ProductBlogBody } from '@/components/ProductBlogMarkdown';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import {
-  BLOG_REVALIDATE,
   fetchArticleBySlugs,
   fetchProductBySlug,
   resolveImageUrl,
   resolveProductImage,
 } from '@/lib/blog/articlePage';
 
-export const revalidate = BLOG_REVALIDATE;
+export const revalidate = 3600;
 
 interface ProductBlogArticlePageProps {
   params: Promise<{ slug: string; articleSlug: string }>;

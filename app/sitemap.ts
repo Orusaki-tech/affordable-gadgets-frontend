@@ -93,10 +93,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const articleResponse = await ApiService.apiV1PublicArticlesList(
         undefined,
         undefined,
-        undefined,
+        "-published_at",
         articlePage,
         PAGE_SIZE,
-        "-published_at"
       );
       for (const article of articleResponse.results ?? []) {
         if (!article.product_slug || !article.slug) continue;

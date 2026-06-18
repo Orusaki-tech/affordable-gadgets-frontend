@@ -15,10 +15,9 @@ async function fetchArticles(pageSize: number): Promise<PublicArticleCard[]> {
     const response = await ApiService.apiV1PublicArticlesList(
       undefined,
       undefined,
-      undefined,
+      '-published_at',
       1,
       pageSize,
-      '-published_at'
     );
     return response.results ?? [];
   } catch {

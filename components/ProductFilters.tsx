@@ -21,7 +21,8 @@ export interface FilterState {
 }
 
 const SORT_OPTIONS = [
-  { value: '', label: 'Default' },
+  { value: '', label: 'Latest release date' },
+  { value: 'release_date', label: 'Oldest release date' },
   { value: 'product_name', label: 'Name (A-Z)' },
   { value: '-product_name', label: 'Name (Z-A)' },
   { value: 'min_price', label: 'Price (Low to High)' },

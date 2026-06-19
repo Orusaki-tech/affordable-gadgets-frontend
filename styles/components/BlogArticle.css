@@ -1,0 +1,36 @@
+.blog-featured-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 420px;
+  margin-bottom: 2.5rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: #fff;
+  border: 1px solid #f3f4f6;
+}
+
+.blog-featured-image__img {
+  object-fit: contain;
+}
+
+.product-blog-body__figure {
+  margin: 2rem 0;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+  padding: 1rem;
+}
+
+.product-blog-body__figure-inner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 480px;
+  margin: 0 auto;
+}
+
+.product-blog-body__image {
+  object-fit: contain;
+}

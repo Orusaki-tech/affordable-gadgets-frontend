@@ -24,8 +24,9 @@ export function BlogCard({ imageUrl, category, title, href }: BlogCardProps) {
         <CloudinaryImage
           src={resolveImageUrl(imageUrl)}
           alt={title}
-          width={640}
-          height={400}
+          preset="productThumb"
+          fill
+          fit="contain"
           className="blog-card__image"
           sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 300px"
         />

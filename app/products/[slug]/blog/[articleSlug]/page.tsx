@@ -7,6 +7,7 @@ import { StructuredData } from '@/components/StructuredData';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { ProductBlogBody } from '@/components/ProductBlogMarkdown';
+import { BlogFeaturedImage } from '@/components/BlogFeaturedImage';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import {
   fetchArticleBySlugs,
@@ -157,12 +158,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
                 `Everything you need to know about the ${productName} series.`}
             </p>
 
-            {featuredImage && (
-              <div className="relative aspect-video w-full mb-10 overflow-hidden rounded-2xl shadow-xl border border-gray-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={featuredImage} alt={headline} className="object-cover w-full h-full" />
-              </div>
-            )}
+            {featuredImage && <BlogFeaturedImage src={featuredImage} alt={headline} />}
           </header>
 
           <article className="prose prose-blue max-w-none">

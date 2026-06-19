@@ -2,6 +2,7 @@
 
 import ReactMarkdown from 'react-markdown';
 import type { Components } from 'react-markdown';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 
 interface ProductBlogBodyProps {
   markdown: string;
@@ -12,12 +13,27 @@ function normalizeBlogMarkdown(input: string): string {
   return input.replace(/^((?:- .+\n)+)(?=[A-Z])/gm, '$1\n');
 }
 
+function BlogMarkdownImage({ src, alt }: { src?: string | Blob | null; alt?: string | null }) {
+  if (!src || typeof src !== 'string') return null;
+  return (
+    <figure className="product-blog-body__figure">
+      <div className="product-blog-body__figure-inner">
+        <CloudinaryImage
+          src={src}
+          alt={alt ?? ''}
+          preset="productGallery"
+          fill
+          fit="contain"
+          sizes="(max-width: 768px) 100vw, 768px"
+          className="product-blog-body__image"
+        />
+      </div>
+    </figure>
+  );
+}
+
 const markdownComponents: Components = {
-  img: ({ src, alt }) =>
-    src ? (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src={src} alt={alt ?? ''} loading="lazy" />
-    ) : null,
+  img: ({ src, alt }) => <BlogMarkdownImage src={src} alt={alt} />,
   a: ({ href, children }) => (
     <a href={href} target={href?.startsWith('http') ? '_blank' : undefined} rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}>
       {children}
@@ -37,7 +53,6 @@ export function ProductBlogBody({ markdown }: ProductBlogBodyProps) {
         [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:space-y-2
         [&_li]:pl-1
         [&_a]:text-blue-600 [&_a]:underline [&_a]:font-medium hover:[&_a]:text-blue-800
-        [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-xl [&_img]:my-8 [&_img]:shadow-md [&_img]:mx-auto
         [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-6 [&_blockquote]:py-1 [&_blockquote]:my-6 [&_blockquote]:italic [&_blockquote]:text-gray-700 [&_blockquote]:bg-gray-50 [&_blockquote]:rounded-r-lg
         [&_pre]:bg-gray-900 [&_pre]:text-gray-100 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-6 [&_pre]:text-sm
         [&_code]:bg-gray-100 [&_code]:text-pink-600 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono

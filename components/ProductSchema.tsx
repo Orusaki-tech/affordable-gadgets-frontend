@@ -8,6 +8,12 @@ interface ProductSchemaProps {
   selectedUnit?: PublicInventoryUnitPublic | null;
 }
 
+/** Derive variant price array from product.variants (for brand-new zero-unit products). */
+function variantPrices(product: PublicProduct): number[] {
+  const v: any[] = (product as any).variants ?? [];
+  return v.map((x: any) => parseFloat(x.selling_price)).filter((p: number) => !isNaN(p) && p > 0);
+}
+
 export function ProductSchema({ product, units = [], reviews = [], selectedUnit }: ProductSchemaProps) {
   // Calculate aggregate rating from reviews
   const aggregateRating = reviews.length > 0
@@ -20,37 +26,51 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
       }
     : undefined;
 
-  // Get price range from units
-  const prices = units
-    .map((u) => Number(u.selling_price))
-    .filter((price) => !isNaN(price) && price > 0);
+  // Get price range from units (fallback to variants when no units exist)
+  const prices = units.length > 0
+    ? units.map((u) => Number(u.selling_price)).filter((price) => !isNaN(price) && price > 0)
+    : variantPrices(product);
 
   const minPrice = prices.length > 0 ? Math.min(...prices) : undefined;
   const maxPrice = prices.length > 0 ? Math.max(...prices) : undefined;
   const price = selectedUnit ? Number(selectedUnit.selling_price) : minPrice;
 
-  // Get availability - units array already contains only available units
-  const availability = units.length > 0
+  // Availability: InStock if units or variants exist
+  const hasAnyOffer = units.length > 0 || (product as any).variants?.length > 0;
+  const availability = hasAnyOffer
     ? 'https://schema.org/InStock'
     : 'https://schema.org/OutOfStock';
 
-  // Build offers array - units are already filtered to available ones
-  const offers = units.map((unit) => ({
-      '@type': 'Offer' as const,
-      url: `${brandConfig.siteUrl}/products/${product.slug || product.id}`,
-      priceCurrency: 'KES',
-      price: Number(unit.selling_price).toFixed(2),
-      availability: 'https://schema.org/InStock',
-      itemCondition: unit.condition === 'N'
-        ? 'https://schema.org/NewCondition'
-        : unit.condition === 'R'
-        ? 'https://schema.org/RefurbishedCondition'
-        : 'https://schema.org/UsedCondition',
-      seller: {
-        '@type': 'Organization' as const,
-        name: brandConfig.business.name,
-      },
-    }));
+  // Build offers array from units (fallback to variants when no units)
+  const offers = units.length > 0
+    ? units.map((unit) => ({
+        '@type': 'Offer' as const,
+        url: `${brandConfig.siteUrl}/products/${product.slug || product.id}`,
+        priceCurrency: 'KES',
+        price: Number(unit.selling_price).toFixed(2),
+        availability: 'https://schema.org/InStock',
+        itemCondition: unit.condition === 'N'
+          ? 'https://schema.org/NewCondition'
+          : unit.condition === 'R'
+          ? 'https://schema.org/RefurbishedCondition'
+          : 'https://schema.org/UsedCondition',
+        seller: {
+          '@type': 'Organization' as const,
+          name: brandConfig.business.name,
+        },
+      }))
+    : variantPrices(product).map((p: number) => ({
+        '@type': 'Offer' as const,
+        url: `${brandConfig.siteUrl}/products/${product.slug || product.id}`,
+        priceCurrency: 'KES',
+        price: p.toFixed(2),
+        availability: 'https://schema.org/InStock',
+        itemCondition: 'https://schema.org/NewCondition',
+        seller: {
+          '@type': 'Organization' as const,
+          name: brandConfig.business.name,
+        },
+      }));
 
   // Build review array for schema
   const reviewSchema = reviews.map((review) => ({

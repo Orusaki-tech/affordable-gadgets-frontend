@@ -432,27 +432,23 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   }, [units]);
 
   // Get unique variants
+  const variantsList: any[] = (product as any)?.variants ?? [];
+
   const uniqueStorage = useMemo<number[]>(() => {
-    if (!units) return [];
-    return Array.from(
-      new Set(
-        units
-          .map((u) => u.storage_gb)
-          .filter((value): value is number => typeof value === 'number')
-      )
-    ).sort((a, b) => a - b);
-  }, [units]);
+    const fromUnits = units
+      ? Array.from(new Set(units.map((u) => u.storage_gb).filter((v): v is number => typeof v === 'number')))
+      : [];
+    if (fromUnits.length > 0) return fromUnits.sort((a, b) => a - b);
+    return Array.from(new Set(variantsList.map((v: any) => v.storage_gb).filter((v: any): v is number => typeof v === 'number'))).sort((a, b) => a - b);
+  }, [units, variantsList]);
 
   const uniqueRAM = useMemo<number[]>(() => {
-    if (!units) return [];
-    return Array.from(
-      new Set(
-        units
-          .map((u) => u.ram_gb)
-          .filter((value): value is number => typeof value === 'number')
-      )
-    ).sort((a, b) => a - b);
-  }, [units]);
+    const fromUnits = units
+      ? Array.from(new Set(units.map((u) => u.ram_gb).filter((v): v is number => typeof v === 'number')))
+      : [];
+    if (fromUnits.length > 0) return fromUnits.sort((a, b) => a - b);
+    return Array.from(new Set(variantsList.map((v: any) => v.ram_gb).filter((v: any): v is number => typeof v === 'number'))).sort((a, b) => a - b);
+  }, [units, variantsList]);
 
   const uniqueColors = useMemo<string[]>(() => {
     if (!units) return [];
@@ -499,6 +495,20 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
   const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
   const [selectedBattery, setSelectedBattery] = useState<number | null>(null);
+
+  // Variant-only fallback when no units exist (derived from selectedStorage/selectedRAM)
+  const hasAnyVariantFilter = selectedStorage !== null || selectedRAM !== null;
+  const selectedVariant = useMemo<any | null>(() => {
+    if ((units?.length ?? 0) > 0) return null;
+    if (variantsList.length === 0 || !hasAnyVariantFilter) return null;
+    return variantsList.find((v: any) => {
+      const storageMatch = selectedStorage === null || v.storage_gb === selectedStorage;
+      const ramMatch = selectedRAM === null || v.ram_gb === selectedRAM;
+      return storageMatch && ramMatch;
+    }) ?? null;
+  }, [units, variantsList, selectedStorage, selectedRAM, hasAnyVariantFilter]);
+
+  const variantPrice = selectedVariant ? parseFloat(selectedVariant.selling_price) : null;
 
   const filteredUnits = useMemo(() => {
     if (!units) return [];
@@ -1114,7 +1124,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           <div className="product-detail__price-cta-row">
             {/* Price - Single Price Display */}
             <div className="product-detail__info-price-block">
-              {selectedUnitData ? (
+              {variantPrice !== null ? (
+                <div className="product-detail__price">
+                  <p className="product-detail__price-current">
+                    {formatPrice(variantPrice)}
+                  </p>
+                </div>
+              ) : selectedUnitData ? (
                 <div className="product-detail__price">
                   {isEligibleForPromotion && promotionUnitPrice !== null ? (
                     <div>
@@ -1159,9 +1175,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             {(() => {
               const hasStock = Number(product.available_units_count ?? 0) > 0;
               const hasUnitOptions = (units?.length ?? 0) > 0;
+              const hasVariantOptions = variantsList.length > 0;
               const showWhatsAppForVariant = hasUnitOptions && Boolean(selectedUnitData);
-              const showWhatsAppFallback = !hasUnitOptions && !hasStock;
-              const showWhatsApp = showWhatsAppForVariant || showWhatsAppFallback;
+              const showWhatsAppForVariantsOnly = !hasUnitOptions && hasVariantOptions && Boolean(selectedVariant);
+              const showWhatsAppFallback = !hasUnitOptions && !hasStock && !hasVariantOptions;
+              const showWhatsApp = showWhatsAppForVariant || showWhatsAppForVariantsOnly || showWhatsAppFallback;
 
               const openWhatsApp = () => {
                 setIsWhatsAppModalOpen(true);
@@ -1208,6 +1226,21 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       ) : (
                         'Select a Variant First'
                       )}
+                    </button>
+                    {whatsAppButton}
+                  </div>
+                );
+              }
+
+              if (showWhatsAppForVariantsOnly) {
+                return (
+                  <div className="product-detail__cta product-detail__cta--inline">
+                    <button
+                      type="button"
+                      className="product-detail__cta-button product-detail__cta-button--whatsapp"
+                      onClick={openWhatsApp}
+                    >
+                      Order Now — {formatPrice(variantPrice)}
                     </button>
                     {whatsAppButton}
                   </div>
@@ -1264,12 +1297,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           )}
 
           {/* Variant Selectors - Storage and Color Only */}
-          {unitsLoading ? (
+          {unitsLoading && !variantsList.length ? (
             <div className="product-detail__variants-loading">
               <div className="product-detail__spinner product-detail__spinner--small"></div>
               <p className="product-detail__variants-loading-text">Loading variants...</p>
             </div>
-          ) : units && units.length > 0 ? (
+          ) : (units && units.length > 0) || variantsList.length > 0 ? (
             <div className="product-detail__variants">
               {/* Label above storage and color options */}
               {(uniqueStorage.length > 0 || uniqueColors.length > 0) && (
@@ -1766,47 +1799,57 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 </div>
               </div>
 
-              {selectedUnitData && (
+              {(selectedUnitData || selectedVariant) && (
                 <div className="product-detail__section-block">
                   <h3 className="product-detail__section-title">Selected Variant Details</h3>
                   <div className="product-detail__variant-details">
-                    {selectedUnitData.storage_gb && (
+                    {(selectedUnitData?.storage_gb ?? selectedVariant?.storage_gb) && (
                       <div className="product-detail__variant-card">
                         <p className="product-detail__variant-label">Storage</p>
-                        <p className="product-detail__variant-value">{selectedUnitData.storage_gb}GB</p>
+                        <p className="product-detail__variant-value">{(selectedUnitData?.storage_gb ?? selectedVariant?.storage_gb)}GB</p>
                       </div>
                     )}
-                    {selectedUnitData.ram_gb && (
+                    {(selectedUnitData?.ram_gb ?? selectedVariant?.ram_gb) && (
                       <div className="product-detail__variant-card">
                         <p className="product-detail__variant-label">RAM</p>
-                        <p className="product-detail__variant-value">{selectedUnitData.ram_gb}GB</p>
+                        <p className="product-detail__variant-value">{(selectedUnitData?.ram_gb ?? selectedVariant?.ram_gb)}GB</p>
                       </div>
                     )}
-                    {selectedUnitData.battery_mah && (
+                    {selectedUnitData?.battery_mah && (
                       <div className="product-detail__variant-card">
                         <p className="product-detail__variant-label">Battery</p>
                         <p className="product-detail__variant-value">{selectedUnitData.battery_mah}mAh</p>
                       </div>
                     )}
-                    {selectedUnitData.color_name && (
+                    {selectedUnitData?.color_name && (
                       <div className="product-detail__variant-card">
                         <p className="product-detail__variant-label">Color</p>
                         <p className="product-detail__variant-value">{selectedUnitData.color_name}</p>
                       </div>
                     )}
-                    <div className="product-detail__variant-card">
-                      <p className="product-detail__variant-label">Condition</p>
-                      <p className="product-detail__variant-value">{selectedUnitData.condition}</p>
-                    </div>
-                    {typeof selectedUnitData.grade === 'string' && selectedUnitData.grade && (
-                      <div className="product-detail__variant-card">
-                        <p className="product-detail__variant-label">Grade</p>
-                        <p className="product-detail__variant-value">{selectedUnitData.grade}</p>
-                      </div>
+                    {selectedUnitData && (
+                      <>
+                        <div className="product-detail__variant-card">
+                          <p className="product-detail__variant-label">Condition</p>
+                          <p className="product-detail__variant-value">{selectedUnitData.condition}</p>
+                        </div>
+                        {typeof selectedUnitData.grade === 'string' && selectedUnitData.grade && (
+                          <div className="product-detail__variant-card">
+                            <p className="product-detail__variant-label">Grade</p>
+                            <p className="product-detail__variant-value">{selectedUnitData.grade}</p>
+                          </div>
+                        )}
+                      </>
                     )}
                     <div className="product-detail__variant-card">
                       <p className="product-detail__variant-label">Price</p>
-                      <p className="product-detail__variant-value">{formatPrice(Number(selectedUnitData.selling_price))}</p>
+                      <p className="product-detail__variant-value">
+                        {selectedUnitData
+                          ? formatPrice(Number(selectedUnitData.selling_price))
+                          : selectedVariant
+                            ? formatPrice(variantPrice!)
+                            : ''}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1817,23 +1860,23 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           {activeTab === 'specs' && (
             <div className="product-detail__specs">
               <h3 className="product-detail__specs-title">Specifications</h3>
-              {selectedUnitData ? (
+              {selectedUnitData || selectedVariant ? (
                 <div className="product-detail__specs-card">
                   <table className="product-detail__specs-table">
                     <tbody className="product-detail__specs-body">
-                      {selectedUnitData.storage_gb && (
+                      {(selectedUnitData?.storage_gb ?? selectedVariant?.storage_gb) && (
                         <tr className="product-detail__specs-row product-detail__specs-row--alt">
                           <td className="product-detail__specs-label">Storage</td>
-                          <td className="product-detail__specs-value">{selectedUnitData.storage_gb}GB</td>
+                          <td className="product-detail__specs-value">{(selectedUnitData?.storage_gb ?? selectedVariant?.storage_gb)}GB</td>
                         </tr>
                       )}
-                      {selectedUnitData.ram_gb && (
+                      {(selectedUnitData?.ram_gb ?? selectedVariant?.ram_gb) && (
                         <tr className="product-detail__specs-row">
                           <td className="product-detail__specs-label">RAM</td>
-                          <td className="product-detail__specs-value">{selectedUnitData.ram_gb}GB</td>
+                          <td className="product-detail__specs-value">{(selectedUnitData?.ram_gb ?? selectedVariant?.ram_gb)}GB</td>
                         </tr>
                       )}
-                      {selectedUnitData.battery_mah && (
+                      {selectedUnitData?.battery_mah && (
                         <tr className="product-detail__specs-row product-detail__specs-row--alt">
                           <td className="product-detail__specs-label">Battery Capacity</td>
                           <td className="product-detail__specs-value">{selectedUnitData.battery_mah}mAh</td>
@@ -1845,26 +1888,30 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                           <td className="product-detail__specs-value">{processorDetails}</td>
                         </tr>
                       )}
-                      {selectedUnitData.color_name && (
+                      {selectedUnitData?.color_name && (
                         <tr className={`product-detail__specs-row ${processorDetails ? 'product-detail__specs-row--alt' : ''}`}>
                           <td className="product-detail__specs-label">Color</td>
                           <td className="product-detail__specs-value">{selectedUnitData.color_name}</td>
                         </tr>
                       )}
-                      <tr className="product-detail__specs-row">
-                        <td className="product-detail__specs-label">Condition</td>
-                        <td className="product-detail__specs-value">
-                          {selectedUnitData.condition === 'N' ? 'New' : 
-                           selectedUnitData.condition === 'R' ? 'Refurbished' : 
-                           selectedUnitData.condition === 'P' ? 'Pre-owned' : 
-                           selectedUnitData.condition}
-                        </td>
-                      </tr>
-                      {typeof selectedUnitData.grade === 'string' && selectedUnitData.grade && (
-                        <tr className="product-detail__specs-row product-detail__specs-row--alt">
-                          <td className="product-detail__specs-label">Grade</td>
-                          <td className="product-detail__specs-value">Grade {selectedUnitData.grade}</td>
-                        </tr>
+                      {selectedUnitData && (
+                        <>
+                          <tr className="product-detail__specs-row">
+                            <td className="product-detail__specs-label">Condition</td>
+                            <td className="product-detail__specs-value">
+                              {selectedUnitData.condition === 'N' ? 'New' : 
+                               selectedUnitData.condition === 'R' ? 'Refurbished' : 
+                               selectedUnitData.condition === 'P' ? 'Pre-owned' : 
+                               selectedUnitData.condition}
+                            </td>
+                          </tr>
+                          {typeof selectedUnitData.grade === 'string' && selectedUnitData.grade && (
+                            <tr className="product-detail__specs-row product-detail__specs-row--alt">
+                              <td className="product-detail__specs-label">Grade</td>
+                              <td className="product-detail__specs-value">Grade {selectedUnitData.grade}</td>
+                            </tr>
+                          )}
+                        </>
                       )}
                     </tbody>
                   </table>

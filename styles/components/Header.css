@@ -608,15 +608,37 @@
   .site-header__container {
     padding: 10px 24px;
   }
+
+  .site-header__cart-label {
+    display: inline;
+  }
+
+  .site-header__account-label {
+    display: inline;
+  }
 }
 
 @media (min-width: 1024px) {
+  .site-header__bar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 16px;
+  }
+
+  .site-header__logo-link {
+    justify-self: start;
+  }
+
   .site-header__nav {
     display: flex;
+    justify-self: center;
+    width: 100%;
   }
 
   .site-header__logo-text {
-    display: none;
+    display: block;
+    font-size: 18px;
   }
 
   .site-header__search--mobile,
@@ -630,58 +652,34 @@
   }
 
   .site-header__container {
-    padding: 4px 16px;
-  }
-
-  .site-header__cart-label,
-  .site-header__account-label {
-    display: none;
+    padding: 4px 24px;
   }
 }
 
 @media (min-width: 1280px) {
-  .site-header__nav {
-    gap: 8px;
-  }
-
-  .site-header__nav-link {
-    font-size: 13px;
-  }
-
-  .site-header__container {
-    padding: 4px 24px;
-  }
-
-  .site-header__cart-label {
-    display: inline;
-  }
-
-  .site-header__more-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1536px) {
   .site-header__nav {
     gap: 10px;
   }
 
   .site-header__nav-link {
     font-size: 14px;
+    padding: 0 6px;
+  }
+
+  .site-header__nav-link--trigger {
+    padding: 0 6px;
   }
 
   .site-header__logo-text {
-    display: block;
-    font-size: 20px;
-  }
-
-  .site-header__logo-wrap {
-    width: 50px;
-    height: 50px;
+    font-size: 22px;
   }
 
   .site-header__container {
     padding: 4px 32px;
+  }
+
+  .site-header__more-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 

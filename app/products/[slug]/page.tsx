@@ -7,6 +7,7 @@ import { ApiService } from '@/lib/api/generated';
 import { brandConfig } from '@/lib/config/brand';
 import type { PublicProduct } from '@/lib/api/generated';
 import { StructuredData } from '@/components/StructuredData';
+import { permanentRedirectToCanonicalProductSlug } from '@/lib/seo/productSlugRedirect';
 
 export const revalidate = 3600;
 
@@ -94,7 +95,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const title = product?.meta_title || (product?.product_name ? `${product.product_name}` : "Product Details");
   const description = buildProductDescription(product);
   const imageUrl = resolveProductImage(product);
-  const canonical = `/products/${slug}`;
+  const canonical = `/products/${product?.slug ?? slug}`;
 
   return {
     title,
@@ -134,7 +135,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
     product = null;
   }
 
-  const productUrl = `${brandConfig.siteUrl}/products/${slug}`;
+  permanentRedirectToCanonicalProductSlug(slug, product?.slug);
+
+  const canonicalSlug = product?.slug ?? slug;
+  const productUrl = `${brandConfig.siteUrl}/products/${canonicalSlug}`;
   const productName = product?.product_name ?? 'Product';
   const description = buildProductDescription(product);
   const imageUrl = resolveProductImage(product);
@@ -175,7 +179,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             url: productUrl,
             image: imageUrl,
             brand: product.brand ?? null,
-            sku: slug,
+            sku: canonicalSlug,
             priceCurrency: 'KES',
             lowPrice,
             highPrice,
@@ -205,7 +209,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </div>
           </div>
         }>
-          <ProductDetail slug={slug} />
+          <ProductDetail slug={canonicalSlug} />
         </Suspense>
       </main>
       <Footer />

@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
-import { fetchPrimaryArticle } from '@/lib/blog/articlePage';
+import { fetchPrimaryArticle, fetchProductBySlug } from '@/lib/blog/articlePage';
+import { permanentRedirectToCanonicalProductSlug } from '@/lib/seo/productSlugRedirect';
 
 interface ProductBlogRedirectPageProps {
   params: Promise<{ slug: string }>;
@@ -7,9 +8,12 @@ interface ProductBlogRedirectPageProps {
 
 export default async function ProductBlogRedirectPage({ params }: ProductBlogRedirectPageProps) {
   const { slug } = await params;
-  const article = await fetchPrimaryArticle(slug);
+  const product = await fetchProductBySlug(slug);
+  permanentRedirectToCanonicalProductSlug(slug, product?.slug, '/blog');
+  const canonicalSlug = product?.slug ?? slug;
+  const article = await fetchPrimaryArticle(canonicalSlug);
   if (!article?.slug) {
     notFound();
   }
-  redirect(`/products/${slug}/blog/${article.slug}`);
+  redirect(`/products/${canonicalSlug}/blog/${article.slug}`);
 }

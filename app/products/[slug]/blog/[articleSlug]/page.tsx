@@ -15,6 +15,7 @@ import {
   resolveImageUrl,
   resolveProductImage,
 } from '@/lib/blog/articlePage';
+import { permanentRedirectToCanonicalProductSlug } from '@/lib/seo/productSlugRedirect';
 
 export const revalidate = 3600;
 
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }: ProductBlogArticlePageProps):
     product?.product_description?.trim() ||
     `Read our buying guide for ${product?.product_name ?? 'this product'}.`;
   const imageUrl = resolveProductImage(product);
-  const canonical = `/products/${slug}/blog/${articleSlug}`;
+  const canonical = `/products/${product?.slug ?? slug}/blog/${articleSlug}`;
 
   return {
     title,
@@ -76,9 +77,12 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
     notFound();
   }
 
+  permanentRedirectToCanonicalProductSlug(slug, product.slug, `/blog/${articleSlug}`);
+
+  const canonicalSlug = product.slug ?? slug;
   const site = brandConfig.siteUrl.replace(/\/+$/, '');
-  const productUrl = `${site}/products/${slug}`;
-  const articleUrl = `${site}/products/${slug}/blog/${articleSlug}`;
+  const productUrl = `${site}/products/${canonicalSlug}`;
+  const articleUrl = `${site}/products/${canonicalSlug}/blog/${articleSlug}`;
   const productName = product.product_name ?? 'Product';
   const headline = article.headline?.trim() || article.seo_title?.trim() || `${productName} buying guide`;
   const featuredImage = resolveImageUrl(article.thumbnail_image as string | undefined) || resolveProductImage(product);
@@ -125,7 +129,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
               Products
             </Link>
             <span className="text-gray-300">/</span>
-            <Link href={`/products/${slug}`} className="hover:text-blue-600 transition-colors">
+            <Link href={`/products/${canonicalSlug}`} className="hover:text-blue-600 transition-colors">
               {productName}
             </Link>
             <span className="text-gray-300">/</span>
@@ -172,7 +176,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
                 <p className="text-gray-600">Check out our latest deals on the {productName}.</p>
               </div>
               <Link
-                href={`/products/${slug}`}
+                href={`/products/${canonicalSlug}`}
                 className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 text-center whitespace-nowrap"
               >
                 View {productName}

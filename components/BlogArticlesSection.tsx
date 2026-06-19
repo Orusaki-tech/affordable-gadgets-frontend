@@ -1,36 +1,17 @@
 import Link from 'next/link';
-import { ApiService } from '@/lib/api/generated';
-import type { PublicArticleCard } from '@/lib/api/generated';
 import { BlogCard } from '@/components/BlogCard';
 import { BlogArticlesCarousel } from '@/components/BlogArticlesCarousel';
 import { getArticleHref } from '@/lib/utils/blogRoutes';
-import { getArticleCardImageUrl } from '@/lib/blog/articlePage';
+import { fetchFeaturedArticles, getArticleCardImageUrl } from '@/lib/blog/articlePage';
 
 interface BlogArticlesSectionProps {
   title?: string;
-  pageSize?: number;
-}
-
-async function fetchArticles(pageSize: number): Promise<PublicArticleCard[]> {
-  try {
-    const response = await ApiService.apiV1PublicArticlesList(
-      undefined,
-      undefined,
-      '-published_at',
-      1,
-      pageSize,
-    );
-    return response.results ?? [];
-  } catch {
-    return [];
-  }
 }
 
 export async function BlogArticlesSection({
   title = "What's New",
-  pageSize = 8,
 }: BlogArticlesSectionProps) {
-  const articles = await fetchArticles(pageSize);
+  const articles = await fetchFeaturedArticles();
   if (!articles.length) return null;
 
   const cards = articles

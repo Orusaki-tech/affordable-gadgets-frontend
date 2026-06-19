@@ -1,8 +1,60 @@
-import { ApiService } from '@/lib/api/generated';
+import { ApiService, OpenAPI } from '@/lib/api/generated';
 import type { PublicProduct, PublicProductArticle, PublicArticleCard } from '@/lib/api/generated';
 import { brandConfig } from '@/lib/config/brand';
 
 export const BLOG_REVALIDATE = 3600;
+/** Keep in sync with FEATURED_PRODUCTS_PAGE_SIZE in lib/hooks/useProducts.ts */
+const FEATURED_ARTICLES_PAGE_SIZE = 5;
+
+async function publicApiHeaders(): Promise<Record<string, string>> {
+  return {
+    Accept: 'application/json',
+    'ngrok-skip-browser-warning': '1',
+    ...(typeof OpenAPI.HEADERS === 'function'
+      ? await OpenAPI.HEADERS({} as never)
+      : (OpenAPI.HEADERS ?? {})),
+  };
+}
+
+/** Articles for homepage blog carousel — one per featured product, same order as featured carousel. */
+export async function fetchFeaturedArticles(): Promise<PublicArticleCard[]> {
+  try {
+    const products = await fetchFeaturedProductsForArticles();
+    if (!products.length) return [];
+
+    const articles: PublicArticleCard[] = [];
+    await Promise.all(
+      products.map(async (product) => {
+        if (!product.slug) return;
+        const productArticles = await fetchProductArticles(product.slug);
+        const card = productArticles.find(isRenderableArticleCard);
+        if (card) articles.push(card);
+      }),
+    );
+
+    const slugOrder = new Map(products.map((product, index) => [product.slug, index]));
+    return articles
+      .sort(
+        (left, right) =>
+          (slugOrder.get(left.product_slug!) ?? 0) - (slugOrder.get(right.product_slug!) ?? 0),
+      )
+      .slice(0, FEATURED_ARTICLES_PAGE_SIZE);
+  } catch {
+    return [];
+  }
+}
+
+async function fetchFeaturedProductsForArticles(): Promise<PublicProduct[]> {
+  const base = OpenAPI.BASE.replace(/\/+$/, '');
+  const url = `${base}/api/v1/public/products/?featured=1&page_size=${FEATURED_ARTICLES_PAGE_SIZE}&page=1`;
+  const res = await fetch(url, {
+    credentials: 'omit',
+    headers: await publicApiHeaders(),
+  });
+  if (!res.ok) return [];
+  const data = (await res.json()) as { results?: PublicProduct[] };
+  return data.results ?? [];
+}
 
 export async function fetchProductBySlug(slug: string): Promise<PublicProduct | null> {
   if (!slug) return null;

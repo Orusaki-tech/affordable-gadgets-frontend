@@ -19,8 +19,8 @@ export type ProductsBrandBannerConfig = {
 const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
   apple: {
     brandFilter: 'Apple',
-    title: 'iPhone',
-    subtitle: '',
+    title: 'Apple',
+    subtitle: 'iPhone, iPad, Mac, and accessories.',
     backgroundImage:
       'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781191802/products-banners/iphone.png',
     imageAlt:
@@ -48,10 +48,60 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     imageWidth: 8000,
     imageHeight: 1800,
   },
-  sony: {
-    brandFilter: 'Sony',
-    title: 'Sony',
-    subtitle: 'Premium Xperia and audio gear.',
+  oneplus: {
+    brandFilter: 'OnePlus',
+    title: 'OnePlus',
+    subtitle: 'Fast, smooth flagship Android.',
+  },
+  xiaomi: {
+    brandFilter: 'Xiaomi',
+    title: 'Xiaomi',
+    subtitle: 'Premium Xiaomi smartphones.',
+  },
+  nothing: {
+    brandFilter: 'Nothing',
+    title: 'Nothing',
+    subtitle: 'Distinctive design, clean software.',
+  },
+  honor: {
+    brandFilter: 'Honor',
+    title: 'Honor',
+    subtitle: 'Honor smartphones and more.',
+  },
+  redmi: {
+    brandFilter: 'Redmi',
+    title: 'Redmi',
+    subtitle: 'Value-packed Redmi phones.',
+  },
+  oppo: {
+    brandFilter: 'Oppo',
+    title: 'Oppo',
+    subtitle: 'Oppo smartphones in Kenya.',
+  },
+  vivo: {
+    brandFilter: 'Vivo',
+    title: 'Vivo',
+    subtitle: 'Vivo phones for every budget.',
+  },
+  realme: {
+    brandFilter: 'Realme',
+    title: 'Realme',
+    subtitle: 'Realme performance phones.',
+  },
+  tecno: {
+    brandFilter: 'Tecno',
+    title: 'Tecno',
+    subtitle: 'Affordable Tecno smartphones.',
+  },
+  infinix: {
+    brandFilter: 'Infinix',
+    title: 'Infinix',
+    subtitle: 'Infinix phones in Kenya.',
+  },
+  itel: {
+    brandFilter: 'Itel',
+    title: 'Itel',
+    subtitle: 'Budget-friendly Itel phones.',
   },
 };
 

@@ -3,16 +3,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useCart } from '@/lib/hooks/useCart';
 import { brandConfig } from '@/lib/config/brand';
+import {
+  PRIMARY_BRAND_NAV,
+  MORE_BRAND_NAV,
+  UTILITY_NAV,
+} from '@/lib/config/nav-links';
 import { clearAuthToken } from '@/lib/api/openapi';
 import { createClient } from '@/lib/supabase/client';
 import { AuthChoiceModal } from './AuthChoiceModal';
+import { HeaderBrandMenu, HeaderMoreBrandsMenu } from './HeaderBrandMenu';
 
 export function Header() {
   const { itemCount } = useCart();
-  const router = useRouter();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,16 +25,7 @@ export function Header() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [currentSearch, setCurrentSearch] = useState('');
 
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/products?type=PH&brand_filter=Apple', label: 'iPhone' },
-    { href: '/products?type=PH&brand_filter=Samsung', label: 'Samsung' },
-    { href: '/products?type=PH&brand_filter=Google', label: 'Google' },
-    { href: '/products?type=PH&brand_filter=Sony', label: 'Sony' },
-    { href: '/products?type=AC', label: 'Accessories' },
-    { href: '/articles', label: 'Blog' },
-    { href: '/financing', label: 'Financing' },
-  ];
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -67,47 +63,51 @@ export function Header() {
     return `/products${qs ? `?${qs}` : ''}`;
   }, [currentSearch, pathname]);
 
+  const utilityLinks = UTILITY_NAV.filter((link) => link.href !== '/');
+
   return (
     <header className="site-header">
       <div className="site-header__container">
         <div className="site-header__bar">
-          {/* Logo */}
-          <Link 
-            href="/" 
-            className="site-header__logo-link"
-          >
+          <Link href="/" className="site-header__logo-link">
             <div className="site-header__logo-wrap">
-              <Image 
-                src="/affordlogo1.svg" 
+              <Image
+                src="/affordlogo1.svg"
                 alt={`${brandConfig.name} logo`}
                 width={60}
                 height={60}
                 className="site-header__logo"
                 priority
-              /> 
+              />
             </div>
-            
-            {/* Logo Text - Hidden on mobile/tablet, visible on desktop */}
-            <span className="site-header__logo-text">
-              {brandConfig.name}
-            </span>
+            <span className="site-header__logo-text">{brandConfig.name}</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="site-header__nav">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="site-header__nav-link"
-              >
+          <nav className="site-header__nav" aria-label="Main">
+            <Link href="/" className="site-header__nav-link">
+              Home
+              <span className="site-header__nav-underline" />
+            </Link>
+
+            {PRIMARY_BRAND_NAV.map((brand) => (
+              <HeaderBrandMenu
+                key={brand.brandFilter}
+                brand={brand}
+                pathname={pathname}
+                search={currentSearch}
+              />
+            ))}
+
+            <HeaderMoreBrandsMenu brands={MORE_BRAND_NAV} variant="desktop" />
+
+            {utilityLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="site-header__nav-link">
                 {link.label}
-                <span className="site-header__nav-underline"></span>
+                <span className="site-header__nav-underline" />
               </Link>
             ))}
           </nav>
 
-          {/* Search, Cart, Account – grouped after nav */}
           <div className="site-header__actions">
             <Link
               href={openProductsFiltersHref}
@@ -116,14 +116,16 @@ export function Header() {
               title="Search"
             >
               <svg className="site-header__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </Link>
 
-            <Link
-              href="/cart"
-              className="site-header__cart"
-            >
+            <Link href="/cart" className="site-header__cart">
               <svg className="site-header__cart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -132,11 +134,7 @@ export function Header() {
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
-              {itemCount > 0 && (
-                <span className="site-header__cart-badge">
-                  {itemCount}
-                </span>
-              )}
+              {itemCount > 0 && <span className="site-header__cart-badge">{itemCount}</span>}
               <span className="site-header__cart-label">Cart</span>
             </Link>
 
@@ -199,18 +197,13 @@ export function Header() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="site-header__menu-button"
             aria-label="Toggle menu"
+            aria-expanded={isMobileMenuOpen}
           >
-            <svg
-              className="site-header__menu-icon"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="site-header__menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMobileMenuOpen ? (
                 <path
                   strokeLinecap="round"
@@ -240,16 +233,36 @@ export function Header() {
           />
         )}
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <nav className="site-header__mobile-menu">
+          <nav className="site-header__mobile-menu" aria-label="Mobile">
             <div className="site-header__mobile-list">
-              {navLinks.map((link) => (
+              <Link href="/" className="site-header__mobile-link" onClick={closeMobileMenu}>
+                Home
+              </Link>
+
+              {PRIMARY_BRAND_NAV.map((brand) => (
+                <HeaderBrandMenu
+                  key={brand.brandFilter}
+                  brand={brand}
+                  pathname={pathname}
+                  search={currentSearch}
+                  variant="mobile"
+                  onNavigate={closeMobileMenu}
+                />
+              ))}
+
+              <HeaderMoreBrandsMenu
+                brands={MORE_BRAND_NAV}
+                variant="mobile"
+                onNavigate={closeMobileMenu}
+              />
+
+              {utilityLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
                   className="site-header__mobile-link"
+                  onClick={closeMobileMenu}
                 >
                   {link.label}
                 </Link>
@@ -261,4 +274,3 @@ export function Header() {
     </header>
   );
 }
-

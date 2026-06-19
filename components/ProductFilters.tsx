@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { allBrandNavItems } from '@/lib/config/nav-links';
 
 interface ProductFiltersProps {
   onFiltersChange: (filters: FilterState) => void;
@@ -275,16 +276,23 @@ export function ProductFilters({
           </div>
 
           <div className="product-filters__field">
-            <label className="product-filters__label">Brand</label>
-            <div className="product-filters__input-wrap product-filters__input-wrap--search">
-              <SearchIcon />
-              <input
-                type="text"
+            <label className="product-filters__label" htmlFor="product-filters-brand">
+              Brand
+            </label>
+            <div className="product-filters__input-wrap">
+              <select
+                id="product-filters-brand"
                 value={filters.brand}
                 onChange={(e) => handleFilterChange('brand', e.target.value)}
-                placeholder="Apple, Samsung"
-                className="product-filters__input"
-              />
+                className="product-filters__input product-filters__select"
+              >
+                <option value="">All brands</option>
+                {allBrandNavItems().map((brand) => (
+                  <option key={brand.brandFilter} value={brand.brandFilter}>
+                    {brand.navLabel}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

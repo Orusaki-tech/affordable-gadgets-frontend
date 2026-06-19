@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { ProductTypesEnum } from './ProductTypesEnum';
 import type { PublicFinancingOffer } from './PublicFinancingOffer';
+import type { PublicProductVariant } from './PublicProductVariant';
 /**
  * Public product serializer (stripped down).
  */
@@ -78,5 +79,9 @@ export type PublicProduct = {
     readonly has_published_article?: boolean;
     readonly article_headline?: string | null;
     readonly published_article_count?: number;
+    /**
+     * Product variants (storage/RAM combos with pricing).
+     */
+    readonly variants?: Array<PublicProductVariant>;
 };
 

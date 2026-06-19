@@ -125,44 +125,38 @@ export function ProductCard({
     return colors;
   }, [units]);
 
-  // Group units by storage and find lowest price for each storage option
+  // Group units/variants by storage and find lowest price for each storage option
   const storageOptions = useMemo(() => {
-    const storageMap = new Map<number, { storage: number; price: number; unitId: number }>();
-    
-    // Debug logging in development
-    if (process.env.NODE_ENV === 'development' && units.length > 0) {
-      console.log('[ProductCard] Units received:', units.map(u => ({
-        id: u.id,
-        storage_gb: u.storage_gb,
-        selling_price: u.selling_price
-      })));
-    }
+    const storageMap = new Map<number, { storage: number; price: number; unitId: number | null }>();
     
     units.forEach((unit) => {
       const storage = unit.storage_gb;
       if (storage !== null && storage !== undefined) {
         const price = parseFloat(unit.selling_price || '0');
         const existing = storageMap.get(storage);
-        
         if (!existing || price < existing.price) {
-          storageMap.set(storage, {
-            storage,
-            price,
-            unitId: unit.id ?? 0,
-          });
+          storageMap.set(storage, { storage, price, unitId: unit.id ?? 0 });
         }
       }
     });
-    
-    const options = Array.from(storageMap.values()).sort((a, b) => a.storage - b.storage);
-    
-    // Debug logging in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[ProductCard] Storage options calculated:', options);
+
+    // Fallback to variants when no units (brand-new, made-to-order products)
+    if (units.length === 0) {
+      const variants: any[] = (product as any).variants ?? [];
+      variants.forEach((v: any) => {
+        const storage = v.storage_gb;
+        if (storage !== null && storage !== undefined) {
+          const price = parseFloat(String(v.selling_price || '0'));
+          const existing = storageMap.get(storage);
+          if (!existing || price < existing.price) {
+            storageMap.set(storage, { storage, price, unitId: null });
+          }
+        }
+      });
     }
-    
-    return options;
-  }, [units]);
+
+    return Array.from(storageMap.values()).sort((a, b) => a.storage - b.storage);
+  }, [units, product]);
 
   const ramOptions = useMemo(() => {
     const set = new Set<number>();
@@ -170,8 +164,15 @@ export function ProductCard({
       const ram = (unit as { ram_gb?: number | null }).ram_gb;
       if (ram != null) set.add(ram);
     });
+    // Fallback to variants when no units
+    if (units.length === 0) {
+      const variants: any[] = (product as any).variants ?? [];
+      variants.forEach((v: any) => {
+        if (v.ram_gb != null) set.add(v.ram_gb);
+      });
+    }
     return Array.from(set).sort((a, b) => a - b);
-  }, [units]);
+  }, [units, product]);
 
   const [selectedStorage, setSelectedStorage] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -235,6 +236,22 @@ export function ProductCard({
 
   const selectedUnit = units.find((unit) => unit.id === selectedUnitId);
 
+  // When no units exist, derive selected variant from product.variants + current filters.
+  // Only active when at least one variant filter (storage/RAM) is selected.
+  const hasAnyVariantFilter = selectedColor !== null || selectedStorage !== null || selectedRam !== null;
+  const selectedVariant = useMemo(() => {
+    if (units.length > 0) return null;
+    const variants: any[] = (product as any).variants ?? [];
+    if (variants.length === 0 || !hasAnyVariantFilter) return null;
+    return variants.find((v) => {
+      const storageMatch = selectedStorage === null || v.storage_gb === selectedStorage;
+      const ramMatch = selectedRam === null || v.ram_gb === selectedRam;
+      return storageMatch && ramMatch;
+    }) ?? null;
+  }, [product, units, selectedStorage, selectedRam, hasAnyVariantFilter]);
+
+  const variantPrice = selectedVariant ? parseFloat(selectedVariant.selling_price) : null;
+
   const filteredUnits = useMemo(() => {
     if (units.length === 0) return [];
     return units.filter((unit) => {
@@ -248,8 +265,6 @@ export function ProductCard({
       return colorMatch && storageMatch && ramMatch;
     });
   }, [units, selectedColor, selectedStorage, selectedRam]);
-
-  const hasAnyVariantFilter = selectedColor !== null || selectedStorage !== null || selectedRam !== null;
 
   const activeUnits = useMemo(() => {
     if (filteredUnits.length > 0) return filteredUnits;
@@ -351,21 +366,25 @@ export function ProductCard({
   }, [activeUnits]);
 
   const showSinglePrice = hasAnyVariantFilter && activeUnits.length > 0;
-  const resolvedPriceText = showSinglePrice && activeUnitsMaxPrice !== null
-    ? formatPrice(activeUnitsMaxPrice)
-    : hasPriceRange
-      ? formatPriceRange(product.min_price ?? null, product.max_price ?? null)
-      : 'Price on request';
+  const resolvedPriceText = variantPrice !== null
+    ? formatPrice(variantPrice)
+    : showSinglePrice && activeUnitsMaxPrice !== null
+      ? formatPrice(activeUnitsMaxPrice)
+      : hasPriceRange
+        ? formatPriceRange(product.min_price ?? null, product.max_price ?? null)
+        : 'Price on request';
 
   /** Show add-to-cart button (icon + price) on hover when at least one variant can be added; button shows single/max price */
   const showAddToCartSingleButton = activeUnits.length >= 1 && activeUnitsMaxPrice != null;
-  const showPriceCtaButton = showAddToCartSingleButton || hasDefaultPriceOffer;
+  const showPriceCtaButton = showAddToCartSingleButton || hasDefaultPriceOffer || variantPrice !== null;
   const addToCartButtonPriceText =
-    activeUnitsMinPrice != null && activeUnitsMaxPrice != null
-      ? activeUnitsMinPrice === activeUnitsMaxPrice
-        ? formatPrice(activeUnitsMaxPrice)
-        : `${formatPrice(activeUnitsMinPrice)} - ${formatPrice(activeUnitsMaxPrice)}`
-      : resolvedPriceText;
+    variantPrice !== null
+      ? formatPrice(variantPrice)
+      : activeUnitsMinPrice != null && activeUnitsMaxPrice != null
+        ? activeUnitsMinPrice === activeUnitsMaxPrice
+          ? formatPrice(activeUnitsMaxPrice)
+          : `${formatPrice(activeUnitsMinPrice)} - ${formatPrice(activeUnitsMaxPrice)}`
+        : resolvedPriceText;
 
   const cartIconSvg = (
     <svg className="product-card__cart-icon-svg" viewBox="0 0 20 20" fill="currentColor">
@@ -840,7 +859,11 @@ export function ProductCard({
 
         {/* Price — always reflects current variant filters (color / storage / RAM) */}
         <div className={`product-card__price-block ${isMinimal ? 'product-card__price-block--minimal' : 'product-card__price-block--standard'}`}>
-          {activeUnitsMaxPrice !== null ? (
+          {variantPrice !== null ? (
+            <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
+              {formatPrice(variantPrice)}
+            </p>
+          ) : activeUnitsMaxPrice !== null ? (
             <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
               {resolvedPriceText}
             </p>

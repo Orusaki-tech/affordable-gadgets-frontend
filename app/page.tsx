@@ -15,6 +15,7 @@ import { CollectionHeaderBanner } from '@/components/CollectionHeaderBanner';
 import { BrandCarousel } from '@/components/BrandCarousel';
 import { BlogArticlesSection } from '@/components/BlogArticlesSection';
 import { brandConfig } from '@/lib/config/brand';
+import { productUrl } from '@/lib/seo/urls';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { Suspense } from 'react';
 import { StructuredData } from '@/components/StructuredData';
@@ -179,7 +180,7 @@ export default async function HomePage() {
       if (!slug) return null;
       return {
         name: p.product_name,
-        url: `${brandConfig.siteUrl}/products/${slug}`,
+        url: productUrl(slug),
         image: resolveProductImage(p.primary_image),
         // Use Thing for ItemList entries so Google doesn't require Product offers/reviews here.
         // The actual Product rich result is emitted on the product detail page.

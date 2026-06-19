@@ -8,6 +8,7 @@ import { brandConfig } from '@/lib/config/brand';
 import type { PublicProduct } from '@/lib/api/generated';
 import { StructuredData } from '@/components/StructuredData';
 import { permanentRedirectToCanonicalProductSlug } from '@/lib/seo/productSlugRedirect';
+import { productPath, productUrl as buildProductUrl, resolveCanonicalProductSlug } from '@/lib/seo/urls';
 
 export const revalidate = 3600;
 
@@ -95,7 +96,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const title = product?.meta_title || (product?.product_name ? `${product.product_name}` : "Product Details");
   const description = buildProductDescription(product);
   const imageUrl = resolveProductImage(product);
-  const canonical = `/products/${product?.slug ?? slug}`;
+  const canonicalSlug = resolveCanonicalProductSlug(slug, product?.slug);
+  const canonical = productPath(canonicalSlug);
 
   return {
     title,
@@ -137,8 +139,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   permanentRedirectToCanonicalProductSlug(slug, product?.slug);
 
-  const canonicalSlug = product?.slug ?? slug;
-  const productUrl = `${brandConfig.siteUrl}/products/${canonicalSlug}`;
+  const canonicalSlug = resolveCanonicalProductSlug(slug, product?.slug);
+  const canonicalProductUrl = buildProductUrl(canonicalSlug);
   const productName = product?.product_name ?? 'Product';
   const description = buildProductDescription(product);
   const imageUrl = resolveProductImage(product);
@@ -167,7 +169,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         breadcrumbs={[
           { name: 'Home', url: brandConfig.siteUrl },
           { name: 'Products', url: `${brandConfig.siteUrl}/products` },
-          { name: productName, url: productUrl },
+          { name: productName, url: canonicalProductUrl },
         ]}
       />
       {product && hasAnyPrice && (
@@ -176,7 +178,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           product={{
             name: productName,
             description,
-            url: productUrl,
+            url: canonicalProductUrl,
             image: imageUrl,
             brand: product.brand ?? null,
             sku: canonicalSlug,

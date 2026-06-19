@@ -14,6 +14,14 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: 'Buying Guides & Articles',
   description: 'Expert guides, history, and tips on renewed tech in Kenya.',
+  alternates: {
+    canonical: '/articles',
+  },
+  openGraph: {
+    title: 'Buying Guides & Articles',
+    description: 'Expert guides, history, and tips on renewed tech in Kenya.',
+    url: '/articles',
+  },
 };
 
 interface PageProps {

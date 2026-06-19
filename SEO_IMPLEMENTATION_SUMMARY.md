@@ -55,6 +55,10 @@ This document summarizes all the SEO enhancements implemented to help your websi
 - ✅ Open Graph tags for social sharing
 - ✅ Twitter Card tags
 - ✅ Canonical URLs
+- ✅ Permanent redirects from legacy slugs to canonical URLs
+- ✅ Sitemap uses canonical product and article URLs only
+
+**Canonical URL pattern:** `/products/{brand-model-slug}` (e.g. `/products/samsung-galaxy-s26-ultra`)
 
 **Features:**
 - Fetches product data server-side for SEO

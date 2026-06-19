@@ -1,4 +1,5 @@
 import { brandConfig } from '@/lib/config/brand';
+import { productUrl } from '@/lib/seo/urls';
 import type { PublicProduct, PublicInventoryUnitPublic, Review } from '@/lib/api/generated';
 
 interface ProductSchemaProps {
@@ -15,6 +16,7 @@ function variantPrices(product: PublicProduct): number[] {
 }
 
 export function ProductSchema({ product, units = [], reviews = [], selectedUnit }: ProductSchemaProps) {
+  const canonicalUrl = product.slug ? productUrl(product.slug) : undefined;
   // Calculate aggregate rating from reviews
   const aggregateRating = reviews.length > 0
     ? {
@@ -45,7 +47,7 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
   const offers = units.length > 0
     ? units.map((unit) => ({
         '@type': 'Offer' as const,
-        url: `${brandConfig.siteUrl}/products/${product.slug || product.id}`,
+        url: canonicalUrl || `${brandConfig.siteUrl}/products/${product.slug || product.id}`,
         priceCurrency: 'KES',
         price: Number(unit.selling_price).toFixed(2),
         availability: 'https://schema.org/InStock',
@@ -61,7 +63,7 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
       }))
     : variantPrices(product).map((p: number) => ({
         '@type': 'Offer' as const,
-        url: `${brandConfig.siteUrl}/products/${product.slug || product.id}`,
+        url: canonicalUrl || `${brandConfig.siteUrl}/products/${product.slug || product.id}`,
         priceCurrency: 'KES',
         price: p.toFixed(2),
         availability: 'https://schema.org/InStock',
@@ -113,9 +115,10 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
     image: product.primary_image
       ? [product.primary_image]
       : [`${brandConfig.siteUrl}/affordlogo1.svg`],
-    sku: product.id?.toString(),
+    sku: product.slug || product.id?.toString(),
     mpn: product.model_series || undefined,
     gtin: undefined, // Add if you have GTIN/EAN codes
+    url: canonicalUrl,
     brand: product.brand
       ? {
           '@type': 'Brand' as const,

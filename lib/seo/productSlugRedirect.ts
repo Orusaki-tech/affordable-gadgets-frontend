@@ -1,4 +1,5 @@
 import { permanentRedirect } from 'next/navigation';
+import { productPath } from '@/lib/seo/urls';
 
 export function permanentRedirectToCanonicalProductSlug(
   requestedSlug: string,
@@ -9,5 +10,5 @@ export function permanentRedirectToCanonicalProductSlug(
   if (!canonical || canonical === requestedSlug) {
     return;
   }
-  permanentRedirect(`/products/${canonical}${suffix}`);
+  permanentRedirect(`${productPath(canonical)}${suffix}`);
 }

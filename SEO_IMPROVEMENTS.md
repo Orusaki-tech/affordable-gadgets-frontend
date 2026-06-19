@@ -131,11 +131,25 @@
 2. ✅ Frontend updated - SEO fields in types
 3. ✅ Metadata generation - Uses SEO fields
 4. ✅ Structured data - Uses SEO fields
-5. ⏳ **Fill SEO fields for products in Admin Panel**
-6. ⏳ **Test with Google Rich Results Test**
-7. ⏳ **Monitor search rankings**
+5. ✅ **Canonical product slugs** - Bulk-renamed for SEO (June 2026)
+6. ✅ **Sitemap** - Lists canonical `/products/{slug}` and article URLs only
+7. ✅ **Legacy redirects** - Old slugs 301/308 to canonical URLs
+8. ⏳ **Fill SEO fields for products in Admin Panel**
+9. ⏳ **Resubmit sitemap** in Google Search Console
+10. ⏳ **Test with Google Rich Results Test**
+
+## Canonical URL Rules (June 2026 slug migration)
+
+| Surface | Canonical pattern |
+|---------|-------------------|
+| Product page | `/products/{slug}` e.g. `/products/samsung-galaxy-a57` |
+| Article page | `/products/{slug}/blog/{articleSlug}` |
+| Sitemap | Canonical URLs only (no legacy slugs, no `/blog` redirect hubs) |
+| Structured data | `url` and `sku` use canonical slug |
+| Google Merchant feed | Product `link` uses live `product.slug` from DB |
+
+**Slug format:** `brand-model[-variant]` — lowercase, hyphenated, no `-ph`/`-ac` suffixes, max ~60 chars.
 
 ---
 
-*Last Updated: $(date)*
-*All TypeScript errors resolved. Build should pass.*
+*Last Updated: June 2026*

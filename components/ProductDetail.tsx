@@ -1326,8 +1326,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             >
               {/* Hint banner — pulsates until user makes first selection */}
               <div className={`product-detail__variant-hint-banner${showVariantHint ? '' : ' product-detail__variant-hint-banner--hidden'}`}>
-                <span className="product-detail__variant-hint-icon">👆</span>
-                <span>Choose a variant above to see price and checkout</span>
+        
+                <span>Choose a variant (Storage, RAM) below to see price and checkout</span>
               </div>
               {/* Storage Options */}
               {uniqueStorage.length > 0 && (

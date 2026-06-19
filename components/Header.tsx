@@ -86,7 +86,7 @@ export function Header() {
           </Link>
 
           <nav className="site-header__nav" aria-label="Main">
-            <Link href="/" className="site-header__nav-link">
+            <Link href="/" className="site-header__nav-link site-header__nav-link--home">
               Home
               <span className="site-header__nav-underline" />
             </Link>

@@ -173,9 +173,22 @@
 }
 
 .site-header__brand-dropdown--more {
-  min-width: 640px;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+  min-width: min(640px, 94vw);
   max-width: min(94vw, 760px);
   padding: 16px;
+}
+
+.site-header__brand-menu--more {
+  position: static;
+}
+
+.site-header__brand-menu--more .site-header__brand-dropdown {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
 }
 
 .site-header__brand-dropdown-link {
@@ -619,44 +632,41 @@
 @media (min-width: 1024px) {
   .site-header__bar {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
+    gap: 12px 16px;
   }
 
   .site-header__logo-link {
     grid-column: 1;
     grid-row: 1;
     justify-self: start;
-    position: relative;
-    z-index: 2;
-    background: var(--ui-white);
-    padding-right: 12px;
+    min-width: 0;
   }
 
   .site-header__nav {
-    grid-column: 1 / -1;
+    grid-column: 2;
     grid-row: 1;
-    justify-self: center;
     display: flex;
-    width: max-content;
-    max-width: calc(100% - 340px);
-    z-index: 1;
-    gap: 4px;
+    justify-content: center;
+    justify-self: stretch;
+    width: 100%;
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .site-header__nav-link--home {
+    display: none;
   }
 
   .site-header__actions {
-    grid-column: 2;
+    grid-column: 3;
     grid-row: 1;
     justify-self: end;
-    position: relative;
-    z-index: 2;
-    background: var(--ui-white);
-    padding-left: 12px;
   }
 
   .site-header__logo-text {
-    display: block;
-    font-size: 17px;
+    display: none;
   }
 
   .site-header__cart-label {
@@ -681,15 +691,19 @@
 @media (min-width: 1280px) {
   .site-header__nav {
     gap: 4px;
-    max-width: calc(100% - 400px);
   }
 
   .site-header__nav-link {
     font-size: 12px;
+    padding: 0 4px;
   }
 
   .site-header__logo-text {
-    font-size: 20px;
+    display: block;
+    font-size: 18px;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .site-header__cart-label {
@@ -707,16 +721,17 @@
 
 @media (min-width: 1440px) {
   .site-header__nav {
-    gap: 4px;
-    max-width: calc(100% - 440px);
+    gap: 6px;
   }
 
   .site-header__nav-link {
-    font-size: 12px;
+    font-size: 13px;
+    padding: 0 6px;
   }
 
   .site-header__logo-text {
-    font-size: 22px;
+    font-size: 20px;
+    max-width: none;
   }
 }
 

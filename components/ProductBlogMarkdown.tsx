@@ -9,11 +9,53 @@ interface ProductBlogBodyProps {
 }
 
 /**
+ * Admin / legacy articles may store HTML fragments. ReactMarkdown shows raw tags
+ * unless we convert common block/inline HTML back to markdown first.
+ */
+function htmlToMarkdown(input: string): string {
+  if (!/<[a-z][\s\S]*>/i.test(input)) {
+    return input;
+  }
+
+  let text = input.trim();
+
+  if (/^<p[^>]*>[\s\S]*<\/p>$/i.test(text)) {
+    text = text.replace(/^<p[^>]*>/i, '').replace(/<\/p>$/i, '');
+  }
+
+  return text
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>\s*<p[^>]*>/gi, '\n\n')
+    .replace(/<\/?p[^>]*>/gi, '\n')
+    .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, '\n\n# $1\n\n')
+    .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, '\n\n## $1\n\n')
+    .replace(/<h3[^>]*>([\s\S]*?)<\/h3>/gi, '\n\n### $1\n\n')
+    .replace(/<strong>([\s\S]*?)<\/strong>/gi, '**$1**')
+    .replace(/<b>([\s\S]*?)<\/b>/gi, '**$1**')
+    .replace(/<em>([\s\S]*?)<\/em>/gi, '*$1*')
+    .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '- $1\n')
+    .replace(/<\/?ul[^>]*>/gi, '\n')
+    .replace(/<\/?ol[^>]*>/gi, '\n')
+    .replace(/<div[^>]*class="product-gallery"[^>]*>([\s\S]*?)<\/div>/gi, '$1')
+    .replace(/<img[^>]*src="([^"]+)"[^>]*alt="([^"]*)"[^>]*\/?>/gi, '\n\n![$2]($1)\n\n')
+    .replace(/<img[^>]*src="([^"]+)"[^>]*\/?>/gi, '\n\n![]($1)\n\n')
+    .replace(/<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi, '[$2]($1)')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .trim();
+}
+
+/**
  * Blog batches often ship with missing blank lines — headings and lists glued to
  * prior paragraphs. CommonMark won't parse block elements unless we repair breaks.
  */
 function normalizeBlogMarkdown(input: string): string {
-  let text = input.replace(/\r\n/g, '\n').trim();
+  let text = htmlToMarkdown(input).replace(/\r\n/g, '\n').trim();
 
   // Headings glued after punctuation on the same line
   text = text.replace(/([.!?])\s+(#{2,6} )/g, '$1\n\n$2');

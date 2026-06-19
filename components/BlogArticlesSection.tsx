@@ -27,7 +27,7 @@ async function fetchArticles(pageSize: number): Promise<PublicArticleCard[]> {
 }
 
 export async function BlogArticlesSection({
-  title = 'Renewed tech helps the planet',
+  title = 'Latest articles',
   pageSize = 8,
 }: BlogArticlesSectionProps) {
   const articles = await fetchArticles(pageSize);

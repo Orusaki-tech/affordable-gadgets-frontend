@@ -172,22 +172,9 @@
 }
 
 .site-header__brand-dropdown--more {
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
   min-width: 640px;
   max-width: min(94vw, 760px);
   padding: 16px;
-}
-
-.site-header__brand-menu--more {
-  position: static;
-}
-
-.site-header__brand-menu--more .site-header__brand-dropdown {
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
 }
 
 .site-header__brand-dropdown-link {

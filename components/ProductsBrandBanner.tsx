@@ -14,6 +14,9 @@ export function ProductsBrandBanner({ config }: ProductsBrandBannerProps) {
     <section
       className="products-brand-banner"
       aria-label={label}
+      style={
+        config.backgroundColor ? { backgroundColor: config.backgroundColor } : undefined
+      }
     >
       {config.backgroundImage ? (
         <CloudinaryImage

@@ -21,6 +21,7 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     brandFilter: 'Apple',
     title: 'Apple',
     subtitle: 'iPhone, iPad, Mac, and accessories.',
+    backgroundColor: '#c8d84a',
     backgroundImage:
       'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781191802/products-banners/iphone.png',
     imageAlt:

@@ -178,7 +178,16 @@ export function ProductCard({
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedRam, setSelectedRam] = useState<number | null>(null);
   const [showSingleStorageOnly, setShowSingleStorageOnly] = useState(false);
+  const [showCardHint, setShowCardHint] = useState(true);
+  const hasMadeCardSelection = useRef(false);
   const featuredNameRef = useRef<HTMLParagraphElement | null>(null);
+
+  const onCardVariantSelect = () => {
+    if (!hasMadeCardSelection.current) {
+      hasMadeCardSelection.current = true;
+      setShowCardHint(false);
+    }
+  };
 
   const secondaryImage = useMemo(() => {
     const primaryImage = product.primary_image;
@@ -503,7 +512,7 @@ export function ProductCard({
             <div className="product-card__overlay-row">
               <span className="product-card__overlay-label">Storage</span>
               <div className="product-card__storage-options product-card__storage-options--expanded">
-                {storageOptions.map((option) => (
+                {storageOptions.map((option, idx) => (
                   <button
                     key={option.storage}
                     type="button"
@@ -513,12 +522,13 @@ export function ProductCard({
                       setSelectedStorage((prev) =>
                         prev === option.storage ? null : option.storage
                       );
+                      onCardVariantSelect();
                     }}
                     className={`product-card__storage-option ${
                       selectedStorage === option.storage
                         ? 'product-card__storage-option--active'
                         : ''
-                    }`}
+                    }${!selectedStorage && !selectedRam && idx === 0 ? ' product-card__storage-option--suggest' : ''}`}
                   >
                     {option.storage}GB
                   </button>
@@ -799,9 +809,12 @@ export function ProductCard({
           {!isMinimal && (
             <div className="product-card__overlay-row">
               <span className="product-card__overlay-label">Storage</span>
+              <div className={`product-card__hint-banner${showCardHint && storageOptions.length > 0 && !selectedStorage ? '' : ' product-card__hint-banner--hidden'}`}>
+                <span>👆 Pick storage & color</span>
+              </div>
               <div className="product-card__storage-options">
                 {storageOptions.length > 0 ? (
-                  storageOptions.map((option) => (
+                  storageOptions.map((option, idx) => (
                     <button
                       key={option.storage}
                       type="button"
@@ -811,12 +824,13 @@ export function ProductCard({
                         setSelectedStorage((prev) =>
                           prev === option.storage ? null : option.storage
                         );
+                        onCardVariantSelect();
                       }}
                       className={`product-card__storage-option ${
                         selectedStorage === option.storage
                           ? 'product-card__storage-option--active'
                           : ''
-                      }`}
+                      }${!selectedStorage && !selectedRam && idx === 0 && storageOptions.length > 1 ? ' product-card__storage-option--suggest' : ''}`}
                     >
                       {option.storage}GB
                     </button>

@@ -308,6 +308,22 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const unitsCarouselRef = useRef<HTMLDivElement | null>(null);
   const [canScrollUnitsLeft, setCanScrollUnitsLeft] = useState(false);
   const [canScrollUnitsRight, setCanScrollUnitsRight] = useState(false);
+  const [variantShake, setVariantShake] = useState(false);
+  const [showVariantHint, setShowVariantHint] = useState(true);
+  const variantRef = useRef<HTMLDivElement | null>(null);
+  const hasMadeSelection = useRef(false);
+
+  const triggerVariantShake = () => {
+    setVariantShake(true);
+    setTimeout(() => setVariantShake(false), 400);
+  };
+
+  const onVariantSelect = () => {
+    if (!hasMadeSelection.current) {
+      hasMadeSelection.current = true;
+      setShowVariantHint(false);
+    }
+  };
 
   const jumpToTab = (tab: TabType) => {
     setActiveTab(tab);
@@ -612,7 +628,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   const handleAddToCart = async () => {
     if (!selectedUnit) {
-      alert('Please select a variant');
+      triggerVariantShake();
       return;
     }
     
@@ -1204,14 +1220,15 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               ) : null;
 
               if (hasStock) {
+                const nothingSelected = !selectedUnit && !selectedVariant;
                 return (
                   <div className="product-detail__cta product-detail__cta--inline">
                     <button
-                      onClick={handleAddToCart}
-                      disabled={!selectedUnit || isAddingToCart}
+                      onClick={nothingSelected ? triggerVariantShake : handleAddToCart}
+                      disabled={(!selectedUnit && !nothingSelected) || isAddingToCart}
                       className={`product-detail__cta-button ${
-                        !selectedUnit || isAddingToCart ? 'product-detail__cta-button--disabled' : ''
-                      }`}
+                        (!selectedUnit && !nothingSelected) || isAddingToCart ? 'product-detail__cta-button--disabled' : ''
+                      }${nothingSelected ? ' product-detail__cta-button--suggest' : ''}`}
                     >
                       {isAddingToCart ? (
                         <span className="product-detail__cta-loading">
@@ -1303,26 +1320,31 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               <p className="product-detail__variants-loading-text">Loading variants...</p>
             </div>
           ) : (units && units.length > 0) || variantsList.length > 0 ? (
-            <div className="product-detail__variants">
-              {/* Label above storage and color options */}
-              {(uniqueStorage.length > 0 || uniqueColors.length > 0) && (
-                <p className="product-detail__variants-note">Select storage and color to see price and checkout</p>
-              )}
+            <div
+              ref={variantRef}
+              className={`product-detail__variants${variantShake ? ' product-detail__variant-shake' : ''}`}
+            >
+              {/* Hint banner — pulsates until user makes first selection */}
+              <div className={`product-detail__variant-hint-banner${showVariantHint ? '' : ' product-detail__variant-hint-banner--hidden'}`}>
+                <span className="product-detail__variant-hint-icon">👆</span>
+                <span>Choose a variant above to see price and checkout</span>
+              </div>
               {/* Storage Options */}
               {uniqueStorage.length > 0 && (
                 <div className="product-detail__variant-group">
                   <label className="product-detail__variant-label">Storage</label>
                   <div className="product-detail__variant-options">
-                    {uniqueStorage.map((storage) => (
+                    {uniqueStorage.map((storage, idx) => (
                       <button
                         key={storage}
                         onClick={() => {
                           setSelectedStorage(selectedStorage === storage ? null : (storage ?? null));
                           setSelectedUnit(null);
+                          onVariantSelect();
                         }}
                         className={`product-detail__variant-option ${
                           selectedStorage === storage ? 'product-detail__variant-option--active' : ''
-                        }`}
+                        }${!selectedStorage && !selectedRAM && !selectedColor && !selectedUnit && idx === 0 ? ' product-detail__variant-option--suggest' : ''}`}
                       >
                         {storage}GB
                       </button>
@@ -1349,6 +1371,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         onClick={() => {
                           setSelectedColor(selectedColor === color ? null : (color ?? null));
                           setSelectedUnit(null);
+                          onVariantSelect();
                         }}
                           disabled={!hasAvailableUnits}
                           className={`product-detail__variant-option ${

@@ -16,14 +16,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 8px;
   position: relative;
 }
 
 .site-header__logo-link {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-shrink: 0;
   text-decoration: none;
   transition: opacity 200ms;
@@ -35,8 +35,8 @@
 
 .site-header__logo-wrap {
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,7 +97,7 @@
 .site-header__nav {
   display: none;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   flex: 1;
   min-width: 0;
   justify-content: center;
@@ -108,8 +108,8 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  font-size: 13px;
+  gap: 1px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--ui-gray-700);
   text-decoration: none;
@@ -119,13 +119,13 @@
 
 .site-header__nav-link--trigger {
   cursor: default;
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .site-header__nav-chevron {
-  width: 14px;
-  height: 14px;
-  opacity: 0.55;
+  width: 12px;
+  height: 12px;
+  opacity: 0.5;
 }
 
 .site-header__brand-menu {
@@ -162,8 +162,8 @@
 .site-header__brand-dropdown--more {
   left: 0;
   transform: none;
-  min-width: 520px;
-  max-width: min(90vw, 640px);
+  min-width: 640px;
+  max-width: min(94vw, 760px);
   padding: 16px;
 }
 
@@ -191,7 +191,7 @@
 .site-header__more-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px 24px;
+  gap: 12px 20px;
 }
 
 .site-header__more-column {
@@ -583,14 +583,6 @@
   .site-header__container {
     padding: 10px 24px;
   }
-
-  .site-header__cart-label {
-    display: inline;
-  }
-
-  .site-header__account-label {
-    display: inline;
-  }
 }
 
 @media (min-width: 1024px) {
@@ -613,13 +605,40 @@
   }
 
   .site-header__container {
-    padding: 4px 32px;
+    padding: 4px 16px;
+  }
+
+  .site-header__cart-label,
+  .site-header__account-label {
+    display: none;
   }
 }
 
 @media (min-width: 1280px) {
   .site-header__nav {
-    gap: 12px;
+    gap: 8px;
+  }
+
+  .site-header__nav-link {
+    font-size: 13px;
+  }
+
+  .site-header__container {
+    padding: 4px 24px;
+  }
+
+  .site-header__cart-label {
+    display: inline;
+  }
+
+  .site-header__more-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1536px) {
+  .site-header__nav {
+    gap: 10px;
   }
 
   .site-header__nav-link {
@@ -628,6 +647,16 @@
 
   .site-header__logo-text {
     display: block;
+    font-size: 20px;
+  }
+
+  .site-header__logo-wrap {
+    width: 50px;
+    height: 50px;
+  }
+
+  .site-header__container {
+    padding: 4px 32px;
   }
 }
 

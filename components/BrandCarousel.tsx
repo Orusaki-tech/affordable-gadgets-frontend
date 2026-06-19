@@ -5,6 +5,7 @@ import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { ProductCarousel } from '@/components/ProductCarousel';
 import {
   PRIMARY_BRAND_NAV,
+  MORE_BRAND_NAV,
   brandCategoryHref,
 } from '@/lib/config/nav-links';
 
@@ -22,7 +23,14 @@ const BRAND_IMAGES: Partial<Record<string, string>> = {
     'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773054257/2_ogrdnk.png',
 };
 
-const BRAND_ITEMS = PRIMARY_BRAND_NAV.map((brand) => ({
+const CAROUSEL_BRANDS = [
+  ...PRIMARY_BRAND_NAV,
+  ...MORE_BRAND_NAV.filter((brand) =>
+    ['Xiaomi', 'Nothing', 'Honor'].includes(brand.navLabel)
+  ),
+];
+
+const BRAND_ITEMS = CAROUSEL_BRANDS.map((brand) => ({
   href: brandCategoryHref(brand.brandFilter, null),
   label: brand.navLabel,
   image: BRAND_IMAGES[brand.navLabel],

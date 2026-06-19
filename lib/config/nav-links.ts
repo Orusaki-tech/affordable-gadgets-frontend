@@ -65,13 +65,13 @@ export const PRIMARY_BRAND_NAV: BrandNavItem[] = [
   }),
   brandItem('Google', 'Google', { phones: true }),
   brandItem('OnePlus', 'OnePlus', { phones: true }),
+];
+
+/** Additional phone brands — grouped under "More" in the nav. */
+export const MORE_BRAND_NAV: BrandNavItem[] = [
   brandItem('Xiaomi', 'Xiaomi', { phones: true }),
   brandItem('Nothing', 'Nothing', { phones: true }),
   brandItem('Honor', 'Honor', { phones: true }),
-];
-
-/** Budget phone brands — grouped under "More" in the nav. */
-export const MORE_BRAND_NAV: BrandNavItem[] = [
   brandItem('Redmi', 'Redmi', { phones: true }),
   brandItem('Oppo', 'Oppo', { phones: true }),
   brandItem('Vivo', 'Vivo', { phones: true }),

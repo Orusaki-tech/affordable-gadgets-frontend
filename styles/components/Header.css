@@ -211,6 +211,14 @@
   color: var(--primary);
 }
 
+.site-header__nav-link--active {
+  color: var(--primary);
+}
+
+.site-header__nav-link--active .site-header__nav-underline {
+  width: 100%;
+}
+
 .site-header__nav-underline {
   position: absolute;
   bottom: 0;

@@ -9,7 +9,9 @@ import { brandConfig } from '@/lib/config/brand';
 import {
   PRIMARY_BRAND_NAV,
   MORE_BRAND_NAV,
+  SHOP_NAV,
   UTILITY_NAV,
+  isShopNavActive,
 } from '@/lib/config/nav-links';
 import { clearAuthToken } from '@/lib/api/openapi';
 import { createClient } from '@/lib/supabase/client';
@@ -99,6 +101,21 @@ export function Header() {
             ))}
 
             <HeaderMoreBrandsMenu brands={MORE_BRAND_NAV} variant="desktop" />
+
+            {SHOP_NAV.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`site-header__nav-link${
+                  isShopNavActive(link.href, pathname, currentSearch)
+                    ? ' site-header__nav-link--active'
+                    : ''
+                }`}
+              >
+                {link.label}
+                <span className="site-header__nav-underline" />
+              </Link>
+            ))}
 
             {utilityLinks.map((link) => (
               <Link key={link.href} href={link.href} className="site-header__nav-link">
@@ -256,6 +273,17 @@ export function Header() {
                 variant="mobile"
                 onNavigate={closeMobileMenu}
               />
+
+              {SHOP_NAV.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="site-header__mobile-link"
+                  onClick={closeMobileMenu}
+                >
+                  {link.label}
+                </Link>
+              ))}
 
               {utilityLinks.map((link) => (
                 <Link

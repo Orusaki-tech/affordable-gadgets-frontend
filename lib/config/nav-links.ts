@@ -18,6 +18,14 @@ export type NavLink = {
   label: string;
 };
 
+/** Standalone shop links (no brand dropdown). */
+export const SHOP_NAV: NavLink[] = [
+  { href: '/products?type=PH&brand_filter=Sony', label: 'Sony' },
+  { href: '/products?type=AC', label: 'Accessories' },
+];
+
+export const SONY_BRAND_NAV: BrandNavItem = brandItem('Sony', 'Sony', { phones: true });
+
 type CategoryOptions = {
   phones?: boolean;
   tablets?: boolean;
@@ -101,7 +109,21 @@ export function brandCategoryHref(
 
 /** Flat list of all brands for filter sidebar selects. */
 export function allBrandNavItems(): BrandNavItem[] {
-  return [...PRIMARY_BRAND_NAV, ...MORE_BRAND_NAV];
+  return [...PRIMARY_BRAND_NAV, SONY_BRAND_NAV, ...MORE_BRAND_NAV];
+}
+
+export function isShopNavActive(href: string, pathname: string, search: string): boolean {
+  if (pathname !== '/products') return false;
+  const linkQuery = href.includes('?') ? href.split('?')[1] : '';
+  const linkParams = new URLSearchParams(linkQuery);
+  const currentParams = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+
+  const linkType = linkParams.get('type') || '';
+  const linkBrand = linkParams.get('brand_filter') || '';
+  const currentType = currentParams.get('type') || '';
+  const currentBrand = currentParams.get('brand_filter') || '';
+
+  return linkType === currentType && linkBrand.toLowerCase() === currentBrand.toLowerCase();
 }
 
 export function isBrandNavActive(

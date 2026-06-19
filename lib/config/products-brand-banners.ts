@@ -103,6 +103,11 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     title: 'Itel',
     subtitle: 'Budget-friendly Itel phones.',
   },
+  sony: {
+    brandFilter: 'Sony',
+    title: 'Sony',
+    subtitle: 'Premium Xperia and audio gear.',
+  },
 };
 
 export function getBrandBannerConfig(

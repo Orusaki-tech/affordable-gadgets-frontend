@@ -114,9 +114,9 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
       >
         <HeaderWithAnnouncement />
       </Suspense>
-      <main className="flex-1 min-w-0 py-8 lg:py-12">
+      <main className="flex-1 min-w-0 py-6 lg:py-12">
         <div className="container mx-auto px-4 max-w-3xl">
-          <nav className="text-sm text-gray-500 mb-8 flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
+          <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
             <Link href="/" className="hover:text-blue-600 transition-colors">
               Home
             </Link>
@@ -132,7 +132,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
             <span className="text-gray-900 font-medium">Guide</span>
           </nav>
 
-          <header className="mb-10">
+          <header className="mb-8">
             <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-blue-600 mb-4">
               <span className="bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider text-[10px]">
                 {formatArticleCategory(article.category)}
@@ -148,11 +148,11 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
               )}
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight leading-[1.1]">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight leading-[1.15]">
               {headline}
             </h1>
 
-            <p className="text-lg text-gray-600 leading-relaxed mb-8">
+            <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-6">
               {article.seo_description ||
                 product.meta_description ||
                 `Everything you need to know about the ${productName} series.`}
@@ -161,7 +161,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
             {featuredImage && <BlogFeaturedImage src={featuredImage} alt={headline} />}
           </header>
 
-          <article className="prose prose-blue max-w-none">
+          <article className="product-blog-article">
             <ProductBlogBody markdown={article.body || '*No content yet.*'} />
           </article>
 

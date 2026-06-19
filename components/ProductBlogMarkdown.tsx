@@ -8,9 +8,31 @@ interface ProductBlogBodyProps {
   markdown: string;
 }
 
-/** Batch 033+ articles often omit a blank line after bullet lists; fix before parse. */
+/**
+ * Blog batches often ship with missing blank lines — headings and lists glued to
+ * prior paragraphs. CommonMark won't parse block elements unless we repair breaks.
+ */
 function normalizeBlogMarkdown(input: string): string {
-  return input.replace(/^((?:- .+\n)+)(?=[A-Z])/gm, '$1\n');
+  let text = input.replace(/\r\n/g, '\n').trim();
+
+  // Headings glued after punctuation on the same line
+  text = text.replace(/([.!?])\s+(#{2,6} )/g, '$1\n\n$2');
+  // Headings glued mid-line without a break
+  text = text.replace(/([^\n#])(#{2,6} )/g, '$1\n\n$2');
+  // Ensure blank line before ATX headings
+  text = text.replace(/([^\n])\n(#{2,6} )/g, '$1\n\n$2');
+
+  // Lists glued after intro lines or punctuation
+  text = text.replace(/([.:!?])\s*\n(- )/g, '$1\n\n$2');
+  text = text.replace(/([.:!?])(- \*\*)/g, '$1\n\n$2');
+
+  // Batch 033+ articles often omit a blank line after bullet lists
+  text = text.replace(/^((?:- .+\n)+)(?=[A-Z#])/gm, '$1\n');
+
+  // Last list item merged with following paragraph (e.g. "Phone\nPriced from…")
+  text = text.replace(/^(- .+)\n([A-Z])/gm, '$1\n\n$2');
+
+  return text.replace(/\n{3,}/g, '\n\n');
 }
 
 function BlogMarkdownImage({ src, alt }: { src?: string | Blob | null; alt?: string | null }) {
@@ -33,9 +55,21 @@ function BlogMarkdownImage({ src, alt }: { src?: string | Blob | null; alt?: str
 }
 
 const markdownComponents: Components = {
+  h2: ({ children }) => <h2 className="product-blog-body__h2">{children}</h2>,
+  h3: ({ children }) => <h3 className="product-blog-body__h3">{children}</h3>,
+  p: ({ children }) => <p className="product-blog-body__p">{children}</p>,
+  ul: ({ children }) => <ul className="product-blog-body__ul">{children}</ul>,
+  ol: ({ children }) => <ol className="product-blog-body__ol">{children}</ol>,
+  li: ({ children }) => <li className="product-blog-body__li">{children}</li>,
+  strong: ({ children }) => <strong className="product-blog-body__strong">{children}</strong>,
   img: ({ src, alt }) => <BlogMarkdownImage src={src} alt={alt} />,
   a: ({ href, children }) => (
-    <a href={href} target={href?.startsWith('http') ? '_blank' : undefined} rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}>
+    <a
+      href={href}
+      className="product-blog-body__link"
+      target={href?.startsWith('http') ? '_blank' : undefined}
+      rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+    >
       {children}
     </a>
   ),
@@ -43,25 +77,7 @@ const markdownComponents: Components = {
 
 export function ProductBlogBody({ markdown }: ProductBlogBodyProps) {
   return (
-    <div
-      className="product-blog-body max-w-none text-gray-800 
-        [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:text-gray-900
-        [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-4 [&_h2]:text-gray-900
-        [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-3 [&_h3]:text-gray-900
-        [&_p]:leading-relaxed [&_p]:mb-4
-        [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ul]:space-y-2
-        [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_ol]:space-y-2
-        [&_li]:pl-1
-        [&_a]:text-blue-600 [&_a]:underline [&_a]:font-medium hover:[&_a]:text-blue-800
-        [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-6 [&_blockquote]:py-1 [&_blockquote]:my-6 [&_blockquote]:italic [&_blockquote]:text-gray-700 [&_blockquote]:bg-gray-50 [&_blockquote]:rounded-r-lg
-        [&_pre]:bg-gray-900 [&_pre]:text-gray-100 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-6 [&_pre]:text-sm
-        [&_code]:bg-gray-100 [&_code]:text-pink-600 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono
-        [&_strong]:font-semibold [&_strong]:text-gray-900
-        [&_hr]:my-10 [&_hr]:border-gray-200
-        [&_table]:w-full [&_table]:border-collapse [&_table]:my-6
-        [&_th]:bg-gray-50 [&_th]:border [&_th]:border-gray-200 [&_th]:p-3 [&_th]:text-left [&_th]:font-semibold
-        [&_td]:border [&_td]:border-gray-200 [&_td]:p-3"
-    >
+    <div className="product-blog-body">
       <ReactMarkdown components={markdownComponents}>
         {normalizeBlogMarkdown(markdown)}
       </ReactMarkdown>

@@ -1219,7 +1219,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   <p className="product-detail__stock-note">
                     {hasUnitOptions
                       ? 'This product is available to order Brand New. Message us on WhatsApp for a premium experience.'
-                      : 'Not in stock online. Message us on WhatsApp for a premium experience.'}
+                      : 'This product is available to order Brand New. Message us on WhatsApp for a premium experience.'}
                   </p>
                   {whatsAppButton}
                 </div>

@@ -269,6 +269,8 @@ export default async function HomePage() {
           </div>
         </section>
 
+        <BlogArticlesSection />
+
         {/* Product / testimonial videos (template for future product-specific reels) */}
         <HomeProductVideosClient />
 
@@ -286,8 +288,6 @@ export default async function HomePage() {
             <ReviewsShowcaseClient />
           </div>
         </section>
-
-        <BlogArticlesSection />
 
         {/* Brand carousel – above Shop by Category (120×70px, last item followed by first) */}
         <section id="brands" className="scroll-mt-20" style={{ minHeight: '140px', backgroundColor: '#f5f5f7' }}>

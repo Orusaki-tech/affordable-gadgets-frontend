@@ -103,7 +103,7 @@
   display: none;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   min-width: 0;
   flex-wrap: nowrap;
 }
@@ -115,25 +115,26 @@
   justify-content: center;
   gap: 2px;
   min-height: 40px;
-  padding: 0 4px;
-  font-size: 13px;
-  font-weight: 500;
+  padding: 0 2px;
+  font-size: 11px;
+  font-weight: 600;
   line-height: 1;
-  color: var(--ui-gray-700);
+  color: var(--ui-gray-800);
   text-decoration: none;
-  transition: color 200ms;
+  transition: color 200ms, font-weight 200ms;
   white-space: nowrap;
 }
 
 .site-header__nav-link--trigger {
   cursor: default;
-  padding: 0 4px;
+  padding: 0 2px;
 }
 
 .site-header__nav-chevron {
-  width: 12px;
-  height: 12px;
-  opacity: 0.5;
+  width: 11px;
+  height: 11px;
+  opacity: 0.45;
+  transition: opacity 200ms;
 }
 
 .site-header__brand-menu {
@@ -145,6 +146,7 @@
 
 .site-header__brand-menu--active .site-header__nav-link {
   color: var(--primary);
+  font-weight: 700;
 }
 
 .site-header__brand-dropdown {
@@ -210,12 +212,22 @@
   padding: 0 12px 4px;
 }
 
-.site-header__nav-link:hover {
-  color: var(--primary);
-}
-
+.site-header__nav-link:hover,
 .site-header__nav-link--active {
   color: var(--primary);
+  font-weight: 700;
+}
+
+.site-header__brand-menu:hover .site-header__nav-link,
+.site-header__brand-menu:focus-within .site-header__nav-link {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.site-header__brand-menu:hover .site-header__nav-chevron,
+.site-header__brand-menu:focus-within .site-header__nav-chevron,
+.site-header__nav-link:hover .site-header__nav-chevron {
+  opacity: 0.9;
 }
 
 .site-header__nav-link--active .site-header__nav-underline {
@@ -629,16 +641,7 @@
     width: max-content;
     max-width: calc(100% - 340px);
     z-index: 1;
-    gap: 5px;
-  }
-
-  .site-header__nav-link {
-    font-size: 12px;
-    padding: 0 3px;
-  }
-
-  .site-header__nav-link--trigger {
-    padding: 0 3px;
+    gap: 4px;
   }
 
   .site-header__actions {
@@ -677,17 +680,12 @@
 
 @media (min-width: 1280px) {
   .site-header__nav {
-    gap: 8px;
+    gap: 4px;
     max-width: calc(100% - 400px);
   }
 
   .site-header__nav-link {
-    font-size: 13px;
-    padding: 0 5px;
-  }
-
-  .site-header__nav-link--trigger {
-    padding: 0 5px;
+    font-size: 12px;
   }
 
   .site-header__logo-text {
@@ -709,17 +707,12 @@
 
 @media (min-width: 1440px) {
   .site-header__nav {
-    gap: 10px;
+    gap: 4px;
     max-width: calc(100% - 440px);
   }
 
   .site-header__nav-link {
-    font-size: 14px;
-    padding: 0 6px;
-  }
-
-  .site-header__nav-link--trigger {
-    padding: 0 6px;
+    font-size: 12px;
   }
 
   .site-header__logo-text {

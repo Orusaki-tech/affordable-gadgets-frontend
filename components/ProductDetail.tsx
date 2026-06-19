@@ -1218,8 +1218,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 <div className="product-detail__cta product-detail__cta--inline product-detail__cta--whatsapp-block">
                   <p className="product-detail__stock-note">
                     {hasUnitOptions
-                      ? 'Not in stock online. Message us on WhatsApp to check availability for this unit.'
-                      : 'Not in stock online. Message us on WhatsApp to check availability.'}
+                      ? 'This product is available to order Brand New. Message us on WhatsApp for a premium experience.'
+                      : 'Not in stock online. Message us on WhatsApp for a premium experience.'}
                   </p>
                   {whatsAppButton}
                 </div>

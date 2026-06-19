@@ -3,9 +3,10 @@ import { ApiService } from "@/lib/api/generated";
 import { brandConfig } from "@/lib/config/brand";
 
 const PAGE_SIZE = 100;
-const MAX_PAGES = Number(process.env.SITEMAP_MAX_PAGES || 20);
+const MAX_PAGES = Number(process.env.SITEMAP_MAX_PAGES || 50);
 
-export const revalidate = 3600;
+// Refresh frequently after catalog URL changes; ISR still caches between rebuilds.
+export const revalidate = 300;
 
 const staticPaths = [
   "",
@@ -38,14 +39,29 @@ const buildStaticEntries = (): MetadataRoute.Sitemap => {
   }));
 };
 
+const addEntry = (
+  entries: MetadataRoute.Sitemap,
+  seen: Set<string>,
+  entry: MetadataRoute.Sitemap[number],
+) => {
+  if (seen.has(entry.url)) return;
+  seen.add(entry.url);
+  entries.push(entry);
+};
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getBaseUrl();
-  const entries: MetadataRoute.Sitemap = [...buildStaticEntries()];
+  const entries: MetadataRoute.Sitemap = [];
+  const seen = new Set<string>();
+  const refreshedAt = new Date();
+
+  for (const entry of buildStaticEntries()) {
+    addEntry(entries, seen, entry);
+  }
 
   try {
     let page = 1;
     let hasNext = true;
-    const allResults: Array<{ slug?: string; has_published_article?: boolean }> = [];
 
     while (hasNext && page <= MAX_PAGES) {
       const response = await ApiService.apiV1PublicProductsList(
@@ -60,35 +76,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         undefined,
         undefined,
         undefined,
-        undefined
+        undefined,
       );
-      allResults.push(...(response.results ?? []));
+
+      for (const product of response.results ?? []) {
+        const slug = product.slug?.trim();
+        if (!slug) continue;
+
+        addEntry(entries, seen, {
+          url: `${baseUrl}/products/${slug}`,
+          lastModified: refreshedAt,
+          changeFrequency: "weekly",
+          priority: 0.8,
+        });
+      }
+
       hasNext = response.next != null;
       page += 1;
     }
 
-    for (const product of allResults) {
-      if (!product.slug) {
-        continue;
-      }
-      entries.push({
-        url: `${baseUrl}/products/${product.slug}`,
-        lastModified: new Date(),
-        changeFrequency: "weekly",
-        priority: 0.8,
-      });
-      if (product.has_published_article) {
-        entries.push({
-          url: `${baseUrl}/products/${product.slug}/blog`,
-          lastModified: new Date(),
-          changeFrequency: "monthly",
-          priority: 0.75,
-        });
-      }
-    }
-
     let articlePage = 1;
     let articlesHasNext = true;
+
     while (articlesHasNext && articlePage <= MAX_PAGES) {
       const articleResponse = await ApiService.apiV1PublicArticlesList(
         undefined,
@@ -97,20 +106,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         articlePage,
         PAGE_SIZE,
       );
+
       for (const article of articleResponse.results ?? []) {
-        if (!article.product_slug || !article.slug) continue;
-        entries.push({
-          url: `${baseUrl}/products/${article.product_slug}/blog/${article.slug}`,
-          lastModified: article.published_at ? new Date(article.published_at) : new Date(),
+        const productSlug = article.product_slug?.trim();
+        const articleSlug = article.slug?.trim();
+        if (!productSlug || !articleSlug) continue;
+
+        addEntry(entries, seen, {
+          url: `${baseUrl}/products/${productSlug}/blog/${articleSlug}`,
+          lastModified: article.published_at ? new Date(article.published_at) : refreshedAt,
           changeFrequency: "monthly",
           priority: 0.74,
         });
       }
+
       articlesHasNext = articleResponse.next != null;
       articlePage += 1;
     }
   } catch {
-    return entries;
+    return entries.length ? entries : buildStaticEntries();
   }
 
   return entries;

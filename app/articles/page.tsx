@@ -1,25 +1,28 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { BlogCard } from '@/components/BlogCard';
 import { ArticlesFilterBar } from '@/components/ArticlesFilterBar';
+import { ArticlesGrid } from '@/components/ArticlesGrid';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
-import { getArticleHref } from '@/lib/utils/blogRoutes';
-import { fetchAllPublishedArticles, getArticleCardImageUrl } from '@/lib/blog/articlePage';
+import {
+  extractBrandOptions,
+  groupArticlesByProductType,
+} from '@/lib/blog/articleFilters';
+import { fetchAllPublishedArticles } from '@/lib/blog/articlePage';
 import type { PublicArticleCard } from '@/lib/api/generated';
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Buying Guides & Articles',
-  description: 'Expert guides, history, and tips on renewed tech in Kenya.',
+  description: 'Expert phone, laptop, tablet and accessory buying guides for renewed tech in Kenya.',
   alternates: {
     canonical: '/articles',
   },
   openGraph: {
     title: 'Buying Guides & Articles',
-    description: 'Expert guides, history, and tips on renewed tech in Kenya.',
+    description: 'Expert phone, laptop, tablet and accessory buying guides for renewed tech in Kenya.',
     url: '/articles',
   },
 };
@@ -28,30 +31,21 @@ interface PageProps {
   searchParams: Promise<Record<string, string | undefined>>;
 }
 
-function buildProductOptions(articles: PublicArticleCard[]) {
-  return articles
-    .filter((a) => a.product_slug && a.product_name)
-    .reduce<Array<{ slug: string; name: string }>>((acc, a) => {
-      if (!acc.find((p) => p.slug === a.product_slug)) {
-        acc.push({ slug: a.product_slug!, name: a.product_name! });
-      }
-      return acc;
-    }, []);
-}
-
 export default async function ArticlesIndexPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const search = sp.search || '';
-  const productSlug = sp.product_slug || '';
+  const brand = sp.brand || '';
+  const hasFilters = Boolean(search || brand);
 
   let articles: PublicArticleCard[] = [];
   try {
-    articles = await fetchAllPublishedArticles(search || undefined, productSlug || undefined);
+    articles = await fetchAllPublishedArticles({ search: sp.search, brand: sp.brand });
   } catch {
     articles = [];
   }
 
-  const productOptions = buildProductOptions(articles);
+  const brandOptions = extractBrandOptions(articles);
+  const sections = groupArticlesByProductType(articles);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f7f8]">
@@ -62,30 +56,35 @@ export default async function ArticlesIndexPage({ searchParams }: PageProps) {
         <div className="container mx-auto px-4 max-w-6xl">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Buying guides & articles</h1>
           <p className="text-gray-500 mb-6">
-            Expert guides, history, and tips on renewed tech in Kenya.
+            Browse expert guides by device type and brand — phones, laptops, tablets and accessories in Kenya.
           </p>
-          <Suspense fallback={<div className="h-12" />}>
-            <ArticlesFilterBar products={productOptions} />
+          <Suspense fallback={<div className="h-24" />}>
+            <ArticlesFilterBar brands={brandOptions} />
           </Suspense>
+
           {articles.length === 0 ? (
-            <p className="text-gray-600">No articles found{search ? ` for "${search}"` : ''}.</p>
+            <p className="text-gray-600">No guides found{search ? ` for "${search}"` : ''}.</p>
+          ) : hasFilters ? (
+            <ArticlesGrid articles={articles} />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {articles.map((article) => {
-                const href = getArticleHref(article.product_slug, article.slug);
-                if (!href || !article.headline) return null;
-                return (
-                  <BlogCard
-                    key={`${article.product_slug}-${article.slug}`}
-                    imageUrl={getArticleCardImageUrl(article)}
-                    category={article.category || 'buying_guide'}
-                    title={article.headline}
-                    href={href}
-                  />
-                );
-              })}
+            <div className="space-y-10">
+              {sections.map(({ hub, articles: sectionArticles }) => (
+                <section key={hub.code}>
+                  <div className="flex items-center justify-between gap-4 mb-4">
+                    <div>
+                      <h2 className="text-2xl font-semibold text-gray-900">{hub.label} guides</h2>
+                      <p className="text-sm text-gray-500">{sectionArticles.length} guides</p>
+                    </div>
+                    <Link href={`/articles/${hub.slug}`} className="text-sm text-blue-600 hover:underline">
+                      View all {hub.label.toLowerCase()} guides
+                    </Link>
+                  </div>
+                  <ArticlesGrid articles={sectionArticles.slice(0, 8)} />
+                </section>
+              ))}
             </div>
           )}
+
           <div className="mt-10">
             <Link href="/products" className="text-blue-600 hover:underline">
               Browse products

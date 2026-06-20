@@ -144,11 +144,12 @@ class ApiService {
      * @param pageSize
      * @param product
      * @param productSlug
+     * @param productType Filter by product type code (PH, LT, TB, or AC).
      * @param search
      * @returns PaginatedPublicArticleCardList
      * @throws ApiError
      */
-    static apiV1PublicArticlesList(brand, category, ordering, page, pageSize, product, productSlug, search) {
+    static apiV1PublicArticlesList(brand, category, ordering, page, pageSize, product, productSlug, productType, search) {
         return (0, request_1.request)(OpenAPI_1.OpenAPI, {
             method: 'GET',
             url: '/api/v1/public/articles/',
@@ -160,6 +161,7 @@ class ApiService {
                 'page_size': pageSize,
                 'product': product,
                 'product_slug': productSlug,
+                'product_type': productType,
                 'search': search,
             },
         });

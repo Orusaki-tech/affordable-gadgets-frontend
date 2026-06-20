@@ -111,11 +111,12 @@ export declare class ApiService {
      * @param pageSize
      * @param product
      * @param productSlug
+     * @param productType Filter by product type code (PH, LT, TB, or AC).
      * @param search
      * @returns PaginatedPublicArticleCardList
      * @throws ApiError
      */
-    static apiV1PublicArticlesList(brand?: string, category?: string, ordering?: string, page?: number, pageSize?: number, product?: number, productSlug?: string, search?: string): CancelablePromise<PaginatedPublicArticleCardList>;
+    static apiV1PublicArticlesList(brand?: string, category?: string, ordering?: string, page?: number, pageSize?: number, product?: number, productSlug?: string, productType?: string, search?: string): CancelablePromise<PaginatedPublicArticleCardList>;
     /**
      * Published articles for blog card carousels and article index pages.
      * @param slug

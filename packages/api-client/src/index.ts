@@ -168,7 +168,6 @@ export type { PublicInventoryUnitPublic } from './models/PublicInventoryUnitPubl
 export type { PublicInventoryUnitPublicRequest } from './models/PublicInventoryUnitPublicRequest';
 export type { PublicProduct } from './models/PublicProduct';
 export type { PublicProductArticle } from './models/PublicProductArticle';
-export type { PublicProductVariant } from './models/PublicProductVariant';
 export type { PublicProductList } from './models/PublicProductList';
 export type { PublicProductListRequest } from './models/PublicProductListRequest';
 export type { PublicPromotion } from './models/PublicPromotion';

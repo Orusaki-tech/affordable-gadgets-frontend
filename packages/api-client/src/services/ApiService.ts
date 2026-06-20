@@ -200,6 +200,7 @@ export class ApiService {
      * @param pageSize
      * @param product
      * @param productSlug
+     * @param productType Filter by product type code (PH, LT, TB, or AC).
      * @param search
      * @returns PaginatedPublicArticleCardList
      * @throws ApiError
@@ -212,6 +213,7 @@ export class ApiService {
         pageSize?: number,
         product?: number,
         productSlug?: string,
+        productType?: string,
         search?: string,
     ): CancelablePromise<PaginatedPublicArticleCardList> {
         return __request(OpenAPI, {
@@ -225,6 +227,7 @@ export class ApiService {
                 'page_size': pageSize,
                 'product': product,
                 'product_slug': productSlug,
+                'product_type': productType,
                 'search': search,
             },
         });

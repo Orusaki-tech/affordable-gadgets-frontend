@@ -1,6 +1,8 @@
 import { ApiService, OpenAPI } from '@/lib/api/generated';
 import type { PublicProduct, PublicProductArticle, PublicArticleCard } from '@/lib/api/generated';
 import { brandConfig } from '@/lib/config/brand';
+import type { ArticleListFilters } from '@/lib/blog/articleFilters';
+import type { ArticleProductTypeCode } from '@/lib/blog/articleHubs';
 
 export const BLOG_REVALIDATE = 3600;
 /** Keep in sync with FEATURED_PRODUCTS_PAGE_SIZE in lib/hooks/useProducts.ts */
@@ -111,31 +113,39 @@ export function isRenderableArticleCard(article: PublicArticleCard): boolean {
 }
 
 export async function fetchAllPublishedArticles(
-  search?: string,
-  productSlug?: string
+  filters: ArticleListFilters = {},
 ): Promise<PublicArticleCard[]> {
   const all: PublicArticleCard[] = [];
   let page = 1;
   const pageSize = 100;
+  const base = `${OpenAPI.BASE.replace(/\/+$/, '')}/api/v1/public/articles/`;
 
   while (true) {
-    const response = await ApiService.apiV1PublicArticlesList(
-      undefined,
-      undefined,
-      '-published_at',
-      page,
-      pageSize,
-      undefined,
-      productSlug,
-      search,
-    );
-    all.push(...(response.results ?? []));
-    if (!response.next) break;
+    const params = new URLSearchParams({
+      ordering: '-published_at',
+      page: String(page),
+      page_size: String(pageSize),
+    });
+    if (filters.search?.trim()) params.set('search', filters.search.trim());
+    if (filters.brand?.trim()) params.set('brand', filters.brand.trim());
+    if (filters.productType) params.set('product_type', filters.productType);
+
+    const res = await fetch(`${base}?${params.toString()}`, {
+      credentials: 'omit',
+      headers: await publicApiHeaders(),
+    });
+    if (!res.ok) break;
+
+    const data = (await res.json()) as { results?: PublicArticleCard[]; next?: string | null };
+    all.push(...(data.results ?? []));
+    if (!data.next) break;
     page += 1;
   }
 
   return all.filter(isRenderableArticleCard);
 }
+
+export type { ArticleListFilters, ArticleProductTypeCode };
 
 export async function fetchArticleBySlugs(
   productSlug: string,

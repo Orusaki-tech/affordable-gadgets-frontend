@@ -158,12 +158,11 @@ export function HeaderMegaMenuPanel({
 
   return (
     <div
-      className="site-header__mega-menu"
+      className={`site-header__mega-panel${isMore ? ' site-header__mega-panel--more' : ''}`}
       role="region"
       aria-label={isMore ? 'More brands menu' : `${brand?.navLabel} menu`}
     >
-      <div className={`site-header__mega-panel${isMore ? ' site-header__mega-panel--more' : ''}`}>
-        <div className="site-header__mega-categories">
+      <div className="site-header__mega-categories">
           {isMore ? (
             <div className="site-header__mega-more-layout">
               <ul className="site-header__mega-more-brands" aria-label="More brands">
@@ -218,7 +217,6 @@ export function HeaderMegaMenuPanel({
             title={productsHeading}
           />
         )}
-      </div>
     </div>
   );
 }

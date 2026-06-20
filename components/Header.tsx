@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -32,16 +32,57 @@ export function Header() {
   const [openMegaMenu, setOpenMegaMenu] = useState<string | null>(null);
   const [moreHoverBrand, setMoreHoverBrand] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [megaMenuTop, setMegaMenuTop] = useState(0);
+  const megaCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
   const closeMegaMenu = useCallback(() => {
+    if (megaCloseTimerRef.current) {
+      clearTimeout(megaCloseTimerRef.current);
+      megaCloseTimerRef.current = null;
+    }
     setOpenMegaMenu(null);
     setMoreHoverBrand(null);
   }, []);
 
+  const cancelMegaMenuClose = useCallback(() => {
+    if (megaCloseTimerRef.current) {
+      clearTimeout(megaCloseTimerRef.current);
+      megaCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleMegaMenuClose = useCallback(() => {
+    cancelMegaMenuClose();
+    megaCloseTimerRef.current = setTimeout(() => {
+      megaCloseTimerRef.current = null;
+      setOpenMegaMenu(null);
+      setMoreHoverBrand(null);
+    }, 180);
+  }, [cancelMegaMenuClose]);
+
   useEffect(() => {
     setIsMounted(true);
+    return () => {
+      if (megaCloseTimerRef.current) {
+        clearTimeout(megaCloseTimerRef.current);
+      }
+    };
   }, []);
+
+  useLayoutEffect(() => {
+    const wrapper = document.querySelector('.site-header-wrapper');
+    if (!wrapper) return;
+    if (openMegaMenu) {
+      wrapper.classList.add('site-header-wrapper--mega-open');
+      setMegaMenuTop(wrapper.getBoundingClientRect().bottom);
+    } else {
+      wrapper.classList.remove('site-header-wrapper--mega-open');
+    }
+    return () => {
+      wrapper.classList.remove('site-header-wrapper--mega-open');
+    };
+  }, [openMegaMenu]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -136,7 +177,8 @@ export function Header() {
 
           <div
             className={`site-header__nav-zone${openMegaMenu ? ' site-header__nav-zone--mega-open' : ''}`}
-            onMouseLeave={closeMegaMenu}
+            onMouseEnter={cancelMegaMenuClose}
+            onMouseLeave={scheduleMegaMenuClose}
           >
             <nav
               className={`site-header__nav${openMegaMenu ? ' site-header__nav--mega-open' : ''}`}
@@ -155,6 +197,7 @@ export function Header() {
                   search={currentSearch}
                   isMegaOpen={openMegaMenu === brand.brandFilter}
                   onMegaOpen={() => {
+                    cancelMegaMenuClose();
                     setMoreHoverBrand(null);
                     setOpenMegaMenu(brand.brandFilter);
                   }}
@@ -166,6 +209,7 @@ export function Header() {
                 variant="desktop"
                 isMegaOpen={openMegaMenu === MEGA_MENU_MORE_KEY}
                 onMegaOpen={() => {
+                  cancelMegaMenuClose();
                   setMoreHoverBrand(MORE_BRAND_NAV[0]?.brandFilter ?? null);
                   setOpenMegaMenu(MEGA_MENU_MORE_KEY);
                 }}
@@ -200,16 +244,6 @@ export function Header() {
               ))}
             </nav>
 
-            {openMegaMenu && (
-              <HeaderMegaMenuPanel
-                openMenu={openMegaMenu}
-                brand={activeMegaBrand}
-                moreBrands={MORE_BRAND_NAV}
-                moreHoverBrand={moreHoverBrand}
-                onMoreBrandHover={setMoreHoverBrand}
-                onClose={closeMegaMenu}
-              />
-            )}
           </div>
 
           <div className="site-header__actions">
@@ -330,12 +364,29 @@ export function Header() {
         {isMounted &&
           openMegaMenu &&
           createPortal(
-            <button
-              type="button"
-              className="site-header__mega-backdrop"
-              aria-label="Close menu"
-              onClick={closeMegaMenu}
-            />,
+            <>
+              <button
+                type="button"
+                className="site-header__mega-backdrop"
+                aria-label="Close menu"
+                onClick={closeMegaMenu}
+              />
+              <div
+                className="site-header__mega-menu site-header__mega-menu--portal"
+                style={{ top: megaMenuTop }}
+                onMouseEnter={cancelMegaMenuClose}
+                onMouseLeave={scheduleMegaMenuClose}
+              >
+                <HeaderMegaMenuPanel
+                  openMenu={openMegaMenu}
+                  brand={activeMegaBrand}
+                  moreBrands={MORE_BRAND_NAV}
+                  moreHoverBrand={moreHoverBrand}
+                  onMoreBrandHover={setMoreHoverBrand}
+                  onClose={closeMegaMenu}
+                />
+              </div>
+            </>,
             document.body
           )}
 

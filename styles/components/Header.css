@@ -129,6 +129,11 @@
   min-width: 0;
   width: 100%;
   height: 50px;
+  overflow: visible;
+}
+
+.site-header__nav-zone--mega-open {
+  overflow: visible;
 }
 
 .site-header__nav-link {
@@ -192,12 +197,12 @@
 .site-header__mega-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 55;
+  z-index: 45;
   border: none;
   padding: 0;
   margin: 0;
   cursor: default;
-  background: rgba(15, 23, 42, 0.28);
+  background: rgba(15, 23, 42, 0.32);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   animation: site-header-mega-fade-in 200ms ease-out;
@@ -212,6 +217,22 @@
   padding-top: 8px;
   z-index: 3;
   animation: site-header-mega-slide-in 200ms ease-out;
+}
+
+.site-header__mega-menu--portal {
+  position: fixed;
+  left: 0;
+  right: 0;
+  width: 100%;
+  padding: 0 16px;
+  z-index: 66;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+
+.site-header__mega-menu--portal .site-header__mega-panel {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .site-header__mega-panel {
@@ -898,6 +919,10 @@
   .site-header__menu-button,
   .site-header__mobile-menu {
     display: none;
+  }
+
+  .site-header__mega-menu--portal {
+    padding: 0 24px;
   }
 
   .site-header__dropdown-grid {

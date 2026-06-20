@@ -22,7 +22,7 @@ export interface FilterState {
 }
 
 const SORT_OPTIONS = [
-  { value: '', label: 'Latest release date' },
+  { value: '-release_date', label: 'Latest release date' },
   { value: 'release_date', label: 'Oldest release date' },
   { value: 'product_name', label: 'Name (A-Z)' },
   { value: '-product_name', label: 'Name (Z-A)' },
@@ -84,7 +84,7 @@ export function ProductFilters({
   );
   const [budgetMin, setBudgetMin] = useState(initialFilters?.minPrice ?? '0');
   const [budgetMax, setBudgetMax] = useState(initialFilters?.maxPrice ?? '100000');
-  const [sort, setSort] = useState('');
+  const [sort, setSort] = useState('-release_date');
   const [sidebarOpen, setSidebarOpen] = useState(Boolean(autoOpen));
   const activeFilterCount = [
     filters.type,

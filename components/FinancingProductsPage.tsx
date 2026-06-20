@@ -76,7 +76,7 @@ export function FinancingProductsPage() {
     [searchParams]
   );
   const [filters, setFilters] = useState<FilterState>(initialFilters);
-  const [sort, setSort] = useState('');
+  const [sort, setSort] = useState('-release_date');
 
   useEffect(() => setFilters(initialFilters), [initialFilters]);
   useEffect(() => {
@@ -134,7 +134,7 @@ export function FinancingProductsPage() {
         brand: filters.brand || undefined,
         min_price: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
         max_price: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
-        ordering: sort || undefined,
+        ordering: sort,
       }),
     staleTime: 30000,
   });

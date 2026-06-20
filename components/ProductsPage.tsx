@@ -59,7 +59,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     [searchParams]
   );
   const [filters, setFilters] = useState<FilterState>(initialFilters);
-  const [sort, setSort] = useState('');
+  const [sort, setSort] = useState('-release_date');
   const [autoOpenFilters, setAutoOpenFilters] = useState(() => searchParams.get('openFilters') === '1');
   const [focusFilterSearch, setFocusFilterSearch] = useState(false);
   const queryClient = useQueryClient();
@@ -273,7 +273,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
     brand_filter: filters.brand || undefined,
     min_price: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
     max_price: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
-    ordering: sort || undefined,
+    ordering: sort,
     promotion: promotionId ? parseInt(promotionId) : undefined, // Backend will filter by promotion
   });
 
@@ -301,7 +301,7 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
             brand_filter: filters.brand || undefined,
             min_price: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
             max_price: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
-            ordering: sort || undefined,
+            ordering: sort,
             promotion: promotionId ? parseInt(promotionId) : undefined,
           },
         ],

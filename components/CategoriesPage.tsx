@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { CATEGORY_CARDS, type CategoryCard } from '@/lib/config/categories';
 import { useInfiniteProducts, useProducts } from '@/lib/hooks/useProducts';
+import type { PublicProductList } from '@/lib/api/generated';
 import { ProductCard } from './ProductCard';
 
 export function CategoriesPage() {
@@ -71,7 +72,7 @@ function CategoryProducts({ category }: { category: CategoryCard }) {
   );
   const pagedProducts = useProducts({ type: category.code, page_size: 4, enabled: !isAccessories });
 
-  const allAccessories = isAccessories
+  const allAccessories: PublicProductList[] = isAccessories
     ? (infiniteAccessories.data?.pages ?? []).flatMap((p) => p.results ?? [])
     : [];
 
@@ -79,9 +80,9 @@ function CategoryProducts({ category }: { category: CategoryCard }) {
   const isLoading = isAccessories ? infiniteAccessories.isLoading : pagedProducts.isLoading;
   const isFetching = isAccessories ? infiniteAccessories.isFetching : pagedProducts.isFetching;
 
-  const filteredResults = (isAccessories ? allAccessories : (data?.results ?? [])).filter(
-    (product) => product.product_type === category.code
-  );
+  const filteredResults = (
+    (isAccessories ? allAccessories : (data?.results ?? [])) as PublicProductList[]
+  ).filter((product) => product.product_type === category.code);
   const visibleProducts = isAccessories
     ? filteredResults.slice(0, accessoriesVisibleCount)
     : filteredResults;

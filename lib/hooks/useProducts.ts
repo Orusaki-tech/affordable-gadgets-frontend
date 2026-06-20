@@ -6,7 +6,18 @@
 import { useEffect } from 'react';
 import { useInfiniteQuery, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
+import {
+  ApiService,
+  OpenAPI,
+  type PaginatedPublicProductListList,
+  type PublicInventoryUnitPublic,
+  type PublicProduct,
+  type PublicProductList,
+} from '@/lib/api/generated';
 import type { ProductTypeFilter } from '@/lib/config/nav-links';
+
+/** List API pagination shape (products list endpoint). */
+export type PaginatedPublicProductList = PaginatedPublicProductListList;
 
 /** Number of items to fetch for the first request (visible above the fold). Next page is prefetched after this loads. */
 export const PRODUCTS_VISIBLE_PAGE_SIZE = 20;
@@ -56,16 +67,16 @@ export function useFeaturedProducts() {
 function getProductFromListCache(
   queryClient: QueryClient,
   opts: { id?: number; slug?: string }
-): PublicProduct | undefined {
+): PublicProductList | undefined {
   const entries = queryClient.getQueriesData<PaginatedPublicProductList>({ queryKey: ['products'] });
   for (const [, data] of entries) {
     if (!data?.results?.length) continue;
     const match = data.results.find(
       (p) =>
         (opts.id != null && p.id === opts.id) ||
-        (opts.slug != null && (p as PublicProduct & { slug?: string }).slug === opts.slug)
+        (opts.slug != null && (p as PublicProductList & { slug?: string }).slug === opts.slug)
     );
-    if (match) return match as PublicProduct;
+    if (match) return match;
   }
   return undefined;
 }
@@ -202,7 +213,7 @@ export function useInfiniteProducts(params?: Omit<ProductsQueryParams, 'page'> &
   });
 }
 
-export function useProduct(id: number, options?: { placeholderFromList?: PublicProduct }) {
+export function useProduct(id: number, options?: { placeholderFromList?: PublicProductList }) {
   const queryClient = useQueryClient();
   return useQuery<PublicProduct>({
     queryKey: ['product', id],
@@ -214,7 +225,7 @@ export function useProduct(id: number, options?: { placeholderFromList?: PublicP
   });
 }
 
-export function useProductBySlug(slug: string, options?: { placeholderFromList?: PublicProduct }) {
+export function useProductBySlug(slug: string, options?: { placeholderFromList?: PublicProductList }) {
   const queryClient = useQueryClient();
   return useQuery<PublicProduct>({
     queryKey: ['product', 'slug', slug],
@@ -278,9 +289,9 @@ export function useProductUnits(
 }
 
 /** Prefetch product detail and units (e.g. on card hover) so the detail page is ready on click. */
-export function prefetchProductDetail(queryClient: QueryClient, product: PublicProduct): void {
+export function prefetchProductDetail(queryClient: QueryClient, product: PublicProductList): void {
   const id = product.id;
-  const slug = (product as PublicProduct & { slug?: string }).slug;
+  const slug = (product as PublicProductList & { slug?: string }).slug;
   if (id != null) {
     queryClient.prefetchQuery({
       queryKey: ['product', id],

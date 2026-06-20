@@ -34,7 +34,6 @@ export function ComparisonPage() {
         min_price: product?.min_price ?? null,
         max_price: product?.max_price ?? null,
         available_units_count: product?.available_units_count ?? null,
-        interest_count: product?.interest_count ?? null,
       };
     });
   }, [compareList, allProducts]);
@@ -65,11 +64,6 @@ export function ComparisonPage() {
       label: 'Available Units',
       render: (p: (typeof selectedProducts)[number]) =>
         p.available_units_count !== null ? String(p.available_units_count) : 'N/A',
-    },
-    {
-      label: 'Interest Count',
-      render: (p: (typeof selectedProducts)[number]) =>
-        p.interest_count !== null ? String(p.interest_count) : 'N/A',
     },
   ];
 

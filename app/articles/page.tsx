@@ -6,10 +6,10 @@ import { ArticlesGrid } from '@/components/ArticlesGrid';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import {
-  extractBrandOptions,
-  groupArticlesByProductType,
+  applyArticleFilters,
+  resolveHubFromParam,
 } from '@/lib/blog/articleFilters';
-import { fetchAllPublishedArticles } from '@/lib/blog/articlePage';
+import { fetchAllPublishedArticles, fetchArticleBrandOptions } from '@/lib/blog/articlePage';
 import type { PublicArticleCard } from '@/lib/api/generated';
 
 export const revalidate = 3600;
@@ -35,17 +35,35 @@ export default async function ArticlesIndexPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const search = sp.search || '';
   const brand = sp.brand || '';
-  const hasFilters = Boolean(search || brand);
+  const activeHub = resolveHubFromParam(sp.type);
 
   let articles: PublicArticleCard[] = [];
+  let brandOptions: string[] = [];
+
   try {
-    articles = await fetchAllPublishedArticles({ search: sp.search, brand: sp.brand });
+    const [fetchedArticles, fetchedBrands] = await Promise.all([
+      fetchAllPublishedArticles({
+        search: sp.search,
+        brand: sp.brand,
+        productType: activeHub?.code,
+      }),
+      fetchArticleBrandOptions(activeHub?.code),
+    ]);
+    articles = applyArticleFilters(
+      fetchedArticles,
+      { search: sp.search, brand: sp.brand, productType: activeHub?.code },
+      fetchedBrands,
+    );
+    brandOptions = fetchedBrands;
   } catch {
     articles = [];
+    brandOptions = [];
   }
 
-  const brandOptions = extractBrandOptions(articles);
-  const sections = groupArticlesByProductType(articles);
+  const resultLabel = activeHub
+    ? `${activeHub.label.toLowerCase()} guides`
+    : 'guides';
+  const brandLabel = brand ? ` from ${brand}` : '';
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f7f8]">
@@ -63,26 +81,19 @@ export default async function ArticlesIndexPage({ searchParams }: PageProps) {
           </Suspense>
 
           {articles.length === 0 ? (
-            <p className="text-gray-600">No guides found{search ? ` for "${search}"` : ''}.</p>
-          ) : hasFilters ? (
-            <ArticlesGrid articles={articles} />
+            <p className="text-gray-600">
+              No {resultLabel} found{brandLabel}
+              {search ? ` matching "${search}"` : ''}.
+            </p>
           ) : (
-            <div className="space-y-10">
-              {sections.map(({ hub, articles: sectionArticles }) => (
-                <section key={hub.code}>
-                  <div className="flex items-center justify-between gap-4 mb-4">
-                    <div>
-                      <h2 className="text-2xl font-semibold text-gray-900">{hub.label} guides</h2>
-                      <p className="text-sm text-gray-500">{sectionArticles.length} guides</p>
-                    </div>
-                    <Link href={`/articles/${hub.slug}`} className="text-sm text-blue-600 hover:underline">
-                      View all {hub.label.toLowerCase()} guides
-                    </Link>
-                  </div>
-                  <ArticlesGrid articles={sectionArticles.slice(0, 8)} />
-                </section>
-              ))}
-            </div>
+            <>
+              <p className="text-sm text-gray-500 mb-4">
+                {articles.length} {resultLabel}
+                {brandLabel}
+                {search ? ` matching "${search}"` : ''}
+              </p>
+              <ArticlesGrid articles={articles} />
+            </>
           )}
 
           <div className="mt-10">

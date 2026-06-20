@@ -145,6 +145,45 @@ export async function fetchAllPublishedArticles(
   return all.filter(isRenderableArticleCard);
 }
 
+/** Distinct brand names for article filter chips (from published products). */
+export async function fetchArticleBrandOptions(
+  productType?: ArticleProductTypeCode,
+): Promise<string[]> {
+  const base = `${OpenAPI.BASE.replace(/\/+$/, '')}/api/v1/public/products/brands/`;
+  const url = productType ? `${base}?type=${productType}` : base;
+
+  try {
+    const res = await fetch(url, {
+      credentials: 'omit',
+      headers: await publicApiHeaders(),
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return [];
+
+    const data = (await res.json()) as
+      | { type?: string; results?: string[] }
+      | { results?: Record<string, string[]> };
+
+    if (Array.isArray((data as { results?: string[] }).results)) {
+      return (data as { results: string[] }).results;
+    }
+
+    const grouped = (data as { results?: Record<string, string[]> }).results ?? {};
+    if (productType) {
+      return grouped[productType] ?? [];
+    }
+    const brands = new Set<string>();
+    for (const list of Object.values(grouped)) {
+      for (const brand of list) {
+        if (brand && brand.toUpperCase() !== 'N/A') brands.add(brand);
+      }
+    }
+    return [...brands].sort((a, b) => a.localeCompare(b));
+  } catch {
+    return [];
+  }
+}
+
 export type { ArticleListFilters, ArticleProductTypeCode };
 
 export async function fetchArticleBySlugs(

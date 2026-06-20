@@ -98,12 +98,18 @@ export function Header() {
 
   const utilityLinks = UTILITY_NAV.filter((link) => link.href !== '/');
 
-  const megaMenuBrandFilters = useMemo(
-    () => [...PRIMARY_BRAND_NAV, ...MORE_BRAND_NAV].map((brand) => brand.brandFilter),
+  const megaMenuPrefetchEntries = useMemo(
+    () =>
+      [...PRIMARY_BRAND_NAV, ...MORE_BRAND_NAV].flatMap((brand) =>
+        brand.categories.map((cat) => ({
+          brandFilter: brand.brandFilter,
+          productType: cat.productType,
+        }))
+      ),
     []
   );
 
-  usePrefetchNavMegaProducts(megaMenuBrandFilters);
+  usePrefetchNavMegaProducts(megaMenuPrefetchEntries);
 
   const activeMegaBrand = useMemo(
     () => PRIMARY_BRAND_NAV.find((brand) => brand.brandFilter === openMegaMenu),

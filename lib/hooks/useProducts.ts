@@ -6,13 +6,7 @@
 import { useEffect } from 'react';
 import { useInfiniteQuery, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
-import {
-  ApiService,
-  OpenAPI,
-  PublicProduct,
-  PublicInventoryUnitPublic,
-  PaginatedPublicProductList,
-} from '@/lib/api/generated';
+import type { ProductTypeFilter } from '@/lib/config/nav-links';
 
 /** Number of items to fetch for the first request (visible above the fold). Next page is prefetched after this loads. */
 export const PRODUCTS_VISIBLE_PAGE_SIZE = 20;
@@ -123,21 +117,30 @@ export function productsQueryFn({
   );
 }
 
-export function navMegaProductsParams(brandFilter: string): ProductsQueryParams {
+export function navMegaProductsParams(
+  brandFilter: string,
+  productType?: ProductTypeFilter | null
+): ProductsQueryParams {
   return {
     brand_filter: brandFilter,
+    type: productType ?? undefined,
     page_size: NAV_MEGA_PRODUCTS_PAGE_SIZE,
     ordering: '-release_date',
     page: 1,
   };
 }
 
+export type NavMegaPrefetchEntry = {
+  brandFilter: string;
+  productType: ProductTypeFilter | null;
+};
+
 export function prefetchNavMegaProducts(
   queryClient: QueryClient,
-  brandFilters: readonly string[]
+  entries: readonly NavMegaPrefetchEntry[]
 ): void {
-  for (const brandFilter of brandFilters) {
-    const params = navMegaProductsParams(brandFilter);
+  for (const { brandFilter, productType } of entries) {
+    const params = navMegaProductsParams(brandFilter, productType);
     void queryClient.prefetchQuery({
       queryKey: ['products', params],
       queryFn: productsQueryFn,
@@ -146,13 +149,13 @@ export function prefetchNavMegaProducts(
   }
 }
 
-export function usePrefetchNavMegaProducts(brandFilters: readonly string[]): void {
+export function usePrefetchNavMegaProducts(entries: readonly NavMegaPrefetchEntry[]): void {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (typeof window === 'undefined' || brandFilters.length === 0) return;
+    if (typeof window === 'undefined' || entries.length === 0) return;
 
-    const run = () => prefetchNavMegaProducts(queryClient, brandFilters);
+    const run = () => prefetchNavMegaProducts(queryClient, entries);
 
     if (typeof window.requestIdleCallback === 'function') {
       const id = window.requestIdleCallback(run, { timeout: 3000 });
@@ -161,7 +164,7 @@ export function usePrefetchNavMegaProducts(brandFilters: readonly string[]): voi
 
     const timer = globalThis.setTimeout(run, 500);
     return () => globalThis.clearTimeout(timer);
-  }, [brandFilters, queryClient]);
+  }, [entries, queryClient]);
 }
 
 export function useProducts(params?: ProductsQueryParams) {

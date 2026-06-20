@@ -1,8 +1,10 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import {
+  type BrandCategoryLink,
   type BrandNavItem,
   MORE_BRAND_NAV,
   brandCategoryHref,
@@ -23,6 +25,13 @@ type HeaderMegaMenuPanelProps = {
   onMoreBrandHover: (brandFilter: string) => void;
   onClose: () => void;
 };
+
+function megaProductsHeading(brandLabel: string, category: BrandCategoryLink): string {
+  if (category.productType === null) {
+    return brandLabel;
+  }
+  return `${brandLabel} ${category.label}`;
+}
 
 function MegaProductTile({ product }: { product: PublicProduct }) {
   const placeholder = getPlaceholderProductImage(product.product_name);
@@ -53,13 +62,15 @@ function MegaProductTile({ product }: { product: PublicProduct }) {
 
 function MegaProductsColumn({
   brandFilter,
+  productType,
   title,
 }: {
   brandFilter: string;
+  productType: BrandCategoryLink['productType'];
   title: string;
 }) {
   const { data, isLoading } = useProducts({
-    ...navMegaProductsParams(brandFilter),
+    ...navMegaProductsParams(brandFilter, productType),
     enabled: !!brandFilter,
   });
 
@@ -76,7 +87,7 @@ function MegaProductsColumn({
         </div>
       ) : products.length > 0 ? (
         <div className="site-header__mega-products-grid">
-          {products.map((product) => (
+          {products.map((product: PublicProduct) => (
             <MegaProductTile key={product.id} product={product} />
           ))}
         </div>
@@ -84,6 +95,32 @@ function MegaProductsColumn({
         <p className="site-header__mega-products-empty">No products available right now.</p>
       )}
     </div>
+  );
+}
+
+function CategoryLink({
+  brandFilter,
+  category,
+  isActive,
+  onHover,
+  onClose,
+}: {
+  brandFilter: string;
+  category: BrandCategoryLink;
+  isActive: boolean;
+  onHover: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <Link
+      href={brandCategoryHref(brandFilter, category.productType)}
+      className={`site-header__mega-link${isActive ? ' site-header__mega-link--active' : ''}`}
+      onMouseEnter={onHover}
+      onFocus={onHover}
+      onClick={onClose}
+    >
+      {category.label}
+    </Link>
   );
 }
 
@@ -98,8 +135,26 @@ export function HeaderMegaMenuPanel({
   const isMore = openMenu === MEGA_MENU_MORE_KEY;
   const activeMoreBrand =
     moreBrands.find((b) => b.brandFilter === moreHoverBrand) ?? moreBrands[0];
+  const [hoveredCategory, setHoveredCategory] = useState<BrandCategoryLink | null>(null);
+  const [moreHoverCategory, setMoreHoverCategory] = useState<BrandCategoryLink | null>(null);
+
+  useEffect(() => {
+    if (isMore) {
+      setHoveredCategory(null);
+      setMoreHoverCategory(activeMoreBrand?.categories[0] ?? null);
+      return;
+    }
+    setMoreHoverCategory(null);
+    setHoveredCategory(brand?.categories[0] ?? null);
+  }, [isMore, brand, activeMoreBrand?.brandFilter]);
+
+  const activeCategory = isMore ? moreHoverCategory : hoveredCategory;
   const productBrandFilter = isMore ? activeMoreBrand?.brandFilter : brand?.brandFilter;
   const productBrandLabel = isMore ? activeMoreBrand?.navLabel : brand?.navLabel;
+  const productsHeading =
+    productBrandLabel && activeCategory
+      ? megaProductsHeading(productBrandLabel, activeCategory)
+      : productBrandLabel;
 
   return (
     <div
@@ -131,33 +186,37 @@ export function HeaderMegaMenuPanel({
               </ul>
               <div className="site-header__mega-more-categories">
                 {activeMoreBrand?.categories.map((cat) => (
-                  <Link
+                  <CategoryLink
                     key={`${activeMoreBrand.brandFilter}-${cat.label}`}
-                    href={brandCategoryHref(activeMoreBrand.brandFilter, cat.productType)}
-                    className="site-header__mega-link"
-                    onClick={onClose}
-                  >
-                    {cat.label}
-                  </Link>
+                    brandFilter={activeMoreBrand.brandFilter}
+                    category={cat}
+                    isActive={moreHoverCategory?.label === cat.label}
+                    onHover={() => setMoreHoverCategory(cat)}
+                    onClose={onClose}
+                  />
                 ))}
               </div>
             </div>
           ) : (
             brand?.categories.map((cat) => (
-              <Link
+              <CategoryLink
                 key={`${brand.brandFilter}-${cat.label}`}
-                href={brandCategoryHref(brand.brandFilter, cat.productType)}
-                className="site-header__mega-link"
-                onClick={onClose}
-              >
-                {cat.label}
-              </Link>
+                brandFilter={brand.brandFilter}
+                category={cat}
+                isActive={hoveredCategory?.label === cat.label}
+                onHover={() => setHoveredCategory(cat)}
+                onClose={onClose}
+              />
             ))
           )}
         </div>
 
-        {productBrandFilter && productBrandLabel && (
-          <MegaProductsColumn brandFilter={productBrandFilter} title={productBrandLabel} />
+        {productBrandFilter && productsHeading && activeCategory && (
+          <MegaProductsColumn
+            brandFilter={productBrandFilter}
+            productType={activeCategory.productType}
+            title={productsHeading}
+          />
         )}
       </div>
     </div>

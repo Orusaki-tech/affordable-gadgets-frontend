@@ -13,9 +13,11 @@ type HeaderBrandMenuProps = {
   search: string;
   variant?: 'desktop' | 'mobile';
   onNavigate?: () => void;
+  isMegaOpen?: boolean;
+  onMegaOpen?: () => void;
 };
 
-function ChevronIcon() {
+export function ChevronIcon() {
   return (
     <svg
       className="site-header__nav-chevron"
@@ -35,6 +37,8 @@ export function HeaderBrandMenu({
   search,
   variant = 'desktop',
   onNavigate,
+  isMegaOpen = false,
+  onMegaOpen,
 }: HeaderBrandMenuProps) {
   const active = isBrandNavActive(brand.brandFilter, pathname, search);
 
@@ -60,24 +64,22 @@ export function HeaderBrandMenu({
 
   return (
     <div
-      className={`site-header__brand-menu${active ? ' site-header__brand-menu--active' : ''}`}
+      className={`site-header__brand-menu${
+        active || isMegaOpen ? ' site-header__brand-menu--active' : ''
+      }`}
+      onMouseEnter={onMegaOpen}
+      onFocus={onMegaOpen}
     >
-      <span className="site-header__nav-link site-header__nav-link--trigger" tabIndex={0}>
+      <span
+        className="site-header__nav-link site-header__nav-link--trigger"
+        tabIndex={0}
+        aria-expanded={isMegaOpen}
+        aria-haspopup="true"
+      >
         {brand.navLabel}
         <ChevronIcon />
         <span className="site-header__nav-underline" />
       </span>
-      <div className="site-header__brand-dropdown">
-        {brand.categories.map((cat) => (
-          <Link
-            key={`${brand.brandFilter}-${cat.label}`}
-            href={brandCategoryHref(brand.brandFilter, cat.productType)}
-            className="site-header__brand-dropdown-link"
-          >
-            {cat.label}
-          </Link>
-        ))}
-      </div>
     </div>
   );
 }
@@ -86,12 +88,16 @@ type HeaderMoreBrandsMenuProps = {
   brands: BrandNavItem[];
   variant?: 'desktop' | 'mobile';
   onNavigate?: () => void;
+  isMegaOpen?: boolean;
+  onMegaOpen?: () => void;
 };
 
 export function HeaderMoreBrandsMenu({
   brands,
   variant = 'desktop',
   onNavigate,
+  isMegaOpen = false,
+  onMegaOpen,
 }: HeaderMoreBrandsMenuProps) {
   if (variant === 'mobile') {
     return (
@@ -119,30 +125,23 @@ export function HeaderMoreBrandsMenu({
   }
 
   return (
-    <div className="site-header__brand-menu site-header__brand-menu--more">
-      <span className="site-header__nav-link site-header__nav-link--trigger" tabIndex={0}>
+    <div
+      className={`site-header__brand-menu site-header__brand-menu--more${
+        isMegaOpen ? ' site-header__brand-menu--active' : ''
+      }`}
+      onMouseEnter={onMegaOpen}
+      onFocus={onMegaOpen}
+    >
+      <span
+        className="site-header__nav-link site-header__nav-link--trigger"
+        tabIndex={0}
+        aria-expanded={isMegaOpen}
+        aria-haspopup="true"
+      >
         More
         <ChevronIcon />
         <span className="site-header__nav-underline" />
       </span>
-      <div className="site-header__brand-dropdown site-header__brand-dropdown--more">
-        <div className="site-header__more-grid">
-          {brands.map((brand) => (
-            <div key={brand.brandFilter} className="site-header__more-column">
-              <span className="site-header__more-brand-label">{brand.navLabel}</span>
-              {brand.categories.map((cat) => (
-                <Link
-                  key={`${brand.brandFilter}-${cat.label}`}
-                  href={brandCategoryHref(brand.brandFilter, cat.productType)}
-                  className="site-header__brand-dropdown-link"
-                >
-                  {cat.label}
-                </Link>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

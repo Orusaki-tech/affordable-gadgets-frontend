@@ -3,6 +3,7 @@
  */
 'use client';
 
+import { useEffect } from 'react';
 import { useInfiniteQuery, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 import {
@@ -18,6 +19,9 @@ export const PRODUCTS_VISIBLE_PAGE_SIZE = 20;
 
 /** Number of featured products to load on the homepage for fast first paint (under 3s). */
 export const FEATURED_PRODUCTS_PAGE_SIZE = 5;
+
+/** Latest products shown in header brand mega-menus. */
+export const NAV_MEGA_PRODUCTS_PAGE_SIZE = 3;
 
 /** Fetches only products tagged "Featured" (page_size=5). Uses same list API with featured=1 for fast homepage load. */
 export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductList> {
@@ -117,6 +121,47 @@ export function productsQueryFn({
     undefined,
     type
   );
+}
+
+export function navMegaProductsParams(brandFilter: string): ProductsQueryParams {
+  return {
+    brand_filter: brandFilter,
+    page_size: NAV_MEGA_PRODUCTS_PAGE_SIZE,
+    ordering: '-release_date',
+    page: 1,
+  };
+}
+
+export function prefetchNavMegaProducts(
+  queryClient: QueryClient,
+  brandFilters: readonly string[]
+): void {
+  for (const brandFilter of brandFilters) {
+    const params = navMegaProductsParams(brandFilter);
+    void queryClient.prefetchQuery({
+      queryKey: ['products', params],
+      queryFn: productsQueryFn,
+      staleTime: 30000,
+    });
+  }
+}
+
+export function usePrefetchNavMegaProducts(brandFilters: readonly string[]): void {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || brandFilters.length === 0) return;
+
+    const run = () => prefetchNavMegaProducts(queryClient, brandFilters);
+
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(run, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+
+    const timer = globalThis.setTimeout(run, 500);
+    return () => globalThis.clearTimeout(timer);
+  }, [brandFilters, queryClient]);
 }
 
 export function useProducts(params?: ProductsQueryParams) {

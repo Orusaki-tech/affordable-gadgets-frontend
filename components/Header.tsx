@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/lib/hooks/useCart';
+import { usePrefetchNavMegaProducts } from '@/lib/hooks/useProducts';
 import { brandConfig } from '@/lib/config/brand';
 import {
   PRIMARY_BRAND_NAV,
@@ -17,6 +18,7 @@ import { clearAuthToken } from '@/lib/api/openapi';
 import { createClient } from '@/lib/supabase/client';
 import { AuthChoiceModal } from './AuthChoiceModal';
 import { HeaderBrandMenu, HeaderMoreBrandsMenu } from './HeaderBrandMenu';
+import { HeaderMegaMenuPanel, MEGA_MENU_MORE_KEY } from './HeaderMegaMenuPanel';
 
 export function Header() {
   const { itemCount } = useCart();
@@ -26,8 +28,14 @@ export function Header() {
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [currentSearch, setCurrentSearch] = useState('');
+  const [openMegaMenu, setOpenMegaMenu] = useState<string | null>(null);
+  const [moreHoverBrand, setMoreHoverBrand] = useState<string | null>(null);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
+  const closeMegaMenu = useCallback(() => {
+    setOpenMegaMenu(null);
+    setMoreHoverBrand(null);
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -54,6 +62,23 @@ export function Header() {
     setCurrentSearch(window.location.search);
   }, [pathname]);
 
+  useEffect(() => {
+    closeMegaMenu();
+  }, [pathname, closeMegaMenu]);
+
+  useEffect(() => {
+    if (!openMegaMenu) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeMegaMenu();
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [openMegaMenu, closeMegaMenu]);
+
   const openProductsFiltersHref = useMemo(() => {
     const isOnProducts = pathname === '/products';
     if (!isOnProducts) {
@@ -67,8 +92,20 @@ export function Header() {
 
   const utilityLinks = UTILITY_NAV.filter((link) => link.href !== '/');
 
+  const megaMenuBrandFilters = useMemo(
+    () => [...PRIMARY_BRAND_NAV, ...MORE_BRAND_NAV].map((brand) => brand.brandFilter),
+    []
+  );
+
+  usePrefetchNavMegaProducts(megaMenuBrandFilters);
+
+  const activeMegaBrand = useMemo(
+    () => PRIMARY_BRAND_NAV.find((brand) => brand.brandFilter === openMegaMenu),
+    [openMegaMenu]
+  );
+
   return (
-    <header className="site-header">
+    <header className={`site-header${openMegaMenu ? ' site-header--mega-open' : ''}`}>
       <div className="site-header__container">
         <div className="site-header__bar">
           <Link href="/" className="site-header__logo-link">
@@ -85,45 +122,83 @@ export function Header() {
             <span className="site-header__logo-text">{brandConfig.name}</span>
           </Link>
 
-          <nav className="site-header__nav" aria-label="Main">
-            <Link href="/" className="site-header__nav-link site-header__nav-link--home">
-              Home
-              <span className="site-header__nav-underline" />
-            </Link>
+          <div
+            className={`site-header__nav-zone${openMegaMenu ? ' site-header__nav-zone--mega-open' : ''}`}
+            onMouseLeave={closeMegaMenu}
+          >
+            <nav
+              className={`site-header__nav${openMegaMenu ? ' site-header__nav--mega-open' : ''}`}
+              aria-label="Main"
+            >
+              <Link href="/" className="site-header__nav-link site-header__nav-link--home">
+                Home
+                <span className="site-header__nav-underline" />
+              </Link>
 
-            {PRIMARY_BRAND_NAV.map((brand) => (
-              <HeaderBrandMenu
-                key={brand.brandFilter}
-                brand={brand}
-                pathname={pathname}
-                search={currentSearch}
+              {PRIMARY_BRAND_NAV.map((brand) => (
+                <HeaderBrandMenu
+                  key={brand.brandFilter}
+                  brand={brand}
+                  pathname={pathname}
+                  search={currentSearch}
+                  isMegaOpen={openMegaMenu === brand.brandFilter}
+                  onMegaOpen={() => {
+                    setMoreHoverBrand(null);
+                    setOpenMegaMenu(brand.brandFilter);
+                  }}
+                />
+              ))}
+
+              <HeaderMoreBrandsMenu
+                brands={MORE_BRAND_NAV}
+                variant="desktop"
+                isMegaOpen={openMegaMenu === MEGA_MENU_MORE_KEY}
+                onMegaOpen={() => {
+                  setMoreHoverBrand(MORE_BRAND_NAV[0]?.brandFilter ?? null);
+                  setOpenMegaMenu(MEGA_MENU_MORE_KEY);
+                }}
               />
-            ))}
 
-            <HeaderMoreBrandsMenu brands={MORE_BRAND_NAV} variant="desktop" />
+              {SHOP_NAV.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`site-header__nav-link${
+                    isShopNavActive(link.href, pathname, currentSearch)
+                      ? ' site-header__nav-link--active'
+                      : ''
+                  }`}
+                  onMouseEnter={closeMegaMenu}
+                >
+                  {link.label}
+                  <span className="site-header__nav-underline" />
+                </Link>
+              ))}
 
-            {SHOP_NAV.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`site-header__nav-link${
-                  isShopNavActive(link.href, pathname, currentSearch)
-                    ? ' site-header__nav-link--active'
-                    : ''
-                }`}
-              >
-                {link.label}
-                <span className="site-header__nav-underline" />
-              </Link>
-            ))}
+              {utilityLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="site-header__nav-link"
+                  onMouseEnter={closeMegaMenu}
+                >
+                  {link.label}
+                  <span className="site-header__nav-underline" />
+                </Link>
+              ))}
+            </nav>
 
-            {utilityLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="site-header__nav-link">
-                {link.label}
-                <span className="site-header__nav-underline" />
-              </Link>
-            ))}
-          </nav>
+            {openMegaMenu && (
+              <HeaderMegaMenuPanel
+                openMenu={openMegaMenu}
+                brand={activeMegaBrand}
+                moreBrands={MORE_BRAND_NAV}
+                moreHoverBrand={moreHoverBrand}
+                onMoreBrandHover={setMoreHoverBrand}
+                onClose={closeMegaMenu}
+              />
+            )}
+          </div>
 
           <div className="site-header__actions">
             <Link
@@ -239,6 +314,15 @@ export function Header() {
             </svg>
           </button>
         </div>
+
+        {openMegaMenu && (
+          <button
+            type="button"
+            className="site-header__mega-backdrop"
+            aria-label="Close menu"
+            onClick={closeMegaMenu}
+          />
+        )}
 
         {isAuthModalOpen && (
           <AuthChoiceModal

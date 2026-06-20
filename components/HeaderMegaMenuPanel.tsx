@@ -107,33 +107,40 @@ export function HeaderMegaMenuPanel({
       role="region"
       aria-label={isMore ? 'More brands menu' : `${brand?.navLabel} menu`}
     >
-      <div className="site-header__mega-panel">
+      <div className={`site-header__mega-panel${isMore ? ' site-header__mega-panel--more' : ''}`}>
         <div className="site-header__mega-categories">
           {isMore ? (
-            <div className="site-header__mega-more-grid">
-              {moreBrands.map((item) => (
-                <div
-                  key={item.brandFilter}
-                  className={`site-header__mega-more-column${
-                    item.brandFilter === activeMoreBrand?.brandFilter
-                      ? ' site-header__mega-more-column--active'
-                      : ''
-                  }`}
-                  onMouseEnter={() => onMoreBrandHover(item.brandFilter)}
-                >
-                  <span className="site-header__mega-more-brand-label">{item.navLabel}</span>
-                  {item.categories.map((cat) => (
-                    <Link
-                      key={`${item.brandFilter}-${cat.label}`}
-                      href={brandCategoryHref(item.brandFilter, cat.productType)}
-                      className="site-header__mega-link"
-                      onClick={onClose}
+            <div className="site-header__mega-more-layout">
+              <ul className="site-header__mega-more-brands" aria-label="More brands">
+                {moreBrands.map((item) => (
+                  <li key={item.brandFilter}>
+                    <button
+                      type="button"
+                      className={`site-header__mega-more-brand-btn${
+                        item.brandFilter === activeMoreBrand?.brandFilter
+                          ? ' site-header__mega-more-brand-btn--active'
+                          : ''
+                      }`}
+                      onMouseEnter={() => onMoreBrandHover(item.brandFilter)}
+                      onFocus={() => onMoreBrandHover(item.brandFilter)}
                     >
-                      {cat.label}
-                    </Link>
-                  ))}
-                </div>
-              ))}
+                      {item.navLabel}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="site-header__mega-more-categories">
+                {activeMoreBrand?.categories.map((cat) => (
+                  <Link
+                    key={`${activeMoreBrand.brandFilter}-${cat.label}`}
+                    href={brandCategoryHref(activeMoreBrand.brandFilter, cat.productType)}
+                    className="site-header__mega-link"
+                    onClick={onClose}
+                  >
+                    {cat.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           ) : (
             brand?.categories.map((cat) => (

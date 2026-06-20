@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -30,11 +31,16 @@ export function Header() {
   const [currentSearch, setCurrentSearch] = useState('');
   const [openMegaMenu, setOpenMegaMenu] = useState<string | null>(null);
   const [moreHoverBrand, setMoreHoverBrand] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
   const closeMegaMenu = useCallback(() => {
     setOpenMegaMenu(null);
     setMoreHoverBrand(null);
+  }, []);
+
+  useEffect(() => {
+    setIsMounted(true);
   }, []);
 
   useEffect(() => {
@@ -315,14 +321,17 @@ export function Header() {
           </button>
         </div>
 
-        {openMegaMenu && (
-          <button
-            type="button"
-            className="site-header__mega-backdrop"
-            aria-label="Close menu"
-            onClick={closeMegaMenu}
-          />
-        )}
+        {isMounted &&
+          openMegaMenu &&
+          createPortal(
+            <button
+              type="button"
+              className="site-header__mega-backdrop"
+              aria-label="Close menu"
+              onClick={closeMegaMenu}
+            />,
+            document.body
+          )}
 
         {isAuthModalOpen && (
           <AuthChoiceModal

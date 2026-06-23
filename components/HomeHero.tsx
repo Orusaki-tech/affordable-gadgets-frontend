@@ -90,12 +90,7 @@ function resolveMediaUrl(image?: string | null): string | null {
 
 function getHeroBannerSrc(promotion: HomeHeroPromotion | null): string | null {
   if (!promotion) return null;
-  return (
-    resolveMediaUrl(promotion.banner_image_url) ||
-    resolveMediaUrl(promotion.banner_image) ||
-    resolveMediaUrl(promotion.promo_card?.product_image_url) ||
-    null
-  );
+  return resolveMediaUrl(promotion.banner_image_url) || resolveMediaUrl(promotion.banner_image) || null;
 }
 
 type HomeHeroProps = {
@@ -190,7 +185,7 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
         alt={activePromotion?.title ?? 'Promotions'}
         preset="card"
         fit="cover"
-        sizes="100vw"
+        sizes="(max-width: 1024px) 100vw, 50vw"
         className="home-hero__banner-image"
         priority
         fill
@@ -221,9 +216,7 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
     <section className="home-hero" aria-label="Homepage hero">
       <div className="home-hero__container">
         <div className="home-hero__main-grid" aria-label="Promotions">
-          <div className="home-hero__banner-row">{renderHeroBanner()}</div>
-
-          <div className="home-hero__search-row">
+          <div className="home-hero__content-row">
             <div className="home-hero__left-column">
               <form
                 className="home-hero__search"
@@ -259,17 +252,7 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
 
               {!searchEnabled ? (
                 <div className="home-hero__left-card" aria-live="polite">
-                  <div className="home-hero__placeholder">
-                    <div className="home-hero__placeholder-media" aria-hidden>
-                      <CloudinaryImage
-                        src={HERO_PROMOTION_PLACEHOLDER_IMAGE}
-                        alt=""
-                        preset="card"
-                        sizes="(max-width: 1024px) 100vw, 420px"
-                        className="home-hero__placeholder-image"
-                        fill
-                      />
-                    </div>
+                  <div className="home-hero__placeholder home-hero__placeholder--text-only">
                     <div className="home-hero__placeholder-body">
                       <p className="home-hero__placeholder-title">Search to start shopping</p>
                       <p className="home-hero__placeholder-copy">
@@ -315,6 +298,8 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
                 </div>
               )}
             </div>
+
+            <div className="home-hero__right">{renderHeroBanner()}</div>
           </div>
         </div>
       </div>

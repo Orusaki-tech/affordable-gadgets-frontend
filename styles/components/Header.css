@@ -99,6 +99,7 @@
   border-radius: 10px;
   color: var(--ui-gray-700);
   text-decoration: none;
+  cursor: pointer;
   transition: color 200ms, background 200ms;
 }
 
@@ -150,22 +151,9 @@
   line-height: 1.25;
   color: var(--ui-gray-800);
   text-decoration: none;
+  cursor: pointer;
   transition: color 200ms, font-weight 200ms;
   white-space: nowrap;
-}
-
-.site-header__nav-link--trigger {
-  cursor: default;
-  padding: 0 3px;
-}
-
-.site-header__nav-chevron {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-  display: block;
-  opacity: 0.45;
-  transition: opacity 200ms;
 }
 
 .site-header__brand-menu {
@@ -185,12 +173,6 @@
 .site-header__brand-menu:focus-within .site-header__nav-link {
   color: var(--primary);
   font-weight: 700;
-}
-
-.site-header__brand-menu:hover .site-header__nav-chevron,
-.site-header__brand-menu:focus-within .site-header__nav-chevron,
-.site-header__nav-link:hover .site-header__nav-chevron {
-  opacity: 0.9;
 }
 
 /* Full-width mega menu (Apple → Financing span) */
@@ -636,6 +618,7 @@
   padding: 8px;
   border-radius: 10px;
   text-decoration: none;
+  cursor: pointer;
   transition: color 200ms, background 200ms;
 }
 
@@ -795,6 +778,7 @@
   border-radius: 10px;
   text-decoration: none;
   font-weight: 500;
+  cursor: pointer;
   transition: background 200ms, color 200ms;
 }
 

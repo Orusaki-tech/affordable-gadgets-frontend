@@ -17,20 +17,6 @@ type HeaderBrandMenuProps = {
   onMegaOpen?: () => void;
 };
 
-export function ChevronIcon() {
-  return (
-    <svg
-      className="site-header__nav-chevron"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      aria-hidden
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-    </svg>
-  );
-}
-
 export function HeaderBrandMenu({
   brand,
   pathname,
@@ -41,6 +27,7 @@ export function HeaderBrandMenu({
   onMegaOpen,
 }: HeaderBrandMenuProps) {
   const active = isBrandNavActive(brand.brandFilter, pathname, search);
+  const brandHref = brandCategoryHref(brand.brandFilter, null);
 
   if (variant === 'mobile') {
     return (
@@ -70,16 +57,19 @@ export function HeaderBrandMenu({
       onMouseEnter={onMegaOpen}
       onFocus={onMegaOpen}
     >
-      <span
-        className="site-header__nav-link site-header__nav-link--trigger"
-        tabIndex={0}
+      <Link
+        href={brandHref}
+        className={`site-header__nav-link${
+          active || isMegaOpen ? ' site-header__nav-link--active' : ''
+        }`}
         aria-expanded={isMegaOpen}
         aria-haspopup="true"
+        onMouseEnter={onMegaOpen}
+        onFocus={onMegaOpen}
       >
         {brand.navLabel}
-        <ChevronIcon />
         <span className="site-header__nav-underline" />
-      </span>
+      </Link>
     </div>
   );
 }
@@ -132,16 +122,17 @@ export function HeaderMoreBrandsMenu({
       onMouseEnter={onMegaOpen}
       onFocus={onMegaOpen}
     >
-      <span
-        className="site-header__nav-link site-header__nav-link--trigger"
-        tabIndex={0}
+      <Link
+        href="/products"
+        className={`site-header__nav-link${isMegaOpen ? ' site-header__nav-link--active' : ''}`}
         aria-expanded={isMegaOpen}
         aria-haspopup="true"
+        onMouseEnter={onMegaOpen}
+        onFocus={onMegaOpen}
       >
         More
-        <ChevronIcon />
         <span className="site-header__nav-underline" />
-      </span>
+      </Link>
     </div>
   );
 }

@@ -255,11 +255,12 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
                   <div className="home-hero__placeholder">
                     <div className="home-hero__placeholder-media" aria-hidden>
                       <CloudinaryImage
-                        src={HERO_PROMOTION_PLACEHOLDER_IMAGE}
-                        alt=""
+                        src={displayBannerSrc}
+                        alt={activePromotion?.title ?? 'Promotion'}
                         preset="card"
+                        fit="cover"
                         sizes="(max-width: 1024px) 100vw, 420px"
-                        className="home-hero__placeholder-image"
+                        className="home-hero__placeholder-image home-hero__placeholder-image--banner"
                         fill
                       />
                     </div>

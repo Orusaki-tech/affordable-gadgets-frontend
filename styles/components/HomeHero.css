@@ -432,6 +432,10 @@
   object-fit: contain;
 }
 
+.home-hero__placeholder-image--banner {
+  object-fit: cover;
+}
+
 .home-hero__placeholder-body {
   display: grid;
   gap: 6px;

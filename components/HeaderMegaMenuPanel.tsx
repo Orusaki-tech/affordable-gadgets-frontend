@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import {
@@ -10,9 +10,9 @@ import {
   brandCategoryHref,
 } from '@/lib/config/nav-links';
 import { useProducts, navMegaProductsParams } from '@/lib/hooks/useProducts';
-import type { PublicProduct } from '@/lib/api/generated';
+import { usePromotions } from '@/lib/hooks/usePromotions';
+import type { PublicProduct, PublicPromotion } from '@/lib/api/generated';
 import { formatPrice, formatPriceRange } from '@/lib/utils/format';
-import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
 export const MEGA_MENU_MORE_KEY = '__more__';
@@ -33,9 +33,51 @@ function megaProductsHeading(brandLabel: string, category: BrandCategoryLink): s
   return `${brandLabel} ${category.label}`;
 }
 
-function MegaProductTile({ product }: { product: PublicProduct }) {
-  const placeholder = getPlaceholderProductImage(product.product_name);
-  const image = product.primary_image || placeholder;
+function promotionImageForProduct(
+  productId: number,
+  promotionImagesByProductId: Map<number, string>
+): string | null {
+  return promotionImagesByProductId.get(productId) ?? null;
+}
+
+function buildPromotionImageMap(promotions: PublicPromotion[]): Map<number, string> {
+  const map = new Map<number, string>();
+  for (const promotion of promotions) {
+    const image =
+      promotion.banner_image_url ||
+      promotion.banner_image ||
+      promotion.promo_card?.product_image_url ||
+      null;
+    if (!image) continue;
+
+    const productIds = new Set<number>();
+    if (typeof promotion.promo_card?.product_id === 'number') {
+      productIds.add(promotion.promo_card.product_id);
+    }
+    for (const productId of promotion.products ?? []) {
+      if (typeof productId === 'number') productIds.add(productId);
+    }
+
+    for (const productId of productIds) {
+      if (!map.has(productId)) map.set(productId, image);
+    }
+  }
+  return map;
+}
+
+function MegaProductTile({
+  product,
+  promotionImagesByProductId,
+}: {
+  product: PublicProduct;
+  promotionImagesByProductId: Map<number, string>;
+}) {
+  const image =
+    (typeof product.id === 'number'
+      ? promotionImageForProduct(product.id, promotionImagesByProductId)
+      : null) ||
+    product.primary_image ||
+    null;
   const priceText =
     product.min_price != null && product.max_price != null && product.min_price !== product.max_price
       ? formatPriceRange(product.min_price, product.max_price)
@@ -46,13 +88,17 @@ function MegaProductTile({ product }: { product: PublicProduct }) {
   return (
     <Link href={getProductHref(product)} className="site-header__mega-product">
       <div className="site-header__mega-product-image-wrap">
-        <CloudinaryImage
-          src={image}
-          alt={product.product_name}
-          width={140}
-          height={140}
-          className="site-header__mega-product-image"
-        />
+        {image ? (
+          <CloudinaryImage
+            src={image}
+            alt={product.product_name}
+            width={112}
+            height={88}
+            className="site-header__mega-product-image"
+          />
+        ) : (
+          <div className="site-header__mega-product-image-fallback" aria-hidden />
+        )}
       </div>
       <span className="site-header__mega-product-name">{product.product_name}</span>
       {priceText && <span className="site-header__mega-product-price">{priceText}</span>}
@@ -73,6 +119,12 @@ function MegaProductsColumn({
     ...navMegaProductsParams(brandFilter, productType),
     enabled: !!brandFilter,
   });
+  const { data: promotionsData } = usePromotions({ page_size: 50 });
+
+  const promotionImagesByProductId = useMemo(
+    () => buildPromotionImageMap(promotionsData?.results ?? []),
+    [promotionsData?.results]
+  );
 
   const products = data?.results ?? [];
 
@@ -88,7 +140,11 @@ function MegaProductsColumn({
       ) : products.length > 0 ? (
         <div className="site-header__mega-products-grid">
           {products.map((product: PublicProduct) => (
-            <MegaProductTile key={product.id} product={product} />
+            <MegaProductTile
+              key={product.id}
+              product={product}
+              promotionImagesByProductId={promotionImagesByProductId}
+            />
           ))}
         </div>
       ) : (

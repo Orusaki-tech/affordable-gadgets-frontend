@@ -245,8 +245,6 @@ export default async function HomePage() {
         </h1>
         <HomeHero initialPromotionsData={initialHeroPromotionsData} />
 
-        <SpecialOffersServer pageSize={12} homepageLayout minPromotions={4} />
-
         {/* Collection header banner – static image above Featured Products. */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-5">
           <CollectionHeaderBanner
@@ -269,6 +267,8 @@ export default async function HomePage() {
             <ProductGridClient featuredOnly pageSize={5} showPagination={false} cardOptions={{ variant: 'featured' }} />
           </div>
         </section>
+
+        <SpecialOffersServer filter="special_offers" pageSize={12} homepageLayout minPromotions={4} />
 
         <BlogArticlesSection />
 

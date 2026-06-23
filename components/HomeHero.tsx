@@ -1,14 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from '@/components/ProductCard';
-import { ProductCarousel } from '@/components/ProductCarousel';
-import { formatPrice } from '@/lib/utils/format';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
 type PromotionPromoCard = {
@@ -26,11 +24,7 @@ type HomeHeroPromotion = PublicPromotion & {
 };
 
 const PROMOTIONS_PAGE_SIZE = 50;
-const PROMO_THUMB_SIZE = 320;
-// Hero promo cards/banner rotation timing (user request).
 const HERO_AUTOPLAY_INTERVAL_MS = 6000;
-/** Number of placeholder/skeleton cards when there are no hero promotions (keep 4 visible to match itemsPerView). */
-const HERO_PLACEHOLDER_COUNT = 4;
 const HERO_PROMOTION_PLACEHOLDER_IMAGE =
   'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773069898/pixel8_cd7p2f.png';
 
@@ -95,25 +89,14 @@ type HomeHeroProps = {
 };
 
 export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
-  const { data: promotionsData, isLoading: promosLoading } = usePromotions({
+  const { data: promotionsData } = usePromotions({
     page_size: PROMOTIONS_PAGE_SIZE,
     initialData: initialPromotionsData,
   });
 
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 639px)');
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-
   const promotions = useMemo(() => {
     return getHeroPromotions(promotionsData);
   }, [promotionsData]);
-
-  const showPromoCarousel = promotions.length >= 4;
 
   const promoIds = useMemo(() => {
     return promotions
@@ -157,12 +140,6 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
     // Depend on promoIdsKey so we only restart when the promo set/order changes.
   }, [promoIdsKey]);
 
-  const selectPromotion = (id: number) => {
-    const idx = promoIds.indexOf(id);
-    rotationIndexRef.current = idx >= 0 ? idx : 0;
-    setActivePromotionId(id);
-  };
-
   const activePromotion = useMemo(() => {
     if (!promotions.length) return null;
     if (activePromotionId === null) return promotions[0] ?? null;
@@ -184,138 +161,10 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
   const activeBannerSrc =
     activePromotion?.banner_image_url || activePromotion?.banner_image || null;
 
-  const renderPromotionCard = (promotion: HomeHeroPromotion): ReactNode => {
-    const id = typeof promotion.id === 'number' ? promotion.id : null;
-    const isActive = id !== null && id === activePromotionId;
-    const promoCard = promotion.promo_card ?? null;
-    const thumbSrc = promoCard?.product_image_url || promotion.banner_image_url || promotion.banner_image || null;
-    const cardTitle = promoCard?.product_name || promotion.title;
-    const optionSummary = promoCard?.option_summary?.trim() || null;
-    const originalPrice = promoCard?.original_price ? Number(promoCard.original_price) : null;
-    const promotionalPrice = promoCard?.promotional_price ? Number(promoCard.promotional_price) : null;
-    const hasPromoPrice =
-      originalPrice !== null &&
-      Number.isFinite(originalPrice) &&
-      promotionalPrice !== null &&
-      Number.isFinite(promotionalPrice) &&
-      promotionalPrice < originalPrice;
-
-    const className = `home-hero__promo-card ${isActive ? 'home-hero__promo-card--active' : ''}`;
-    const key = id ?? promotion.title;
-
-    const inner = (
-      <>
-        <div className="home-hero__promo-media">
-          {thumbSrc ? (
-            <CloudinaryImage
-              src={thumbSrc}
-              alt={cardTitle}
-              preset="productThumb"
-              width={PROMO_THUMB_SIZE}
-              height={PROMO_THUMB_SIZE}
-              className="home-hero__promo-image"
-            />
-          ) : (
-            <div className="home-hero__promo-image home-hero__promo-image--placeholder" />
-          )}
-        </div>
-        <div className="home-hero__promo-info">
-          <p className="home-hero__promo-title">{cardTitle}</p>
-          {optionSummary ? (
-            <p className="home-hero__promo-options">{optionSummary}</p>
-          ) : promotion.discount_display ? (
-            <p className="home-hero__promo-subtitle">{promotion.discount_display}</p>
-          ) : promotion.description ? (
-            <p className="home-hero__promo-subtitle">{promotion.description}</p>
-          ) : (
-            <p className="home-hero__promo-subtitle">View offer</p>
-          )}
-          {hasPromoPrice && (
-            <div className="home-hero__promo-price-row">
-              <span className="home-hero__promo-price-old">{formatPrice(originalPrice)}</span>
-              <span className="home-hero__promo-price-new">{formatPrice(promotionalPrice)}</span>
-            </div>
-          )}
-        </div>
-      </>
-    );
-
-    // Mobile: promo card behaves as a link to the product details page.
-    if (isMobile) {
-      return (
-        <Link key={key} href={getPromotionHref(promotion)} className={className} aria-label={cardTitle}>
-          {inner}
-        </Link>
-      );
-    }
-
-    // Tablet/Desktop: promo card selects the active banner/promo.
-    return (
-      <button
-        key={key}
-        type="button"
-        className={className}
-        onMouseEnter={() => {
-          if (id !== null) selectPromotion(id);
-        }}
-        onFocus={() => {
-          if (id !== null) selectPromotion(id);
-        }}
-        onClick={() => {
-          if (id !== null) selectPromotion(id);
-        }}
-        aria-pressed={isActive}
-      >
-        {inner}
-      </button>
-    );
-  };
-
-  const carouselContent: ReactNode[] =
-    promosLoading && promotions.length === 0
-      ? Array.from({ length: HERO_PLACEHOLDER_COUNT }).map((_, i) => (
-          <div key={i} className="home-hero__promo-skeleton" />
-        ))
-      : promotions.length > 0
-        ? isMobile
-          ? [renderPromotionCard(activePromotion ?? promotions[0]!)]
-          : promotions.map((promotion) => renderPromotionCard(promotion))
-        : Array.from({ length: HERO_PLACEHOLDER_COUNT }).map((_, index) => (
-            <div
-              key={index}
-              className="home-hero__promo-empty-card"
-              aria-label="Promotions coming soon"
-            >
-              <div className="home-hero__promo-empty-media" />
-              <div className="home-hero__promo-empty-body">
-                <p className="home-hero__promo-empty-title">Coming soon</p>
-                <p className="home-hero__promo-empty-copy">
-                  Future deals and stories will appear here.
-                </p>
-              </div>
-            </div>
-          ));
-
   return (
     <section className="home-hero" aria-label="Homepage hero">
       <div className="home-hero__container">
-        {/* Single layout: carousel on top, then two-column hero (left: search + card, right: banner) on desktop */}
         <div className="home-hero__main-grid" aria-label="Promotions">
-          {showPromoCarousel && (
-            <ProductCarousel
-              // Keep the promo cards visible (do not collapse to a single card).
-              // Banner rotation is handled by `activePromotionId` + timer.
-              itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
-              showNavigation={!isMobile}
-              alwaysShowNavigation={!isMobile}
-              splitNav
-              showPagination={false}
-              className="home-hero__promo-carousel"
-            >
-              {...carouselContent}
-            </ProductCarousel>
-          )}
-
           <div className="home-hero__content-row">
             <div className="home-hero__left-column">
               <form

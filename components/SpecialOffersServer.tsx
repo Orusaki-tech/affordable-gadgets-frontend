@@ -107,17 +107,17 @@ export async function SpecialOffersServer(
 
   if (homepageLayout) {
     return (
-      <section id="promotions" className="bg-white scroll-mt-20">
+      <section id="special-offers" className="bg-white scroll-mt-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-[30px] pb-12 sm:pb-12 lg:pb-16">
           <div className="mb-10 lg:mb-12">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
               <span className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 bg-clip-text text-transparent">
-                Promotions
+                {sectionTitle}
               </span>
             </h2>
             <p className="text-gray-600 text-lg sm:text-xl">Don&apos;t miss out on these amazing deals</p>
           </div>
-          <SpecialOffersCarousel promotions={specialOffersPromotions} sectionTitle={sectionTitle} />
+          <SpecialOffersCarousel promotions={specialOffersPromotions} showSectionTitle={false} />
         </div>
       </section>
     );

@@ -49,8 +49,8 @@ function MegaProductTile({ product }: { product: PublicProduct }) {
         <CloudinaryImage
           src={image}
           alt={product.product_name}
-          width={160}
-          height={160}
+          width={140}
+          height={140}
           className="site-header__mega-product-image"
         />
       </div>

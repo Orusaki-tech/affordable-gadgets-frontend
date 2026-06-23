@@ -419,16 +419,6 @@
   align-content: start;
 }
 
-.home-hero__placeholder--text-only {
-  display: flex;
-  align-items: center;
-  min-height: 120px;
-}
-
-.home-hero__placeholder--text-only .home-hero__placeholder-body {
-  width: 100%;
-}
-
 .home-hero__placeholder-media {
   position: relative;
   width: 100%;

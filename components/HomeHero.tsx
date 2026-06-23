@@ -252,7 +252,17 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
 
               {!searchEnabled ? (
                 <div className="home-hero__left-card" aria-live="polite">
-                  <div className="home-hero__placeholder home-hero__placeholder--text-only">
+                  <div className="home-hero__placeholder">
+                    <div className="home-hero__placeholder-media" aria-hidden>
+                      <CloudinaryImage
+                        src={HERO_PROMOTION_PLACEHOLDER_IMAGE}
+                        alt=""
+                        preset="card"
+                        sizes="(max-width: 1024px) 100vw, 420px"
+                        className="home-hero__placeholder-image"
+                        fill
+                      />
+                    </div>
                     <div className="home-hero__placeholder-body">
                       <p className="home-hero__placeholder-title">Search to start shopping</p>
                       <p className="home-hero__placeholder-copy">

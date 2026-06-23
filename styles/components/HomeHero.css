@@ -534,6 +534,15 @@
   width: 45%;
 }
 
+.home-hero__banner-row {
+  width: 100%;
+}
+
+.home-hero__search-row {
+  width: 100%;
+  min-width: 0;
+}
+
 .home-hero__right {
   position: relative;
 }
@@ -546,6 +555,16 @@
 }
 
 /* Hero banner: fixed 16:9 ratio, image fills the card */
+.home-hero__banner-row .home-hero__banner {
+  aspect-ratio: 21 / 9;
+}
+
+@media (max-width: 639px) {
+  .home-hero__banner-row .home-hero__banner {
+    aspect-ratio: 16 / 9;
+  }
+}
+
 .home-hero__banner {
   position: relative;
   display: block;
@@ -587,6 +606,10 @@
 }
 
 @media (min-width: 1024px) {
+  .home-hero__search-row {
+    max-width: 420px;
+  }
+
   .home-hero__content-row {
     display: flex;
     gap: 24px;

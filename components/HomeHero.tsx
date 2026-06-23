@@ -7,6 +7,7 @@ import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from '@/components/ProductCard';
+import { brandConfig } from '@/lib/config/brand';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
 type PromotionPromoCard = {
@@ -78,10 +79,23 @@ function getHeroPromotions(promotionsData?: PaginatedPublicPromotionList): HomeH
     return locations.length > 0 && locations.includes('homepage_hero');
   });
 
-  const baseList =
-    featuredForHero.length > 0 ? featuredForHero : (results as HomeHeroPromotion[]);
+  return sortPromotions(featuredForHero);
+}
 
-  return sortPromotions(baseList);
+function resolveMediaUrl(image?: string | null): string | null {
+  if (!image?.trim()) return null;
+  if (image.startsWith('http')) return image;
+  return `${brandConfig.apiBaseUrl}${image.startsWith('/') ? '' : '/'}${image}`;
+}
+
+function getHeroBannerSrc(promotion: HomeHeroPromotion | null): string | null {
+  if (!promotion) return null;
+  return (
+    resolveMediaUrl(promotion.banner_image_url) ||
+    resolveMediaUrl(promotion.banner_image) ||
+    resolveMediaUrl(promotion.promo_card?.product_image_url) ||
+    null
+  );
 }
 
 type HomeHeroProps = {
@@ -158,14 +172,58 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
   });
   const product = productsData?.results?.[0] ?? null;
 
-  const activeBannerSrc =
-    activePromotion?.banner_image_url || activePromotion?.banner_image || null;
+  const activeBannerSrc = useMemo(() => getHeroBannerSrc(activePromotion), [activePromotion]);
+  const [bannerImageFailed, setBannerImageFailed] = useState(false);
+
+  useEffect(() => {
+    setBannerImageFailed(false);
+  }, [activePromotionId, activeBannerSrc]);
+
+  const displayBannerSrc =
+    activeBannerSrc && !bannerImageFailed ? activeBannerSrc : HERO_PROMOTION_PLACEHOLDER_IMAGE;
+  const showBannerLink = Boolean(activePromotion && activeBannerSrc && !bannerImageFailed);
+
+  const renderHeroBanner = () => {
+    const bannerInner = (
+      <CloudinaryImage
+        src={displayBannerSrc}
+        alt={activePromotion?.title ?? 'Promotions'}
+        preset="card"
+        fit="cover"
+        sizes="100vw"
+        className="home-hero__banner-image"
+        priority
+        fill
+        onError={() => setBannerImageFailed(true)}
+      />
+    );
+
+    if (showBannerLink && activePromotion) {
+      return (
+        <Link
+          href={getPromotionHref(activePromotion)}
+          className="home-hero__banner"
+          aria-label={activePromotion.title}
+        >
+          {bannerInner}
+        </Link>
+      );
+    }
+
+    return (
+      <div className="home-hero__banner home-hero__banner--placeholder" aria-label="Promotions banner">
+        {bannerInner}
+      </div>
+    );
+  };
 
   return (
     <section className="home-hero" aria-label="Homepage hero">
       <div className="home-hero__container">
         <div className="home-hero__main-grid" aria-label="Promotions">
-          <div className="home-hero__content-row">
+          <div className="home-hero__banner-row">{renderHeroBanner()}</div>
+
+          <div className="home-hero__search-row">
             <div className="home-hero__left-column">
               <form
                 className="home-hero__search"
@@ -254,34 +312,6 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
                       We couldn’t find anything for “{normalizedQuery}”. Try a different search.
                     </p>
                   </div>
-                </div>
-              )}
-            </div>
-
-            <div className="home-hero__right">
-              {activePromotion && activeBannerSrc ? (
-                <Link href={getPromotionHref(activePromotion)} className="home-hero__banner" aria-label={activePromotion.title}>
-                  <CloudinaryImage
-                    src={activeBannerSrc}
-                    alt={activePromotion.title}
-                    preset="card"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="home-hero__banner-image"
-                    priority
-                    fill
-                  />
-                </Link>
-              ) : (
-                <div className="home-hero__banner home-hero__banner--placeholder" aria-label="Promotions placeholder">
-                  <CloudinaryImage
-                    src={HERO_PROMOTION_PLACEHOLDER_IMAGE}
-                    alt="Promotions coming soon"
-                    preset="card"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="home-hero__banner-image"
-                    priority
-                    fill
-                  />
                 </div>
               )}
             </div>

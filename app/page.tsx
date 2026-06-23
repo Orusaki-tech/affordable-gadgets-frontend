@@ -60,7 +60,7 @@ function selectHomeHeroPromotions(promotions: PublicPromotion[]) {
     return locations.length > 0 && locations.includes('homepage_hero');
   });
 
-  const baseList = featuredForHero.length > 0 ? featuredForHero : promotions;
+  const baseList = featuredForHero.length > 0 ? featuredForHero : [];
   return sortPromotions(baseList);
 }
 

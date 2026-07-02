@@ -16,6 +16,17 @@ import {
 } from '@/lib/api/generated';
 import type { ProductTypeFilter } from '@/lib/config/nav-links';
 
+function apiQueryRetry(failureCount: number, error: unknown): boolean {
+  const status = (error as { status?: number })?.status;
+  if (status === 429 && failureCount < 3) return true;
+  return failureCount < 1;
+}
+
+function apiQueryRetryDelay(_failureCount: number, error: unknown): number {
+  const status = (error as { status?: number })?.status;
+  return status === 429 ? 15_000 : 1_000;
+}
+
 /** List API pagination shape (products list endpoint). */
 export type PaginatedPublicProductList = PaginatedPublicProductListList;
 
@@ -220,6 +231,8 @@ export function useProduct(id: number, options?: { placeholderFromList?: PublicP
     queryFn: () => ApiService.apiV1PublicProductsRetrieve(id),
     enabled: !!id,
     staleTime: 30000, // Keep cached products fresh for short navigations
+    retry: apiQueryRetry,
+    retryDelay: apiQueryRetryDelay,
     placeholderData: () =>
       options?.placeholderFromList ?? getProductFromListCache(queryClient, { id }),
   });
@@ -250,7 +263,8 @@ export function useProductBySlug(slug: string, options?: { placeholderFromList?:
         throw new Error(`Product "${slug}" not found.`);
       }),
     enabled: !!slug,
-    retry: 1, // Only retry once
+    retry: apiQueryRetry,
+    retryDelay: apiQueryRetryDelay,
     retryOnMount: false, // Don't retry on mount if it failed
     placeholderData: () =>
       options?.placeholderFromList ?? getProductFromListCache(queryClient, { slug }),

@@ -33,6 +33,7 @@ import type { PromotionVideoProduct } from '@/components/ProductVideoReel';
 import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
 import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
+import { getApiErrorInfo } from '@/lib/utils/apiError';
 
 interface ProductDetailProps {
   slug: string;
@@ -957,12 +958,17 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   }
 
   if (productError || !product) {
+    const { message, status } = productError ? getApiErrorInfo(productError) : { message: '', status: undefined };
+    const errorCopy =
+      status === 429
+        ? 'The store is busy right now. Please wait a few seconds and refresh the page.'
+        : message || "The product you're looking for doesn't exist or has been removed.";
     return (
       <div className="product-detail__error">
-        <h2 className="product-detail__error-title">Product Not Found</h2>
-        <p className="product-detail__error-copy">
-          {productError instanceof Error ? productError.message : 'The product you\'re looking for doesn\'t exist or has been removed.'}
-        </p>
+        <h2 className="product-detail__error-title">
+          {status === 429 ? 'Please try again' : 'Product Not Found'}
+        </h2>
+        <p className="product-detail__error-copy">{errorCopy}</p>
         <Link href="/products" className="product-detail__error-link">
           Browse all products
         </Link>

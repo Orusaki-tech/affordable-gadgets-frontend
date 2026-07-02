@@ -14,6 +14,7 @@ type HeaderBrandMenuProps = {
   variant?: 'desktop' | 'mobile';
   onNavigate?: () => void;
   isMegaOpen?: boolean;
+  suppressUrlActive?: boolean;
   onMegaOpen?: () => void;
 };
 
@@ -24,9 +25,10 @@ export function HeaderBrandMenu({
   variant = 'desktop',
   onNavigate,
   isMegaOpen = false,
+  suppressUrlActive = false,
   onMegaOpen,
 }: HeaderBrandMenuProps) {
-  const active = isBrandNavActive(brand.brandFilter, pathname, search);
+  const active = !suppressUrlActive && isBrandNavActive(brand.brandFilter, pathname, search);
   const brandHref = brandCategoryHref(brand.brandFilter, null);
 
   if (variant === 'mobile') {
@@ -66,6 +68,7 @@ export function HeaderBrandMenu({
         aria-haspopup="true"
         onMouseEnter={onMegaOpen}
         onFocus={onMegaOpen}
+        onClick={onNavigate}
       >
         {brand.navLabel}
         <span className="site-header__nav-underline" />
@@ -129,6 +132,7 @@ export function HeaderMoreBrandsMenu({
         aria-haspopup="true"
         onMouseEnter={onMegaOpen}
         onFocus={onMegaOpen}
+        onClick={onNavigate}
       >
         More
         <span className="site-header__nav-underline" />

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useCart } from '@/lib/hooks/useCart';
 import { usePrefetchNavMegaProducts } from '@/lib/hooks/useProducts';
 import { brandConfig } from '@/lib/config/brand';
@@ -24,11 +24,15 @@ import { HeaderMegaMenuPanel, MEGA_MENU_MORE_KEY } from './HeaderMegaMenuPanel';
 export function Header() {
   const { itemCount } = useCart();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentSearch = useMemo(() => {
+    const qs = searchParams.toString();
+    return qs ? `?${qs}` : '';
+  }, [searchParams]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [currentSearch, setCurrentSearch] = useState('');
   const [openMegaMenu, setOpenMegaMenu] = useState<string | null>(null);
   const [moreHoverBrand, setMoreHoverBrand] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -105,13 +109,20 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    setCurrentSearch(window.location.search);
-  }, [pathname]);
+    closeMegaMenu();
+  }, [pathname, currentSearch, closeMegaMenu]);
 
   useEffect(() => {
-    closeMegaMenu();
-  }, [pathname, closeMegaMenu]);
+    if (!openMegaMenu) return;
+
+    const closeOnScroll = () => closeMegaMenu();
+    window.addEventListener('scroll', closeOnScroll, { passive: true });
+    window.addEventListener('wheel', closeOnScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', closeOnScroll);
+      window.removeEventListener('wheel', closeOnScroll);
+    };
+  }, [openMegaMenu, closeMegaMenu]);
 
   useEffect(() => {
     if (!openMegaMenu) return;
@@ -156,6 +167,7 @@ export function Header() {
     () => PRIMARY_BRAND_NAV.find((brand) => brand.brandFilter === openMegaMenu),
     [openMegaMenu]
   );
+  const isAnyMegaOpen = openMegaMenu != null;
 
   return (
     <header className={`site-header${openMegaMenu ? ' site-header--mega-open' : ''}`}>
@@ -196,11 +208,13 @@ export function Header() {
                   pathname={pathname}
                   search={currentSearch}
                   isMegaOpen={openMegaMenu === brand.brandFilter}
+                  suppressUrlActive={isAnyMegaOpen}
                   onMegaOpen={() => {
                     cancelMegaMenuClose();
                     setMoreHoverBrand(null);
                     setOpenMegaMenu(brand.brandFilter);
                   }}
+                  onNavigate={closeMegaMenu}
                 />
               ))}
 
@@ -213,6 +227,7 @@ export function Header() {
                   setMoreHoverBrand(MORE_BRAND_NAV[0]?.brandFilter ?? null);
                   setOpenMegaMenu(MEGA_MENU_MORE_KEY);
                 }}
+                onNavigate={closeMegaMenu}
               />
 
               {SHOP_NAV.map((link) => (

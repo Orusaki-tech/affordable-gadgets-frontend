@@ -179,7 +179,7 @@
 .site-header__mega-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 45;
+  z-index: 64;
   border: none;
   padding: 0;
   margin: 0;
@@ -506,8 +506,8 @@
 
 .site-header__mega-product-body {
   display: grid;
-  gap: 3px;
-  padding: 0 2px;
+  gap: 0;
+  padding: 0 2px 10px;
   min-width: 0;
 }
 
@@ -515,7 +515,7 @@
   font-size: 12px;
   font-weight: 500;
   color: var(--ui-gray-500);
-  line-height: 1.45;
+  line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -527,6 +527,8 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--ui-gray-900);
+  line-height: 1.2;
+  margin-top: 1px;
 }
 
 .site-header__mega-product:hover .site-header__mega-product-price {

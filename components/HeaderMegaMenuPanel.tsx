@@ -88,21 +88,25 @@ function MegaProductTile({
   return (
     <Link href={getProductHref(product)} className="site-header__mega-product">
       <div className="site-header__mega-product-image-wrap">
+        <div className="site-header__mega-product-image-inner">
         {image ? (
           <CloudinaryImage
             src={image}
             alt={product.product_name}
             preset="productThumb"
-            sizes="140px"
+            sizes="156px"
             className="site-header__mega-product-image"
             fill
           />
         ) : (
           <div className="site-header__mega-product-image-fallback" aria-hidden />
         )}
+        </div>
       </div>
-      <span className="site-header__mega-product-name">{product.product_name}</span>
-      {priceText && <span className="site-header__mega-product-price">{priceText}</span>}
+      <div className="site-header__mega-product-body">
+        <span className="site-header__mega-product-name">{product.product_name}</span>
+        {priceText && <span className="site-header__mega-product-price">{priceText}</span>}
+      </div>
     </Link>
   );
 }
@@ -131,7 +135,10 @@ function MegaProductsColumn({
 
   return (
     <div className="site-header__mega-products">
-      <p className="site-header__mega-products-heading">Latest {title}</p>
+      <div className="site-header__mega-products-header">
+        <p className="site-header__mega-products-eyebrow">Latest</p>
+        <h3 className="site-header__mega-products-title">{title}</h3>
+      </div>
       {isLoading ? (
         <div className="site-header__mega-products-grid site-header__mega-products-grid--loading">
           {Array.from({ length: 8 }, (_, i) => (
@@ -254,16 +261,22 @@ export function HeaderMegaMenuPanel({
               </div>
             </div>
           ) : (
-            brand?.categories.map((cat) => (
-              <CategoryLink
-                key={`${brand.brandFilter}-${cat.label}`}
-                brandFilter={brand.brandFilter}
-                category={cat}
-                isActive={hoveredCategory?.label === cat.label}
-                onHover={() => setHoveredCategory(cat)}
-                onClose={onClose}
-              />
-            ))
+            <>
+              <div className="site-header__mega-categories-header">
+                <p className="site-header__mega-categories-eyebrow">Browse</p>
+                <p className="site-header__mega-categories-title">{brand?.navLabel}</p>
+              </div>
+              {brand?.categories.map((cat) => (
+                <CategoryLink
+                  key={`${brand.brandFilter}-${cat.label}`}
+                  brandFilter={brand.brandFilter}
+                  category={cat}
+                  isActive={hoveredCategory?.label === cat.label}
+                  onHover={() => setHoveredCategory(cat)}
+                  onClose={onClose}
+                />
+              ))}
+            </>
           )}
         </div>
 

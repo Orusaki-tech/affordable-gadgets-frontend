@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { getApiErrorInfo } from '@/lib/utils/apiError';
 
 interface AddToCartLeadModalProps {
   productName: string;
@@ -58,7 +58,8 @@ export function AddToCartLeadModal({
       await onConfirm(normalizedPhone);
       setSubmitted(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add to cart');
+      const { message } = getApiErrorInfo(err);
+      setError(message || 'Failed to add to cart');
     } finally {
       setSubmitting(false);
     }

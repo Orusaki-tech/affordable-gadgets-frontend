@@ -37,7 +37,7 @@ export const PRODUCTS_VISIBLE_PAGE_SIZE = 20;
 export const FEATURED_PRODUCTS_PAGE_SIZE = 5;
 
 /** Latest products shown in header brand mega-menus. */
-export const NAV_MEGA_PRODUCTS_PAGE_SIZE = 3;
+export const NAV_MEGA_PRODUCTS_PAGE_SIZE = 12;
 
 /** Fetches only products tagged "Featured" (page_size=5). Uses same list API with featured=1 for fast homepage load. */
 export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductList> {

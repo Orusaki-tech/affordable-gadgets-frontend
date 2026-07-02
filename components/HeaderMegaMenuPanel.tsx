@@ -92,9 +92,10 @@ function MegaProductTile({
           <CloudinaryImage
             src={image}
             alt={product.product_name}
-            width={112}
-            height={88}
+            preset="productThumb"
+            sizes="140px"
             className="site-header__mega-product-image"
+            fill
           />
         ) : (
           <div className="site-header__mega-product-image-fallback" aria-hidden />
@@ -133,7 +134,7 @@ function MegaProductsColumn({
       <p className="site-header__mega-products-heading">Latest {title}</p>
       {isLoading ? (
         <div className="site-header__mega-products-grid site-header__mega-products-grid--loading">
-          {Array.from({ length: 3 }, (_, i) => (
+          {Array.from({ length: 8 }, (_, i) => (
             <div key={i} className="site-header__mega-product-skeleton" aria-hidden />
           ))}
         </div>

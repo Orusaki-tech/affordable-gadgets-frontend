@@ -68,6 +68,15 @@
   cursor: not-allowed;
 }
 
+.add-to-cart-lead-modal__icon {
+  background: #e8f5f3;
+  color: #128c7e;
+}
+
+.add-to-cart-lead-modal__icon svg {
+  transform: scale(0.95);
+}
+
 .whatsapp-lead-modal__subtitle {
   font-size: 15px;
   color: var(--ui-gray-600);

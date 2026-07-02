@@ -14,6 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
 import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
+import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
 
 /** Same stroke as `.product-card__buy-btn--featured`. Hex matches --primary-dark so it always paints (see DevTools). */
 const productCardLinkFrameStyle: CSSProperties = {
@@ -198,14 +199,14 @@ export function ProductCard({
     return candidate?.image_url || null;
   }, [product.primary_image, units]);
 
-  const { addToCart } = useCart();
+  const { addToCart, updateCartPhone } = useCart();
   const { isInWishlist, toggle } = useWishlist();
 
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
   const [selectedUnitId, setSelectedUnitId] = useState<number | null>(null);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [pendingCartQty, setPendingCartQty] = useState<number | null>(null);
 
   // Auto-select first storage option on load
   useEffect(() => {
@@ -309,16 +310,17 @@ export function ProductCard({
     toggle(product.id);
   };
 
-  const handleAddToCart = async (event: React.MouseEvent, qty?: number) => {
+  const handleAddToCart = (event: React.MouseEvent, qty?: number) => {
     event.preventDefault();
     event.stopPropagation();
     if (!selectedUnit?.id) return;
-    try {
-      setIsAddingToCart(true);
-      await addToCart(selectedUnit.id, qty ?? 1);
-    } finally {
-      setIsAddingToCart(false);
-    }
+    setPendingCartQty(qty ?? 1);
+  };
+
+  const handleConfirmCartAdd = async (phone: string) => {
+    if (!selectedUnit?.id || pendingCartQty == null) return;
+    await updateCartPhone(phone);
+    await addToCart(selectedUnit.id, pendingCartQty);
   };
 
   const hasPriceRange =
@@ -402,16 +404,31 @@ export function ProductCard({
   );
 
   const handlePriceCtaClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (selectedUnit?.id) {
-      handleAddToCart(event, 1);
+      setPendingCartQty(1);
       return;
     }
     setProductDetailPlaceholder(product);
   };
 
   if (isFeaturedVariant) {
-    const canAddToCart = Boolean(selectedUnit?.id) && !isAddingToCart && !unitsLoading;
+    const canAddToCart = Boolean(selectedUnit?.id) && !unitsLoading;
+    const addToCartModal = pendingCartQty != null ? (
+      <AddToCartLeadModal
+        productName={product.product_name}
+        productBrand={product.brand}
+        productModel={product.model_series}
+        initialPhone={
+          typeof window !== 'undefined' ? localStorage.getItem('customer_phone') || '' : ''
+        }
+        onClose={() => setPendingCartQty(null)}
+        onConfirm={handleConfirmCartAdd}
+      />
+    ) : null;
     return (
+      <>
       <Link
         href={getProductHref(product)}
         className="product-card product-card--featured"
@@ -450,7 +467,7 @@ export function ProductCard({
                   if (!selectedUnit?.id) return;
                   handleAddToCart(event, 1);
                 }}
-                disabled={!canAddToCart || isAddingToCart}
+                disabled={!canAddToCart}
                 className="product-card__cart-icon product-card__cart-icon--featured product-card__cart-icon--bar-hover"
                 aria-label="Add to cart"
               >
@@ -569,12 +586,11 @@ export function ProductCard({
                     if (!selectedUnit?.id) return;
                     handleAddToCart(event, 1);
                   }}
-                  disabled={!canAddToCart || isAddingToCart}
+                  disabled={!canAddToCart}
                   className="product-card__add-to-cart-btn product-card__add-to-cart-btn--overlay-single"
                   aria-label="Add to cart"
                 >
-                  <span className="product-card__add-to-cart-btn-icon">{cartIconSvg}</span>
-                  <span className="product-card__add-to-cart-btn-price">{addToCartButtonPriceText}</span>
+                  Add to cart
                 </button>
               )}
               {hasDefaultPriceOffer && (
@@ -592,6 +608,8 @@ export function ProductCard({
           </div>
         </div>
       </Link>
+      {addToCartModal}
+      </>
     );
   }
 
@@ -702,12 +720,10 @@ export function ProductCard({
             <button
               type="button"
               onClick={handlePriceCtaClick}
-              disabled={Boolean(selectedUnit?.id) && isAddingToCart}
               className="product-card__add-to-cart-btn product-card__add-to-cart-btn--overlay-single"
               aria-label={selectedUnit?.id ? 'Add to cart' : 'View product details'}
             >
-              <span className="product-card__add-to-cart-btn-icon">{cartIconSvg}</span>
-              <span className="product-card__add-to-cart-btn-price">{addToCartButtonPriceText}</span>
+              {selectedUnit?.id ? 'Add to cart' : addToCartButtonPriceText}
             </button>
           </div>
         )}
@@ -959,10 +975,10 @@ export function ProductCard({
                   <button
                     type="button"
                     onClick={(event) => handleAddToCart(event, 1)}
-                    disabled={!selectedUnit?.id || isAddingToCart}
+                    disabled={!selectedUnit?.id}
                     className="product-card__quick-add-button"
                   >
-                    {isAddingToCart ? 'Adding...' : 'Add to cart'}
+                    Add to cart
                   </button>
                   <div className="product-card__quick-add-help">
                     Prefer more options? <span className="product-card__quick-add-link">View details</span>
@@ -1024,6 +1040,18 @@ export function ProductCard({
       </div>
     </Link>
 
+      {pendingCartQty != null && (
+        <AddToCartLeadModal
+          productName={product.product_name}
+          productBrand={product.brand}
+          productModel={product.model_series}
+          initialPhone={
+            typeof window !== 'undefined' ? localStorage.getItem('customer_phone') || '' : ''
+          }
+          onClose={() => setPendingCartQty(null)}
+          onConfirm={handleConfirmCartAdd}
+        />
+      )}
       {isWhatsAppModalOpen && product.id != null && (
         <WhatsAppLeadModal
           productId={product.id}

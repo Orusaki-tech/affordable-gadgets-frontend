@@ -5,8 +5,12 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { ApiService, Cart, CartItemRequest, CartRequest } from '@/lib/api/generated';
-import { getSessionKey } from '@/lib/tracking';
 import { getApiErrorInfo } from '@/lib/utils/apiError';
+
+function getAuthToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('auth_token');
+}
 
 interface CartContextType {
   cart: Cart | null;
@@ -14,6 +18,7 @@ interface CartContextType {
   error: string | null;
   addToCart: (inventoryUnitId: number, quantity?: number, promotionId?: number, unitPrice?: number) => Promise<void>;
   addBundleToCart: (bundleId: number, mainInventoryUnitId?: number, bundleItemIds?: number[]) => Promise<void>;
+  updateCartPhone: (phone: string) => Promise<void>;
   removeFromCart: (itemId: number) => Promise<void>;
   updateCart: () => Promise<void>;
   checkout: (checkoutData: CartRequest) => Promise<Cart>;
@@ -44,23 +49,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get or create cart on mount
+  // Load cart only for signed-in customers
   useEffect(() => {
     const initCart = async () => {
+      if (!getAuthToken()) {
+        setCart(null);
+        setError(null);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         setIsLoading(true);
-        setError(null); // Clear any previous errors
-        
-        const sessionKey = getSessionKey();
-        console.log('Initializing cart with session key:', sessionKey);
-        const newCart = await ApiService.apiV1PublicCartCreate({
-          session_key: sessionKey,
-        });
+        setError(null);
+        const newCart = await ApiService.apiV1PublicCartCreate({});
         setCart(newCart);
-        console.log('Cart initialized successfully:', newCart.id);
       } catch (err: any) {
         const { data: errorData, message: errorMessage, brandCode, status, url } = getApiErrorInfo(err);
-        
+
         console.error('Cart initialization error:', {
           message: errorMessage,
           brand_code: brandCode || 'Unknown',
@@ -69,22 +75,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
           url,
           fullError: err,
         });
-        
-        // Handle connection errors
+
         if (err?.code === 'ECONNREFUSED' || err?.message?.includes('Network Error')) {
           setError('Cannot connect to backend server. Please ensure the Django backend is running.');
-          return; // Don't try to create cart if backend is down
+          return;
         }
-        
-        // Don't set error for 400/404 - cart might not exist yet, which is fine
-        // Cart will be created when first item is added
+
+        if (status === 401 || status === 403) {
+          setCart(null);
+          setError(null);
+          return;
+        }
+
         if (err?.response?.status === 400 || err?.response?.status === 404) {
           if (errorMessage.includes('Brand') || errorMessage.includes('brand')) {
-            console.error(`Brand configuration error: Brand code "${brandCode || 'Unknown'}" is not configured or inactive.`);
-            console.error('To fix this, run: python manage.py create_default_brand');
             setError(`Brand not configured: ${brandCode || 'Unknown'}. Run 'python manage.py create_default_brand' to create it.`);
           } else {
-            console.warn('Cart not available yet, will be created on first add:', errorMessage);
             setCart(null);
           }
         } else {
@@ -95,7 +101,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    initCart();
+    const handleAuthChange = () => {
+      void initCart();
+    };
+
+    void initCart();
+    window.addEventListener('auth-token-changed', handleAuthChange);
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'auth_token') handleAuthChange();
+    });
+    return () => {
+      window.removeEventListener('auth-token-changed', handleAuthChange);
+    };
   }, []);
 
   const updateCart = useCallback(async () => {
@@ -128,28 +145,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
     promotionId?: number,
     unitPrice?: number
   ) => {
+    if (!getAuthToken()) {
+      throw new Error('Sign in required to add items to cart');
+    }
     try {
       let currentCart = cart;
       
-      // Create cart if it doesn't exist
       if (!currentCart) {
-        console.log('Cart not found, creating new cart...');
-        try {
-          currentCart = await ApiService.apiV1PublicCartCreate({
-            session_key: getSessionKey(),
-          });
-          setCart(currentCart);
-          console.log('Cart created successfully:', currentCart.id);
-        } catch (cartErr: any) {
-          const { data, message, status, url } = getApiErrorInfo(cartErr);
-          console.error('Failed to create cart:', {
-            message,
-            response: data,
-            status,
-            url,
-          });
-          throw new Error(message || 'Failed to create cart');
-        }
+        currentCart = await ApiService.apiV1PublicCartCreate({});
+        setCart(currentCart);
       }
       
       // Add item to cart with promotion info
@@ -188,12 +192,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     mainInventoryUnitId?: number,
     bundleItemIds?: number[]
   ) => {
+    if (!getAuthToken()) {
+      throw new Error('Sign in required to add items to cart');
+    }
     try {
       let currentCart = cart;
       if (!currentCart) {
-        currentCart = await ApiService.apiV1PublicCartCreate({
-          session_key: getSessionKey(),
-        });
+        currentCart = await ApiService.apiV1PublicCartCreate({});
         setCart(currentCart);
       }
       const cartId = getCartId(currentCart);
@@ -210,6 +215,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
       throw err;
     }
   }, [cart, updateCart]);
+
+  const updateCartPhone = useCallback(async (phone: string) => {
+    if (!getAuthToken()) {
+      throw new Error('Sign in required to add items to cart');
+    }
+    let currentCart = cart;
+    if (!currentCart) {
+      currentCart = await ApiService.apiV1PublicCartCreate({});
+      setCart(currentCart);
+    }
+    const cartId = getCartId(currentCart);
+    const updated = await ApiService.apiV1PublicCartPartialUpdate(cartId, {
+      customer_phone: phone,
+    });
+    setCart(updated);
+  }, [cart]);
 
   const removeFromCart = useCallback(async (itemId: number) => {
     if (!cart) {
@@ -264,6 +285,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     error,
     addToCart,
     addBundleToCart,
+    updateCartPhone,
     removeFromCart,
     updateCart,
     checkout,

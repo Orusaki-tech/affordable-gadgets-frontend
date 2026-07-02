@@ -32,10 +32,16 @@ import { ProductBlogTab } from '@/components/ProductBlogTab';
 import type { PromotionVideoProduct } from '@/components/ProductVideoReel';
 import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
+import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
 
 interface ProductDetailProps {
   slug: string;
 }
+
+type PendingCartAdd =
+  | { kind: 'unit'; quantity: number; promotionId?: number; unitPrice?: number }
+  | { kind: 'bundle'; bundleId: number; bundleItemIds: number[] }
+  | { kind: 'accessory'; unitId: number; quantity: number; unitPrice?: number; accessoryName?: string };
 
 type TabType = 'overview' | 'specs' | 'reviews' | 'videos' | 'compare' | 'blog';
 
@@ -286,19 +292,19 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const { data: accessories } = useProductAccessories(product?.id || 0);
   const { data: promotion } = usePromotion(promotionId ? parseInt(promotionId) : 0);
   const { data: bundlesData, isLoading: bundlesLoading } = useBundles({ productId: product?.id });
-  const { addToCart, addBundleToCart } = useCart();
+  const { addToCart, addBundleToCart, updateCartPhone } = useCart();
   const router = useRouter();
 
   const [isPromoVideosOpen, setIsPromoVideosOpen] = useState(false);
   const [isFinancingOpen, setIsFinancingOpen] = useState(false);
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [pendingCartAdd, setPendingCartAdd] = useState<PendingCartAdd | null>(null);
   
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
   const productId = product?.id;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [mainImageLoadFailed, setMainImageLoadFailed] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [bundleAddingId, setBundleAddingId] = useState<number | null>(null);
@@ -626,37 +632,60 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     }
   }, [filteredUnits, selectedUnit, selectedStorage, selectedColor]);
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = () => {
     if (!selectedUnit) {
       triggerVariantShake();
       return;
     }
-    
-    setIsAddingToCart(true);
-    try {
-      // Get promotion info if eligible
-      const promoId = isEligibleForPromotion && promotion ? promotion.id : undefined;
-      const promoPrice = isEligibleForPromotion && promotionUnitPrice !== null 
-        ? promotionUnitPrice 
-        : selectedUnitData?.selling_price;
-      const normalizedPromoPrice =
-        promoPrice !== undefined && promoPrice !== null ? Number(promoPrice) : undefined;
-      
+
+    const promoId = isEligibleForPromotion && promotion ? promotion.id : undefined;
+    const promoPrice = isEligibleForPromotion && promotionUnitPrice !== null
+      ? promotionUnitPrice
+      : selectedUnitData?.selling_price;
+    const normalizedPromoPrice =
+      promoPrice !== undefined && promoPrice !== null ? Number(promoPrice) : undefined;
+
+    setPendingCartAdd({
+      kind: 'unit',
+      quantity,
+      promotionId: promoId,
+      unitPrice: normalizedPromoPrice,
+    });
+  };
+
+  const handleConfirmCartAdd = async (phone: string) => {
+    if (!pendingCartAdd) return;
+    await updateCartPhone(phone);
+
+    if (pendingCartAdd.kind === 'unit') {
+      if (!selectedUnit) throw new Error('Please select a variant first');
       await addToCart(
-        selectedUnit, 
-        quantity,
-        promoId,
-        normalizedPromoPrice
+        selectedUnit,
+        pendingCartAdd.quantity,
+        pendingCartAdd.promotionId,
+        pendingCartAdd.unitPrice,
       );
       setShowSuccessMessage(true);
       setTimeout(() => setShowSuccessMessage(false), 3000);
-    } catch (error: any) {
-      console.error('Add to cart error:', error);
-      const errorMessage = error?.response?.data?.error || error?.message || 'Failed to add to cart';
-      alert(`Failed to add to cart: ${errorMessage}`);
-    } finally {
-      setIsAddingToCart(false);
+      return;
     }
+
+    if (pendingCartAdd.kind === 'bundle') {
+      if (!selectedUnit) throw new Error('Please select a variant first');
+      await addBundleToCart(pendingCartAdd.bundleId, selectedUnit, pendingCartAdd.bundleItemIds);
+      setBundleSuccessMessage('Bundle added to cart successfully!');
+      setTimeout(() => setBundleSuccessMessage(null), 3000);
+      return;
+    }
+
+    await addToCart(
+      pendingCartAdd.unitId,
+      pendingCartAdd.quantity,
+      undefined,
+      pendingCartAdd.unitPrice,
+    );
+    setShowSuccessMessage(true);
+    setTimeout(() => setShowSuccessMessage(false), 3000);
   };
 
   const handleAddBundleToCart = async (bundleId: number) => {
@@ -669,17 +698,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       alert('Please select at least one bundle item');
       return;
     }
-    setBundleAddingId(bundleId);
-    try {
-      await addBundleToCart(bundleId, selectedUnit, selectedIds);
-      setBundleSuccessMessage('Bundle added to cart successfully!');
-      setTimeout(() => setBundleSuccessMessage(null), 3000);
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.error || error?.message || 'Failed to add bundle to cart';
-      alert(`Failed to add bundle to cart: ${errorMessage}`);
-    } finally {
-      setBundleAddingId(null);
-    }
+    setPendingCartAdd({ kind: 'bundle', bundleId, bundleItemIds: selectedIds });
   };
 
   const handleAddAccessoryVariantToCart = async (
@@ -697,24 +716,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       alert('No unit available');
       return;
     }
-    
-    setIsAddingToCart(true);
-    try {
-      await addToCart(
-        unit.unit_id,
-        accessory.required_quantity,
-        undefined, // No promotion for accessories (or could add later)
-        unit.price
-      );
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 3000);
-    } catch (error: any) {
-      console.error('Add accessory to cart error:', error);
-      const errorMessage = error?.response?.data?.error || error?.message || 'Failed to add to cart';
-      alert(`Failed to add to cart: ${errorMessage}`);
-    } finally {
-      setIsAddingToCart(false);
-    }
+
+    setPendingCartAdd({
+      kind: 'accessory',
+      unitId: unit.unit_id,
+      quantity: accessory.required_quantity ?? 1,
+      unitPrice: unit.price != null ? Number(unit.price) : undefined,
+      accessoryName: accessory.accessory_name,
+    });
   };
 
 
@@ -1225,20 +1234,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   <div className="product-detail__cta product-detail__cta--inline">
                     <button
                       onClick={nothingSelected ? triggerVariantShake : handleAddToCart}
-                      disabled={(!selectedUnit && !nothingSelected) || isAddingToCart}
+                      disabled={!selectedUnit && !nothingSelected}
                       className={`product-detail__cta-button ${
-                        (!selectedUnit && !nothingSelected) || isAddingToCart ? 'product-detail__cta-button--disabled' : ''
+                        !selectedUnit && !nothingSelected ? 'product-detail__cta-button--disabled' : ''
                       }${nothingSelected ? ' product-detail__cta-button--suggest' : ''}`}
                     >
-                      {isAddingToCart ? (
-                        <span className="product-detail__cta-loading">
-                          <svg className="product-detail__cta-spinner" fill="none" viewBox="0 0 24 24">
-                            <circle className="product-detail__cta-spinner-track" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="product-detail__cta-spinner-fill" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Adding...
-                        </span>
-                      ) : selectedUnit ? (
+                      {selectedUnit ? (
                         'Add to cart'
                       ) : (
                         'Select a Variant First'
@@ -2041,6 +2042,28 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           ) : undefined}
           prefilledMessage={whatsAppPrefilledMessage}
           onClose={() => setIsWhatsAppModalOpen(false)}
+        />
+      )}
+      {pendingCartAdd && product && (
+        <AddToCartLeadModal
+          productName={product.product_name}
+          productBrand={product.brand}
+          productModel={product.model_series}
+          unitLabel={
+            pendingCartAdd.kind === 'accessory'
+              ? pendingCartAdd.accessoryName
+              : selectedUnitData
+                ? [
+                    selectedUnitData.storage_gb ? `${selectedUnitData.storage_gb}GB` : '',
+                    selectedUnitData.color_name || '',
+                  ].filter(Boolean).join(' ')
+                : undefined
+          }
+          initialPhone={
+            typeof window !== 'undefined' ? localStorage.getItem('customer_phone') || '' : ''
+          }
+          onClose={() => setPendingCartAdd(null)}
+          onConfirm={handleConfirmCartAdd}
         />
       )}
     </div>

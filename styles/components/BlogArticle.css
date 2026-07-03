@@ -15,24 +15,38 @@
 }
 
 .product-blog-body__figure {
-  margin: 2rem 0;
   overflow: hidden;
   border-radius: 0.75rem;
   background: #f9fafb;
   border: 1px solid #f3f4f6;
-  padding: 1rem;
+  padding: 0.75rem;
+}
+
+.product-blog-body__figure--aside {
+  float: right;
+  width: min(44%, 320px);
+  margin: 0.25rem 0 1rem 1.5rem;
 }
 
 .product-blog-body__figure-inner {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-height: 480px;
   margin: 0 auto;
 }
 
 .product-blog-body__image {
   object-fit: contain;
+}
+
+.product-blog-body__layout::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.product-blog-body__content {
+  min-width: 0;
 }
 
 .product-blog-body {
@@ -113,5 +127,14 @@
 
   .product-blog-body__h3 {
     font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .product-blog-body__figure--aside {
+    float: none;
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto 1.5rem;
   }
 }

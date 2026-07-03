@@ -7,7 +7,6 @@ import { StructuredData } from '@/components/StructuredData';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { ProductBlogBody } from '@/components/ProductBlogMarkdown';
-import { BlogFeaturedImage } from '@/components/BlogFeaturedImage';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import {
   fetchArticleBySlugs,
@@ -163,12 +162,14 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
                 product.meta_description ||
                 `Everything you need to know about the ${productName} series.`}
             </p>
-
-            {featuredImage && <BlogFeaturedImage src={featuredImage} alt={headline} />}
           </header>
 
           <article className="product-blog-article">
-            <ProductBlogBody markdown={article.body || '*No content yet.*'} />
+            <ProductBlogBody
+              markdown={article.body || '*No content yet.*'}
+              imageUrl={featuredImage}
+              imageAlt={headline}
+            />
           </article>
 
           <div className="mt-16 pt-10 border-t border-gray-100">

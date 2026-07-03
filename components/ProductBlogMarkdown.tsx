@@ -6,6 +6,13 @@ import { CloudinaryImage } from '@/components/CloudinaryImage';
 
 interface ProductBlogBodyProps {
   markdown: string;
+  imageUrl?: string | null;
+  imageAlt?: string;
+}
+
+interface BlogImage {
+  src: string;
+  alt: string;
 }
 
 /**
@@ -77,18 +84,33 @@ function normalizeBlogMarkdown(input: string): string {
   return text.replace(/\n{3,}/g, '\n\n');
 }
 
-function BlogMarkdownImage({ src, alt }: { src?: string | Blob | null; alt?: string | null }) {
-  if (!src || typeof src !== 'string') return null;
+/** Keep only the first markdown image for the aside; strip the rest from body copy. */
+export function extractPrimaryBlogImage(input: string): {
+  image: BlogImage | null;
+  markdown: string;
+} {
+  const normalized = normalizeBlogMarkdown(input);
+  const match = /!\[([^\]]*)\]\(([^)]+)\)/.exec(normalized);
+  const image = match ? { alt: match[1] || '', src: match[2] } : null;
+  const markdown = normalized
+    .replace(/!\[[^\]]*\]\([^)]+\)\s*/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  return { image, markdown };
+}
+
+function BlogAsideImage({ src, alt }: BlogImage) {
   return (
-    <figure className="product-blog-body__figure">
+    <figure className="product-blog-body__figure product-blog-body__figure--aside">
       <div className="product-blog-body__figure-inner">
         <CloudinaryImage
           src={src}
-          alt={alt ?? ''}
+          alt={alt}
           preset="productGallery"
           fill
           fit="contain"
-          sizes="(max-width: 768px) 100vw, 768px"
+          sizes="(max-width: 767px) 280px, 320px"
           className="product-blog-body__image"
         />
       </div>
@@ -104,7 +126,7 @@ const markdownComponents: Components = {
   ol: ({ children }) => <ol className="product-blog-body__ol">{children}</ol>,
   li: ({ children }) => <li className="product-blog-body__li">{children}</li>,
   strong: ({ children }) => <strong className="product-blog-body__strong">{children}</strong>,
-  img: ({ src, alt }) => <BlogMarkdownImage src={src} alt={alt} />,
+  img: () => null,
   a: ({ href, children }) => (
     <a
       href={href}
@@ -117,12 +139,19 @@ const markdownComponents: Components = {
   ),
 };
 
-export function ProductBlogBody({ markdown }: ProductBlogBodyProps) {
+export function ProductBlogBody({ markdown, imageUrl, imageAlt = '' }: ProductBlogBodyProps) {
+  const { image: bodyImage, markdown: bodyMarkdown } = extractPrimaryBlogImage(markdown);
+  const asideImage =
+    bodyImage ?? (imageUrl ? { src: imageUrl, alt: imageAlt } : null);
+
   return (
     <div className="product-blog-body">
-      <ReactMarkdown components={markdownComponents}>
-        {normalizeBlogMarkdown(markdown)}
-      </ReactMarkdown>
+      <div className="product-blog-body__layout">
+        {asideImage && <BlogAsideImage src={asideImage.src} alt={asideImage.alt} />}
+        <div className="product-blog-body__content">
+          <ReactMarkdown components={markdownComponents}>{bodyMarkdown || '*No content yet.*'}</ReactMarkdown>
+        </div>
+      </div>
     </div>
   );
 }

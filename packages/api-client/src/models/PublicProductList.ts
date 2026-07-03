@@ -59,9 +59,6 @@ export type PublicProductList = {
     readonly bundle_price_preview?: number;
     readonly has_published_article?: boolean;
     readonly published_article_count?: number;
-    /**
-     * Last catalog edit timestamp (for sitemap lastmod).
-     */
-    readonly updated_at?: string;
+    readonly updated_at?: string | null;
 };
 

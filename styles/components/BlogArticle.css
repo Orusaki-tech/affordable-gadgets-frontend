@@ -14,18 +14,46 @@
   object-fit: contain;
 }
 
-.product-blog-body__figure {
-  overflow: hidden;
-  border-radius: 0.75rem;
-  background: #f9fafb;
-  border: 1px solid #f3f4f6;
-  padding: 0.75rem;
+.product-blog-body {
+  color: #374151;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
-.product-blog-body__figure--aside {
-  float: right;
-  width: min(44%, 320px);
-  margin: 0.25rem 0 1rem 1.5rem;
+.product-blog-body__hero {
+  display: grid;
+  gap: 1.75rem;
+  margin-bottom: 2.75rem;
+  align-items: start;
+}
+
+.product-blog-body__hero-media {
+  order: -1;
+}
+
+.product-blog-body__hero-copy .product-blog-body__p {
+  font-size: 1.125rem;
+  line-height: 1.85;
+  color: #1f2937;
+}
+
+.product-blog-body__hero-copy .product-blog-body__p:last-child {
+  margin-bottom: 0;
+}
+
+.product-blog-body__figure {
+  overflow: hidden;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, #fafafa 0%, #f3f4f6 100%);
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.06);
+}
+
+.product-blog-body__figure--hero {
+  margin: 0;
 }
 
 .product-blog-body__figure-inner {
@@ -39,34 +67,26 @@
   object-fit: contain;
 }
 
-.product-blog-body__layout::after {
-  content: '';
-  display: table;
-  clear: both;
-}
-
-.product-blog-body__content {
+.product-blog-body__sections {
   min-width: 0;
 }
 
-.product-blog-body {
-  color: #374151;
-  font-size: 1rem;
-  line-height: 1.75;
-  word-wrap: break-word;
-  overflow-wrap: anywhere;
-}
-
 .product-blog-body__h2 {
-  margin: 2rem 0 0.75rem;
-  font-size: 1.375rem;
-  font-weight: 600;
-  line-height: 1.3;
+  margin: 2.5rem 0 1rem;
+  padding-top: 0.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
   color: #111827;
 }
 
+.product-blog-body__h2:first-child {
+  margin-top: 0;
+}
+
 .product-blog-body__h3 {
-  margin: 1.5rem 0 0.5rem;
+  margin: 1.75rem 0 0.75rem;
   font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.35;
@@ -74,14 +94,14 @@
 }
 
 .product-blog-body__p {
-  margin: 0 0 1rem;
-  line-height: 1.75;
+  margin: 0 0 1.125rem;
+  line-height: 1.8;
 }
 
 .product-blog-body__ul,
 .product-blog-body__ol {
-  margin: 0 0 1rem;
-  padding-left: 1.25rem;
+  margin: 0 0 1.25rem;
+  padding-left: 1.35rem;
 }
 
 .product-blog-body__ul {
@@ -93,7 +113,7 @@
 }
 
 .product-blog-body__li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
   padding-left: 0.25rem;
 }
 
@@ -106,23 +126,90 @@
   color: #111827;
 }
 
+.product-blog-body__em {
+  font-style: italic;
+  color: #4b5563;
+}
+
+.product-blog-body__hr {
+  margin: 2.5rem 0;
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+}
+
 .product-blog-body__link {
   color: #2563eb;
   font-weight: 500;
   text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .product-blog-body__link:hover {
   color: #1e40af;
 }
 
+.product-blog-body__table-wrap {
+  margin: 1.25rem 0 1.75rem;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.875rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04);
+}
+
+.product-blog-body__table {
+  width: 100%;
+  min-width: 28rem;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.product-blog-body__th,
+.product-blog-body__td {
+  padding: 0.875rem 1rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.product-blog-body__th {
+  background: #f9fafb;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.product-blog-body__tbody .product-blog-body__tr:last-child .product-blog-body__td {
+  border-bottom: 0;
+}
+
+.product-blog-body__td strong,
+.product-blog-body__td .product-blog-body__strong {
+  color: #111827;
+  font-variant-numeric: tabular-nums;
+}
+
 .product-blog-article {
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
 }
 
 @media (min-width: 768px) {
+  .product-blog-body__hero {
+    grid-template-columns: minmax(0, 1fr) min(320px, 38%);
+    gap: 2.5rem;
+  }
+
+  .product-blog-body__hero-media {
+    order: 1;
+    position: sticky;
+    top: 5.5rem;
+  }
+
   .product-blog-body__h2 {
-    font-size: 1.5rem;
+    font-size: 1.625rem;
   }
 
   .product-blog-body__h3 {
@@ -131,10 +218,8 @@
 }
 
 @media (max-width: 767px) {
-  .product-blog-body__figure--aside {
-    float: none;
-    width: 100%;
-    max-width: 280px;
-    margin: 0 auto 1.5rem;
+  .product-blog-body__hero-media {
+    max-width: 18rem;
+    margin: 0 auto;
   }
 }

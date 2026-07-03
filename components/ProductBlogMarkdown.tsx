@@ -2,17 +2,25 @@
 
 import ReactMarkdown from 'react-markdown';
 import type { Components } from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 
 interface ProductBlogBodyProps {
   markdown: string;
   imageUrl?: string | null;
   imageAlt?: string;
+  headline?: string;
 }
 
 interface BlogImage {
   src: string;
   alt: string;
+}
+
+interface PreparedBlogContent {
+  image: BlogImage | null;
+  introMarkdown: string;
+  bodyMarkdown: string;
 }
 
 /**
@@ -64,24 +72,29 @@ function htmlToMarkdown(input: string): string {
 function normalizeBlogMarkdown(input: string): string {
   let text = htmlToMarkdown(input).replace(/\r\n/g, '\n').trim();
 
-  // Headings glued after punctuation on the same line
   text = text.replace(/([.!?])\s+(#{2,6} )/g, '$1\n\n$2');
-  // Headings glued mid-line without a break
   text = text.replace(/([^\n#])(#{2,6} )/g, '$1\n\n$2');
-  // Ensure blank line before ATX headings
   text = text.replace(/([^\n])\n(#{2,6} )/g, '$1\n\n$2');
-
-  // Lists glued after intro lines or punctuation
   text = text.replace(/([.:!?])\s*\n(- )/g, '$1\n\n$2');
   text = text.replace(/([.:!?])(- \*\*)/g, '$1\n\n$2');
-
-  // Batch 033+ articles often omit a blank line after bullet lists
   text = text.replace(/^((?:- .+\n)+)(?=[A-Z#])/gm, '$1\n');
-
-  // Last list item merged with following paragraph (e.g. "Phone\nPriced from…")
   text = text.replace(/^(- .+)\n([A-Z])/gm, '$1\n\n$2');
 
   return text.replace(/\n{3,}/g, '\n\n');
+}
+
+function stripLeadingH1(text: string, headline?: string): string {
+  const lines = text.split('\n');
+  if (!lines[0]?.startsWith('# ')) {
+    return text;
+  }
+
+  const h1Text = lines[0].slice(2).trim();
+  if (!headline || h1Text.toLowerCase() === headline.trim().toLowerCase()) {
+    return lines.slice(1).join('\n').trim();
+  }
+
+  return text;
 }
 
 /** Keep only the first markdown image for the aside; strip the rest from body copy. */
@@ -100,9 +113,32 @@ export function extractPrimaryBlogImage(input: string): {
   return { image, markdown };
 }
 
+export function prepareBlogContent(
+  input: string,
+  headline?: string,
+): PreparedBlogContent {
+  const { image, markdown } = extractPrimaryBlogImage(input);
+  const withoutDuplicateTitle = stripLeadingH1(markdown, headline);
+  const h2Index = withoutDuplicateTitle.search(/\n## /);
+
+  if (h2Index === -1) {
+    return {
+      image,
+      introMarkdown: withoutDuplicateTitle,
+      bodyMarkdown: '',
+    };
+  }
+
+  return {
+    image,
+    introMarkdown: withoutDuplicateTitle.slice(0, h2Index).trim(),
+    bodyMarkdown: withoutDuplicateTitle.slice(h2Index).trim(),
+  };
+}
+
 function BlogAsideImage({ src, alt }: BlogImage) {
   return (
-    <figure className="product-blog-body__figure product-blog-body__figure--aside">
+    <figure className="product-blog-body__figure product-blog-body__figure--hero">
       <div className="product-blog-body__figure-inner">
         <CloudinaryImage
           src={src}
@@ -110,7 +146,7 @@ function BlogAsideImage({ src, alt }: BlogImage) {
           preset="productGallery"
           fill
           fit="contain"
-          sizes="(max-width: 767px) 280px, 320px"
+          sizes="(max-width: 767px) 100vw, 300px"
           className="product-blog-body__image"
         />
       </div>
@@ -119,6 +155,7 @@ function BlogAsideImage({ src, alt }: BlogImage) {
 }
 
 const markdownComponents: Components = {
+  h1: ({ children }) => <h2 className="product-blog-body__h2">{children}</h2>,
   h2: ({ children }) => <h2 className="product-blog-body__h2">{children}</h2>,
   h3: ({ children }) => <h3 className="product-blog-body__h3">{children}</h3>,
   p: ({ children }) => <p className="product-blog-body__p">{children}</p>,
@@ -126,6 +163,8 @@ const markdownComponents: Components = {
   ol: ({ children }) => <ol className="product-blog-body__ol">{children}</ol>,
   li: ({ children }) => <li className="product-blog-body__li">{children}</li>,
   strong: ({ children }) => <strong className="product-blog-body__strong">{children}</strong>,
+  em: ({ children }) => <em className="product-blog-body__em">{children}</em>,
+  hr: () => <hr className="product-blog-body__hr" />,
   img: () => null,
   a: ({ href, children }) => (
     <a
@@ -137,21 +176,64 @@ const markdownComponents: Components = {
       {children}
     </a>
   ),
+  table: ({ children }) => (
+    <div className="product-blog-body__table-wrap">
+      <table className="product-blog-body__table">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => <thead className="product-blog-body__thead">{children}</thead>,
+  tbody: ({ children }) => <tbody className="product-blog-body__tbody">{children}</tbody>,
+  tr: ({ children }) => <tr className="product-blog-body__tr">{children}</tr>,
+  th: ({ children }) => <th className="product-blog-body__th">{children}</th>,
+  td: ({ children }) => <td className="product-blog-body__td">{children}</td>,
 };
 
-export function ProductBlogBody({ markdown, imageUrl, imageAlt = '' }: ProductBlogBodyProps) {
-  const { image: bodyImage, markdown: bodyMarkdown } = extractPrimaryBlogImage(markdown);
-  const asideImage =
-    bodyImage ?? (imageUrl ? { src: imageUrl, alt: imageAlt } : null);
+function BlogMarkdown({ children }: { children: string }) {
+  if (!children.trim()) {
+    return null;
+  }
+
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+      {children}
+    </ReactMarkdown>
+  );
+}
+
+export function ProductBlogBody({
+  markdown,
+  imageUrl,
+  imageAlt = '',
+  headline,
+}: ProductBlogBodyProps) {
+  const { image, introMarkdown, bodyMarkdown } = prepareBlogContent(markdown, headline);
+  const asideImage = image ?? (imageUrl ? { src: imageUrl, alt: imageAlt } : null);
+  const hasHero = Boolean(introMarkdown || asideImage);
 
   return (
     <div className="product-blog-body">
-      <div className="product-blog-body__layout">
-        {asideImage && <BlogAsideImage src={asideImage.src} alt={asideImage.alt} />}
-        <div className="product-blog-body__content">
-          <ReactMarkdown components={markdownComponents}>{bodyMarkdown || '*No content yet.*'}</ReactMarkdown>
-        </div>
-      </div>
+      {hasHero && (
+        <section className="product-blog-body__hero" aria-label="Article introduction">
+          {asideImage && (
+            <div className="product-blog-body__hero-media">
+              <BlogAsideImage src={asideImage.src} alt={asideImage.alt} />
+            </div>
+          )}
+          {introMarkdown && (
+            <div className="product-blog-body__hero-copy">
+              <BlogMarkdown>{introMarkdown}</BlogMarkdown>
+            </div>
+          )}
+        </section>
+      )}
+
+      {bodyMarkdown && (
+        <section className="product-blog-body__sections" aria-label="Article sections">
+          <BlogMarkdown>{bodyMarkdown}</BlogMarkdown>
+        </section>
+      )}
+
+      {!hasHero && !bodyMarkdown && <BlogMarkdown>*No content yet.*</BlogMarkdown>}
     </div>
   );
 }

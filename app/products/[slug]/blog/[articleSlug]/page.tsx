@@ -120,7 +120,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
         <HeaderWithAnnouncement />
       </Suspense>
       <main className="flex-1 min-w-0 py-6 lg:py-12">
-        <div className="container mx-auto px-4 max-w-3xl">
+        <div className="container mx-auto px-4 max-w-4xl">
           <nav className="text-sm text-gray-500 mb-6 flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
             <Link href="/" className="hover:text-blue-600 transition-colors">
               Home
@@ -169,6 +169,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
               markdown={article.body || '*No content yet.*'}
               imageUrl={featuredImage}
               imageAlt={headline}
+              headline={headline}
             />
           </article>
 

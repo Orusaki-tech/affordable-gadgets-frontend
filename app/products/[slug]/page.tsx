@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { ProductDetail } from '@/components/ProductDetail';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
@@ -92,11 +93,18 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     product = null;
   }
 
+  if (!product) {
+    return {
+      title: 'Product Not Found',
+      robots: { index: false, follow: false },
+    };
+  }
+
   // Use meta_title for SEO if available, otherwise use product_name
-  const title = product?.meta_title || (product?.product_name ? `${product.product_name}` : "Product Details");
+  const title = product.meta_title || `${product.product_name}`;
   const description = buildProductDescription(product);
   const imageUrl = resolveProductImage(product);
-  const canonicalSlug = resolveCanonicalProductSlug(slug, product?.slug);
+  const canonicalSlug = resolveCanonicalProductSlug(slug, product.slug);
   const canonical = productPath(canonicalSlug);
 
   return {
@@ -137,18 +145,22 @@ export default async function ProductPage({ params }: ProductPageProps) {
     product = null;
   }
 
-  permanentRedirectToCanonicalProductSlug(slug, product?.slug);
+  if (!product) {
+    notFound();
+  }
 
-  const canonicalSlug = resolveCanonicalProductSlug(slug, product?.slug);
+  permanentRedirectToCanonicalProductSlug(slug, product.slug);
+
+  const canonicalSlug = resolveCanonicalProductSlug(slug, product.slug);
   const canonicalProductUrl = buildProductUrl(canonicalSlug);
-  const productName = product?.product_name ?? 'Product';
+  const productName = product.product_name ?? 'Product';
   const description = buildProductDescription(product);
   const imageUrl = resolveProductImage(product);
-  let lowPrice = isFiniteNumber(product?.min_price) ? product!.min_price : null;
-  let highPrice = isFiniteNumber(product?.max_price) ? product!.max_price : null;
+  let lowPrice = isFiniteNumber(product.min_price) ? product.min_price : null;
+  let highPrice = isFiniteNumber(product.max_price) ? product.max_price : null;
 
   // If product min/max price isn't present, derive it from available units (for valid schema.org offers).
-  if (product?.id && (!isFiniteNumber(lowPrice) || !isFiniteNumber(highPrice))) {
+  if (product.id && (!isFiniteNumber(lowPrice) || !isFiniteNumber(highPrice))) {
     try {
       const derived = await fetchMinMaxPriceFromUnits(product.id);
       lowPrice = isFiniteNumber(lowPrice) ? lowPrice : derived.lowPrice;
@@ -160,7 +172,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const hasAnyPrice = isFiniteNumber(lowPrice) || isFiniteNumber(highPrice);
   const availability =
-    Number(product?.available_units_count ?? 0) > 0 ? 'InStock' : 'OutOfStock';
+    Number(product.available_units_count ?? 0) > 0 ? 'InStock' : 'OutOfStock';
   
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#ffffff' }}>

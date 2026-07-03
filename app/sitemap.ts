@@ -53,6 +53,16 @@ const addEntry = (
   entries.push(entry);
 };
 
+const parseLastModified = (value?: string | null, fallback?: Date) => {
+  if (value) {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed;
+    }
+  }
+  return fallback ?? new Date();
+};
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getBaseUrl();
   const entries: MetadataRoute.Sitemap = [];
@@ -89,7 +99,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
         addEntry(entries, seen, {
           url: `${baseUrl}/products/${slug}`,
-          lastModified: refreshedAt,
+          lastModified: parseLastModified(product.updated_at, refreshedAt),
           changeFrequency: "weekly",
           priority: 0.8,
         });
@@ -118,7 +128,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
         addEntry(entries, seen, {
           url: `${baseUrl}/products/${productSlug}/blog/${articleSlug}`,
-          lastModified: article.published_at ? new Date(article.published_at) : refreshedAt,
+          lastModified: parseLastModified(
+            article.updated_at ?? article.published_at,
+            refreshedAt,
+          ),
           changeFrequency: "monthly",
           priority: 0.74,
         });

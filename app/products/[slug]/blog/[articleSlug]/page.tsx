@@ -15,6 +15,7 @@ import {
   resolveProductImage,
 } from '@/lib/blog/articlePage';
 import { articlePath, productPath, productUrl as buildProductUrl, resolveCanonicalProductSlug } from '@/lib/seo/urls';
+import { permanentRedirectToCanonicalArticleSlug } from '@/lib/seo/articleSlugRedirect';
 import { permanentRedirectToCanonicalProductSlug } from '@/lib/seo/productSlugRedirect';
 
 export const revalidate = 3600;
@@ -45,7 +46,8 @@ export async function generateMetadata({ params }: ProductBlogArticlePageProps):
     `Read our buying guide for ${product?.product_name ?? 'this product'}.`;
   const imageUrl = resolveProductImage(product);
   const canonicalSlug = resolveCanonicalProductSlug(slug, product?.slug);
-  const canonical = articlePath(canonicalSlug, articleSlug);
+  const canonicalArticleSlug = article.slug?.trim() || articleSlug;
+  const canonical = articlePath(canonicalSlug, canonicalArticleSlug);
 
   return {
     title,
@@ -79,11 +81,17 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
   }
 
   permanentRedirectToCanonicalProductSlug(slug, product.slug, `/blog/${articleSlug}`);
+  permanentRedirectToCanonicalArticleSlug(
+    resolveCanonicalProductSlug(slug, product.slug),
+    articleSlug,
+    article.slug,
+  );
 
   const canonicalSlug = resolveCanonicalProductSlug(slug, product.slug);
+  const canonicalArticleSlug = article.slug?.trim() || articleSlug;
   const site = brandConfig.siteUrl.replace(/\/+$/, '');
   const canonicalProductUrl = buildProductUrl(canonicalSlug);
-  const articleUrl = `${site}${articlePath(canonicalSlug, articleSlug)}`;
+  const articleUrl = `${site}${articlePath(canonicalSlug, canonicalArticleSlug)}`;
   const productName = product.product_name ?? 'Product';
   const headline = article.headline?.trim() || article.seo_title?.trim() || `${productName} buying guide`;
   const featuredImage = resolveImageUrl(article.thumbnail_image as string | undefined) || resolveProductImage(product);

@@ -10,7 +10,10 @@ interface ProductBlogRedirectPageProps {
 export default async function ProductBlogRedirectPage({ params }: ProductBlogRedirectPageProps) {
   const { slug } = await params;
   const product = await fetchProductBySlug(slug);
-  permanentRedirectToCanonicalProductSlug(slug, product?.slug, '/blog');
+  if (!product) {
+    notFound();
+  }
+  permanentRedirectToCanonicalProductSlug(slug, product.slug, '/blog');
   const canonicalSlug = resolveCanonicalProductSlug(slug, product?.slug);
   const article = await fetchPrimaryArticle(canonicalSlug);
   if (!article?.slug) {

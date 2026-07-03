@@ -17,6 +17,7 @@ export type PublicArticleCard = {
      */
     readonly thumbnail_image?: string | null;
     readonly published_at?: string | null;
+    readonly updated_at?: string | null;
     readonly product_slug?: string;
     readonly product_name?: string;
     /**

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { PublicProduct, InventoryUnitImage } from '@/lib/api/generated';
@@ -103,6 +104,7 @@ export function ProductCard({
   const financingAvailable = Boolean((product as any)?.financing_available);
 
   const queryClient = useQueryClient();
+  const router = useRouter();
   const shouldLoadUnits = allowSwatches || allowQuickActions || allowQuickView || isFeaturedVariant;
   const { data: units = [], isLoading: unitsLoading } = useProductUnits(product.id ?? 0, {
     enabled: shouldLoadUnits,
@@ -403,6 +405,11 @@ export function ProductCard({
     </svg>
   );
 
+  const navigateToProductDetail = () => {
+    setProductDetailPlaceholder(product);
+    router.push(getProductHref(product));
+  };
+
   const handlePriceCtaClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -410,7 +417,7 @@ export function ProductCard({
       setPendingCartQty(1);
       return;
     }
-    setProductDetailPlaceholder(product);
+    navigateToProductDetail();
   };
 
   if (isFeaturedVariant) {

@@ -5,6 +5,7 @@ import { usePromotion } from '@/lib/hooks/usePromotions';
 import {
   getFeaturedOverridePrice,
   getPromotionPriceForUnit,
+  resolvePromotionDisplayPrice,
 } from '@/lib/utils/promotionPricing';
 import { useBundles } from '@/lib/hooks/useBundles';
 import { useCart } from '@/lib/hooks/useCart';
@@ -109,6 +110,34 @@ function buildWhatsAppProductOnlyMessage(product: PublicProduct): string {
   ];
   if (product.brand?.trim()) lines.push(`Brand: ${product.brand.trim()}`);
   if (product.model_series?.trim()) lines.push(`Model: ${product.model_series.trim()}`);
+  return lines.join('\n');
+}
+
+function buildWhatsAppVariantInquiryMessage(
+  product: PublicProduct,
+  variant: { storage_gb?: number | null; ram_gb?: number | null; selling_price?: string | number | null },
+  effectivePrice?: number | null,
+): string {
+  const lines: string[] = [
+    `Hi, I'm interested in: ${product.product_name?.trim() || 'a product'}`,
+  ];
+  if (product.brand?.trim()) lines.push(`Brand: ${product.brand.trim()}`);
+  if (product.model_series?.trim()) lines.push(`Model: ${product.model_series.trim()}`);
+
+  const variantBits: string[] = [];
+  if (typeof variant.storage_gb === 'number') variantBits.push(`${variant.storage_gb}GB storage`);
+  if (typeof variant.ram_gb === 'number') variantBits.push(`${variant.ram_gb}GB RAM`);
+  if (variantBits.length) lines.push(`Variant: ${variantBits.join(' · ')}`);
+
+  const fallbackPrice = variant.selling_price != null ? Number(variant.selling_price) : null;
+  const price =
+    effectivePrice != null && !Number.isNaN(Number(effectivePrice))
+      ? Number(effectivePrice)
+      : fallbackPrice;
+  if (price != null && !Number.isNaN(price)) {
+    lines.push(`Listed price: ${formatPrice(price)}`);
+  }
+
   return lines.join('\n');
 }
 
@@ -321,6 +350,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [canScrollUnitsRight, setCanScrollUnitsRight] = useState(false);
   const [variantShake, setVariantShake] = useState(false);
   const [showVariantHint, setShowVariantHint] = useState(true);
+  const [usePromotionPrice, setUsePromotionPrice] = useState(true);
   const variantRef = useRef<HTMLDivElement | null>(null);
   const hasMadeSelection = useRef(false);
 
@@ -643,10 +673,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       return;
     }
 
-    const promoId = isEligibleForPromotion && promotion ? promotion.id : undefined;
-    const promoPrice = isEligibleForPromotion && promotionUnitPrice !== null
-      ? promotionUnitPrice
-      : selectedUnitData?.selling_price;
+    const promoId =
+      isEligibleForPromotion && promotion && usePromotionPrice && activePromoPrice !== null
+        ? promotion.id
+        : undefined;
+    const promoPrice =
+      promoId && checkoutPrice !== null && checkoutPrice !== undefined
+        ? checkoutPrice
+        : selectedUnitData?.selling_price;
     const normalizedPromoPrice =
       promoPrice !== undefined && promoPrice !== null ? Number(promoPrice) : undefined;
 
@@ -894,10 +928,54 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     return calculatePromotionPrice(product.max_price);
   }, [isEligibleForPromotion, featuredOverridePrice, product?.max_price, calculatePromotionPrice]);
 
-  const promotionUnitPrice = useMemo(() => {
-    if (!isEligibleForPromotion || !selectedUnitData) return null;
-    return calculatePromotionPrice(Number(selectedUnitData.selling_price));
-  }, [isEligibleForPromotion, selectedUnitData, calculatePromotionPrice]);
+  const activeOriginalPrice = useMemo(() => {
+    if (selectedUnitData?.selling_price != null) {
+      return Number(selectedUnitData.selling_price);
+    }
+    if (variantPrice !== null && Number.isFinite(variantPrice)) {
+      return variantPrice;
+    }
+    return null;
+  }, [selectedUnitData, variantPrice]);
+
+  const activePromoPrice = useMemo(() => {
+    if (!isEligibleForPromotion || activeOriginalPrice === null) return null;
+    if (featuredOverridePrice !== null) return featuredOverridePrice;
+    return getPromotionPriceForUnit(promotion, product, activeOriginalPrice);
+  }, [
+    isEligibleForPromotion,
+    activeOriginalPrice,
+    featuredOverridePrice,
+    promotion,
+    product,
+  ]);
+
+  const canChoosePromotionPrice = Boolean(
+    isEligibleForPromotion &&
+      activeOriginalPrice !== null &&
+      activePromoPrice !== null &&
+      activePromoPrice < activeOriginalPrice,
+  );
+
+  const activePriceDisplay = useMemo(() => {
+    if (activeOriginalPrice === null) return null;
+    return resolvePromotionDisplayPrice(promotion, product, activeOriginalPrice, {
+      applyPromotion: usePromotionPrice && isEligibleForPromotion,
+    });
+  }, [promotion, product, activeOriginalPrice, usePromotionPrice, isEligibleForPromotion]);
+
+  const checkoutPrice = useMemo(() => {
+    if (canChoosePromotionPrice && usePromotionPrice && activePromoPrice !== null) {
+      return activePromoPrice;
+    }
+    return activeOriginalPrice;
+  }, [canChoosePromotionPrice, usePromotionPrice, activePromoPrice, activeOriginalPrice]);
+
+  useEffect(() => {
+    if (promotionId && isEligibleForPromotion) {
+      setUsePromotionPrice(true);
+    }
+  }, [promotionId, isEligibleForPromotion]);
 
   const whatsAppPrefilledMessage = useMemo(() => {
     if (!product) return '';
@@ -906,8 +984,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     const showWhatsAppForVariant = hasUnitOptions && Boolean(selectedUnitData);
     if (showWhatsAppForVariant && selectedUnitData) {
       const effectivePrice =
-        isEligibleForPromotion && promotionUnitPrice !== null
-          ? promotionUnitPrice
+        canChoosePromotionPrice && usePromotionPrice && checkoutPrice !== null
+          ? checkoutPrice
           : null;
       return buildWhatsAppUnitInquiryMessage(
         product,
@@ -915,8 +993,23 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         effectivePrice ?? undefined
       );
     }
+    if (selectedVariant) {
+      const effectivePrice =
+        canChoosePromotionPrice && usePromotionPrice && checkoutPrice !== null
+          ? checkoutPrice
+          : null;
+      return buildWhatsAppVariantInquiryMessage(product, selectedVariant, effectivePrice ?? undefined);
+    }
     return buildWhatsAppProductOnlyMessage(product);
-  }, [product, units, selectedUnitData, isEligibleForPromotion, promotionUnitPrice]);
+  }, [
+    product,
+    units,
+    selectedUnitData,
+    selectedVariant,
+    canChoosePromotionPrice,
+    usePromotionPrice,
+    checkoutPrice,
+  ]);
 
   const promoBannerDetails = useMemo(() => {
     if (!promotion) return 'Check out our best offers';
@@ -1160,32 +1253,29 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           <div className="product-detail__price-cta-row">
             {/* Price - Single Price Display */}
             <div className="product-detail__info-price-block">
-              {variantPrice !== null ? (
+              {activePriceDisplay ? (
                 <div className="product-detail__price">
-                  <p className="product-detail__price-current">
-                    {formatPrice(variantPrice)}
-                  </p>
-                </div>
-              ) : selectedUnitData ? (
-                <div className="product-detail__price">
-                  {isEligibleForPromotion && promotionUnitPrice !== null ? (
+                  {activePriceDisplay.hasPromotion ? (
                     <div>
                       <p className="product-detail__price-current product-detail__price-current--promo">
-                        {formatPrice(promotionUnitPrice)}
+                        {formatPrice(activePriceDisplay.currentPrice)}
                       </p>
                       <p className="product-detail__price-old">
-                        {formatPrice(Number(selectedUnitData.selling_price))}
+                        {formatPrice(activePriceDisplay.originalPrice!)}
                       </p>
                     </div>
                   ) : (
                     <p className="product-detail__price-current">
-                      {formatPrice(Number(selectedUnitData.selling_price))}
+                      {formatPrice(activePriceDisplay.currentPrice)}
                     </p>
                   )}
                 </div>
               ) : product.min_price !== null && product.max_price !== null ? (
                 <div className="product-detail__price">
-                  {isEligibleForPromotion && promotionMinPrice !== null && promotionMaxPrice !== null ? (
+                  {isEligibleForPromotion &&
+                  usePromotionPrice &&
+                  promotionMinPrice !== null &&
+                  promotionMaxPrice !== null ? (
                     <div>
                       <p className="product-detail__price-current product-detail__price-current--promo">
                         {promotionMinPrice === promotionMaxPrice
@@ -1207,6 +1297,86 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   )}
                 </div>
               ) : null}
+              {canChoosePromotionPrice && activePromoPrice !== null && activeOriginalPrice !== null && (
+                <div
+                  className="product-detail__price-options"
+                  role="radiogroup"
+                  aria-label="Choose price"
+                >
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={usePromotionPrice}
+                    className={`product-detail__price-option${
+                      usePromotionPrice ? ' product-detail__price-option--active' : ''
+                    }`}
+                    onClick={() => setUsePromotionPrice(true)}
+                  >
+                    <span className="product-detail__price-option-label">Promo price</span>
+                    <span className="product-detail__price-option-value">
+                      {formatPrice(activePromoPrice)}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={!usePromotionPrice}
+                    className={`product-detail__price-option${
+                      !usePromotionPrice ? ' product-detail__price-option--active' : ''
+                    }`}
+                    onClick={() => setUsePromotionPrice(false)}
+                  >
+                    <span className="product-detail__price-option-label">Regular price</span>
+                    <span className="product-detail__price-option-value">
+                      {formatPrice(activeOriginalPrice)}
+                    </span>
+                  </button>
+                </div>
+              )}
+              {isEligibleForPromotion &&
+                activeOriginalPrice === null &&
+                product.min_price !== null &&
+                promotionMinPrice !== null &&
+                promotionMinPrice < Number(product.min_price) && (
+                <div
+                  className="product-detail__price-options"
+                  role="radiogroup"
+                  aria-label="Choose price"
+                >
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={usePromotionPrice}
+                    className={`product-detail__price-option${
+                      usePromotionPrice ? ' product-detail__price-option--active' : ''
+                    }`}
+                    onClick={() => setUsePromotionPrice(true)}
+                  >
+                    <span className="product-detail__price-option-label">Promo price</span>
+                    <span className="product-detail__price-option-value">
+                      {promotionMinPrice === promotionMaxPrice
+                        ? formatPrice(promotionMinPrice)
+                        : `${formatPrice(promotionMinPrice!)} - ${formatPrice(promotionMaxPrice!)}`}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={!usePromotionPrice}
+                    className={`product-detail__price-option${
+                      !usePromotionPrice ? ' product-detail__price-option--active' : ''
+                    }`}
+                    onClick={() => setUsePromotionPrice(false)}
+                  >
+                    <span className="product-detail__price-option-label">Regular price</span>
+                    <span className="product-detail__price-option-value">
+                      {product.min_price === product.max_price
+                        ? formatPrice(product.min_price)
+                        : `${formatPrice(product.min_price)} - ${formatPrice(product.max_price)}`}
+                    </span>
+                  </button>
+                </div>
+              )}
             </div>
             {(() => {
               const hasStock = Number(product.available_units_count ?? 0) > 0;
@@ -1269,7 +1439,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       className="product-detail__cta-button product-detail__cta-button--whatsapp"
                       onClick={openWhatsApp}
                     >
-                      Order Now — {formatPrice(variantPrice)}
+                      Order Now — {formatPrice(checkoutPrice ?? variantPrice ?? 0)}
                     </button>
                     {whatsAppButton}
                   </div>
@@ -1879,11 +2049,24 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     <div className="product-detail__variant-card">
                       <p className="product-detail__variant-label">Price</p>
                       <p className="product-detail__variant-value">
-                        {selectedUnitData
-                          ? formatPrice(Number(selectedUnitData.selling_price))
-                          : selectedVariant
-                            ? formatPrice(variantPrice!)
-                            : ''}
+                        {activePriceDisplay?.hasPromotion ? (
+                          <>
+                            <span className="product-detail__variant-value-promo">
+                              {formatPrice(activePriceDisplay.currentPrice)}
+                            </span>
+                            <span className="product-detail__variant-value-old">
+                              {formatPrice(activePriceDisplay.originalPrice!)}
+                            </span>
+                          </>
+                        ) : activePriceDisplay ? (
+                          formatPrice(activePriceDisplay.currentPrice)
+                        ) : selectedUnitData ? (
+                          formatPrice(Number(selectedUnitData.selling_price))
+                        ) : selectedVariant ? (
+                          formatPrice(variantPrice!)
+                        ) : (
+                          ''
+                        )}
                       </p>
                     </div>
                   </div>

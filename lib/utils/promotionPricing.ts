@@ -52,3 +52,32 @@ export function getPromotionPriceForUnit(
 
   return null;
 }
+
+export type PromotionDisplayPrice = {
+  currentPrice: number;
+  originalPrice: number | null;
+  hasPromotion: boolean;
+};
+
+export function resolvePromotionDisplayPrice(
+  promotion: PublicPromotion | null | undefined,
+  product: PromotionPricingProduct | null | undefined,
+  originalPrice: number | null | undefined,
+  options?: { applyPromotion?: boolean },
+): PromotionDisplayPrice | null {
+  if (originalPrice === null || originalPrice === undefined || !Number.isFinite(originalPrice)) {
+    return null;
+  }
+
+  const applyPromotion = options?.applyPromotion !== false;
+  if (!applyPromotion) {
+    return { currentPrice: originalPrice, originalPrice: null, hasPromotion: false };
+  }
+
+  const promoPrice = getPromotionPriceForUnit(promotion, product, originalPrice);
+  if (promoPrice !== null && promoPrice < originalPrice) {
+    return { currentPrice: promoPrice, originalPrice, hasPromotion: true };
+  }
+
+  return { currentPrice: originalPrice, originalPrice: null, hasPromotion: false };
+}

@@ -6,6 +6,7 @@ import { useProducts } from '@/lib/hooks/useProducts';
 import { PublicPromotion, PublicProduct } from '@/lib/api/generated';
 import { useRouter } from 'next/navigation';
 import { getProductHref } from '@/lib/utils/productRoutes';
+import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { ProductCarousel } from './ProductCarousel';
 
@@ -317,15 +318,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
   }, [bannerItem, gridItems]);
 
   const handlePromotionClick = (promotion: PublicPromotion) => {
-    const firstProductId = promotion.products && promotion.products.length > 0 
-      ? promotion.products[0] 
-      : null;
-
-    if (firstProductId) {
-      router.push(`/products/${firstProductId}?promotion=${promotion.id}`);
-    } else {
-      router.push(`/products?promotion=${promotion.id}`);
-    }
+    router.push(getPromotionHref(promotion));
   };
 
   const handleVideoClick = (product: PublicProduct) => {

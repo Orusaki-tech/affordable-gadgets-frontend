@@ -2,6 +2,10 @@
 
 import { useProduct, useProductBySlug, useProductUnits } from '@/lib/hooks/useProducts';
 import { usePromotion } from '@/lib/hooks/usePromotions';
+import {
+  getFeaturedOverridePrice,
+  getPromotionPriceForUnit,
+} from '@/lib/utils/promotionPricing';
 import { useBundles } from '@/lib/hooks/useBundles';
 import { useCart } from '@/lib/hooks/useCart';
 import { useProductAccessories } from '@/lib/hooks/useAccessories';
@@ -225,7 +229,7 @@ function UnitCard({ unit, isSelected, onSelect, promotionPrice, onColorSelect }:
         </div>
       </div>
       <div className="product-detail__unit-row">
-        {promotionPrice ? (
+        {promotionPrice !== null ? (
           <div>
             <p className="product-detail__unit-price product-detail__unit-price--promo">{formatPrice(promotionPrice)}</p>
             <p className="product-detail__unit-price-old">{formatPrice(Number(unit.selling_price))}</p>
@@ -774,21 +778,47 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     setMainImageLoadFailed(false);
   }, [mainDisplayImage]);
 
+  // Check if product is eligible for promotion
+  const isEligibleForPromotion = useMemo(() => {
+    if (!promotion || !product) return false;
+    
+    // Check if promotion is currently active
+    const now = new Date();
+    const startDate = new Date(promotion.start_date);
+    const endDate = new Date(promotion.end_date);
+    
+    if (!promotion.is_currently_active || now < startDate || now > endDate) {
+      return false;
+    }
+    
+    // Check if product is in promotion's products list
+    if (promotion.products && promotion.products.length > 0) {
+      if (product.id === undefined) {
+        return false;
+      }
+      return promotion.products.includes(product.id);
+    }
+    
+    // Check if product type matches
+    if (promotion.product_types && product.product_type === promotion.product_types) {
+      return true;
+    }
+    
+    return false;
+  }, [promotion, product]);
+
   // Calculate promotion prices
   const calculatePromotionPrice = useMemo(() => {
-    return (originalPrice: number): number => {
-      if (!promotion) return originalPrice;
-      
-      if (promotion.discount_percentage) {
-        const discount = (originalPrice * Number(promotion.discount_percentage)) / 100;
-        return originalPrice - discount;
-      } else if (promotion.discount_amount) {
-        return Math.max(0, originalPrice - Number(promotion.discount_amount));
-      }
-      
-      return originalPrice;
+    return (originalPrice: number): number | null => {
+      if (!isEligibleForPromotion) return null;
+      return getPromotionPriceForUnit(promotion, product, originalPrice);
     };
-  }, [promotion]);
+  }, [promotion, product, isEligibleForPromotion]);
+
+  const featuredOverridePrice = useMemo(
+    () => (isEligibleForPromotion ? getFeaturedOverridePrice(promotion, product) : null),
+    [isEligibleForPromotion, promotion, product],
+  );
 
   const getBundleDisplayPrice = (
     bundle: Pick<
@@ -828,35 +858,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`;
   };
 
-  // Check if product is eligible for promotion
-  const isEligibleForPromotion = useMemo(() => {
-    if (!promotion || !product) return false;
-    
-    // Check if promotion is currently active
-    const now = new Date();
-    const startDate = new Date(promotion.start_date);
-    const endDate = new Date(promotion.end_date);
-    
-    if (!promotion.is_currently_active || now < startDate || now > endDate) {
-      return false;
-    }
-    
-    // Check if product is in promotion's products list
-    if (promotion.products && promotion.products.length > 0) {
-      if (product.id === undefined) {
-        return false;
-      }
-      return promotion.products.includes(product.id);
-    }
-    
-    // Check if product type matches
-    if (promotion.product_types && product.product_type === promotion.product_types) {
-      return true;
-    }
-    
-    return false;
-  }, [promotion, product]);
-
   const promoDrawerProducts = useMemo<PromotionVideoProduct[]>(() => {
     // Only show videos associated with THIS product (attached to the offer).
     // If this product has no video, render no promo videos.
@@ -880,14 +881,18 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   // Calculate min/max prices with promotion
   const promotionMinPrice = useMemo(() => {
-    if (!isEligibleForPromotion || !product?.min_price) return null;
+    if (!isEligibleForPromotion) return null;
+    if (featuredOverridePrice !== null) return featuredOverridePrice;
+    if (!product?.min_price) return null;
     return calculatePromotionPrice(product.min_price);
-  }, [isEligibleForPromotion, product?.min_price, calculatePromotionPrice]);
+  }, [isEligibleForPromotion, featuredOverridePrice, product?.min_price, calculatePromotionPrice]);
 
   const promotionMaxPrice = useMemo(() => {
-    if (!isEligibleForPromotion || !product?.max_price) return null;
+    if (!isEligibleForPromotion) return null;
+    if (featuredOverridePrice !== null) return featuredOverridePrice;
+    if (!product?.max_price) return null;
     return calculatePromotionPrice(product.max_price);
-  }, [isEligibleForPromotion, product?.max_price, calculatePromotionPrice]);
+  }, [isEligibleForPromotion, featuredOverridePrice, product?.max_price, calculatePromotionPrice]);
 
   const promotionUnitPrice = useMemo(() => {
     if (!isEligibleForPromotion || !selectedUnitData) return null;

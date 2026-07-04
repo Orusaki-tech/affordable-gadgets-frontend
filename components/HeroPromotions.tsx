@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { brandConfig } from '@/lib/config/brand';
-import { getProductHref } from '@/lib/utils/productRoutes';
+import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 
 const PROMOTIONS_PAGE_SIZE = 12;
@@ -56,19 +56,6 @@ async function fetchPromotions(): Promise<PublicPromotion[]> {
   } catch {
     return [];
   }
-}
-
-function getPromotionHref(promotion: PublicPromotion): string {
-  const promotionId = typeof promotion.id === 'number' ? promotion.id : null;
-  const firstProductId = Array.isArray(promotion.products) ? promotion.products[0] : null;
-
-  if (firstProductId) {
-    return getProductHref(undefined, { fallbackId: firstProductId, promotionId });
-  }
-  if (promotionId) {
-    return `/products?promotion=${promotionId}`;
-  }
-  return '/products';
 }
 
 export async function HeroPromotions() {

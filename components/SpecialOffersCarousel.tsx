@@ -3,7 +3,7 @@
 import { PublicPromotion } from '@/lib/api/generated';
 import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
-import { getProductHref } from '@/lib/utils/productRoutes';
+import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 import { ProductCarousel } from './ProductCarousel';
 
 interface SpecialOffersCarouselProps {
@@ -44,16 +44,8 @@ export function SpecialOffersCarousel({
         autoPlay
       >
         {promotions.map((promotion, index) => {
-          const firstProductId = promotion.products && promotion.products.length > 0
-            ? promotion.products[0]
-            : null;
           const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
-          const promotionId = typeof promotion.id === 'number' ? promotion.id : null;
-          const href = firstProductId
-            ? getProductHref(undefined, { fallbackId: firstProductId, promotionId })
-            : promotionId
-              ? `/products?promotion=${promotionId}`
-              : '/products';
+          const href = getPromotionHref(promotion);
 
           return (
             <Link

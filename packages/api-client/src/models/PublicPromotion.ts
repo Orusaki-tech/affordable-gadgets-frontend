@@ -44,6 +44,14 @@ export type PublicPromotion = {
      */
     carousel_position?: number | null;
     readonly products?: Array<number>;
+    /**
+     * Product showcased in storefront promo cards.
+     */
+    featured_product?: number | null;
+    /**
+     * Explicit sale price for the featured product.
+     */
+    featured_sale_price?: string | null;
     readonly promo_card?: PublicPromotionCard | null;
 };
 

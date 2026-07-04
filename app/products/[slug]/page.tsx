@@ -17,6 +17,7 @@ interface ProductPageProps {
   params: Promise<{
     slug: string;
   }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 const resolveProductImage = (product?: PublicProduct | null) => {
@@ -60,6 +61,37 @@ const fetchProductBySlug = async (slug: string) => {
   return response.results?.[0] ?? null;
 };
 
+const fetchProductForRoute = async (slugOrId: string) => {
+  if (!slugOrId) {
+    return null;
+  }
+  if (/^\d+$/.test(slugOrId)) {
+    try {
+      return await ApiService.apiV1PublicProductsRetrieve(Number(slugOrId));
+    } catch {
+      return null;
+    }
+  }
+  return fetchProductBySlug(slugOrId);
+};
+
+const buildQuerySuffix = (searchParams: Record<string, string | string[] | undefined>) => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (typeof value === 'string') {
+      params.set(key, value);
+    } else if (Array.isArray(value)) {
+      value.forEach((entry) => {
+        if (entry) {
+          params.append(key, entry);
+        }
+      });
+    }
+  }
+  const query = params.toString();
+  return query ? `?${query}` : '';
+};
+
 const isFiniteNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value);
 
@@ -88,7 +120,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   let product: PublicProduct | null = null;
 
   try {
-    product = await fetchProductBySlug(slug);
+    product = await fetchProductForRoute(slug);
   } catch {
     product = null;
   }
@@ -135,12 +167,13 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   };
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({ params, searchParams }: ProductPageProps) {
   const { slug } = await params;
+  const resolvedSearchParams = await searchParams;
   let product: PublicProduct | null = null;
 
   try {
-    product = await fetchProductBySlug(slug);
+    product = await fetchProductForRoute(slug);
   } catch {
     product = null;
   }
@@ -149,7 +182,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  permanentRedirectToCanonicalProductSlug(slug, product.slug);
+  const querySuffix = buildQuerySuffix(resolvedSearchParams);
+  permanentRedirectToCanonicalProductSlug(slug, product.slug, querySuffix);
 
   const canonicalSlug = resolveCanonicalProductSlug(slug, product.slug);
   const canonicalProductUrl = buildProductUrl(canonicalSlug);

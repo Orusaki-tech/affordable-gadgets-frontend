@@ -8,7 +8,7 @@ import { usePromotions } from '@/lib/hooks/usePromotions';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { ProductCard } from '@/components/ProductCard';
 import { brandConfig } from '@/lib/config/brand';
-import { getProductHref } from '@/lib/utils/productRoutes';
+import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 
 type PromotionPromoCard = {
   product_id: number;
@@ -55,20 +55,6 @@ function sortPromotions(promotions: HomeHeroPromotion[]) {
 
     return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
   });
-}
-
-function getPromotionHref(promotion: HomeHeroPromotion): string {
-  const promotionId = typeof promotion.id === 'number' ? promotion.id : null;
-  const promoCardProductId = promotion.promo_card?.product_id ?? null;
-  const firstProductId = promoCardProductId ?? (Array.isArray(promotion.products) ? promotion.products[0] : null);
-
-  if (firstProductId) {
-    return getProductHref(undefined, { fallbackId: firstProductId, promotionId });
-  }
-  if (promotionId) {
-    return `/products?promotion=${promotionId}`;
-  }
-  return '/products';
 }
 
 function getHeroPromotions(promotionsData?: PaginatedPublicPromotionList): HomeHeroPromotion[] {

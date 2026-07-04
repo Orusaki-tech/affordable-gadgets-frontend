@@ -1385,7 +1385,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               const showWhatsAppForVariant = hasUnitOptions && Boolean(selectedUnitData);
               const showWhatsAppForVariantsOnly = !hasUnitOptions && hasVariantOptions && Boolean(selectedVariant);
               const showWhatsAppFallback = !hasUnitOptions && !hasStock && !hasVariantOptions;
-              const showWhatsApp = showWhatsAppForVariant || showWhatsAppForVariantsOnly || showWhatsAppFallback;
+              // Made-to-order / no stock: always show WhatsApp even before a variant is picked
+              const showWhatsApp =
+                !hasStock ||
+                showWhatsAppForVariant ||
+                showWhatsAppForVariantsOnly ||
+                showWhatsAppFallback;
 
               const openWhatsApp = () => {
                 setIsWhatsAppModalOpen(true);

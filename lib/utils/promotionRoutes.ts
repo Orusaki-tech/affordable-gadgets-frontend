@@ -1,10 +1,12 @@
 import type { PublicPromotion } from '@/lib/api/generated';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
-type PromotionLinkSource = Pick<
-  PublicPromotion,
-  'id' | 'products' | 'promo_card' | 'featured_product'
->;
+type PromotionLinkSource = {
+  id?: number;
+  products?: Array<number>;
+  promo_card?: PublicPromotion['promo_card'];
+  featured_product?: number | null;
+};
 
 export function getPromotionHref(promotion: PromotionLinkSource): string {
   const promotionId = typeof promotion.id === 'number' ? promotion.id : null;

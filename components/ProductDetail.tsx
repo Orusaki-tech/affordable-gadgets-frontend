@@ -1551,13 +1551,18 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   <label className="product-detail__variant-label">RAM</label>
                   <div className="product-detail__variant-options">
                     {uniqueRAM.map((ram) => {
-                      const availableForRam =
-                        units?.filter((u: PublicInventoryUnitPublic) => {
-                          if (selectedStorage !== null && u.storage_gb !== selectedStorage) return false;
-                          if (selectedColor !== null && u.color_name !== selectedColor) return false;
-                          return u.ram_gb === ram;
-                        }) || [];
-                      const hasAvailableUnits = availableForRam.length > 0;
+                      const hasUnits = (units?.length ?? 0) > 0;
+                      const hasAvailableVariant = hasUnits
+                        ? (units || []).some((u: PublicInventoryUnitPublic) => {
+                            if (selectedStorage !== null && u.storage_gb !== selectedStorage) return false;
+                            if (selectedColor !== null && u.color_name !== selectedColor) return false;
+                            return u.ram_gb === ram;
+                          })
+                        : variantsList.some((v: any) => {
+                            const storageMatch = selectedStorage === null || v.storage_gb === selectedStorage;
+                            const ramMatch = v.ram_gb === ram;
+                            return storageMatch && ramMatch;
+                          });
                       return (
                         <button
                           key={ram}
@@ -1566,10 +1571,10 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                             setSelectedUnit(null);
                             onVariantSelect();
                           }}
-                          disabled={!hasAvailableUnits}
+                          disabled={!hasAvailableVariant}
                           className={`product-detail__variant-option ${
                             selectedRAM === ram ? 'product-detail__variant-option--active' : ''
-                          } ${!hasAvailableUnits ? 'product-detail__variant-option--disabled' : ''}`}
+                          } ${!hasAvailableVariant ? 'product-detail__variant-option--disabled' : ''}`}
                         >
                           {ram}GB
                         </button>
@@ -1585,13 +1590,16 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   <label className="product-detail__variant-label">Color</label>
                   <div className="product-detail__variant-options">
                     {uniqueColors.map((color) => {
-                      // Check if this color has units available with current Storage/RAM filters
-                      const availableForColor = units?.filter((u: PublicInventoryUnitPublic) => {
-                        if (selectedStorage !== null && u.storage_gb !== selectedStorage) return false;
-                        if (selectedRAM !== null && u.ram_gb !== selectedRAM) return false;
-                        return u.color_name === color;
-                      }) || [];
-                      const hasAvailableUnits = availableForColor.length > 0;
+                      const hasUnits = (units?.length ?? 0) > 0;
+                      const hasAvailableVariant = hasUnits
+                        ? (units || []).some((u: PublicInventoryUnitPublic) => {
+                            if (selectedStorage !== null && u.storage_gb !== selectedStorage) return false;
+                            if (selectedRAM !== null && u.ram_gb !== selectedRAM) return false;
+                            return u.color_name === color;
+                          })
+                        : variantsList.length > 0
+                          ? false
+                          : true;
                       return (
                       <button
                         key={color}
@@ -1600,10 +1608,10 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                           setSelectedUnit(null);
                           onVariantSelect();
                         }}
-                          disabled={!hasAvailableUnits}
+                          disabled={!hasAvailableVariant}
                           className={`product-detail__variant-option ${
                           selectedColor === color ? 'product-detail__variant-option--active' : ''
-                          } ${!hasAvailableUnits ? 'product-detail__variant-option--disabled' : ''}`}
+                          } ${!hasAvailableVariant ? 'product-detail__variant-option--disabled' : ''}`}
                       >
                         {color}
                       </button>

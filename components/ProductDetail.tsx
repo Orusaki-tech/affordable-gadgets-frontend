@@ -640,7 +640,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     });
   };
 
-  // Auto-select from filtered units when Storage and Color are selected
+  // Auto-select from filtered units when core variant filters are selected
   useEffect(() => {
     if (filteredUnits.length === 0) {
       if (selectedUnit) {
@@ -655,7 +655,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     }
 
     if (!selectedUnit) {
-      if (filteredUnits.length === 1 || (selectedStorage && selectedColor)) {
+      const ramRequired = uniqueRAM.length > 0;
+      const hasCoreSelection =
+        selectedStorage !== null &&
+        selectedColor !== null &&
+        (!ramRequired || selectedRAM !== null);
+      if (filteredUnits.length === 1 || hasCoreSelection) {
         setSelectedUnit(firstUnitId);
       }
       return;
@@ -665,7 +670,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     if (!stillAvailable) {
       setSelectedUnit(firstUnitId);
     }
-  }, [filteredUnits, selectedUnit, selectedStorage, selectedColor]);
+  }, [filteredUnits, selectedUnit, selectedStorage, selectedRAM, selectedColor, uniqueRAM.length]);
 
   const handleAddToCart = () => {
     if (!selectedUnit) {
@@ -1500,7 +1505,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             </div>
           )}
 
-          {/* Variant Selectors - Storage and Color Only */}
+          {/* Variant Selectors - Storage / RAM / Color */}
           {unitsLoading && !variantsList.length ? (
             <div className="product-detail__variants-loading">
               <div className="product-detail__spinner product-detail__spinner--small"></div>
@@ -1540,15 +1545,50 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                 </div>
               )}
 
+              {/* RAM Options */}
+              {uniqueRAM.length > 0 && (
+                <div className="product-detail__variant-group">
+                  <label className="product-detail__variant-label">RAM</label>
+                  <div className="product-detail__variant-options">
+                    {uniqueRAM.map((ram) => {
+                      const availableForRam =
+                        units?.filter((u: PublicInventoryUnitPublic) => {
+                          if (selectedStorage !== null && u.storage_gb !== selectedStorage) return false;
+                          if (selectedColor !== null && u.color_name !== selectedColor) return false;
+                          return u.ram_gb === ram;
+                        }) || [];
+                      const hasAvailableUnits = availableForRam.length > 0;
+                      return (
+                        <button
+                          key={ram}
+                          onClick={() => {
+                            setSelectedRAM(selectedRAM === ram ? null : (ram ?? null));
+                            setSelectedUnit(null);
+                            onVariantSelect();
+                          }}
+                          disabled={!hasAvailableUnits}
+                          className={`product-detail__variant-option ${
+                            selectedRAM === ram ? 'product-detail__variant-option--active' : ''
+                          } ${!hasAvailableUnits ? 'product-detail__variant-option--disabled' : ''}`}
+                        >
+                          {ram}GB
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Color Options */}
               {uniqueColors.length > 0 && (
                 <div className="product-detail__variant-group">
                   <label className="product-detail__variant-label">Color</label>
                   <div className="product-detail__variant-options">
                     {uniqueColors.map((color) => {
-                      // Check if this color has units available with current storage filter
+                      // Check if this color has units available with current Storage/RAM filters
                       const availableForColor = units?.filter((u: PublicInventoryUnitPublic) => {
-                        if (selectedStorage && u.storage_gb !== selectedStorage) return false;
+                        if (selectedStorage !== null && u.storage_gb !== selectedStorage) return false;
+                        if (selectedRAM !== null && u.ram_gb !== selectedRAM) return false;
                         return u.color_name === color;
                       }) || [];
                       const hasAvailableUnits = availableForColor.length > 0;

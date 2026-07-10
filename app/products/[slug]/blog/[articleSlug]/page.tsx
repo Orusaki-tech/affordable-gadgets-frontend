@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { brandConfig } from '@/lib/config/brand';
 import { StructuredData } from '@/components/StructuredData';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
@@ -22,6 +22,31 @@ export const revalidate = 3600;
 
 interface ProductBlogArticlePageProps {
   params: Promise<{ slug: string; articleSlug: string }>;
+}
+
+function resolveArticleCanonicalProductSlug(
+  requestedProductSlug: string,
+  productSlug?: string | null,
+  articleProductSlug?: string | null,
+) {
+  const fromArticle = articleProductSlug?.trim();
+  if (fromArticle) {
+    return fromArticle;
+  }
+  return resolveCanonicalProductSlug(requestedProductSlug, productSlug);
+}
+
+function redirectIfArticleBelongsToAnotherProduct(
+  requestedProductSlug: string,
+  articleProductSlug?: string | null,
+  articleSlug?: string | null,
+) {
+  const owner = articleProductSlug?.trim();
+  const canonicalArticleSlug = articleSlug?.trim();
+  if (!owner || !canonicalArticleSlug || owner === requestedProductSlug) {
+    return;
+  }
+  permanentRedirect(articlePath(owner, canonicalArticleSlug));
 }
 
 export async function generateMetadata({ params }: ProductBlogArticlePageProps): Promise<Metadata> {
@@ -45,7 +70,7 @@ export async function generateMetadata({ params }: ProductBlogArticlePageProps):
     product?.product_description?.trim() ||
     `Read our buying guide for ${product?.product_name ?? 'this product'}.`;
   const imageUrl = resolveProductImage(product);
-  const canonicalSlug = resolveCanonicalProductSlug(slug, product?.slug);
+  const canonicalSlug = resolveArticleCanonicalProductSlug(slug, product?.slug, article.product_slug);
   const canonicalArticleSlug = article.slug?.trim() || articleSlug;
   const canonical = articlePath(canonicalSlug, canonicalArticleSlug);
 
@@ -71,12 +96,18 @@ export async function generateMetadata({ params }: ProductBlogArticlePageProps):
 
 export default async function ProductBlogArticlePage({ params }: ProductBlogArticlePageProps) {
   const { slug, articleSlug } = await params;
-  const [article, product] = await Promise.all([
-    fetchArticleBySlugs(slug, articleSlug),
-    fetchProductBySlug(slug),
-  ]);
+  const article = await fetchArticleBySlugs(slug, articleSlug);
 
-  if (!article || !product) {
+  if (!article) {
+    notFound();
+  }
+
+  // Global article fallback can resolve content under the wrong product URL.
+  // Always send Google (and users) to the article's real product parent.
+  redirectIfArticleBelongsToAnotherProduct(slug, article.product_slug, article.slug || articleSlug);
+
+  const product = await fetchProductBySlug(slug);
+  if (!product) {
     notFound();
   }
 
@@ -87,7 +118,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
     article.slug,
   );
 
-  const canonicalSlug = resolveCanonicalProductSlug(slug, product.slug);
+  const canonicalSlug = resolveArticleCanonicalProductSlug(slug, product.slug, article.product_slug);
   const canonicalArticleSlug = article.slug?.trim() || articleSlug;
   const site = brandConfig.siteUrl.replace(/\/+$/, '');
   const canonicalProductUrl = buildProductUrl(canonicalSlug);

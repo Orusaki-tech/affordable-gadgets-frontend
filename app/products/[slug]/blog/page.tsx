@@ -1,4 +1,4 @@
-import { notFound, redirect } from 'next/navigation';
+import { notFound, permanentRedirect, redirect } from 'next/navigation';
 import { fetchPrimaryArticle, fetchProductBySlug } from '@/lib/blog/articlePage';
 import { permanentRedirectToCanonicalProductSlug } from '@/lib/seo/productSlugRedirect';
 import { articlePath, productPath, resolveCanonicalProductSlug } from '@/lib/seo/urls';
@@ -16,8 +16,11 @@ export default async function ProductBlogRedirectPage({ params }: ProductBlogRed
   permanentRedirectToCanonicalProductSlug(slug, product.slug, '/blog');
   const canonicalSlug = resolveCanonicalProductSlug(slug, product?.slug);
   const article = await fetchPrimaryArticle(canonicalSlug);
+  // Prefer a primary article; otherwise send crawlers to the product page
+  // instead of a noindex 404 for empty /blog hubs.
   if (!article?.slug) {
-    notFound();
+    permanentRedirect(productPath(canonicalSlug));
+  } else {
+    redirect(articlePath(canonicalSlug, article.slug));
   }
-  redirect(articlePath(canonicalSlug, article.slug));
 }

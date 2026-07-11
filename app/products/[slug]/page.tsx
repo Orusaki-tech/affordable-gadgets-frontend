@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { ProductDetail } from '@/components/ProductDetail';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
@@ -10,6 +10,10 @@ import type { PublicProduct } from '@/lib/api/generated';
 import { StructuredData } from '@/components/StructuredData';
 import { permanentRedirectToCanonicalProductSlug } from '@/lib/seo/productSlugRedirect';
 import { productPath, productUrl as buildProductUrl, resolveCanonicalProductSlug } from '@/lib/seo/urls';
+import {
+  buildProductQuerySuffix,
+  productUrlHasStrippableSeoParams,
+} from '@/lib/utils/productRoutes';
 
 export const revalidate = 3600;
 
@@ -73,23 +77,6 @@ const fetchProductForRoute = async (slugOrId: string) => {
     }
   }
   return fetchProductBySlug(slugOrId);
-};
-
-const buildQuerySuffix = (searchParams: Record<string, string | string[] | undefined>) => {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(searchParams)) {
-    if (typeof value === 'string') {
-      params.set(key, value);
-    } else if (Array.isArray(value)) {
-      value.forEach((entry) => {
-        if (entry) {
-          params.append(key, entry);
-        }
-      });
-    }
-  }
-  const query = params.toString();
-  return query ? `?${query}` : '';
 };
 
 const isFiniteNumber = (value: unknown): value is number =>
@@ -182,10 +169,15 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
     notFound();
   }
 
-  const querySuffix = buildQuerySuffix(resolvedSearchParams);
+  const querySuffix = buildProductQuerySuffix(resolvedSearchParams);
   permanentRedirectToCanonicalProductSlug(slug, product.slug, querySuffix);
 
   const canonicalSlug = resolveCanonicalProductSlug(slug, product.slug);
+  // Strip ?pid= and other crawl noise even when the slug is already canonical.
+  if (productUrlHasStrippableSeoParams(resolvedSearchParams)) {
+    permanentRedirect(`${productPath(canonicalSlug)}${querySuffix}`);
+  }
+
   const canonicalProductUrl = buildProductUrl(canonicalSlug);
   const productName = product.product_name ?? 'Product';
   const description = buildProductDescription(product);

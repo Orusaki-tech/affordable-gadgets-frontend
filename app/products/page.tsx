@@ -27,19 +27,31 @@ function asNumber(value: string | string[] | undefined) {
 
 type ProductsSearchParams = Record<string, string | string[] | undefined>;
 
-function buildCanonicalFromSearchParams(sp: ProductsSearchParams) {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(sp)) {
-    if (value === undefined) continue;
-    if (key === 'focusSearch' || key === 'openFilters') continue;
-    if (Array.isArray(value)) {
-      value.forEach((v) => params.append(key, v));
-    } else {
-      params.set(key, value);
-    }
-  }
-  const qs = params.toString();
-  return `/products${qs ? `?${qs}` : ''}`;
+/** Params that make a filtered listing a near-duplicate of /products. */
+const LISTING_FILTER_PARAMS = new Set([
+  'type',
+  'brand',
+  'brand_filter',
+  'search',
+  'min_price',
+  'max_price',
+  'promotion',
+  'focusSearch',
+  'openFilters',
+  'condition',
+  'storage',
+  'ram',
+  'sort',
+  'ordering',
+]);
+
+function listingHasFilters(sp: ProductsSearchParams) {
+  return Object.entries(sp).some(([key, value]) => {
+    if (!LISTING_FILTER_PARAMS.has(key)) return false;
+    if (value === undefined) return false;
+    if (Array.isArray(value)) return value.some(Boolean);
+    return Boolean(value);
+  });
 }
 
 export async function generateMetadata({
@@ -56,12 +68,16 @@ export async function generateMetadata({
   const title = brandTitle
     ? `${brandTitle} Deals in Kenya | Affordable Gadgets${suffix}`
     : `${BASE_TITLE}${suffix}`;
+  const hasFilters = listingHasFilters(sp);
+  // One indexable listing URL; filtered/search variants are duplicates in GSC.
+  const canonical = page && page > 1 ? `/products?page=${page}` : '/products';
   return {
     title,
     description: BASE_DESCRIPTION,
     alternates: {
-      canonical: buildCanonicalFromSearchParams(sp),
+      canonical,
     },
+    ...(hasFilters ? { robots: { index: false, follow: true } } : {}),
   };
 }
 

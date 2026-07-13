@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -18,7 +19,6 @@ interface BlogImage {
 }
 
 interface PreparedBlogContent {
-  image: BlogImage | null;
   introMarkdown: string;
   bodyMarkdown: string;
 }
@@ -97,50 +97,25 @@ function stripLeadingH1(text: string, headline?: string): string {
   return text;
 }
 
-/** Prefer a dedicated cover image; otherwise lift the first markdown image for the hero. */
-export function extractPrimaryBlogImage(
-  input: string,
-  opts: { keepInlineImages?: boolean } = {},
-): {
-  image: BlogImage | null;
-  markdown: string;
-} {
-  const normalized = normalizeBlogMarkdown(input);
-  const match = /!\[([^\]]*)\]\(([^)]+)\)/.exec(normalized);
-  const image = match ? { alt: match[1] || '', src: match[2] } : null;
-
-  if (opts.keepInlineImages || !match) {
-    return { image, markdown: normalized };
-  }
-
-  // Remove only the first image occurrence (used as hero) — keep later images inline.
-  const markdown = normalized
-    .replace(match[0], '')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-
-  return { image, markdown };
-}
-
+/**
+ * Split intro vs sections. Body images always stay in place — never lifted into a hero.
+ */
 export function prepareBlogContent(
   input: string,
   headline?: string,
-  opts: { keepInlineImages?: boolean } = {},
 ): PreparedBlogContent {
-  const { image, markdown } = extractPrimaryBlogImage(input, opts);
-  const withoutDuplicateTitle = stripLeadingH1(markdown, headline);
+  const normalized = normalizeBlogMarkdown(input);
+  const withoutDuplicateTitle = stripLeadingH1(normalized, headline);
   const h2Index = withoutDuplicateTitle.search(/\n## /);
 
   if (h2Index === -1) {
     return {
-      image,
       introMarkdown: withoutDuplicateTitle,
       bodyMarkdown: '',
     };
   }
 
   return {
-    image,
     introMarkdown: withoutDuplicateTitle.slice(0, h2Index).trim(),
     bodyMarkdown: withoutDuplicateTitle.slice(h2Index).trim(),
   };
@@ -183,11 +158,19 @@ function BlogInlineImage({ src, alt }: BlogImage) {
   );
 }
 
+function isSoleImageChild(children: React.ReactNode): boolean {
+  const items = React.Children.toArray(children);
+  if (items.length !== 1 || !React.isValidElement(items[0])) return false;
+  return items[0].type === BlogInlineImage;
+}
+
 const markdownComponents: Components = {
   h1: ({ children }) => <h2 className="product-blog-body__h2">{children}</h2>,
   h2: ({ children }) => <h2 className="product-blog-body__h2">{children}</h2>,
   h3: ({ children }) => <h3 className="product-blog-body__h3">{children}</h3>,
-  p: ({ children }) => <p className="product-blog-body__p">{children}</p>,
+  // Unwrap sole-image paragraphs so <figure> is not nested inside <p>.
+  p: ({ children }) =>
+    isSoleImageChild(children) ? <>{children}</> : <p className="product-blog-body__p">{children}</p>,
   ul: ({ children }) => <ul className="product-blog-body__ul">{children}</ul>,
   ol: ({ children }) => <ol className="product-blog-body__ol">{children}</ol>,
   li: ({ children }) => <li className="product-blog-body__li">{children}</li>,
@@ -238,15 +221,11 @@ export function ProductBlogBody({
   imageAlt = '',
   headline,
 }: ProductBlogBodyProps) {
-  // When a product/featured cover is provided, keep every body image inline.
-  // Otherwise lift the first markdown image into the hero and keep the rest inline.
-  const hasCover = Boolean(imageUrl);
-  const { image, introMarkdown, bodyMarkdown } = prepareBlogContent(markdown, headline, {
-    keepInlineImages: hasCover,
-  });
-  const asideImage = hasCover
-    ? { src: imageUrl as string, alt: imageAlt }
-    : image;
+  // No body images → product/cover fills the hero (current).
+  // Body images from editing → stay exactly where placed; never moved to the hero.
+  // Product/cover still shows at top when provided so the page format stays the same.
+  const { introMarkdown, bodyMarkdown } = prepareBlogContent(markdown, headline);
+  const asideImage = imageUrl ? { src: imageUrl, alt: imageAlt } : null;
   const hasHero = Boolean(introMarkdown || asideImage);
 
   return (

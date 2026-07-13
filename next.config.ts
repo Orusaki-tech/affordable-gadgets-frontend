@@ -88,6 +88,33 @@ const nextConfig: NextConfig = {
     externalDir: true,
   },
   transpilePackages: ['@shwari/api-client'],
+
+  // Deleted / moved blog posts that still appear in search — preserve ranking with 301s
+  async redirects() {
+    const iphone17KenyaGuide =
+      '/products/apple-iphone-17-e-sim/blog/iphone-17-the-most-improved-standard-iphone-in-years-now-in-kenya';
+
+    return [
+      {
+        source:
+          '/products/apple-iphone-13-sim/blog/iphone-17-review-apples-most-refined-base-model-yet',
+        destination: iphone17KenyaGuide,
+        permanent: true,
+      },
+      {
+        source:
+          '/products/apple-iphone-17-e-sim/blog/iphone-17-review-apples-most-refined-base-model-yet',
+        destination: iphone17KenyaGuide,
+        permanent: true,
+      },
+      {
+        source:
+          '/products/apple-iphone-17-e-sim/blog/iphone-17-review-apple-s-most-refined-base-model-yet',
+        destination: iphone17KenyaGuide,
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

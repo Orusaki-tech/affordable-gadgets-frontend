@@ -106,15 +106,23 @@
   height: 100%;
 }
 
-/* Mobile-only: toggle hover/options overlay from top-right */
-.product-card__peek-toggle {
+/* Mobile-only: options/close top-right; details arrow just above Buy, same right edge */
+.product-card__mobile-actions {
   display: none;
   position: absolute;
-  top: 8px;
-  right: 8px;
+  inset: 0;
   z-index: 6;
-  width: 32px;
-  height: 32px;
+  pointer-events: none;
+}
+
+.product-card__details-btn,
+.product-card__peek-toggle {
+  pointer-events: auto;
+  position: absolute;
+  right: 8px;
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--ui-gray-200);
@@ -125,11 +133,41 @@
   cursor: pointer;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
+.product-card__peek-toggle {
+  top: 8px;
+}
+
+.product-card__details-btn {
+  /* Sit just above the footer Buy bar, aligned with the close/options icon */
+  bottom: 52px;
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--ui-white);
+  animation: product-card-details-pulse 2.4s ease-in-out infinite;
+}
+
+.product-card--featured.product-card--peek .product-card__details-btn {
+  /* Keep clear of the expanded overlay actions */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.product-card__details-btn svg,
 .product-card__peek-toggle svg {
   width: 16px;
   height: 16px;
+}
+
+.product-card__details-btn svg {
+  animation: product-card-details-nudge 1.8s ease-in-out infinite;
+}
+
+.product-card__details-btn:active {
+  transform: scale(0.94);
+  animation: none;
 }
 
 .product-card__peek-toggle--open {
@@ -138,9 +176,40 @@
   color: var(--ui-white);
 }
 
+@keyframes product-card-details-nudge {
+  0%,
+  70%,
+  100% {
+    transform: translateX(0);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+  90% {
+    transform: translateX(-1px);
+  }
+}
+
+@keyframes product-card-details-pulse {
+  0%,
+  100% {
+    box-shadow: 0 1px 4px var(--ui-shadow-08), 0 0 0 0 rgba(18, 18, 18, 0.28);
+  }
+  55% {
+    box-shadow: 0 1px 4px var(--ui-shadow-08), 0 0 0 8px rgba(18, 18, 18, 0);
+  }
+}
+
 @media (hover: none) {
-  .product-card__peek-toggle {
-    display: inline-flex;
+  .product-card__mobile-actions {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card__details-btn,
+  .product-card__details-btn svg {
+    animation: none;
   }
 }
 

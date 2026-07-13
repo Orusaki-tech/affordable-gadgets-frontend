@@ -12,14 +12,25 @@ export const revalidate = 300;
 
 const getBaseUrl = () => brandConfig.siteUrl.replace(/\/+$/, "");
 
+/** Next.js sitemap serialization does not XML-escape `&` in query strings. */
+function xmlEscapeUrl(url: string): string {
+  return url
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
 const addEntry = (
   entries: MetadataRoute.Sitemap,
   seen: Set<string>,
   entry: MetadataRoute.Sitemap[number],
 ) => {
-  if (seen.has(entry.url)) return;
-  seen.add(entry.url);
-  entries.push(entry);
+  const url = xmlEscapeUrl(entry.url);
+  if (seen.has(url)) return;
+  seen.add(url);
+  entries.push({ ...entry, url });
 };
 
 const parseLastModified = (value?: string | null, fallback?: Date) => {

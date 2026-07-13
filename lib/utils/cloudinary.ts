@@ -39,7 +39,7 @@ export function getCloudinarySizedImageUrl(
   return buildCloudinaryTransformedUrl(url, transformation);
 }
 
-/** Wide banner / hero tiles — width-only scaling, `f_auto` + `q_auto:best` for sharpness. */
+/** Wide banner / hero tiles — width-only scaling, `f_auto` + `q_auto` for size/quality balance. */
 export function getCloudinaryBannerImageUrl(
   url: string,
   width: number,
@@ -48,14 +48,14 @@ export function getCloudinaryBannerImageUrl(
   fit: 'cover' | 'contain' = 'contain'
 ): string {
   if (fit === 'contain') {
-    return buildCloudinaryTransformedUrl(url, `f_auto,q_auto:best,c_limit,w_${width}`);
+    return buildCloudinaryTransformedUrl(url, `f_auto,q_auto,c_limit,w_${width}`);
   }
   const aspectWidth = _aspectWidth ?? width;
   const aspectHeight = _aspectHeight ?? width;
   const height = Math.round((width * aspectHeight) / aspectWidth);
   return buildCloudinaryTransformedUrl(
     url,
-    `f_auto,q_auto:best,c_fill,g_east,w_${width},h_${height}`
+    `f_auto,q_auto,c_fill,g_east,w_${width},h_${height}`
   );
 }
 

@@ -51,16 +51,19 @@ export function youtubeVideoIdFromLink(url: string): string | null {
   return videoId.split('&')[0].split('?')[0] || null;
 }
 
-/** Ordered YouTube stills: highest quality first (may 404 on some videos; fall through in UI). */
+/**
+ * Ordered YouTube stills sized for ~250px homepage cards (not maxres 1280×720).
+ * Prefer hqdefault (~480px) first; fall through if a quality is missing.
+ */
 export function youtubePosterCandidatesFromLink(url: string): string[] {
   const id = youtubeVideoIdFromLink(url);
   if (!id) return [];
   const base = `https://i.ytimg.com/vi/${id}`;
   return [
-    `${base}/maxresdefault.jpg`,
-    `${base}/sddefault.jpg`,
     `${base}/hqdefault.jpg`,
     `${base}/mqdefault.jpg`,
+    `${base}/sddefault.jpg`,
+    `${base}/maxresdefault.jpg`,
   ];
 }
 

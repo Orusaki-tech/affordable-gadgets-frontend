@@ -21,7 +21,7 @@
 
 .reviews-showcase__subtitle {
   font-size: 14px;
-  color: var(--gray-500);
+  color: var(--gray-700);
 }
 
 .reviews-showcase__actions {
@@ -260,7 +260,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--gray-500);
+  color: var(--gray-700);
   margin-bottom: 8px;
 }
 

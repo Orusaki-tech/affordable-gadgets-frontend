@@ -299,11 +299,9 @@ export default async function HomePage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
             <div className="text-left mb-12 lg:mb-16">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
-                <span className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
-                  What Our Customers Say
-                </span>
+                What Our Customers Say
               </h2>
-              <p className="text-gray-600 text-lg sm:text-xl mb-2">Real reviews from real customers</p>
+              <p className="text-gray-700 text-lg sm:text-xl mb-2">Real reviews from real customers</p>
             </div>
             <ReviewsShowcaseClient />
           </div>

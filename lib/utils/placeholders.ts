@@ -3,7 +3,7 @@
  */
 
 /**
- * Get a placeholder image URL
+ * Get a placeholder image URL (inline SVG — no third-party request / cache TTL issues).
  * @param width - Image width in pixels
  * @param height - Image height in pixels
  * @param text - Optional text to display on placeholder
@@ -14,9 +14,14 @@ export function getPlaceholderImage(
   height: number = 400,
   text: string = 'No Image'
 ): string {
-  // Using placehold.co for reliable placeholder images
-  const encodedText = encodeURIComponent(text);
-  return `https://placehold.co/${width}x${height}/e5e7eb/6b7280?text=${encodedText}`;
+  const safeText = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+  const fontSize = Math.max(12, Math.min(22, Math.round(width / 14)));
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect fill="#e5e7eb" width="100%" height="100%"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#6b7280" font-family="system-ui,sans-serif" font-size="${fontSize}">${safeText}</text></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
 /**
@@ -72,8 +77,9 @@ export function getPlaceholderUnitImage(color?: string): string {
  */
 export function isPlaceholderImage(url: string | null | undefined): boolean {
   if (!url) return true;
-  return url.includes('placehold.co') || 
-         url.includes('placeholder') || 
+  return url.startsWith('data:image/svg+xml') ||
+         url.includes('placehold.co') ||
+         url.includes('placeholder') ||
          url.startsWith('/placeholder');
 }
 

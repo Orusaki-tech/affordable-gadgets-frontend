@@ -119,7 +119,8 @@ function PosterImageFallback({
     <CloudinaryImage
       src={src}
       alt=""
-      preset="card"
+      width={480}
+      height={360}
       className={className}
       sizes={IMAGE_SIZES}
       fill

@@ -41,6 +41,24 @@ export const IMAGE_PRESETS = {
     fit: 'contain' as const,
   },
 
+  /** Special-offers / promo tiles displayed ~240px wide. */
+  promoTile: {
+    type: 'srcset',
+    widths: [240, 360, 480, 720],
+    sizes: '(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 240px',
+    defaultWidth: 360,
+    fit: 'contain' as const,
+  },
+
+  /** Full-width collection / section banners (3:1 slot). */
+  collectionBanner: {
+    type: 'srcset',
+    widths: [640, 960, 1280, 1600],
+    sizes: '(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 1280px',
+    defaultWidth: 1280,
+    fit: 'contain' as const,
+  },
+
   /** Compact Discover category tiles (~344px slot, Apple shop proportions). */
   categoryCard: {
     type: 'srcset',

@@ -58,8 +58,7 @@ export function SpecialOffersCarousel({
                   <CloudinaryImage
                     src={promotionImageSrc}
                     alt={promotion.title}
-                    preset="card"
-                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    preset="promoTile"
                     className="special-offers-carousel__promo-image"
                     fill
                   />

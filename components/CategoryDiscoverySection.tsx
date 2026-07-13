@@ -55,6 +55,8 @@ export function CategoryDiscoverySection() {
                 src={card.backgroundImage}
                 alt={card.alt}
                 preset="categoryCard"
+                width={344}
+                height={300}
                 className="category-discovery__card-image"
               />
             </div>

@@ -24,9 +24,8 @@ export function CollectionHeaderBanner({
           <CloudinaryImage
             src={src}
             alt={alt}
-            preset="card"
+            preset="collectionBanner"
             className="collection-header-banner__image"
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 100vw, 1280px"
             fill
           />
         ) : (

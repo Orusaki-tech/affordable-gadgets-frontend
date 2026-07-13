@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 
@@ -11,7 +12,15 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div className="min-h-screen flex flex-col">
-      <HeaderWithAnnouncement />
+      <Suspense
+        fallback={
+          <div className="site-header-wrapper">
+            <div className="site-header" aria-hidden />
+          </div>
+        }
+      >
+        <HeaderWithAnnouncement />
+      </Suspense>
       <main className="flex-1 flex items-center justify-center px-4">
         <div className="mx-auto max-w-lg text-center">
           <h1 className="text-6xl font-bold text-gray-900">404</h1>

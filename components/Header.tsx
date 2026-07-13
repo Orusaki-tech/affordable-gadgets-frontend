@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -21,7 +21,27 @@ import { AuthChoiceModal } from './AuthChoiceModal';
 import { HeaderBrandMenu, HeaderMoreBrandsMenu } from './HeaderBrandMenu';
 import { HeaderMegaMenuPanel, MEGA_MENU_MORE_KEY } from './HeaderMegaMenuPanel';
 
+function HeaderFallback() {
+  return (
+    <header className="site-header" aria-hidden>
+      <div className="site-header__inner">
+        <div className="site-header__brand">
+          <span className="site-header__logo-text">{brandConfig.name}</span>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 export function Header() {
+  return (
+    <Suspense fallback={<HeaderFallback />}>
+      <HeaderContent />
+    </Suspense>
+  );
+}
+
+function HeaderContent() {
   const { itemCount } = useCart();
   const pathname = usePathname();
   const searchParams = useSearchParams();

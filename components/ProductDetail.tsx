@@ -38,7 +38,13 @@ import type { PromotionVideoProduct } from '@/components/ProductVideoReel';
 import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
 import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
+import { AuthChoiceModal } from '@/components/AuthChoiceModal';
 import { getApiErrorInfo } from '@/lib/utils/apiError';
+
+function hasAuthToken(): boolean {
+  if (typeof window === 'undefined') return false;
+  return !!localStorage.getItem('auth_token');
+}
 
 interface ProductDetailProps {
   slug: string;
@@ -333,6 +339,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const [isFinancingOpen, setIsFinancingOpen] = useState(false);
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [pendingCartAdd, setPendingCartAdd] = useState<PendingCartAdd | null>(null);
+  const [needsAuthForCart, setNeedsAuthForCart] = useState(false);
   
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
   const productId = product?.id;
@@ -672,6 +679,25 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     }
   }, [filteredUnits, selectedUnit, selectedStorage, selectedRAM, selectedColor, uniqueRAM.length]);
 
+  const beginPendingCartAdd = (pending: PendingCartAdd) => {
+    setPendingCartAdd(pending);
+    if (!hasAuthToken()) {
+      setNeedsAuthForCart(true);
+    }
+  };
+
+  const handleAuthSuccessForCart = () => {
+    setNeedsAuthForCart(false);
+  };
+
+  const handleAuthCloseForCart = () => {
+    setNeedsAuthForCart(false);
+    // AuthChoiceModal also calls onClose after success — keep pending add in that case.
+    if (!hasAuthToken()) {
+      setPendingCartAdd(null);
+    }
+  };
+
   const handleAddToCart = () => {
     if (!selectedUnit) {
       triggerVariantShake();
@@ -689,7 +715,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     const normalizedPromoPrice =
       promoPrice !== undefined && promoPrice !== null ? Number(promoPrice) : undefined;
 
-    setPendingCartAdd({
+    beginPendingCartAdd({
       kind: 'unit',
       quantity,
       promotionId: promoId,
@@ -742,7 +768,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       alert('Please select at least one bundle item');
       return;
     }
-    setPendingCartAdd({ kind: 'bundle', bundleId, bundleItemIds: selectedIds });
+    beginPendingCartAdd({ kind: 'bundle', bundleId, bundleItemIds: selectedIds });
   };
 
   const handleAddAccessoryVariantToCart = async (
@@ -761,7 +787,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       return;
     }
 
-    setPendingCartAdd({
+    beginPendingCartAdd({
       kind: 'accessory',
       unitId: unit.unit_id,
       quantity: accessory.required_quantity ?? 1,
@@ -2291,7 +2317,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           onClose={() => setIsWhatsAppModalOpen(false)}
         />
       )}
-      {pendingCartAdd && product && (
+      {pendingCartAdd && product && !needsAuthForCart && (
         <AddToCartLeadModal
           productName={product.product_name}
           productBrand={product.brand}
@@ -2311,6 +2337,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           }
           onClose={() => setPendingCartAdd(null)}
           onConfirm={handleConfirmCartAdd}
+        />
+      )}
+      {needsAuthForCart && (
+        <AuthChoiceModal
+          onClose={handleAuthCloseForCart}
+          onAuthSuccess={handleAuthSuccessForCart}
+          title="Sign in to add to cart"
+          description="Create an account or sign in to save items to your cart."
         />
       )}
     </div>

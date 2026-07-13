@@ -16,6 +16,12 @@ import { useCart } from '@/lib/hooks/useCart';
 import { useWishlist } from '@/lib/hooks/useWishlist';
 import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
 import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
+import { AuthChoiceModal } from '@/components/AuthChoiceModal';
+
+function hasAuthToken(): boolean {
+  if (typeof window === 'undefined') return false;
+  return !!localStorage.getItem('auth_token');
+}
 
 /** Same stroke as `.product-card__buy-btn--featured`. Hex matches --primary-dark so it always paints (see DevTools). */
 const productCardLinkFrameStyle: CSSProperties = {
@@ -209,6 +215,7 @@ export function ProductCard({
   const [quantity, setQuantity] = useState(1);
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [pendingCartQty, setPendingCartQty] = useState<number | null>(null);
+  const [needsAuthForCart, setNeedsAuthForCart] = useState(false);
 
   // Auto-select first storage option on load
   useEffect(() => {
@@ -312,11 +319,30 @@ export function ProductCard({
     toggle(product.id);
   };
 
+  const beginAddToCart = (qty: number) => {
+    setPendingCartQty(qty);
+    if (!hasAuthToken()) {
+      setNeedsAuthForCart(true);
+    }
+  };
+
   const handleAddToCart = (event: React.MouseEvent, qty?: number) => {
     event.preventDefault();
     event.stopPropagation();
     if (!selectedUnit?.id) return;
-    setPendingCartQty(qty ?? 1);
+    beginAddToCart(qty ?? 1);
+  };
+
+  const handleAuthSuccessForCart = () => {
+    setNeedsAuthForCart(false);
+  };
+
+  const handleAuthCloseForCart = () => {
+    setNeedsAuthForCart(false);
+    // AuthChoiceModal also calls onClose after success — keep pending add in that case.
+    if (!hasAuthToken()) {
+      setPendingCartQty(null);
+    }
   };
 
   const handleConfirmCartAdd = async (phone: string) => {
@@ -414,7 +440,7 @@ export function ProductCard({
     event.preventDefault();
     event.stopPropagation();
     if (selectedUnit?.id) {
-      setPendingCartQty(1);
+      beginAddToCart(1);
       return;
     }
     navigateToProductDetail();
@@ -422,7 +448,8 @@ export function ProductCard({
 
   if (isFeaturedVariant) {
     const canAddToCart = Boolean(selectedUnit?.id) && !unitsLoading;
-    const addToCartModal = pendingCartQty != null ? (
+    const addToCartModal =
+      pendingCartQty != null && !needsAuthForCart ? (
       <AddToCartLeadModal
         productName={product.product_name}
         productBrand={product.brand}
@@ -434,8 +461,17 @@ export function ProductCard({
         onConfirm={handleConfirmCartAdd}
       />
     ) : null;
+    const authModal = needsAuthForCart ? (
+      <AuthChoiceModal
+        onClose={handleAuthCloseForCart}
+        onAuthSuccess={handleAuthSuccessForCart}
+        title="Sign in to add to cart"
+        description="Create an account or sign in to save items to your cart."
+      />
+    ) : null;
     return (
       <>
+      {authModal}
       <Link
         href={getProductHref(product)}
         className="product-card product-card--featured"
@@ -1047,7 +1083,7 @@ export function ProductCard({
       </div>
     </Link>
 
-      {pendingCartQty != null && (
+      {pendingCartQty != null && !needsAuthForCart && (
         <AddToCartLeadModal
           productName={product.product_name}
           productBrand={product.brand}
@@ -1057,6 +1093,14 @@ export function ProductCard({
           }
           onClose={() => setPendingCartQty(null)}
           onConfirm={handleConfirmCartAdd}
+        />
+      )}
+      {needsAuthForCart && (
+        <AuthChoiceModal
+          onClose={handleAuthCloseForCart}
+          onAuthSuccess={handleAuthSuccessForCart}
+          title="Sign in to add to cart"
+          description="Create an account or sign in to save items to your cart."
         />
       )}
       {isWhatsAppModalOpen && product.id != null && (

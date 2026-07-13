@@ -12,9 +12,17 @@ interface AuthChoiceModalProps {
   onClose: () => void;
   onAuthSuccess: () => void;
   initialEmail?: string;
+  title?: string;
+  description?: string;
 }
 
-export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthChoiceModalProps) {
+export function AuthChoiceModal({
+  onClose,
+  onAuthSuccess,
+  initialEmail,
+  title = 'Continue to Payment',
+  description = 'Sign in to your account to continue.',
+}: AuthChoiceModalProps) {
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authNotice, setAuthNotice] = useState<string | null>(null);
@@ -258,10 +266,8 @@ export function AuthChoiceModal({ onClose, onAuthSuccess, initialEmail }: AuthCh
           />
         </div>
 
-        <h2 className="checkout-modal__heading">Continue to Payment</h2>
-        <p className="checkout-modal__text">
-          Sign in to your account to continue.
-        </p>
+        <h2 className="checkout-modal__heading">{title}</h2>
+        <p className="checkout-modal__text">{description}</p>
 
         <div className="checkout-modal__auth">
           <button

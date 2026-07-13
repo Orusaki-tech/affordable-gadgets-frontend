@@ -3,7 +3,15 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+} from 'react';
 import { PublicProduct, InventoryUnitImage } from '@/lib/api/generated';
 import { formatPrice, formatPriceRange } from '@/lib/utils/format';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
@@ -216,6 +224,73 @@ export function ProductCard({
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [pendingCartQty, setPendingCartQty] = useState<number | null>(null);
   const [needsAuthForCart, setNeedsAuthForCart] = useState(false);
+  const [isPeekOpen, setIsPeekOpen] = useState(false);
+  const cardRef = useRef<HTMLAnchorElement | null>(null);
+  const isTouchLikeRef = useRef(false);
+
+  // Touch/coarse devices: first tap peeks (hover UI), second tap navigates
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(hover: none)');
+    const update = () => {
+      isTouchLikeRef.current = mq.matches;
+    };
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (!isPeekOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+        setIsPeekOpen(false);
+      }
+    };
+    const onOtherPeek = (event: Event) => {
+      const detail = (event as CustomEvent<number | string | undefined>).detail;
+      if (detail !== product.id) setIsPeekOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('product-card-peek', onOtherPeek);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('product-card-peek', onOtherPeek);
+    };
+  }, [isPeekOpen, product.id]);
+
+  const isInteractiveCardTarget = (target: EventTarget | null) => {
+    if (!(target instanceof Element)) return false;
+    return Boolean(
+      target.closest('button, [role="button"], input, select, textarea, label')
+    );
+  };
+
+  const handleCardClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    // Keep add-to-cart / variant / wishlist controls from triggering navigation
+    if (isInteractiveCardTarget(event.target)) {
+      event.preventDefault();
+      return;
+    }
+
+    if (isTouchLikeRef.current && !isPeekOpen) {
+      event.preventDefault();
+      setIsPeekOpen(true);
+      window.dispatchEvent(
+        new CustomEvent('product-card-peek', { detail: product.id })
+      );
+      handlePrefetch();
+      return;
+    }
+    setProductDetailPlaceholder(product);
+  };
+
+  const handleBuyClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setProductDetailPlaceholder(product);
+    router.push(getProductHref(product));
+  };
 
   // Auto-select first storage option on load
   useEffect(() => {
@@ -473,12 +548,14 @@ export function ProductCard({
       <>
       {authModal}
       <Link
+        ref={cardRef}
         href={getProductHref(product)}
-        className="product-card product-card--featured"
+        className={`product-card product-card--featured${isPeekOpen ? ' product-card--peek' : ''}`}
         style={productCardLinkFrameStyle}
-        onClick={() => setProductDetailPlaceholder(product)}
+        onClick={handleCardClick}
         onMouseEnter={handlePrefetch}
         onFocus={handlePrefetch}
+        aria-expanded={isPeekOpen}
       >
         <div className="product-card__media product-card__media--square product-card__media--featured">
           <CloudinaryImage
@@ -500,7 +577,13 @@ export function ProductCard({
             >
               {product.product_name}
             </p>
-            <span className="product-card__buy-btn product-card__buy-btn--featured">Buy</span>
+            <button
+              type="button"
+              onClick={handleBuyClick}
+              className="product-card__buy-btn product-card__buy-btn--featured"
+            >
+              Buy
+            </button>
             {hasStock && (
               <button
                 type="button"
@@ -659,12 +742,14 @@ export function ProductCard({
   return (
     <>
     <Link
+      ref={cardRef}
       href={getProductHref(product)}
-      className={`product-card product-card--default ${isMinimal ? 'product-card--minimal' : 'product-card--standard'}`}
+      className={`product-card product-card--default ${isMinimal ? 'product-card--minimal' : 'product-card--standard'}${isPeekOpen ? ' product-card--peek' : ''}`}
       style={productCardLinkFrameStyle}
-      onClick={() => setProductDetailPlaceholder(product)}
+      onClick={handleCardClick}
       onMouseEnter={handlePrefetch}
       onFocus={handlePrefetch}
+      aria-expanded={isPeekOpen}
     >
       {/* Product Image */}
       <div className={`product-card__media ${isMinimal ? 'product-card__media--square' : 'product-card__media--wide'}`}>

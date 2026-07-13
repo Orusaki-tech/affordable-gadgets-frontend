@@ -98,13 +98,77 @@ function stripLeadingH1(text: string, headline?: string): string {
 }
 
 /**
- * Split intro vs sections. Body images always stay in place — never lifted into a hero.
+ * Identity key for comparing cover vs markdown images across Cloudinary transforms
+ * (e.g. /upload/v1/... vs /upload/w_800/v1/...).
+ */
+export function blogImageAssetKey(src: string): string {
+  const cleaned = src.trim().split('?')[0].replace(/\/$/, '');
+  const uploadIdx = cleaned.indexOf('/upload/');
+  if (uploadIdx !== -1) {
+    const parts = cleaned.slice(uploadIdx + '/upload/'.length).split('/');
+    let i = 0;
+    while (i < parts.length) {
+      const part = parts[i];
+      if (/^v\d+$/.test(part)) {
+        i += 1;
+        break;
+      }
+      // Transformation segment (w_800, c_fill,w_800, f_auto, …) — not a public_id path.
+      if (
+        /,/.test(part) ||
+        /^(c|w|h|f|q|e|dpr|fl|ar|g|x|y|b|r|o|a|z|t|l|bo|cs|ac|dn|so|sp|vc|vs|fn|ki|u|pg|dl|ew|du|af|if)[_=]/i.test(
+          part,
+        )
+      ) {
+        i += 1;
+        continue;
+      }
+      break;
+    }
+    return parts
+      .slice(i)
+      .join('/')
+      .replace(/\.[a-z0-9]+$/i, '')
+      .toLowerCase();
+  }
+
+  try {
+    return new URL(cleaned).pathname.replace(/\.[a-z0-9]+$/i, '').toLowerCase();
+  } catch {
+    return cleaned.toLowerCase();
+  }
+}
+
+function imagesReferToSameAsset(a: string, b: string): boolean {
+  return blogImageAssetKey(a) === blogImageAssetKey(b);
+}
+
+/**
+ * Remove markdown images that duplicate the product/cover hero so the page
+ * shows one product shot when the author did not add distinct article images.
+ */
+export function stripMatchingMarkdownImages(markdown: string, coverUrl: string): string {
+  return markdown
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (full, _alt: string, src: string) =>
+      imagesReferToSameAsset(src, coverUrl) ? '' : full,
+    )
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+/**
+ * Split intro vs sections. Distinct body images stay in place — never lifted into a hero.
+ * Images that match the product/cover URL are stripped when a cover is provided.
  */
 export function prepareBlogContent(
   input: string,
   headline?: string,
+  coverUrl?: string | null,
 ): PreparedBlogContent {
-  const normalized = normalizeBlogMarkdown(input);
+  let normalized = normalizeBlogMarkdown(input);
+  if (coverUrl) {
+    normalized = stripMatchingMarkdownImages(normalized, coverUrl);
+  }
   const withoutDuplicateTitle = stripLeadingH1(normalized, headline);
   const h2Index = withoutDuplicateTitle.search(/\n## /);
 
@@ -221,10 +285,10 @@ export function ProductBlogBody({
   imageAlt = '',
   headline,
 }: ProductBlogBodyProps) {
-  // No body images → product/cover fills the hero (current).
-  // Body images from editing → stay exactly where placed; never moved to the hero.
-  // Product/cover still shows at top when provided so the page format stays the same.
-  const { introMarkdown, bodyMarkdown } = prepareBlogContent(markdown, headline);
+  // Product/cover is the single default image when the article has no distinct embeds.
+  // Markdown images that match the cover (common in batch content) are stripped.
+  // Editor-added images that differ stay exactly where they appear in the body.
+  const { introMarkdown, bodyMarkdown } = prepareBlogContent(markdown, headline, imageUrl);
   const asideImage = imageUrl ? { src: imageUrl, alt: imageAlt } : null;
   const hasHero = Boolean(introMarkdown || asideImage);
 

@@ -7,6 +7,7 @@ import { brandConfig } from '@/lib/config/brand';
 import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
 import { createClient } from '@/lib/supabase/client';
 import { exchangeSupabaseToken } from '@/lib/supabase/auth-exchange';
+import { getAuthAttributionFields } from '@/lib/auth/attribution';
 
 interface AuthChoiceModalProps {
   onClose: () => void;
@@ -117,6 +118,7 @@ export function AuthChoiceModal({
         const res = await LoginService.loginCreate({
           username_or_email: authForm.username_or_email,
           password: authForm.password,
+          ...getAuthAttributionFields(),
         });
         setPendingVerificationEmail(null);
         const token = (res as { token?: string })?.token;
@@ -157,7 +159,8 @@ export function AuthChoiceModal({
           username: authForm.username,
           email: authForm.email,
           password: authForm.password,
-        });
+          ...getAuthAttributionFields(),
+        } as Parameters<typeof RegisterService.registerCreate>[0]);
       } finally {
         OpenAPI.BASE = previousBase;
       }

@@ -9,6 +9,7 @@ import { ApiService, OpenAPI, OrdersService, OrderRequest, Order, InitiatePaymen
 import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
 import { PaymentMethodModal } from './PaymentMethodModal';
 import { brandConfig } from '@/lib/config/brand';
+import { getAuthAttributionFields } from '@/lib/auth/attribution';
 
 interface CheckoutModalProps {
   onClose: () => void;
@@ -363,6 +364,7 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
         res = await LoginService.loginCreate({
           username_or_email: authForm.username_or_email,
           password: authForm.password,
+          ...getAuthAttributionFields(),
         });
       } finally {
         OpenAPI.BASE = previousBase;
@@ -398,7 +400,8 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
           password: authForm.password,
           phone_number: formData.customer_phone || undefined,
           address: formData.delivery_address || undefined,
-        });
+          ...getAuthAttributionFields(),
+        } as Parameters<typeof RegisterService.registerCreate>[0]);
       } finally {
         OpenAPI.BASE = previousBase;
       }

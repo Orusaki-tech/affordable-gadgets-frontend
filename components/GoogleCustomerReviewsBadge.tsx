@@ -4,7 +4,13 @@ import { useEffect } from 'react';
 
 declare global {
   interface Window {
-    merchantwidget?: any;
+    merchantwidget?: {
+      start?: (opts: {
+        merchant_id: number;
+        position: string;
+        region: string;
+      }) => void;
+    };
   }
 }
 
@@ -24,13 +30,30 @@ function loadOnce(src: string, id: string) {
   document.head.appendChild(s);
 }
 
+function scheduleIdle(callback: () => void): () => void {
+  if (typeof window === 'undefined') return () => undefined;
+
+  const idleWindow = window as Window & {
+    requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    cancelIdleCallback?: (id: number) => void;
+  };
+
+  if (typeof idleWindow.requestIdleCallback === 'function') {
+    const id = idleWindow.requestIdleCallback(callback, { timeout: 4000 });
+    return () => idleWindow.cancelIdleCallback?.(id);
+  }
+
+  const t = window.setTimeout(callback, 2500);
+  return () => window.clearTimeout(t);
+}
+
 export function GoogleCustomerReviewsBadge({
   merchantId,
   position = 'BOTTOM_RIGHT',
   region = 'KE',
 }: GoogleCustomerReviewsBadgeProps) {
   useEffect(() => {
-    loadOnce('https://www.gstatic.com/shopping/merchant/merchantwidget.js', 'google-merchantwidget-js');
+    let startTimer: ReturnType<typeof setTimeout> | undefined;
 
     const start = () => {
       try {
@@ -44,12 +67,20 @@ export function GoogleCustomerReviewsBadge({
       }
     };
 
-    // If script already present, try starting immediately; otherwise wait a bit.
-    start();
-    const t = window.setTimeout(start, 750);
-    return () => window.clearTimeout(t);
+    const cancelIdle = scheduleIdle(() => {
+      loadOnce(
+        'https://www.gstatic.com/shopping/merchant/merchantwidget.js',
+        'google-merchantwidget-js'
+      );
+      start();
+      startTimer = setTimeout(start, 1000);
+    });
+
+    return () => {
+      cancelIdle();
+      if (startTimer) clearTimeout(startTimer);
+    };
   }, [merchantId, position, region]);
 
   return null;
 }
-

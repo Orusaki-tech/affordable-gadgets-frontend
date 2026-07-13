@@ -94,3 +94,36 @@ export const RecentlyViewedClient = dynamic(
     ),
   }
 );
+
+export const BrandCarouselClient = dynamic(
+  () => import('@/components/BrandCarousel').then((mod) => mod.BrandCarousel),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[88px] w-full animate-pulse rounded-lg bg-gray-200/70" aria-hidden />
+    ),
+  }
+);
+
+export const ImageCarouselClient = dynamic(
+  () => import('@/components/ImageCarousel').then((mod) => mod.ImageCarousel),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[220px] w-full animate-pulse rounded-2xl bg-gray-200/70" aria-hidden />
+    ),
+  }
+);
+
+export const CategoryDiscoverySectionClient = dynamic(
+  () =>
+    import('@/components/CategoryDiscoverySection').then(
+      (mod) => mod.CategoryDiscoverySection
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="min-h-[320px] w-full animate-pulse rounded-2xl bg-gray-200/70" aria-hidden />
+    ),
+  }
+);

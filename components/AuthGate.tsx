@@ -1,39 +1,45 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import { AuthOverlay } from './AuthOverlay';
 import { persistUTMParams } from '@/lib/utm';
 import { trackPageView } from '@/lib/tracking';
 
+const AuthOverlay = dynamic(
+  () => import('./AuthOverlay').then((mod) => mod.AuthOverlay),
+  { ssr: false }
+);
+
 export function AuthGate({ children }: { children: React.ReactNode }) {
+  // null = not checked yet — never block SSR/first paint on auth
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
     persistUTMParams();
     trackPageView();
-    setIsAuthed(!!localStorage.getItem('auth_token'));
-    const handleAuthChange = () => setIsAuthed(!!localStorage.getItem('auth_token'));
+
+    const sync = () => setIsAuthed(!!localStorage.getItem('auth_token'));
+    sync();
+
+    const handleAuthChange = () => sync();
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'auth_token') sync();
+    };
+
     window.addEventListener('auth-token-changed', handleAuthChange);
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'auth_token') setIsAuthed(!!e.newValue);
-    });
+    window.addEventListener('storage', handleStorage);
     return () => {
       window.removeEventListener('auth-token-changed', handleAuthChange);
+      window.removeEventListener('storage', handleStorage);
     };
   }, []);
-
-  if (isAuthed === null) {
-    return (
-      <div className="auth-gate-loading">
-        <div className="auth-gate-loading__spinner" />
-      </div>
-    );
-  }
 
   return (
     <>
       {children}
-      {!isAuthed && <AuthOverlay onAuthSuccess={() => setIsAuthed(true)} />}
+      {isAuthed === false && (
+        <AuthOverlay onAuthSuccess={() => setIsAuthed(true)} />
+      )}
     </>
   );
 }

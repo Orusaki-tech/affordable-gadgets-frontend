@@ -169,7 +169,7 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
       <CloudinaryImage
         src={displayBannerSrc}
         alt={activePromotion?.title ?? 'Promotions'}
-        preset="card"
+        preset="homepageHero"
         fit="cover"
         sizes="(max-width: 1024px) 100vw, 50vw"
         className="home-hero__banner-image"
@@ -242,11 +242,12 @@ export function HomeHero({ initialPromotionsData }: HomeHeroProps) {
                     <div className="home-hero__placeholder-media" aria-hidden>
                       <CloudinaryImage
                         src={displayBannerSrc}
-                        alt={activePromotion?.title ?? 'Promotion'}
-                        preset="card"
+                        alt=""
+                        preset="productThumb"
                         fit="cover"
                         sizes="(max-width: 1024px) 100vw, 420px"
                         className="home-hero__placeholder-image home-hero__placeholder-image--banner"
+                        loading="lazy"
                         fill
                       />
                     </div>

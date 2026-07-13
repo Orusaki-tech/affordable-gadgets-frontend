@@ -25,6 +25,14 @@ export const IMAGE_PRESETS = {
     defaultWidth: 2560,
     fit: 'contain' as const,
   },
+  /** Homepage hero banner — width-based delivery; CSS object-fit covers the 16:9 slot. */
+  homepageHero: {
+    type: 'srcset',
+    widths: [480, 640, 800, 960, 1200, 1600],
+    sizes: '(max-width: 1024px) 100vw, 50vw',
+    defaultWidth: 960,
+    fit: 'contain' as const,
+  },
   card: {
     type: 'srcset',
     widths: [300, 600, 900, 1200],
@@ -32,6 +40,7 @@ export const IMAGE_PRESETS = {
     defaultWidth: 600,
     fit: 'contain' as const,
   },
+
   /** Compact Discover category tiles (~344px slot, Apple shop proportions). */
   categoryCard: {
     type: 'srcset',

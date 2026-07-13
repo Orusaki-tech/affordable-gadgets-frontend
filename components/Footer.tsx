@@ -18,7 +18,6 @@ export function Footer() {
                 width={100}
                 height={100}
                 className="site-footer__logo"
-                priority
               />
               <span className="site-footer__logo-text">{brandConfig.name}</span>
             </Link>

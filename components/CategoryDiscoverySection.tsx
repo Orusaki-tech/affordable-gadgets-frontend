@@ -35,7 +35,6 @@ export function CategoryDiscoverySection() {
           height={CATEGORY_DISCOVERY_HERO.imageHeight}
           pictureClassName="category-discovery__hero-picture"
           className="category-discovery__hero-image"
-          priority
         />
       </div>
 

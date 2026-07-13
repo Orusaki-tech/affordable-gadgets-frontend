@@ -8,14 +8,15 @@ import {
   ReviewsShowcaseClient,
   CategoriesSectionClient,
   RecentlyViewedClient,
+  BrandCarouselClient,
+  ImageCarouselClient,
+  CategoryDiscoverySectionClient,
 } from '@/components/HomeSectionsClient';
-import { ImageCarousel } from '@/components/ImageCarousel';
-import { CategoryDiscoverySection } from '@/components/CategoryDiscoverySection';
 import { CollectionHeaderBanner } from '@/components/CollectionHeaderBanner';
-import { BrandCarousel } from '@/components/BrandCarousel';
 import { BlogArticlesSection } from '@/components/BlogArticlesSection';
 import { brandConfig } from '@/lib/config/brand';
 import { productUrl } from '@/lib/seo/urls';
+import { getCloudinaryBannerImageUrl, isCloudinaryUrl } from '@/lib/utils/cloudinary';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { Suspense } from 'react';
 import { StructuredData } from '@/components/StructuredData';
@@ -169,8 +170,10 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const initialHeroPromotionsData = await fetchInitialHeroPromotions();
-  const featuredForSchema = await fetchFeaturedProductsForSchema();
+  const [initialHeroPromotionsData, featuredForSchema] = await Promise.all([
+    fetchInitialHeroPromotions(),
+    fetchFeaturedProductsForSchema(),
+  ]);
   type FeaturedItem = { name: string; url: string; image?: string | null; type: 'Thing' };
   const isFeaturedItem = (value: FeaturedItem | null): value is FeaturedItem => value !== null;
 
@@ -189,8 +192,20 @@ export default async function HomePage() {
     })
     .filter(isFeaturedItem);
 
+  const firstHeroBanner =
+    initialHeroPromotionsData?.results?.[0]?.banner_image_url ||
+    initialHeroPromotionsData?.results?.[0]?.banner_image ||
+    null;
+  const heroPreloadSrc =
+    typeof firstHeroBanner === 'string' && isCloudinaryUrl(firstHeroBanner)
+      ? getCloudinaryBannerImageUrl(firstHeroBanner, 960, undefined, undefined, 'contain')
+      : null;
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 via-white to-gray-50">
+      {heroPreloadSrc ? (
+        <link rel="preload" as="image" href={heroPreloadSrc} fetchPriority="high" />
+      ) : null}
       {featuredItemListItems.length > 0 && (
         <StructuredData
           type="ItemList"
@@ -268,9 +283,13 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <SpecialOffersServer filter="special_offers" pageSize={12} homepageLayout minPromotions={4} />
+        <Suspense fallback={<div className="min-h-[240px]" aria-hidden />}>
+          <SpecialOffersServer filter="special_offers" pageSize={12} homepageLayout minPromotions={4} />
+        </Suspense>
 
-        <BlogArticlesSection />
+        <Suspense fallback={<div className="min-h-[200px]" aria-hidden />}>
+          <BlogArticlesSection />
+        </Suspense>
 
         {/* Product / testimonial videos (template for future product-specific reels) */}
         <HomeProductVideosClient />
@@ -293,7 +312,7 @@ export default async function HomePage() {
         {/* Brand carousel – above Shop by Category (120×70px, last item followed by first) */}
         <section id="brands" className="scroll-mt-20" style={{ minHeight: '140px', backgroundColor: '#f5f5f7' }}>
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <BrandCarousel />
+            <BrandCarouselClient />
           </div>
         </section>
 
@@ -323,7 +342,7 @@ export default async function HomePage() {
               </h2>
               <p className="text-gray-600 text-lg sm:text-xl mb-2">What&apos;s new in our lineup</p>
             </div>
-            <CategoryDiscoverySection />
+            <CategoryDiscoverySectionClient />
           </div>
         </section>
 
@@ -338,7 +357,7 @@ export default async function HomePage() {
               </h2>
               <p className="text-gray-600 text-lg sm:text-xl mb-2">Explore our collection</p>
             </div>
-            <ImageCarousel />
+            <ImageCarouselClient />
           </div>
         </section>
 

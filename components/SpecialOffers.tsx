@@ -133,7 +133,7 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
                       alt={promotion.title}
                       preset="card"
                       sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                      priority={index === 0}
+                      priority={false}
                       loading={index < 2 ? 'eager' : 'lazy'}
                       className="special-offers__promo-image"
                       fill

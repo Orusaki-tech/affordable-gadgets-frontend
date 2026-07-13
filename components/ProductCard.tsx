@@ -748,7 +748,7 @@ export function ProductCard({
             <div className="product-card__overlay-row">
               <span className="product-card__overlay-label">RAM</span>
               <div className="product-card__ram-options">
-                {ramOptions.map((ram) => (
+                {ramOptions.map((ram, idx) => (
                   <button
                     key={ram}
                     type="button"
@@ -759,6 +759,10 @@ export function ProductCard({
                     }}
                     className={`product-card__ram-chip ${
                       selectedRam === ram ? 'product-card__ram-chip--active' : ''
+                    }${
+                      selectedRam === null && idx === 0
+                        ? ' product-card__ram-chip--suggest'
+                        : ''
                     }`}
                   >
                     {ram}GB
@@ -1058,7 +1062,7 @@ export function ProductCard({
               <span className="product-card__overlay-label">RAM</span>
               <div className="product-card__ram-options">
                 {ramOptions.length > 0 ? (
-                  ramOptions.map((ram) => (
+                  ramOptions.map((ram, idx) => (
                     <button
                       key={ram}
                       type="button"
@@ -1069,6 +1073,10 @@ export function ProductCard({
                       }}
                       className={`product-card__ram-chip ${
                         selectedRam === ram ? 'product-card__ram-chip--active' : ''
+                      }${
+                        selectedRam === null && idx === 0
+                          ? ' product-card__ram-chip--suggest'
+                          : ''
                       }`}
                     >
                       {ram}GB

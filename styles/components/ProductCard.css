@@ -506,6 +506,18 @@
   color: var(--ui-white);
 }
 
+.product-card__ram-chip--suggest {
+  border-color: #2563eb;
+  border-width: 2px;
+  animation: cardChipPulse 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card__ram-chip--suggest {
+    animation: none;
+  }
+}
+
 .product-card__overlay-actions {
   margin-top: auto;
   padding-top: 8px;

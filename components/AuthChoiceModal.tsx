@@ -113,23 +113,26 @@ export function AuthChoiceModal({
     setAuthNotice(null);
     try {
       const previousBase = OpenAPI.BASE;
+      let res: Awaited<ReturnType<typeof LoginService.loginCreate>> | null = null;
       try {
         OpenAPI.BASE = inventoryBaseUrl;
-        const res = await LoginService.loginCreate({
+        res = await LoginService.loginCreate({
           username_or_email: authForm.username_or_email,
           password: authForm.password,
           ...getAuthAttributionFields(),
         });
-        setPendingVerificationEmail(null);
-        const token = (res as { token?: string })?.token;
-        if (token) {
-          setAuthToken(token);
-        }
-        onAuthSuccess();
-        onClose();
       } finally {
+        // Restore API base BEFORE setAuthToken so CartProvider's cart create
+        // does not hit /api/inventory/api/v1/public/cart/.
         OpenAPI.BASE = previousBase;
       }
+      setPendingVerificationEmail(null);
+      const token = (res as { token?: string } | null)?.token;
+      if (token) {
+        setAuthToken(token);
+      }
+      onAuthSuccess();
+      onClose();
     } catch (err) {
       const message =
         (err as { body?: { detail?: string; error?: string } })?.body?.detail ||

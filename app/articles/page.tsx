@@ -7,6 +7,7 @@ import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import {
   applyArticleFilters,
+  buildArticlesPath,
   resolveHubFromParam,
 } from '@/lib/blog/articleFilters';
 import { fetchAllPublishedArticles, fetchArticleBrandOptions } from '@/lib/blog/articlePage';
@@ -14,21 +15,63 @@ import type { PublicArticleCard } from '@/lib/api/generated';
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: 'Buying Guides & Articles',
-  description: 'Expert phone, laptop, tablet and accessory buying guides for renewed tech in Kenya.',
-  alternates: {
-    canonical: '/articles',
-  },
-  openGraph: {
-    title: 'Buying Guides & Articles',
-    description: 'Expert phone, laptop, tablet and accessory buying guides for renewed tech in Kenya.',
-    url: '/articles',
-  },
-};
+const BASE_TITLE = 'Buying Guides & Articles';
+const BASE_DESCRIPTION =
+  'Expert phone, laptop, tablet and accessory buying guides for renewed tech in Kenya.';
 
 interface PageProps {
   searchParams: Promise<Record<string, string | undefined>>;
+}
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const sp = await searchParams;
+  const hub = resolveHubFromParam(sp.type);
+  const hasSearch = Boolean(sp.search?.trim());
+  const hasBrand = Boolean(sp.brand?.trim());
+
+  // Type-only hubs are indexable marketing landings (listed in sitemap / llms.txt).
+  if (hub && !hasSearch && !hasBrand) {
+    const canonical = buildArticlesPath({ productType: hub.code });
+    return {
+      title: `${hub.title} | Affordable Gadgets`,
+      description: hub.description,
+      alternates: { canonical },
+      openGraph: {
+        title: hub.title,
+        description: hub.description,
+        url: canonical,
+      },
+    };
+  }
+
+  // Search/brand filtered article lists stay noindex near-duplicates of the hub.
+  if (hub || hasSearch || hasBrand) {
+    const canonical = hub
+      ? buildArticlesPath({ productType: hub.code })
+      : '/articles';
+    return {
+      title: BASE_TITLE,
+      description: BASE_DESCRIPTION,
+      alternates: { canonical },
+      robots: { index: false, follow: true },
+      openGraph: {
+        title: BASE_TITLE,
+        description: BASE_DESCRIPTION,
+        url: canonical,
+      },
+    };
+  }
+
+  return {
+    title: BASE_TITLE,
+    description: BASE_DESCRIPTION,
+    alternates: { canonical: '/articles' },
+    openGraph: {
+      title: BASE_TITLE,
+      description: BASE_DESCRIPTION,
+      url: '/articles',
+    },
+  };
 }
 
 export default async function ArticlesIndexPage({ searchParams }: PageProps) {

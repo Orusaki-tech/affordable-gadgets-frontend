@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { ApiService } from "@/lib/api/generated";
 import { brandConfig } from "@/lib/config/brand";
+import { PRODUCT_TYPES } from "@/lib/config/nav-links";
+import { listIndexableProductListingPaths } from "@/lib/seo/indexableProductListings";
 
 const PAGE_SIZE = 100;
 const MAX_PAGES = Number(process.env.SITEMAP_MAX_PAGES || 50);
@@ -8,33 +10,7 @@ const MAX_PAGES = Number(process.env.SITEMAP_MAX_PAGES || 50);
 // Refresh frequently after catalog URL changes; ISR still caches between rebuilds.
 export const revalidate = 300;
 
-const staticPaths = [
-  "",
-  "/products",
-  "/articles",
-  "/promotions",
-  "/reviews",
-  "/videos",
-  "/faq",
-  "/shipping",
-  "/financing",
-  "/contact",
-  "/privacy",
-  "/terms",
-];
-
 const getBaseUrl = () => brandConfig.siteUrl.replace(/\/+$/, "");
-
-const buildStaticEntries = (): MetadataRoute.Sitemap => {
-  const baseUrl = getBaseUrl();
-  const lastModified = new Date();
-  return staticPaths.map((path) => ({
-    url: `${baseUrl}${path}`,
-    lastModified,
-    changeFrequency: "weekly",
-    priority: path === "" ? 1 : 0.7,
-  }));
-};
 
 const addEntry = (
   entries: MetadataRoute.Sitemap,
@@ -56,16 +32,66 @@ const parseLastModified = (value?: string | null, fallback?: Date) => {
   return fallback ?? new Date();
 };
 
+function absoluteUrl(baseUrl: string, path: string): string {
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  if (!path || path === "/") return baseUrl;
+  return `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getBaseUrl();
-  const entries: MetadataRoute.Sitemap = [];
-  const seen = new Set<string>();
   const refreshedAt = new Date();
+  const seen = new Set<string>();
+  const entries: MetadataRoute.Sitemap = [];
+  const optionalTail: MetadataRoute.Sitemap = [];
 
-  for (const entry of buildStaticEntries()) {
-    addEntry(entries, seen, entry);
+  const { mainNav, shopByBrand, optionalBrands } =
+    listIndexableProductListingPaths();
+
+  const push = (
+    path: string,
+    priority: number,
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] = "weekly",
+    bucket: MetadataRoute.Sitemap = entries,
+  ) => {
+    addEntry(bucket, seen, {
+      url: absoluteUrl(baseUrl, path),
+      lastModified: refreshedAt,
+      changeFrequency,
+      priority,
+    });
+  };
+
+  // 1. Main navigation (prime marketing space — same order as header / llms.txt)
+  push("/", 1.0, "daily");
+  for (const path of mainNav) push(path, 0.95);
+  push("/articles", 0.95);
+  push("/financing", 0.95);
+
+  // 2. Shop by brand / type
+  push("/products", 0.9);
+  for (const path of shopByBrand) push(path, 0.9);
+  push("/promotions", 0.9);
+
+  // 3. Blog hubs
+  for (const type of PRODUCT_TYPES) {
+    push(`/articles?type=${type}`, 0.85);
   }
 
+  // 4. Customer help
+  for (const path of [
+    "/faq",
+    "/shipping",
+    "/contact",
+    "/budget-search",
+    "/match-score",
+    "/reviews",
+    "/videos",
+  ]) {
+    push(path, 0.7);
+  }
+
+  // 5–6. Products then articles (lower priority than marketing)
   try {
     let page = 1;
     let hasNext = true;
@@ -94,7 +120,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           url: `${baseUrl}/products/${slug}`,
           lastModified: parseLastModified(product.updated_at, refreshedAt),
           changeFrequency: "weekly",
-          priority: 0.8,
+          priority: 0.6,
         });
       }
 
@@ -127,7 +153,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
               refreshedAt,
             ),
             changeFrequency: "monthly",
-            priority: 0.74,
+            priority: 0.55,
           });
         } else {
           addEntry(entries, seen, {
@@ -137,7 +163,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
               refreshedAt,
             ),
             changeFrequency: "monthly",
-            priority: 0.74,
+            priority: 0.55,
           });
         }
       }
@@ -146,8 +172,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       articlePage += 1;
     }
   } catch {
-    return entries.length ? entries : buildStaticEntries();
+    // Keep marketing entries even if catalog fetch fails.
   }
 
-  return entries;
+  // 7. Optional — More brands + legal
+  for (const path of optionalBrands) {
+    push(path, 0.4, "weekly", optionalTail);
+  }
+  push("/privacy", 0.4, "yearly", optionalTail);
+  push("/terms", 0.4, "yearly", optionalTail);
+
+  return [...entries, ...optionalTail];
 }

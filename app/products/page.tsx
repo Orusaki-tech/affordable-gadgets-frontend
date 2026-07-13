@@ -6,6 +6,7 @@ import { Footer } from '@/components/Footer';
 import { StructuredData } from '@/components/StructuredData';
 import { brandConfig } from '@/lib/config/brand';
 import { getBrandBannerTitleForMetadata } from '@/lib/config/products-brand-banners';
+import { resolveIndexableProductListing } from '@/lib/seo/indexableProductListings';
 
 export const revalidate = 3600;
 
@@ -13,6 +14,13 @@ const BASE_TITLE =
   'Affordable Phones, Laptops & Electronics in Kenya | Affordable Gadgets';
 const BASE_DESCRIPTION =
   'Shop affordable phones, laptops, tablets, iPads and accessories in Kenya. Compare specs, prices and payment options and buy online or pick up in Nairobi CBD.';
+
+const TYPE_TITLES: Record<string, string> = {
+  PH: 'Affordable Phones in Kenya',
+  LT: 'Affordable Laptops in Kenya',
+  TB: 'Affordable Tablets & iPads in Kenya',
+  AC: 'Affordable Accessories in Kenya',
+};
 
 function asString(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -27,33 +35,6 @@ function asNumber(value: string | string[] | undefined) {
 
 type ProductsSearchParams = Record<string, string | string[] | undefined>;
 
-/** Params that make a filtered listing a near-duplicate of /products. */
-const LISTING_FILTER_PARAMS = new Set([
-  'type',
-  'brand',
-  'brand_filter',
-  'search',
-  'min_price',
-  'max_price',
-  'promotion',
-  'focusSearch',
-  'openFilters',
-  'condition',
-  'storage',
-  'ram',
-  'sort',
-  'ordering',
-]);
-
-function listingHasFilters(sp: ProductsSearchParams) {
-  return Object.entries(sp).some(([key, value]) => {
-    if (!LISTING_FILTER_PARAMS.has(key)) return false;
-    if (value === undefined) return false;
-    if (Array.isArray(value)) return value.some(Boolean);
-    return Boolean(value);
-  });
-}
-
 export async function generateMetadata({
   searchParams,
 }: {
@@ -63,21 +44,54 @@ export async function generateMetadata({
   const page = asNumber(sp.page);
   const suffix = page && page > 1 ? ` (Page ${page})` : '';
   const promotionId = asString(sp.promotion);
-  const brandFilter = asString(sp.brand_filter) || asString(sp.brand) || '';
-  const brandTitle = !promotionId ? getBrandBannerTitleForMetadata(brandFilter) : undefined;
+  const marketing = resolveIndexableProductListing(sp);
+  const brandFilter =
+    marketing?.brandFilter || asString(sp.brand_filter) || asString(sp.brand) || '';
+  const brandTitle =
+    !promotionId && brandFilter ? getBrandBannerTitleForMetadata(brandFilter) : undefined;
+  const typeTitle =
+    !brandTitle && marketing?.productType ? TYPE_TITLES[marketing.productType] : undefined;
   const title = brandTitle
     ? `${brandTitle} Deals in Kenya | Affordable Gadgets${suffix}`
-    : `${BASE_TITLE}${suffix}`;
-  const hasFilters = listingHasFilters(sp);
-  // One indexable listing URL; filtered/search variants are duplicates in GSC.
-  const canonical = page && page > 1 ? `/products?page=${page}` : '/products';
+    : typeTitle
+      ? `${typeTitle} | Affordable Gadgets${suffix}`
+      : `${BASE_TITLE}${suffix}`;
+
+  // Unfiltered /products (and paginated /products?page=N) stay indexable.
+  if (!marketing && !brandFilter && !asString(sp.type) && !promotionId) {
+    const hasOtherFilters = Object.entries(sp).some(([key, value]) => {
+      if (key === 'page') return false;
+      if (value === undefined) return false;
+      if (Array.isArray(value)) return value.some(Boolean);
+      return Boolean(String(value).trim());
+    });
+    if (!hasOtherFilters) {
+      const canonical = page && page > 1 ? `/products?page=${page}` : '/products';
+      return {
+        title,
+        description: BASE_DESCRIPTION,
+        alternates: { canonical },
+      };
+    }
+  }
+
+  // Primary nav marketing landings: self-canonical + indexable (page 1 only).
+  if (marketing && (!page || page <= 1)) {
+    return {
+      title,
+      description: BASE_DESCRIPTION,
+      alternates: { canonical: marketing.canonicalPath },
+    };
+  }
+
+  // Search/sort/price/etc. and page>1 marketing variants: noindex, point at hub.
+  const canonical =
+    marketing && page && page > 1 ? marketing.canonicalPath : '/products';
   return {
     title,
     description: BASE_DESCRIPTION,
-    alternates: {
-      canonical,
-    },
-    ...(hasFilters ? { robots: { index: false, follow: true } } : {}),
+    alternates: { canonical },
+    robots: { index: false, follow: true },
   };
 }
 

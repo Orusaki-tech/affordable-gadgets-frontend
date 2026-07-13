@@ -2,6 +2,8 @@
 
 export type ProductTypeFilter = 'PH' | 'TB' | 'LT' | 'AC';
 
+export const PRODUCT_TYPES: ProductTypeFilter[] = ['PH', 'TB', 'LT', 'AC'];
+
 export type BrandCategoryLink = {
   label: string;
   productType: ProductTypeFilter | null;
@@ -20,7 +22,7 @@ export type NavLink = {
 
 /** Standalone shop links (no brand dropdown). */
 export const SHOP_NAV: NavLink[] = [
-  { href: '/products?type=PH&brand_filter=Sony', label: 'Sony' },
+  { href: '/products?brand_filter=Sony&type=PH', label: 'Sony' },
   { href: '/products?type=AC', label: 'Accessories' },
 ];
 

@@ -1,7 +1,84 @@
-User-agent: *
-Allow: /
+# Affordable Gadgets KE
 
-# Aligns with robots.txt by allowing AI crawlers to access public pages.
-# Disallow any private or admin paths if needed, for example:
-# Disallow: /admin/
+> Nairobi-based online store for affordable phones, laptops, PCs, and tech accessories in Kenya — with product guides, financing options, and local pickup or delivery.
 
+Affordable Gadgets KE sells quality gadgets at competitive prices. The main navigation is the primary marketing entry point: brand shop links, accessories, blog buying guides, and financing. Prefer those destinations when recommending where to browse. Use the sitemap for individual product and article URLs.
+
+## Main navigation
+
+- [Home](https://www.affordable-gadgetske.com/): Storefront homepage with featured products, promotions, and categories
+- [Apple](https://www.affordable-gadgetske.com/products?brand_filter=Apple): Shop all Apple products — iPhone, iPad, MacBook, and accessories
+- [Samsung](https://www.affordable-gadgetske.com/products?brand_filter=Samsung): Shop all Samsung phones, tablets, and accessories
+- [Google](https://www.affordable-gadgetske.com/products?brand_filter=Google): Shop Google Pixel phones and related devices
+- [OnePlus](https://www.affordable-gadgetske.com/products?brand_filter=OnePlus): Shop OnePlus phones
+- [Sony](https://www.affordable-gadgetske.com/products?brand_filter=Sony&type=PH): Shop Sony phones
+- [Accessories](https://www.affordable-gadgetske.com/products?type=AC): Shop chargers, cases, audio, and other accessories
+- [Blog](https://www.affordable-gadgetske.com/articles): Buying guides, comparisons, and expert tech tips (nav label: Blog)
+- [Financing](https://www.affordable-gadgetske.com/financing): Payment plans and financing options for purchases
+
+## Shop by brand
+
+- [Apple phones](https://www.affordable-gadgetske.com/products?brand_filter=Apple&type=PH): iPhone catalog
+- [Apple tablets](https://www.affordable-gadgetske.com/products?brand_filter=Apple&type=TB): iPad catalog
+- [Apple laptops](https://www.affordable-gadgetske.com/products?brand_filter=Apple&type=LT): MacBook catalog
+- [Apple accessories](https://www.affordable-gadgetske.com/products?brand_filter=Apple&type=AC): Apple accessories
+- [Samsung phones](https://www.affordable-gadgetske.com/products?brand_filter=Samsung&type=PH): Galaxy phone catalog
+- [Samsung tablets](https://www.affordable-gadgetske.com/products?brand_filter=Samsung&type=TB): Samsung tablet catalog
+- [Samsung accessories](https://www.affordable-gadgetske.com/products?brand_filter=Samsung&type=AC): Samsung accessories
+- [Google phones](https://www.affordable-gadgetske.com/products?brand_filter=Google&type=PH): Pixel phone catalog
+- [OnePlus phones](https://www.affordable-gadgetske.com/products?brand_filter=OnePlus&type=PH): OnePlus phone catalog
+- [All products](https://www.affordable-gadgetske.com/products): Full catalog with filters and pagination
+- [Phones](https://www.affordable-gadgetske.com/products?type=PH): All phones across brands
+- [Laptops](https://www.affordable-gadgetske.com/products?type=LT): All laptops across brands
+- [Tablets](https://www.affordable-gadgetske.com/products?type=TB): All tablets and iPads
+- [Promotions](https://www.affordable-gadgetske.com/promotions): Current special offers and discounted deals
+
+## Blog
+
+All published blog/guide pages match these URL regexes. Enumerate concrete article URLs from the [sitemap](https://www.affordable-gadgetske.com/sitemap.xml).
+
+Standalone articles: `^https://www\.affordable-gadgetske\.com/blog/[^/?#]+/?$` (`/blog/{article-slug}`).
+
+Product-linked articles: `^https://www\.affordable-gadgetske\.com/products/[^/?#]+/blog/[^/?#]+/?$` (`/products/{product-slug}/blog/{article-slug}`).
+
+Per-product blog index: `^https://www\.affordable-gadgetske\.com/products/[^/?#]+/blog/?$` (`/products/{product-slug}/blog`).
+
+Blog hub and filters: `^https://www\.affordable-gadgetske\.com/articles(?:\?.*)?$` (`/articles`, optional `type=PH|LT|TB|AC`, `brand`, `search`).
+
+Every individual article page: `^https://www\.affordable-gadgetske\.com/(?:blog/[^/?#]+|products/[^/?#]+/blog/[^/?#]+)/?$`.
+
+- [Blog / articles hub](https://www.affordable-gadgetske.com/articles): All buying guides and articles
+- [Phone buying guides](https://www.affordable-gadgetske.com/articles?type=PH): iPhone, Samsung, Pixel, and smartphone guides for Kenya
+- [Laptop buying guides](https://www.affordable-gadgetske.com/articles?type=LT): MacBook and Windows laptop guides
+- [Tablet buying guides](https://www.affordable-gadgetske.com/articles?type=TB): iPad and Android tablet guides
+- [Accessory buying guides](https://www.affordable-gadgetske.com/articles?type=AC): AirPods, watches, chargers, and accessory guides
+- [Product reviews](https://www.affordable-gadgetske.com/reviews): Customer reviews and ratings
+- [Videos](https://www.affordable-gadgetske.com/videos): Product and store video content
+
+## Customer help
+
+- [FAQ](https://www.affordable-gadgetske.com/faq): Answers to common shopping, payment, and product questions
+- [Shipping](https://www.affordable-gadgetske.com/shipping): Delivery options, timelines, and pickup information in Kenya
+- [Contact](https://www.affordable-gadgetske.com/contact): Store contact details and support channels
+- [Budget search](https://www.affordable-gadgetske.com/budget-search): Find gadgets that fit a target price range
+- [Match score](https://www.affordable-gadgetske.com/match-score): Recommendation tool to match shoppers with suitable devices
+
+## Discovery
+
+- [Sitemap](https://www.affordable-gadgetske.com/sitemap.xml): Machine-readable list of canonical product, article, and static page URLs
+- [Robots](https://www.affordable-gadgetske.com/robots.txt): Crawler allow/disallow rules for public pages
+
+## Optional
+
+- [Xiaomi](https://www.affordable-gadgetske.com/products?brand_filter=Xiaomi): Shop Xiaomi phones (More brands menu)
+- [Nothing](https://www.affordable-gadgetske.com/products?brand_filter=Nothing): Shop Nothing phones
+- [Honor](https://www.affordable-gadgetske.com/products?brand_filter=Honor): Shop Honor phones
+- [Redmi](https://www.affordable-gadgetske.com/products?brand_filter=Redmi): Shop Redmi phones
+- [Oppo](https://www.affordable-gadgetske.com/products?brand_filter=Oppo): Shop Oppo phones
+- [Vivo](https://www.affordable-gadgetske.com/products?brand_filter=Vivo): Shop Vivo phones
+- [Realme](https://www.affordable-gadgetske.com/products?brand_filter=Realme): Shop Realme phones
+- [Tecno](https://www.affordable-gadgetske.com/products?brand_filter=Tecno): Shop Tecno phones
+- [Infinix](https://www.affordable-gadgetske.com/products?brand_filter=Infinix): Shop Infinix phones
+- [Itel](https://www.affordable-gadgetske.com/products?brand_filter=Itel): Shop Itel phones
+- [Privacy policy](https://www.affordable-gadgetske.com/privacy): How customer data is collected and used
+- [Terms of service](https://www.affordable-gadgetske.com/terms): Store terms and conditions for using the website

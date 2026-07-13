@@ -11,6 +11,8 @@ interface AddToCartLeadModalProps {
   initialPhone?: string;
   onClose: () => void;
   onConfirm: (phone: string) => Promise<void>;
+  /** After phone is saved and item is added, continue to checkout (cart). */
+  proceedToCheckout?: boolean;
 }
 
 function validatePhone(value: string): string | null {
@@ -27,6 +29,7 @@ export function AddToCartLeadModal({
   initialPhone = '',
   onClose,
   onConfirm,
+  proceedToCheckout = true,
 }: AddToCartLeadModalProps) {
   const [phone, setPhone] = useState(initialPhone);
   const [submitting, setSubmitting] = useState(false);
@@ -57,7 +60,9 @@ export function AddToCartLeadModal({
         localStorage.setItem('customer_phone', normalizedPhone);
       }
       await onConfirm(normalizedPhone);
-      setSubmitted(true);
+      if (!proceedToCheckout) {
+        setSubmitted(true);
+      }
     } catch (err) {
       const { message } = getApiErrorInfo(err);
       setError(message || 'Failed to add to cart');
@@ -88,9 +93,13 @@ export function AddToCartLeadModal({
               </svg>
             </div>
 
-            <h2 className="checkout-modal__title">Interested in this item?</h2>
+            <h2 className="checkout-modal__title">
+              {proceedToCheckout ? 'Almost there' : 'Interested in this item?'}
+            </h2>
             <p className="whatsapp-lead-modal__subtitle">
-              Leave your phone number and a salesperson will contact you shortly.
+              {proceedToCheckout
+                ? 'Enter your phone number to add this item and continue to checkout.'
+                : 'Leave your phone number and a salesperson will contact you shortly.'}
             </p>
 
             <div className="whatsapp-lead-modal__product">
@@ -140,7 +149,13 @@ export function AddToCartLeadModal({
                 onClick={handleSubmit}
                 disabled={!isPhoneValid || submitting}
               >
-                {submitting ? 'Adding to cart...' : 'Add to cart'}
+                {submitting
+                  ? proceedToCheckout
+                    ? 'Continuing...'
+                    : 'Adding to cart...'
+                  : proceedToCheckout
+                    ? 'Continue to checkout'
+                    : 'Add to cart'}
               </button>
 
               <button

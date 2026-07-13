@@ -292,6 +292,44 @@ export function ProductCard({
     router.push(getProductHref(product));
   };
 
+  const handlePeekToggle = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (isPeekOpen) {
+      setIsPeekOpen(false);
+      return;
+    }
+    setIsPeekOpen(true);
+    window.dispatchEvent(
+      new CustomEvent('product-card-peek', { detail: product.id })
+    );
+    handlePrefetch();
+  };
+
+  const peekToggleButton = (
+    <button
+      type="button"
+      className={`product-card__peek-toggle${isPeekOpen ? ' product-card__peek-toggle--open' : ''}`}
+      onClick={handlePeekToggle}
+      aria-label={isPeekOpen ? 'Hide product options' : 'Show product options'}
+      aria-expanded={isPeekOpen}
+    >
+      {isPeekOpen ? (
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path
+            fillRule="evenodd"
+            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+            clipRule="evenodd"
+          />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+        </svg>
+      )}
+    </button>
+  );
+
   // Auto-select first storage option on load
   useEffect(() => {
     if (storageOptions.length > 1 && selectedStorage === null) {
@@ -424,6 +462,9 @@ export function ProductCard({
     if (!selectedUnit?.id || pendingCartQty == null) return;
     await updateCartPhone(phone);
     await addToCart(selectedUnit.id, pendingCartQty);
+    setPendingCartQty(null);
+    setIsPeekOpen(false);
+    router.push('/cart');
   };
 
   const hasPriceRange =
@@ -568,6 +609,7 @@ export function ProductCard({
           />
           <ProductTrustStamp condition={trustStampCondition} size="card" />
         </div>
+        {peekToggleButton}
         {/* Footer: default = bar (name + cart icon); hover = full overlay with storage, RAM, price range, reviews, cart icon */}
         <div className="product-card__footer product-card__footer--featured">
           <div className="product-card__footer-bar">
@@ -771,6 +813,7 @@ export function ProductCard({
               fill
             />
           )}
+        {peekToggleButton}
 
           <ProductTrustStamp condition={trustStampCondition} size="card" />
 

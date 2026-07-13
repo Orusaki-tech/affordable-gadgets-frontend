@@ -106,6 +106,44 @@
   height: 100%;
 }
 
+/* Mobile-only: toggle hover/options overlay from top-right */
+.product-card__peek-toggle {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 6;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ui-gray-200);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--primary-dark);
+  box-shadow: 0 1px 4px var(--ui-shadow-08);
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.product-card__peek-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.product-card__peek-toggle--open {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--ui-white);
+}
+
+@media (hover: none) {
+  .product-card__peek-toggle {
+    display: inline-flex;
+  }
+}
+
 /* Min-height ensures footer + Add to Cart are never clipped in narrow columns (e.g. Products page grid) */
 .product-card--featured {
   border-radius: 16px;

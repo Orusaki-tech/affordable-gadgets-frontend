@@ -735,16 +735,16 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         pendingCartAdd.promotionId,
         pendingCartAdd.unitPrice,
       );
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 3000);
+      setPendingCartAdd(null);
+      router.push('/cart');
       return;
     }
 
     if (pendingCartAdd.kind === 'bundle') {
       if (!selectedUnit) throw new Error('Please select a variant first');
       await addBundleToCart(pendingCartAdd.bundleId, selectedUnit, pendingCartAdd.bundleItemIds);
-      setBundleSuccessMessage('Bundle added to cart successfully!');
-      setTimeout(() => setBundleSuccessMessage(null), 3000);
+      setPendingCartAdd(null);
+      router.push('/cart');
       return;
     }
 
@@ -754,8 +754,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       undefined,
       pendingCartAdd.unitPrice,
     );
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000);
+    setPendingCartAdd(null);
+    router.push('/cart');
   };
 
   const handleAddBundleToCart = async (bundleId: number) => {

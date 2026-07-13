@@ -97,16 +97,25 @@ function stripLeadingH1(text: string, headline?: string): string {
   return text;
 }
 
-/** Keep only the first markdown image for the aside; strip the rest from body copy. */
-export function extractPrimaryBlogImage(input: string): {
+/** Prefer a dedicated cover image; otherwise lift the first markdown image for the hero. */
+export function extractPrimaryBlogImage(
+  input: string,
+  opts: { keepInlineImages?: boolean } = {},
+): {
   image: BlogImage | null;
   markdown: string;
 } {
   const normalized = normalizeBlogMarkdown(input);
   const match = /!\[([^\]]*)\]\(([^)]+)\)/.exec(normalized);
   const image = match ? { alt: match[1] || '', src: match[2] } : null;
+
+  if (opts.keepInlineImages || !match) {
+    return { image, markdown: normalized };
+  }
+
+  // Remove only the first image occurrence (used as hero) — keep later images inline.
   const markdown = normalized
-    .replace(/!\[[^\]]*\]\([^)]+\)\s*/g, '')
+    .replace(match[0], '')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 
@@ -116,8 +125,9 @@ export function extractPrimaryBlogImage(input: string): {
 export function prepareBlogContent(
   input: string,
   headline?: string,
+  opts: { keepInlineImages?: boolean } = {},
 ): PreparedBlogContent {
-  const { image, markdown } = extractPrimaryBlogImage(input);
+  const { image, markdown } = extractPrimaryBlogImage(input, opts);
   const withoutDuplicateTitle = stripLeadingH1(markdown, headline);
   const h2Index = withoutDuplicateTitle.search(/\n## /);
 
@@ -154,6 +164,25 @@ function BlogAsideImage({ src, alt }: BlogImage) {
   );
 }
 
+function BlogInlineImage({ src, alt }: BlogImage) {
+  return (
+    <figure className="product-blog-body__figure product-blog-body__figure--inline">
+      <div className="product-blog-body__figure-inner product-blog-body__figure-inner--inline">
+        <CloudinaryImage
+          src={src}
+          alt={alt}
+          preset="productGallery"
+          fill
+          fit="contain"
+          sizes="(max-width: 767px) 100vw, 720px"
+          className="product-blog-body__image product-blog-body__image--inline"
+        />
+      </div>
+      {alt ? <figcaption className="product-blog-body__figcaption">{alt}</figcaption> : null}
+    </figure>
+  );
+}
+
 const markdownComponents: Components = {
   h1: ({ children }) => <h2 className="product-blog-body__h2">{children}</h2>,
   h2: ({ children }) => <h2 className="product-blog-body__h2">{children}</h2>,
@@ -165,7 +194,10 @@ const markdownComponents: Components = {
   strong: ({ children }) => <strong className="product-blog-body__strong">{children}</strong>,
   em: ({ children }) => <em className="product-blog-body__em">{children}</em>,
   hr: () => <hr className="product-blog-body__hr" />,
-  img: () => null,
+  img: ({ src, alt }) => {
+    if (!src || typeof src !== 'string') return null;
+    return <BlogInlineImage src={src} alt={typeof alt === 'string' ? alt : ''} />;
+  },
   a: ({ href, children }) => (
     <a
       href={href}
@@ -206,8 +238,15 @@ export function ProductBlogBody({
   imageAlt = '',
   headline,
 }: ProductBlogBodyProps) {
-  const { image, introMarkdown, bodyMarkdown } = prepareBlogContent(markdown, headline);
-  const asideImage = image ?? (imageUrl ? { src: imageUrl, alt: imageAlt } : null);
+  // When a product/featured cover is provided, keep every body image inline.
+  // Otherwise lift the first markdown image into the hero and keep the rest inline.
+  const hasCover = Boolean(imageUrl);
+  const { image, introMarkdown, bodyMarkdown } = prepareBlogContent(markdown, headline, {
+    keepInlineImages: hasCover,
+  });
+  const asideImage = hasCover
+    ? { src: imageUrl as string, alt: imageAlt }
+    : image;
   const hasHero = Boolean(introMarkdown || asideImage);
 
   return (

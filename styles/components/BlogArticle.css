@@ -56,6 +56,33 @@
   margin: 0;
 }
 
+.product-blog-body__figure--inline {
+  margin: 1.75rem 0;
+  width: 100%;
+}
+
+.product-blog-body__figure-inner--inline {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  max-height: 520px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+}
+
+.product-blog-body__image--inline {
+  object-fit: contain;
+}
+
+.product-blog-body__figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
+}
+
 .product-blog-body__figure-inner {
   position: relative;
   width: 100%;

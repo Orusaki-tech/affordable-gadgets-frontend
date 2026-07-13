@@ -273,15 +273,20 @@ export function ProductCard({
       return;
     }
 
-    if (isTouchLikeRef.current && !isPeekOpen) {
+    // Touch: never navigate via whitespace — open/keep peek so filters stay usable.
+    // Product details is only via the dedicated details button on the peek UI.
+    if (isTouchLikeRef.current) {
       event.preventDefault();
-      setIsPeekOpen(true);
-      window.dispatchEvent(
-        new CustomEvent('product-card-peek', { detail: product.id })
-      );
-      handlePrefetch();
+      if (!isPeekOpen) {
+        setIsPeekOpen(true);
+        window.dispatchEvent(
+          new CustomEvent('product-card-peek', { detail: product.id })
+        );
+        handlePrefetch();
+      }
       return;
     }
+
     setProductDetailPlaceholder(product);
   };
 
@@ -331,7 +336,9 @@ export function ProductCard({
       </button>
       <button
         type="button"
-        className="product-card__details-btn"
+        className={`product-card__details-btn${
+          selectedRam !== null ? ' product-card__details-btn--animate' : ''
+        }`}
         onClick={handleBuyClick}
         aria-label="View product details"
       >

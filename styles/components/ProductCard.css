@@ -140,29 +140,49 @@
   top: 8px;
 }
 
-.product-card__details-btn {
-  /* Sit just above the footer Buy bar, aligned with the close/options icon */
-  bottom: 52px;
-  background: var(--primary-dark);
-  border-color: var(--primary-dark);
-  color: var(--ui-white);
+.product-card__peek-toggle:not(.product-card__peek-toggle--open) {
   animation: product-card-details-pulse 2.4s ease-in-out infinite;
 }
 
-.product-card--featured.product-card--peek .product-card__details-btn {
-  /* Keep clear of the expanded overlay actions */
+.product-card__peek-toggle:not(.product-card__peek-toggle--open) svg {
+  animation: product-card-details-nudge 1.8s ease-in-out infinite;
+}
+
+.product-card__peek-toggle:active {
+  transform: scale(0.94);
+  animation: none;
+}
+
+.product-card__details-btn {
+  /* Only on peek/options UI — just above add-to-cart, aligned with close */
+  top: auto;
+  bottom: 58px;
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--ui-white);
+}
+
+.product-card--peek .product-card__details-btn {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.product-card--peek .product-card__details-btn--animate {
+  animation: product-card-details-pulse 2.4s ease-in-out infinite;
+}
+
+.product-card--peek .product-card__details-btn--animate svg {
+  animation: product-card-details-nudge 1.8s ease-in-out infinite;
 }
 
 .product-card__details-btn svg,
 .product-card__peek-toggle svg {
   width: 16px;
   height: 16px;
-}
-
-.product-card__details-btn svg {
-  animation: product-card-details-nudge 1.8s ease-in-out infinite;
 }
 
 .product-card__details-btn:active {
@@ -174,6 +194,11 @@
   background: var(--primary-dark);
   border-color: var(--primary-dark);
   color: var(--ui-white);
+  animation: none;
+}
+
+.product-card__peek-toggle--open svg {
+  animation: none;
 }
 
 @keyframes product-card-details-nudge {
@@ -207,8 +232,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .product-card__details-btn,
-  .product-card__details-btn svg {
+  .product-card__peek-toggle:not(.product-card__peek-toggle--open),
+  .product-card__peek-toggle:not(.product-card__peek-toggle--open) svg,
+  .product-card--peek .product-card__details-btn--animate,
+  .product-card--peek .product-card__details-btn--animate svg {
     animation: none;
   }
 }

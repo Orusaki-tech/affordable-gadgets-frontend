@@ -109,7 +109,7 @@ export function normalizeArticleList(
 }
 
 export function isRenderableArticleCard(article: PublicArticleCard): boolean {
-  return Boolean(article.slug && article.headline && article.product_slug);
+  return Boolean(article.slug && article.headline);
 }
 
 export async function fetchAllPublishedArticles(
@@ -204,6 +204,17 @@ export async function fetchArticleBySlugs(
         return null;
       }
     }
+    throw e;
+  }
+}
+
+/** Standalone (no product) or global article retrieve by article slug. */
+export async function fetchArticleBySlug(articleSlug: string): Promise<PublicProductArticle | null> {
+  if (!articleSlug) return null;
+  try {
+    return await ApiService.apiV1PublicArticlesRetrieve(articleSlug);
+  } catch (e: unknown) {
+    if (getErrorStatus(e) === 404) return null;
     throw e;
   }
 }

@@ -117,17 +117,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       for (const article of articleResponse.results ?? []) {
         const productSlug = article.product_slug?.trim();
         const articleSlug = article.slug?.trim();
-        if (!productSlug || !articleSlug) continue;
+        if (!articleSlug) continue;
 
-        addEntry(entries, seen, {
-          url: `${baseUrl}/products/${productSlug}/blog/${articleSlug}`,
-          lastModified: parseLastModified(
-            article.updated_at ?? article.published_at,
-            refreshedAt,
-          ),
-          changeFrequency: "monthly",
-          priority: 0.74,
-        });
+        if (productSlug) {
+          addEntry(entries, seen, {
+            url: `${baseUrl}/products/${productSlug}/blog/${articleSlug}`,
+            lastModified: parseLastModified(
+              article.updated_at ?? article.published_at,
+              refreshedAt,
+            ),
+            changeFrequency: "monthly",
+            priority: 0.74,
+          });
+        } else {
+          addEntry(entries, seen, {
+            url: `${baseUrl}/blog/${articleSlug}`,
+            lastModified: parseLastModified(
+              article.updated_at ?? article.published_at,
+              refreshedAt,
+            ),
+            changeFrequency: "monthly",
+            priority: 0.74,
+          });
+        }
       }
 
       articlesHasNext = articleResponse.next != null;

@@ -14,8 +14,16 @@ export function articlePath(productSlug: string, articleSlug: string) {
   return `/products/${productSlug.trim()}/blog/${articleSlug.trim()}`;
 }
 
+export function blogPath(articleSlug: string) {
+  return `/blog/${articleSlug.trim()}`;
+}
+
 export function articleUrl(productSlug: string, articleSlug: string) {
   return `${trimBase()}${articlePath(productSlug, articleSlug)}`;
+}
+
+export function blogUrl(articleSlug: string) {
+  return `${trimBase()}${blogPath(articleSlug)}`;
 }
 
 export function resolveCanonicalProductSlug(requestedSlug: string, productSlug?: string | null) {

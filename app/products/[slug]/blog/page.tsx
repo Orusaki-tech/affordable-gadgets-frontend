@@ -1,4 +1,4 @@
-import { notFound, permanentRedirect, redirect } from 'next/navigation';
+import { permanentRedirect, redirect } from 'next/navigation';
 import { fetchPrimaryArticle, fetchProductBySlug } from '@/lib/blog/articlePage';
 import { permanentRedirectToCanonicalProductSlug } from '@/lib/seo/productSlugRedirect';
 import { articlePath, productPath, resolveCanonicalProductSlug } from '@/lib/seo/urls';
@@ -11,7 +11,7 @@ export default async function ProductBlogRedirectPage({ params }: ProductBlogRed
   const { slug } = await params;
   const product = await fetchProductBySlug(slug);
   if (!product) {
-    notFound();
+    redirect('/articles');
   }
   permanentRedirectToCanonicalProductSlug(slug, product.slug, '/blog');
   const canonicalSlug = resolveCanonicalProductSlug(slug, product?.slug);

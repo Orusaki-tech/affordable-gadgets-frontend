@@ -113,6 +113,13 @@ const nextConfig: NextConfig = {
         destination: iphone17KenyaGuide,
         permanent: true,
       },
+      {
+        source:
+          '/products/apple-iphone-15-pro-max/blog/iphone-15-review-why-its-still-a-great-buy-in-2026',
+        destination:
+          '/products/apple-iphone-15-sim/blog/iphone-15-review-why-its-still-a-great-buy-in-2026',
+        permanent: true,
+      },
     ];
   },
 };

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { notFound, permanentRedirect } from 'next/navigation';
+import { permanentRedirect, redirect } from 'next/navigation';
 import { brandConfig } from '@/lib/config/brand';
 import { StructuredData } from '@/components/StructuredData';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
@@ -74,7 +74,7 @@ export default async function StandaloneBlogPage({ params }: StandaloneBlogPageP
   const article = await fetchArticleBySlug(slug);
 
   if (!article) {
-    notFound();
+    redirect('/articles');
   }
 
   const canonicalArticleSlug = article.slug?.trim() || slug;

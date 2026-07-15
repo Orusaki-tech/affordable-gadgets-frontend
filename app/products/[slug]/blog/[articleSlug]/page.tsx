@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { notFound, permanentRedirect } from 'next/navigation';
+import { permanentRedirect, redirect } from 'next/navigation';
 import { brandConfig } from '@/lib/config/brand';
 import { StructuredData } from '@/components/StructuredData';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
@@ -99,7 +99,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
   const article = await fetchArticleBySlugs(slug, articleSlug);
 
   if (!article) {
-    notFound();
+    redirect('/articles');
   }
 
   // Global article fallback can resolve content under the wrong product URL.
@@ -108,7 +108,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
 
   const product = await fetchProductBySlug(slug);
   if (!product) {
-    notFound();
+    redirect('/articles');
   }
 
   permanentRedirectToCanonicalProductSlug(slug, product.slug, `/blog/${articleSlug}`);

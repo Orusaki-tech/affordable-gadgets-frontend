@@ -192,18 +192,14 @@ export async function fetchArticleBySlugs(
 ): Promise<PublicProductArticle | null> {
   try {
     // Generated client arg order is (articleSlug, productSlug).
+    // Do not fall back to the global article endpoint here — that soft-serves
+    // the same article under unrelated product URLs and pollutes Google's index.
     return await ApiService.apiV1PublicProductsBySlugArticlesRetrieve(
       articleSlug,
       productSlug
     );
   } catch (e: unknown) {
-    if (getErrorStatus(e) === 404) {
-      try {
-        return await ApiService.apiV1PublicArticlesRetrieve(articleSlug);
-      } catch {
-        return null;
-      }
-    }
+    if (getErrorStatus(e) === 404) return null;
     throw e;
   }
 }

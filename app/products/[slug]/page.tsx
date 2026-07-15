@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import { notFound, permanentRedirect } from 'next/navigation';
+import { redirect, permanentRedirect } from 'next/navigation';
 import { ProductDetail } from '@/components/ProductDetail';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
@@ -114,8 +114,8 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
   if (!product) {
     return {
-      title: 'Product Not Found',
-      robots: { index: false, follow: false },
+      title: 'Products',
+      alternates: { canonical: '/products' },
     };
   }
 
@@ -166,7 +166,7 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
   }
 
   if (!product) {
-    notFound();
+    redirect('/products');
   }
 
   const querySuffix = buildProductQuerySuffix(resolvedSearchParams);

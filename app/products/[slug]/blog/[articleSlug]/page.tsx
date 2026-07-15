@@ -9,6 +9,7 @@ import { Footer } from '@/components/Footer';
 import { ProductBlogBody } from '@/components/ProductBlogMarkdown';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import {
+  fetchArticleBySlug,
   fetchArticleBySlugs,
   fetchProductBySlug,
   resolveImageUrl,
@@ -49,6 +50,20 @@ function redirectIfArticleBelongsToAnotherProduct(
   permanentRedirect(articlePath(owner, canonicalArticleSlug));
 }
 
+async function redirectMissingProductArticle(productSlug: string, articleSlug: string): Promise<never> {
+  // If the article exists under another product, send crawlers there (301).
+  const orphan = await fetchArticleBySlug(articleSlug);
+  const owner = orphan?.product_slug?.trim();
+  const canonicalArticleSlug = orphan?.slug?.trim() || articleSlug;
+  if (owner && owner !== productSlug) {
+    permanentRedirect(articlePath(owner, canonicalArticleSlug));
+  }
+  if (owner && orphan?.slug && orphan.slug !== articleSlug) {
+    permanentRedirect(articlePath(owner, orphan.slug));
+  }
+  redirect('/articles');
+}
+
 export async function generateMetadata({ params }: ProductBlogArticlePageProps): Promise<Metadata> {
   const { slug, articleSlug } = await params;
   const [article, product] = await Promise.all([
@@ -58,8 +73,8 @@ export async function generateMetadata({ params }: ProductBlogArticlePageProps):
 
   if (!article) {
     return {
-      title: 'Article',
-      robots: { index: false, follow: false },
+      title: 'Buying Guides & Articles',
+      alternates: { canonical: '/articles' },
     };
   }
 
@@ -99,19 +114,24 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
   const article = await fetchArticleBySlugs(slug, articleSlug);
 
   if (!article) {
-    redirect('/articles');
+    await redirectMissingProductArticle(slug, articleSlug);
   }
 
-  // Global article fallback can resolve content under the wrong product URL.
-  // Always send Google (and users) to the article's real product parent.
+  // Safety net if product_slug disagrees with the URL (e.g. after reparenting).
   redirectIfArticleBelongsToAnotherProduct(slug, article.product_slug, article.slug || articleSlug);
 
   const product = await fetchProductBySlug(slug);
   if (!product) {
-    redirect('/articles');
+    await redirectMissingProductArticle(slug, articleSlug);
   }
 
+  // Prefer the article's declared parent once the product slug is canonicalized.
   permanentRedirectToCanonicalProductSlug(slug, product.slug, `/blog/${articleSlug}`);
+  redirectIfArticleBelongsToAnotherProduct(
+    resolveCanonicalProductSlug(slug, product.slug),
+    article.product_slug,
+    article.slug || articleSlug,
+  );
   permanentRedirectToCanonicalArticleSlug(
     resolveCanonicalProductSlug(slug, product.slug),
     articleSlug,

@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: StandaloneBlogPageProps): Pro
 
   if (!article) {
     return {
-      title: 'Article',
-      robots: { index: false, follow: false },
+      title: 'Buying Guides & Articles',
+      alternates: { canonical: '/articles' },
     };
   }
 

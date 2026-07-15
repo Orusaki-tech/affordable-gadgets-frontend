@@ -94,8 +94,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/faq",
     "/shipping",
     "/contact",
-    "/budget-search",
-    "/match-score",
     "/reviews",
     "/videos",
   ]) {

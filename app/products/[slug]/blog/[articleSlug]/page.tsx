@@ -114,7 +114,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
   const article = await fetchArticleBySlugs(slug, articleSlug);
 
   if (!article) {
-    await redirectMissingProductArticle(slug, articleSlug);
+    return await redirectMissingProductArticle(slug, articleSlug);
   }
 
   // Safety net if product_slug disagrees with the URL (e.g. after reparenting).
@@ -122,7 +122,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
 
   const product = await fetchProductBySlug(slug);
   if (!product) {
-    await redirectMissingProductArticle(slug, articleSlug);
+    return await redirectMissingProductArticle(slug, articleSlug);
   }
 
   // Prefer the article's declared parent once the product slug is canonicalized.

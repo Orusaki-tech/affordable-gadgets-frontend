@@ -206,16 +206,14 @@ function BlogAsideImage({ src, alt }: BlogImage) {
 function BlogInlineImage({ src, alt }: BlogImage) {
   return (
     <figure className="product-blog-body__figure product-blog-body__figure--inline">
-      <div className="product-blog-body__figure-inner product-blog-body__figure-inner--inline">
-        <CloudinaryImage
-          src={src}
-          alt={alt}
-          preset="productGallery"
-          fit="contain"
-          sizes="(max-width: 767px) 100vw, 720px"
-          className="product-blog-body__image product-blog-body__image--inline"
-        />
-      </div>
+      <CloudinaryImage
+        src={src}
+        alt={alt}
+        preset="productGallery"
+        fit="contain"
+        sizes="(max-width: 767px) 100vw, 800px"
+        className="product-blog-body__image product-blog-body__image--inline"
+      />
       {alt ? <figcaption className="product-blog-body__figcaption">{alt}</figcaption> : null}
     </figure>
   );

@@ -59,14 +59,20 @@
 .product-blog-body__figure--inline {
   margin: 1.75rem 0;
   width: 100%;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  overflow: visible;
 }
 
 .product-blog-body__figure-inner--inline {
   position: relative;
   width: 100%;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  background: #f3f4f6;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
   border: none;
   line-height: 0;
 }
@@ -76,7 +82,12 @@
   width: 100%;
   height: auto;
   max-width: 100%;
+  border-radius: 6px;
   object-fit: contain;
+}
+
+.product-blog-body__figure--inline .product-blog-body__figcaption {
+  padding: 0.55rem 0 0;
 }
 
 .product-blog-body__figcaption {

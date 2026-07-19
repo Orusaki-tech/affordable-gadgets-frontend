@@ -67,16 +67,6 @@
   overflow: visible;
 }
 
-.product-blog-body__figure-inner--inline {
-  position: relative;
-  width: 100%;
-  border-radius: 0;
-  overflow: visible;
-  background: transparent;
-  border: none;
-  line-height: 0;
-}
-
 .product-blog-body__image--inline {
   display: block;
   width: 100%;
@@ -103,6 +93,40 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   margin: 0 auto;
+}
+
+/* Must come after .figure-inner so inline images are not forced into 1:1. */
+.product-blog-body__figure-inner--inline {
+  position: relative;
+  width: 100%;
+  aspect-ratio: auto;
+  height: auto;
+  max-height: none;
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+  border: none;
+  line-height: 0;
+}
+
+/* If an older build still absolutizes fill images, drop to natural flow. */
+.product-blog-body__figure-inner--inline .cloudinary-image__fill,
+.product-blog-body__figure--inline > .cloudinary-image__fill {
+  position: static;
+  inset: auto;
+  display: block;
+  overflow: visible;
+}
+
+.product-blog-body__figure-inner--inline .cloudinary-image__img--fill,
+.product-blog-body__figure--inline .cloudinary-image__img--fill,
+.product-blog-body__image--inline.cloudinary-image__img--fill {
+  position: static;
+  inset: auto;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 .product-blog-body__image {

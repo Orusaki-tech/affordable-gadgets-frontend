@@ -118,19 +118,22 @@
   overflow: visible;
 }
 
+.product-blog-body__image {
+  object-fit: cover;
+}
+
 .product-blog-body__figure-inner--inline .cloudinary-image__img--fill,
 .product-blog-body__figure--inline .cloudinary-image__img--fill,
-.product-blog-body__image--inline.cloudinary-image__img--fill {
+.product-blog-body__image--inline.cloudinary-image__img--fill,
+.product-blog-body__image--inline {
   position: static;
   inset: auto;
+  display: block;
   width: 100%;
   height: auto;
   max-width: 100%;
+  border-radius: 6px;
   object-fit: contain;
-}
-
-.product-blog-body__image {
-  object-fit: cover;
 }
 
 .product-blog-body__sections {

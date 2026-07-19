@@ -11,7 +11,6 @@ import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import {
   fetchArticleBySlug,
   resolveImageUrl,
-  resolveProductImage,
 } from '@/lib/blog/articlePage';
 import { articlePath, blogPath, blogUrl } from '@/lib/seo/urls';
 
@@ -91,9 +90,7 @@ export default async function StandaloneBlogPage({ params }: StandaloneBlogPageP
   const site = brandConfig.siteUrl.replace(/\/+$/, '');
   const articleUrl = blogUrl(canonicalArticleSlug);
   const headline = article.headline?.trim() || article.seo_title?.trim() || 'Blog';
-  const featuredImage =
-    resolveImageUrl(article.thumbnail_image as string | undefined) ||
-    resolveProductImage(null);
+  const featuredImage = resolveImageUrl(article.thumbnail_image as string | undefined);
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#ffffff' }}>
@@ -169,7 +166,7 @@ export default async function StandaloneBlogPage({ params }: StandaloneBlogPageP
           <article className="product-blog-article">
             <ProductBlogBody
               markdown={article.body || '*No content yet.*'}
-              imageUrl={featuredImage}
+              imageUrl={featuredImage || undefined}
               imageAlt={headline}
               headline={headline}
             />

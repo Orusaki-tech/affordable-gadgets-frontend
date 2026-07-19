@@ -26,7 +26,7 @@ export function BlogCard({ imageUrl, category, title, href }: BlogCardProps) {
           alt={title}
           preset="productThumb"
           fill
-          fit="contain"
+          fit="cover"
           className="blog-card__image"
           sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 300px"
         />

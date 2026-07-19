@@ -15,7 +15,7 @@ export function BlogFeaturedImage({ src, alt }: BlogFeaturedImageProps) {
         alt={alt}
         preset="productGallery"
         fill
-        fit="contain"
+          fit="cover"
         sizes="(max-width: 768px) 100vw, 768px"
         className="blog-featured-image__img"
         priority

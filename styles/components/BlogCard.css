@@ -22,11 +22,11 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
-  background: #fff;
+  background: #f3f4f6;
 }
 
 .blog-card__image {
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .blog-card__body {

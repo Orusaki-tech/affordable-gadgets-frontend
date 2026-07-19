@@ -194,7 +194,7 @@ function BlogAsideImage({ src, alt }: BlogImage) {
           alt={alt}
           preset="productGallery"
           fill
-          fit="contain"
+          fit="cover"
           sizes="(max-width: 767px) 100vw, 300px"
           className="product-blog-body__image"
         />
@@ -212,7 +212,7 @@ function BlogInlineImage({ src, alt }: BlogImage) {
           alt={alt}
           preset="productGallery"
           fill
-          fit="contain"
+          fit="cover"
           sizes="(max-width: 767px) 100vw, 720px"
           className="product-blog-body__image product-blog-body__image--inline"
         />

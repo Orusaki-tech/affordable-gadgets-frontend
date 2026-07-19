@@ -64,16 +64,19 @@
 .product-blog-body__figure-inner--inline {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 2;
-  max-height: 520px;
   border-radius: 0.75rem;
   overflow: hidden;
   background: #f3f4f6;
   border: none;
+  line-height: 0;
 }
 
 .product-blog-body__image--inline {
-  object-fit: cover;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 .product-blog-body__figcaption {

@@ -211,8 +211,7 @@ function BlogInlineImage({ src, alt }: BlogImage) {
           src={src}
           alt={alt}
           preset="productGallery"
-          fill
-          fit="cover"
+          fit="contain"
           sizes="(max-width: 767px) 100vw, 720px"
           className="product-blog-body__image product-blog-body__image--inline"
         />

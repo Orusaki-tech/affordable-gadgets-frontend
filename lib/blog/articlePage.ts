@@ -21,6 +21,21 @@ async function publicApiHeaders(): Promise<Record<string, string>> {
 /** Articles for homepage blog carousel — one per featured product, same order as featured carousel. */
 export async function fetchFeaturedArticles(): Promise<PublicArticleCard[]> {
   try {
+    const base = OpenAPI.BASE.replace(/\/+$/, '');
+    const tagRes = await fetch(`${base}/api/v1/public/articles/?tag=featured&page_size=${FEATURED_ARTICLES_PAGE_SIZE}`, {
+      credentials: 'omit',
+      headers: await publicApiHeaders(),
+      next: { revalidate: BLOG_REVALIDATE },
+    });
+    if (tagRes.ok) {
+      const tagData = (await tagRes.json()) as { results?: PublicArticleCard[] };
+      const tagged = (tagData.results ?? []).filter(isRenderableArticleCard);
+      if (tagged.length > 0) return tagged.slice(0, FEATURED_ARTICLES_PAGE_SIZE);
+    }
+  } catch {
+    /* fallback to product-based */
+  }
+  try {
     const products = await fetchFeaturedProductsForArticles();
     if (!products.length) return [];
 

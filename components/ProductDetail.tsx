@@ -32,6 +32,7 @@ import { getPlaceholderProductImage, getPlaceholderUnitImage, getPlaceholderVide
 import { getAndClearProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
 import { PRICING_MODE } from '@/lib/constants/apiEnums';
 import { PromotionVideosDrawer } from '@/components/PromotionVideosDrawer';
+import { PreOrderModal } from '@/components/PreOrderModal';
 import { ProductTrustStamp } from '@/components/ProductTrustStamp';
 import { ProductBlogTab } from '@/components/ProductBlogTab';
 import type { PromotionVideoProduct } from '@/components/ProductVideoReel';
@@ -40,6 +41,8 @@ import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
 import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
 import { AuthChoiceModal } from '@/components/AuthChoiceModal';
 import { getApiErrorInfo } from '@/lib/utils/apiError';
+
+const IPHONE_18_PRO_MAX_SLUG = 'apple-iphone-18-pro-max';
 
 function hasAuthToken(): boolean {
   if (typeof window === 'undefined') return false;
@@ -336,6 +339,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const router = useRouter();
 
   const [isPromoVideosOpen, setIsPromoVideosOpen] = useState(false);
+  const [isPreOrderOpen, setIsPreOrderOpen] = useState(false);
   const [isFinancingOpen, setIsFinancingOpen] = useState(false);
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [pendingCartAdd, setPendingCartAdd] = useState<PendingCartAdd | null>(null);
@@ -944,6 +948,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     return hasAnyVideo ? [row] : [];
   }, [isEligibleForPromotion, product]);
 
+  const isIphone18ProMaxPreorder = product?.slug === IPHONE_18_PRO_MAX_SLUG;
+
   // Calculate min/max prices with promotion
   const promotionMinPrice = useMemo(() => {
     if (!isEligibleForPromotion) return null;
@@ -1221,10 +1227,14 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       type="button"
                       className="product-detail__promo-cta"
                       onClick={() => {
+                        if (isIphone18ProMaxPreorder) {
+                          setIsPreOrderOpen(true);
+                          return;
+                        }
                         setIsPromoVideosOpen(true);
                       }}
                     >
-                      View
+                      {isIphone18ProMaxPreorder ? 'Pre order now' : 'View'}
                     </button>
                   </div>
                 </div>
@@ -2294,6 +2304,22 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         subtitle={promoBannerDetails}
         products={promoDrawerProducts}
         onClose={() => setIsPromoVideosOpen(false)}
+      />
+
+      <PreOrderModal
+        open={isPreOrderOpen}
+        title={product?.product_name || promotion?.title || 'Pre-order'}
+        subtitle={promoBannerDetails}
+        videoSource={
+          product
+            ? {
+                product_video_url: (product as { product_video_url?: string | null }).product_video_url,
+                product_video_file_url: (product as { product_video_file_url?: string | null })
+                  .product_video_file_url,
+              }
+            : null
+        }
+        onClose={() => setIsPreOrderOpen(false)}
       />
 
       {isFinancingOpen && (

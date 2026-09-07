@@ -10,6 +10,8 @@ export type ProductsBrandBannerConfig = {
   /** Banner field color behind contained art (e.g. #d4e157). */
   backgroundColor?: string;
   imageAlt?: string;
+  /** Optional link when the whole banner is clickable (e.g. product PDP). */
+  href?: string;
   /** Canva / Cloudinary master width (reference: 1280 at 1×). */
   imageWidth?: number;
   /** Canva / Cloudinary master height (Back Market min-h-72 = 288px at 1280). */
@@ -21,13 +23,13 @@ const PRODUCTS_BRAND_BANNERS: Record<string, ProductsBrandBannerConfig> = {
     brandFilter: 'Apple',
     title: 'Apple',
     subtitle: 'iPhone, iPad, Mac, and accessories.',
-    backgroundColor: '#c8d84a',
+    backgroundColor: '#ffffff',
     backgroundImage:
-      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1781191802/products-banners/iphone.png',
-    imageAlt:
-      'Latest Apple devices in Kenya — shop genuine new Apple products with trusted local support',
-    imageWidth: 8000,
-    imageHeight: 1800,
+      'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1788773195/products-banners/iphone.jpg',
+    imageAlt: 'Apple 18 Pro Max — Out September 9. Pre Order Now',
+    href: '/products/apple-iphone-18-pro-max',
+    imageWidth: 7388,
+    imageHeight: 1969,
   },
   samsung: {
     brandFilter: 'Samsung',

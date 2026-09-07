@@ -3,9 +3,11 @@
  */
 'use client';
 
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 import { ApiService, PublicPromotion, PaginatedPublicPromotionList } from '@/lib/api/generated';
+import { pickActivePromotionForProduct } from '@/lib/utils/promotionPricing';
 
 /** Prefetch a single promotion (e.g. when promotionId is in URL so detail page has it in cache). */
 export function prefetchPromotion(queryClient: QueryClient, id: number): void {
@@ -45,6 +47,19 @@ export function usePromotion(id: number) {
     queryFn: () => ApiService.apiV1PublicPromotionsRetrieve(id),
     enabled: !!id,
   });
+}
+
+/** Active promotion attached to a product (URL preference optional). */
+export function useActivePromotionForProduct(
+  product?: { id?: number; product_type?: string | null } | null,
+  preferredPromotionId?: number | null,
+) {
+  const { data, isLoading, error } = usePromotions({ page_size: 50 });
+  const promotion = useMemo(
+    () => pickActivePromotionForProduct(data?.results, product, preferredPromotionId),
+    [data?.results, product, preferredPromotionId],
+  );
+  return { promotion, isLoading, error };
 }
 
 

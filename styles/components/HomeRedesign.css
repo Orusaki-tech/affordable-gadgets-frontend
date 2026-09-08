@@ -6,16 +6,58 @@
   flex: 1 1 auto;
 }
 
-/* Hero banner: always edge-to-edge cover — no left/right letterbox at any width */
+/* Hero: mobile stack (banner first); desktop 33% budget / 66% banner */
+.home-redesign__hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.home-redesign__hero-budget {
+  order: 2;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 1rem;
+  border-radius: 1rem;
+  background: var(--promo-lime, #9fe855);
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+@media (min-width: 640px) {
+  .home-redesign__hero-budget {
+    padding: 1.5rem;
+  }
+}
+
 .home-redesign__hero-banner {
+  order: 1;
   position: relative;
   width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 1rem;
   min-height: clamp(16rem, 56vw, 22rem);
   background: var(--surface-canvas, #f5f5f7);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 @media (min-width: 1024px) {
+  .home-redesign__hero-grid {
+    /* 1 : 2  →  ~33% budget / ~66% banner (not two equal thirds) */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 1.25rem;
+  }
+
+  .home-redesign__hero-budget {
+    order: 1;
+    min-height: 520px;
+  }
+
   .home-redesign__hero-banner {
+    order: 2;
     height: 100%;
     min-height: 520px;
   }

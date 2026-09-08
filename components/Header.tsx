@@ -39,7 +39,7 @@ const BUDGET_CHIPS = [
 function HeaderFallback() {
   return (
     <header className="site-header" aria-hidden>
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center px-4 lg:px-6">
+      <div className="mx-auto flex h-16 w-full items-center px-[var(--section-x)] md:px-[var(--section-x-lg)]">
         <span className="font-semibold tracking-tight text-primary">{brandConfig.name}</span>
       </div>
     </header>
@@ -197,7 +197,7 @@ function HeaderContent() {
     <header
       className={`site-header${openMegaMenu ? ' site-header--mega-open' : ''} border-b border-border-hairline bg-white`}
     >
-      <div className="site-header__container mx-auto max-w-[1400px] px-4 lg:px-6">
+      <div className="site-header__container ag-shell">
         {/* Top utility row: logo | search | actions */}
         <div className="site-header__bar flex items-center gap-3 py-3 lg:gap-5">
           <Link href="/" className="site-header__logo-link shrink-0">
@@ -349,7 +349,7 @@ function HeaderContent() {
 
         {/* Pill category nav — mockup second row */}
         <div
-          className={`site-header__nav-zone -mx-4 hidden border-t border-border-hairline bg-surface-muted/80 px-4 lg:-mx-6 lg:block lg:px-6${
+          className={`site-header__nav-zone -mx-[var(--section-x)] hidden border-t border-border-hairline bg-surface-muted/80 px-[var(--section-x)] md:-mx-[var(--section-x-lg)] md:px-[var(--section-x-lg)] lg:block${
             openMegaMenu ? ' site-header__nav-zone--mega-open' : ''
           }`}
           onMouseEnter={cancelMegaMenuClose}

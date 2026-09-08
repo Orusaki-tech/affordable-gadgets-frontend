@@ -56,7 +56,7 @@ export function AnnouncementBar(_props?: Partial<AnnouncementBarProps>) {
       role="region"
       aria-label="Site info"
     >
-      <div className="announcement-bar__container mx-auto flex h-9 max-w-[1400px] items-center justify-between gap-4 px-4 lg:px-6">
+      <div className="announcement-bar__container ag-shell flex h-9 items-center justify-between gap-4">
         <div className="announcement-bar__items flex items-center gap-2 overflow-x-auto py-1 text-[12px] font-medium whitespace-nowrap">
           {trustItems.map((item, index) => (
             <span key={item.id} className="flex items-center gap-2">

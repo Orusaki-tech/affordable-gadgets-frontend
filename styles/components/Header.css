@@ -12,13 +12,20 @@
 }
 
 .site-header__top-bar-content {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 16px;
+  max-width: none;
+  margin: 0;
+  padding: 0 var(--section-x);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 24px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .site-header__top-bar-content {
+    padding-inline: var(--section-x-lg);
+  }
 }
 
 .site-header__top-badge {
@@ -52,10 +59,17 @@
 }
 
 .site-header__container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 10px;
+  max-width: none;
+  margin: 0;
+  padding: 10px var(--section-x);
   width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .site-header__container {
+    padding-inline: var(--section-x-lg);
+  }
 }
 
 .site-header__bar {

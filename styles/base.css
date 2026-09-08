@@ -202,15 +202,17 @@
   --space-12: 3rem;
   --space-14: 3.5rem;
 
-  --section-x: var(--space-4);
-  --section-x-lg: var(--space-6);
+  --section-x: var(--space-6); /* ~px-6 */
+  --section-x-lg: var(--space-12); /* ~md:px-12 — Programs-style pad, no second max-width frame */
   --section-y: var(--space-14);
   --section-y-tight: var(--space-12);
   --section-y-hero: var(--space-6);
   --panel-pad: var(--space-6);
   --panel-pad-lg: var(--space-8);
   --panel-radius: 1rem;
-  --layout-max: 87.5rem; /* 1400px @ 16 */
+  /* Reading measure only — not for whole section shells */
+  --prose-max: 40rem;
+  --layout-max: 87.5rem; /* legacy; shells no longer center on this */
   /* Shared hero column height — rem so Ctrl+/- zoom scales budget + banner together */
   --hero-panel-min-h: 32.5rem;
 
@@ -339,9 +341,28 @@
 }
 
 html {
-  font-size: 100%; /* keep rem tied to browser/OS text size + zoom */
+  /* Default: respect browser/OS preference; rem drives type + spacing ladders */
+  font-size: 100%;
   scroll-behavior: smooth;
-  overflow-x: hidden;
+  overflow-x: clip;
+  min-height: 100dvh;
+  color-scheme: light;
+}
+
+/*
+ * Fluid root — density grows with viewport (VFRIA-style), not a fixed rem island.
+ * rem in these calcs resolves against the browser initial size (~16px).
+ */
+@media (min-width: 1024px) and (max-width: 2559px) {
+  html {
+    font-size: calc(0.875rem + (100vw - 1024px) * 0.004725);
+  }
+}
+
+@media (min-width: 2560px) {
+  html {
+    font-size: clamp(1rem, calc(1rem + (100vw - 1024px) * 0.0054), 5.25rem);
+  }
 }
 
 body {
@@ -349,10 +370,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   font-size: var(--type-body);
-  line-height: 1.4;
+  line-height: var(--body-lh);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 100%;
 }
 
 h1 {
@@ -373,24 +397,12 @@ h3 {
 }
 
 @media (min-width: 768px) {
-  body {
-    font-size: var(--type-body-lg);
-    line-height: var(--body-lh);
-  }
-
   h1 {
     font-size: var(--type-display);
   }
 
   h2 {
     font-size: var(--type-h2-lg);
-  }
-}
-
-@media (min-width: 1025px) {
-  body {
-    font-size: var(--text-lg);
-    line-height: 1.6;
   }
 }
 
@@ -439,18 +451,27 @@ h3 {
   color: var(--secondary);
 }
 
-.ag-section {
+/* Programs-style shell: full width + horizontal pad only (no centered max-width frame) */
+.ag-shell,
+.ag-section,
+.ag-bleed__inner {
   width: 100%;
-  max-width: var(--layout-max);
-  margin-inline: auto;
-  margin-top: var(--section-y);
+  max-width: none;
+  margin-inline: 0;
   padding-inline: var(--section-x);
+  box-sizing: border-box;
 }
 
-@media (min-width: 1024px) {
-  .ag-section {
+@media (min-width: 768px) {
+  .ag-shell,
+  .ag-section,
+  .ag-bleed__inner {
     padding-inline: var(--section-x-lg);
   }
+}
+
+.ag-section {
+  margin-top: var(--section-y);
 }
 
 .ag-section--tight {
@@ -476,9 +497,14 @@ h3 {
   margin-top: var(--space-5);
 }
 
+/* Short copy only — not whole section rows */
+.ag-prose {
+  max-width: var(--prose-max);
+}
+
 /*
- * Full-bleed bands: background paints edge-to-edge (any zoom/width);
- * inner keeps content on the layout max grid.
+ * Full-bleed bands: background paints edge-to-edge;
+ * inner uses the same pad shell as .ag-section (no second max-width).
  */
 .ag-bleed {
   width: 100%;
@@ -486,20 +512,6 @@ h3 {
   margin-inline: 0;
   padding-inline: 0;
   box-sizing: border-box;
-}
-
-.ag-bleed__inner {
-  width: 100%;
-  max-width: var(--layout-max);
-  margin-inline: auto;
-  padding-inline: var(--section-x);
-  box-sizing: border-box;
-}
-
-@media (min-width: 1024px) {
-  .ag-bleed__inner {
-    padding-inline: var(--section-x-lg);
-  }
 }
 
 .ag-bleed--hero {
@@ -540,7 +552,7 @@ h3 {
   background: var(--surface-container-low, #f3f3f5);
 }
 
-/* Header paints full viewport width (content stays max-width inside) */
+/* Header paints full viewport width (content stays on pad shell inside) */
 .site-header {
   width: 100%;
 }

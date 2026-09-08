@@ -1091,3 +1091,47 @@
     background-position: -200% 0;
   }
 }
+
+/* Pill category row — mockup second nav */
+.site-header__nav--pills {
+  display: flex !important;
+  height: auto !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+}
+
+.site-header__nav--pills .site-header__nav-link {
+  display: inline-flex !important;
+  align-items: center;
+  height: auto !important;
+  padding: 6px 14px !important;
+  border-radius: 9999px !important;
+  background: #fff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--on-surface) !important;
+  white-space: nowrap;
+}
+
+.site-header__nav--pills .site-header__nav-underline {
+  display: none !important;
+}
+
+.site-header__nav--pills .site-header__brand-menu--active .site-header__nav-link,
+.site-header__nav--pills .site-header__nav-link--active,
+.site-header__nav--pills .site-header__brand-menu:hover .site-header__nav-link {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+@media (min-width: 1024px) {
+  .site-header__nav-zone {
+    display: block !important;
+  }
+
+  .site-header__menu-button {
+    display: none !important;
+  }
+}
+

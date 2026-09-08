@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MaterialIcon } from '@/components/MaterialIcon';
@@ -11,17 +11,23 @@ const IPHONE_18_PRO_MAX_SLUG = 'apple-iphone-18-pro-max';
 const IPHONE_HERO_IMAGE =
   'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1788773195/products-banners/iphone.jpg';
 
-const BUDGET_PILLS = [
-  { label: 'Under KSh 20,000', href: '/products?max_price=20000' },
-  { label: 'KSh 20,000 – 40,000', href: '/products?min_price=20000&max_price=40000' },
-  { label: 'KSh 40,000 – 80,000', href: '/products?min_price=40000&max_price=80000' },
-  { label: 'Above KSh 80,000', href: '/products?min_price=80000' },
+const BUDGET_PRESETS = [
+  { label: 'Under 20k', value: 20000, href: '/products?max_price=20000' },
+  { label: '20k–50k', value: 35000, href: '/products?min_price=20000&max_price=50000' },
+  { label: 'Flagship', value: 100000, href: '/products?min_price=80000' },
 ] as const;
 
 export function HomeHeroSpotlight() {
   const router = useRouter();
   const [query, setQuery] = useState('');
+  const [budget, setBudget] = useState(45000);
   const [preOrderOpen, setPreOrderOpen] = useState(false);
+
+  const budgetHref = useMemo(() => {
+    if (budget <= 20000) return '/products?max_price=20000';
+    if (budget <= 50000) return `/products?min_price=20000&max_price=${budget}`;
+    return `/products?min_price=${Math.max(50000, budget - 20000)}&max_price=${budget + 20000}`;
+  }, [budget]);
 
   const onSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -29,96 +35,168 @@ export function HomeHeroSpotlight() {
     router.push(q ? `/products?search=${encodeURIComponent(q)}` : '/products');
   };
 
+  const whatsappWaitlist = getBusinessWhatsAppUrl(
+    'Hi — I want to join the iPhone 18 Pro Max waiting list for early discounts.'
+  );
+
   return (
     <section className="home-redesign__hero mx-auto max-w-[1400px] px-4 pt-6 lg:px-6 lg:pt-8">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
-        <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-promo-lime p-5 shadow-sm sm:p-6 lg:col-span-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-primary/70">Start here</p>
-            <h2 className="mt-2 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
-              Search to start shopping
-            </h2>
-            <p className="mt-2 text-sm text-primary/80">
-              Find verified phones, laptops, and accessories — or jump by budget.
-            </p>
-          </div>
-
-          <form onSubmit={onSearch} className="mt-6 space-y-3">
-            <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest p-2.5 shadow-sm">
+        {/* Left: search + live preview + budget matcher */}
+        <div className="flex flex-col gap-4 rounded-2xl bg-promo-lime p-5 shadow-sm sm:p-6 lg:col-span-4">
+          <form onSubmit={onSearch}>
+            <div className="flex items-center gap-2 rounded-xl bg-white p-2.5 shadow-sm">
               <MaterialIcon name="search" className="text-[20px] text-secondary" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="iPhone 15, Pixel, MacBook…"
+                placeholder="Search products…"
                 className="w-full bg-transparent text-sm outline-none"
                 aria-label="Search catalog"
               />
-              <button
-                type="submit"
-                className="rounded-lg bg-primary px-3 py-2 text-xs font-bold text-promo-lime"
-              >
-                Go
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {BUDGET_PILLS.map((pill) => (
-                <Link
-                  key={pill.href}
-                  href={pill.href}
-                  className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary transition hover:bg-primary hover:text-promo-lime"
-                >
-                  {pill.label}
-                </Link>
-              ))}
             </div>
           </form>
 
-          <a
-            href={getBusinessWhatsAppUrl('Hi — I need help picking a device.')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-promo-lime"
-          >
-            <MaterialIcon name="chat" className="text-[18px]" />
-            Ask on WhatsApp
-          </a>
+          <div className="rounded-xl bg-white p-3 shadow-sm">
+            <div className="flex gap-3">
+              <div
+                className="h-20 w-16 shrink-0 rounded-lg bg-surface-muted bg-contain bg-center bg-no-repeat"
+                style={{ backgroundImage: `url('${IPHONE_HERO_IMAGE}')` }}
+                aria-hidden
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-secondary">
+                  Featured match
+                </p>
+                <p className="truncate text-sm font-bold text-primary">Apple iPhone 18 Pro Max</p>
+                <p className="text-xs text-secondary">Pre-order · Out Sept 9</p>
+                <button
+                  type="button"
+                  onClick={() => setPreOrderOpen(true)}
+                  className="mt-2 inline-flex rounded-lg bg-primary px-3 py-1.5 text-[11px] font-bold text-promo-lime"
+                >
+                  Pre-order Now
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-primary">Search to start shopping</h2>
+            <p className="mt-1 text-sm text-primary/75">
+              Type a product name above and we&apos;ll surface matches — or use Instant Budget Match.
+            </p>
+          </div>
+
+          <div className="rounded-xl bg-white/70 p-4 backdrop-blur-sm">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-bold uppercase tracking-wider text-primary">
+                Instant Budget Match
+              </p>
+              <p className="text-sm font-bold text-primary">
+                KSh {budget.toLocaleString('en-KE')}
+              </p>
+            </div>
+            <input
+              type="range"
+              min={10000}
+              max={150000}
+              step={5000}
+              value={budget}
+              onChange={(e) => setBudget(Number(e.target.value))}
+              className="mt-3 w-full accent-primary"
+              aria-label="Budget amount"
+            />
+            <div className="mt-3 flex flex-wrap gap-2">
+              {BUDGET_PRESETS.map((preset) => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => setBudget(preset.value)}
+                  className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary hover:bg-primary hover:text-promo-lime"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+            <Link
+              href={budgetHref}
+              className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-promo-lime"
+            >
+              Show devices in budget
+              <MaterialIcon name="arrow_forward" className="text-[16px]" />
+            </Link>
+          </div>
         </div>
 
+        {/* Right: iPhone 18 Pro Max launch spotlight */}
         <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-surface-canvas p-6 shadow-sm sm:p-8 lg:col-span-8 lg:p-10">
-          <div className="relative z-10 max-w-lg">
-            <span className="inline-flex items-center gap-2 rounded-full bg-surface-container-lowest px-3 py-1 text-xs font-semibold text-primary shadow-sm">
-              <MaterialIcon name="new_releases" className="text-[16px] text-badge-bundle-orange" />
-              Out September 9
-            </span>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-primary sm:text-4xl lg:text-5xl">
+          <div className="relative z-10 max-w-xl">
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-promo-lime">
+                Authorized Stockist Launch
+              </span>
+              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary shadow-sm">
+                Global Release Window: September 2026
+              </span>
+            </div>
+
+            <p className="mt-5 text-sm font-semibold text-secondary">Out September 9</p>
+            <h2 className="mt-1 text-3xl font-bold tracking-tight text-primary sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
               Apple iPhone 18 Pro Max
             </h2>
-            <p className="mt-3 text-sm text-secondary sm:text-base">
-              Pre-order the next flagship from Affordable Gadgets KE. Walk-in and delivery options
-              available across Kenya.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
+
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={() => setPreOrderOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-promo-lime"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#f5e642] px-6 py-3.5 text-sm font-bold text-primary shadow-sm"
               >
-                Pre Order
+                Pre Order Now
                 <MaterialIcon name="arrow_forward" className="text-[18px]" />
               </button>
               <Link
                 href={`/products/${IPHONE_18_PRO_MAX_SLUG}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-border-strong bg-white px-5 py-3 text-sm font-semibold text-primary"
+                className="text-sm font-semibold text-primary underline-offset-2 hover:underline"
               >
                 View details
               </Link>
             </div>
+
+            <p className="mt-4 max-w-md text-sm text-secondary">
+              Note: WhatsApp us to join our waiting list for early discounts.
+            </p>
+            <a
+              href={whatsappWaitlist}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-whatsapp-emerald"
+            >
+              <MaterialIcon name="chat" className="text-[16px]" />
+              Direct WhatsApp Concierge
+            </a>
+
+            <div className="mt-6 flex flex-wrap gap-4 text-xs font-semibold text-on-surface-variant">
+              <span className="inline-flex items-center gap-1">
+                <MaterialIcon name="verified" className="text-[16px] text-stock-green" />
+                Genuine Apple KE IMEI
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <MaterialIcon name="swap_horiz" className="text-[16px] text-stock-green" />
+                Trade-in Supported
+              </span>
+            </div>
           </div>
+
           <div
-            className="pointer-events-none absolute inset-y-0 right-0 w-[55%] bg-contain bg-right bg-no-repeat opacity-90"
+            className="pointer-events-none absolute inset-y-4 right-0 w-[48%] bg-contain bg-right bg-no-repeat opacity-95"
             style={{ backgroundImage: `url('${IPHONE_HERO_IMAGE}')` }}
             aria-hidden
           />
+
+          <p className="relative z-10 mt-8 text-[11px] font-bold uppercase tracking-[0.16em] text-secondary">
+            Norwich Union House Hub — Nairobi CBD
+          </p>
         </div>
       </div>
 

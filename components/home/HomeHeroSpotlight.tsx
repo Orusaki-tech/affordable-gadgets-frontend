@@ -236,14 +236,14 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
             <button
               type="button"
               onClick={() => setPreOrderOpen(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#f5e642] px-6 py-3.5 text-sm font-bold text-primary shadow-md"
+              className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#f5e642] px-6 text-sm font-bold text-primary shadow-md"
             >
               Pre Order Now
               <MaterialIcon name="arrow_forward" className="text-[18px]" />
             </button>
             <Link
               href={`/products/${IPHONE_18_PRO_MAX_SLUG}`}
-              className="inline-flex items-center rounded-xl border border-border-strong bg-white/95 px-5 py-3.5 text-sm font-semibold text-primary shadow-sm backdrop-blur-sm"
+              className="inline-flex h-11 items-center rounded-xl border border-border-strong bg-white/95 px-5 text-sm font-semibold text-primary shadow-sm backdrop-blur-sm"
             >
               View details
             </Link>

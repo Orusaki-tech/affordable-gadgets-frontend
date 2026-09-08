@@ -1108,27 +1108,32 @@
   }
 }
 
-/* Pill category row — mockup second nav */
+/* Pill category row — every link shares identical 32px chip geometry */
 .site-header__nav--pills {
   display: flex !important;
   height: auto !important;
   width: 100% !important;
   justify-content: flex-start !important;
+  align-items: center !important;
   gap: 6px !important;
 }
 
 .site-header__nav--pills .site-header__brand-menu {
-  height: auto !important;
+  height: 32px !important;
   align-items: center;
 }
 
+.site-header__nav--pills a,
+.site-header__nav--pills .ag-nav-pill,
+.site-header__nav--pills .ag-chip,
 .site-header__nav--pills .site-header__nav-link {
   display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
   height: 32px !important;
   min-height: 32px !important;
+  max-height: 32px !important;
   padding: 0 12px !important;
   border-radius: 9999px !important;
   background: #fff !important;
@@ -1136,7 +1141,9 @@
   font-weight: 600 !important;
   line-height: 1 !important;
   color: var(--on-surface) !important;
-  white-space: nowrap;
+  white-space: nowrap !important;
+  border: 1px solid transparent !important;
+  gap: 0 !important;
 }
 
 .site-header__nav--pills .site-header__nav-underline {
@@ -1145,7 +1152,9 @@
 
 .site-header__nav--pills .site-header__brand-menu--active .site-header__nav-link,
 .site-header__nav--pills .site-header__nav-link--active,
-.site-header__nav--pills .site-header__brand-menu:hover .site-header__nav-link {
+.site-header__nav--pills .ag-nav-pill--active,
+.site-header__nav--pills .site-header__brand-menu:hover .site-header__nav-link,
+.site-header__nav--pills .site-header__brand-menu:hover .ag-nav-pill {
   background: var(--primary) !important;
   color: #fff !important;
 }

@@ -71,7 +71,6 @@ export function HeaderBrandMenu({
         onClick={onNavigate}
       >
         {brand.navLabel}
-        <span className="site-header__nav-underline" />
       </Link>
     </div>
   );
@@ -137,7 +136,6 @@ export function HeaderMoreBrandsMenu({
         onClick={onNavigate}
       >
         More
-        <span className="site-header__nav-underline" />
       </Link>
     </div>
   );

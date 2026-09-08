@@ -6,13 +6,16 @@
   flex: 1 1 auto;
 }
 
-/* One chip system: interactive filters / budget / CTAs */
-.ag-chip {
+/* One chip system: interactive filters / budget / nav / CTAs */
+.ag-chip,
+.ag-nav-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
   height: 32px;
+  min-height: 32px;
+  max-height: 32px;
   padding: 0 12px;
   border-radius: 9999px;
   font-size: 12px;
@@ -23,6 +26,8 @@
   border: 1px solid transparent;
   vertical-align: middle;
   gap: 4px;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .ag-chip--muted {
@@ -54,7 +59,6 @@
 }
 
 .ag-chip--cta {
-  height: 32px;
   padding: 0 14px;
   font-weight: 700;
 }
@@ -86,24 +90,11 @@
   color: color-mix(in srgb, #fff 85%, transparent);
 }
 
-/* Nav pills share the same scale as chips */
+/* Nav pills = same chip geometry, white fill */
 .ag-nav-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
-  text-decoration: none;
   background: #fff;
   color: var(--on-surface, #1a1c1d);
-  border: 0;
-  flex-shrink: 0;
+  border-color: transparent;
 }
 
 .ag-nav-pill:hover {

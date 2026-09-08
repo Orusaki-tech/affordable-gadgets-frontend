@@ -31,7 +31,7 @@ export default function ContactPage() {
             <span className="font-semibold">Email:</span> affordablegadgetske@gmail.com
           </p>
           <p>
-            <span className="font-semibold">Location:</span> Kimathi House Room 504, Nairobi
+            <span className="font-semibold">Location:</span> Kimathi House Room 504, 5th Floor, Nairobi
           </p>
         </div>
       </main>

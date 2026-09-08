@@ -39,15 +39,9 @@ export function Footer() {
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="ag-chip ag-chip--sm" style={{ background: 'var(--stock-green-light)', color: 'var(--stock-green)' }}>
-                M-Pesa Verified
-              </span>
-              <span className="ag-chip ag-chip--sm ag-chip--muted uppercase tracking-wider">
-                Lipa Polepole BNPL
-              </span>
-              <span className="ag-chip ag-chip--sm ag-chip--muted uppercase tracking-wider">
-                6-12M Warranty
-              </span>
+              <span className="ag-tag ag-tag--success">M-Pesa Verified</span>
+              <span className="ag-tag">Lipa Polepole BNPL</span>
+              <span className="ag-tag">6–12M Warranty</span>
             </div>
             <div className="flex items-center gap-3 pt-2">
               {(brandConfig.business.sameAs || []).map((url) => (
@@ -77,7 +71,7 @@ export function Footer() {
             </Link>
             <Link href="/financing" className="flex items-center gap-1 text-sm text-secondary transition hover:text-primary">
               <MaterialIcon name="payments" className="text-[16px]" />
-              Financing / BNPL
+              Financing
             </Link>
             <Link href="/wishlist" className="flex items-center gap-1 text-sm text-secondary transition hover:text-primary">
               <MaterialIcon name="favorite" className="text-[16px]" />

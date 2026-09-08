@@ -84,7 +84,7 @@ export const brandConfig = {
     name: 'Affordable Gadgets KE',
     description: 'Your go to destination for affordable tech devices, PCs & accessories. Quality Gadgets at unbeatable prices!',
     address: {
-      streetAddress: 'Kimathi House Room 504',
+      streetAddress: 'Kimathi House Room 504, 5th Floor',
       addressLocality: 'Nairobi',
       addressRegion: 'Nairobi',
       postalCode: '00100',

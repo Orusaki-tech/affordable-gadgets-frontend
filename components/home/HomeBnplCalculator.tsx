@@ -40,11 +40,7 @@ export function HomeBnplCalculator() {
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               {PARTNERS.map((partner) => (
-                <span
-                  key={partner}
-                  className="ag-chip ag-chip--sm"
-                  style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', borderColor: 'transparent' }}
-                >
+                <span key={partner} className="ag-tag ag-tag--on-dark">
                   {partner}
                 </span>
               ))}

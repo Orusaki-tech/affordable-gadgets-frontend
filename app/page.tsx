@@ -179,7 +179,7 @@ export default async function HomePage() {
           {
             question: 'Where are you located in Nairobi?',
             answer:
-              'Visit our CBD shop at Norwich Union House, Kimathi Street (also Kimathi House Room 504). You can also order online for delivery.',
+              'Visit our CBD shop at Kimathi House Room 504, 5th Floor, Nairobi. You can also order online for delivery.',
           },
         ]}
       />

@@ -6,7 +6,7 @@
   flex: 1 1 auto;
 }
 
-/* Uniform chip / pill tokens used across header + homepage */
+/* One chip system: interactive filters / budget / CTAs */
 .ag-chip {
   display: inline-flex;
   align-items: center;
@@ -22,12 +22,7 @@
   text-decoration: none;
   border: 1px solid transparent;
   vertical-align: middle;
-}
-
-.ag-chip--sm {
-  height: 28px;
-  padding: 0 10px;
-  font-size: 11px;
+  gap: 4px;
 }
 
 .ag-chip--muted {
@@ -52,34 +47,55 @@
   color: var(--promo-lime, #9fe855);
 }
 
+.ag-chip--lime {
+  background: var(--promo-lime, #9fe855);
+  color: var(--primary, #030304);
+  border-color: transparent;
+}
+
 .ag-chip--cta {
-  height: 36px;
+  height: 32px;
   padding: 0 14px;
-  font-size: 12px;
   font-weight: 700;
 }
 
-.ag-chip--dark {
-  background: var(--primary, #030304);
-  color: var(--promo-lime, #9fe855);
-  border-color: transparent;
+/* Quiet status / location labels — not interactive chips */
+.ag-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--on-surface, #1a1c1d) 6%, transparent);
+  color: var(--on-surface-variant, #46464a);
 }
 
-.ag-chip--ghost {
-  background: color-mix(in srgb, #fff 90%, transparent);
-  color: var(--secondary, #5e5e63);
-  border-color: transparent;
+.ag-tag--success {
+  background: var(--stock-green-light, #e8f5e9);
+  color: var(--stock-green, #2e7d32);
 }
 
+.ag-tag--on-dark {
+  background: color-mix(in srgb, #fff 12%, transparent);
+  color: color-mix(in srgb, #fff 85%, transparent);
+}
+
+/* Nav pills share the same scale as chips */
 .ag-nav-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  height: 36px;
-  padding: 0 14px;
+  height: 32px;
+  padding: 0 12px;
   border-radius: 9999px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
@@ -149,16 +165,44 @@
   color: var(--primary, #030304);
 }
 
+/* Default footer bar: dark bar needs light type (was dark-on-dark) */
+.home-redesign__featured .product-card__footer--featured {
+  background: var(--primary, #030304);
+}
+
+.home-redesign__featured .product-card__footer-bar .product-card__name,
+.home-redesign__featured .product-card__footer-bar .product-card__name--featured {
+  color: #fff;
+}
+
+.home-redesign__featured .product-card__buy-btn--featured {
+  color: var(--promo-lime, #9fe855);
+  border-color: var(--promo-lime, #9fe855);
+  background: transparent;
+}
+
+.home-redesign__featured .product-card__buy-btn--featured:hover {
+  background: var(--promo-lime, #9fe855);
+  color: var(--primary, #030304);
+}
+
 .home-redesign__featured .product-card__cta,
-.home-redesign__featured .product-card__add-to-cart,
-.home-redesign__featured .product-card__footer-bar {
+.home-redesign__featured .product-card__add-to-cart-btn--main {
   background: var(--primary, #030304);
   color: var(--promo-lime, #9fe855);
   border-color: var(--primary, #030304);
 }
 
-.home-redesign__featured .product-card__price,
-.home-redesign__featured .product-card__name {
+/* Peek / hover overlay stays light with dark type */
+.home-redesign__featured .product-card--featured.product-card--peek .product-card__footer--featured,
+.home-redesign__featured .product-card--featured:hover .product-card__footer--featured {
+  background: #fff;
+}
+
+.home-redesign__featured .product-card__footer-overlay .product-card__name,
+.home-redesign__featured .product-card__footer-overlay .product-card__name--featured,
+.home-redesign__featured .product-card__footer-overlay .product-card__price,
+.home-redesign__featured .product-card__footer-overlay .product-card__price--featured {
   color: var(--on-surface, #1a1c1d);
 }
 

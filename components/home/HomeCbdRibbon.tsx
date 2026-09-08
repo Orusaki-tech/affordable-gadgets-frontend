@@ -3,7 +3,7 @@ import { MaterialIcon } from '@/components/MaterialIcon';
 import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 
 const MAPS_URL =
-  'https://www.google.com/maps/search/?api=1&query=Norwich+Union+House+Kimathi+Street+Nairobi';
+  'https://www.google.com/maps/search/?api=1&query=Kimathi+House+Room+504+Nairobi';
 
 const THUMBS = [
   'https://res.cloudinary.com/dhgaqa2gb/image/upload/f_auto,q_auto,w_96/v1788773195/products-banners/iphone.jpg',
@@ -24,13 +24,10 @@ export function HomeCbdRibbon() {
               <p className="text-sm font-bold text-white sm:text-base">
                 Get KSh 500 OFF Website Prices
               </p>
-              <span className="ag-chip ag-chip--sm ag-chip--lime uppercase tracking-wider">
-                Nairobi CBD Shop
-              </span>
+              <span className="ag-tag ag-tag--on-dark">Nairobi CBD</span>
             </div>
             <p className="mt-1 text-sm text-white/80">
-              Walk in at Norwich Union House, 3rd Floor, Kimathi St. Cash, M-Pesa, Card accepted on
-              spot.
+              Walk in at Kimathi House Room 504, 5th Floor. Cash, M-Pesa, Card accepted on spot.
             </p>
           </div>
         </div>

@@ -6,9 +6,8 @@ import { useRouter } from 'next/navigation';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { MaterialIcon } from '@/components/MaterialIcon';
 import { PreOrderModal } from '@/components/PreOrderModal';
-import { brandConfig, getBusinessWhatsAppUrl } from '@/lib/config/brand';
+import { brandConfig } from '@/lib/config/brand';
 import { usePromotions } from '@/lib/hooks/usePromotions';
-import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 
 const IPHONE_18_PRO_MAX_SLUG = 'apple-iphone-18-pro-max';
@@ -151,10 +150,6 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
     router.push(q ? `/products?search=${encodeURIComponent(q)}` : '/products');
   };
 
-  const whatsappWaitlist = getBusinessWhatsAppUrl(
-    'Hi — I want to join the iPhone 18 Pro Max waiting list for early discounts.'
-  );
-
   return (
     <section className="home-redesign__hero mx-auto max-w-[1400px] px-4 pt-6 lg:px-6 lg:pt-8">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
@@ -221,9 +216,9 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
           </div>
         </div>
 
-        {/* Right: promotional banner (homepage_hero) + launch copy / CTAs */}
+        {/* Right: promotional banner only — Pre Order + View details */}
         <div className="relative min-h-[420px] overflow-hidden rounded-2xl bg-surface-canvas shadow-sm sm:min-h-[480px] lg:col-span-8 lg:min-h-[520px]">
-          <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0">
             <CloudinaryImage
               src={displayBannerSrc}
               alt={activePromotion?.title ?? 'Featured promotion'}
@@ -236,81 +231,22 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
               onError={() => setBannerImageFailed(true)}
             />
           </div>
-          {/* Soft left wash so launch copy stays readable over the promo art */}
-          <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/92 via-white/55 to-transparent"
-            aria-hidden
-          />
 
-          <div className="relative z-10 flex h-full min-h-[420px] flex-col p-6 sm:min-h-[480px] sm:p-8 lg:min-h-[520px] lg:p-10">
-            <div className="max-w-md">
-              <div className="flex flex-wrap gap-2">
-                <span className="ag-chip ag-chip--sm ag-chip--dark uppercase tracking-wider">
-                  Authorized Stockist Launch
-                </span>
-                <span className="ag-chip ag-chip--sm ag-chip--ghost uppercase tracking-wider shadow-sm">
-                  Global Release Window: September 2026
-                </span>
-              </div>
-
-              <p className="mt-5 text-sm font-semibold text-secondary">Out September 9</p>
-              <h2 className="mt-1 text-3xl font-bold tracking-tight text-primary sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
-                Apple iPhone 18 Pro Max
-              </h2>
-
-              <p className="mt-3 max-w-sm text-sm text-secondary">
-                Note: WhatsApp us to join our waiting list for early discounts.
-              </p>
-              <a
-                href={whatsappWaitlist}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-whatsapp-emerald"
-              >
-                <MaterialIcon name="chat" className="text-[16px]" />
-                Direct WhatsApp Concierge
-              </a>
-
-              <div className="mt-4 flex flex-wrap gap-4 text-xs font-semibold text-on-surface-variant">
-                <span className="inline-flex items-center gap-1">
-                  <MaterialIcon name="verified" className="text-[16px] text-stock-green" />
-                  Genuine Apple KE IMEI
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <MaterialIcon name="swap_horiz" className="text-[16px] text-stock-green" />
-                  Trade-in Supported
-                </span>
-              </div>
-            </div>
-
-            <div className="relative z-20 mt-auto flex flex-wrap items-center gap-3 pt-8">
-              <button
-                type="button"
-                onClick={() => setPreOrderOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#f5e642] px-6 py-3.5 text-sm font-bold text-primary shadow-md"
-              >
-                Pre Order Now
-                <MaterialIcon name="arrow_forward" className="text-[18px]" />
-              </button>
-              <Link
-                href={`/products/${IPHONE_18_PRO_MAX_SLUG}`}
-                className="inline-flex items-center rounded-xl border border-border-strong bg-white/95 px-5 py-3.5 text-sm font-semibold text-primary shadow-sm backdrop-blur-sm"
-              >
-                View details
-              </Link>
-              {activePromotion ? (
-                <Link
-                  href={getPromotionHref(activePromotion)}
-                  className="text-sm font-semibold text-primary underline-offset-2 hover:underline"
-                >
-                  View promo
-                </Link>
-              ) : null}
-            </div>
-
-            <p className="relative z-20 mt-4 text-[11px] font-bold uppercase tracking-[0.16em] text-secondary">
-              Norwich Union House Hub — Nairobi CBD
-            </p>
+          <div className="absolute bottom-6 left-6 z-20 flex flex-wrap items-center gap-3 sm:bottom-8 sm:left-8">
+            <button
+              type="button"
+              onClick={() => setPreOrderOpen(true)}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#f5e642] px-6 py-3.5 text-sm font-bold text-primary shadow-md"
+            >
+              Pre Order Now
+              <MaterialIcon name="arrow_forward" className="text-[18px]" />
+            </button>
+            <Link
+              href={`/products/${IPHONE_18_PRO_MAX_SLUG}`}
+              className="inline-flex items-center rounded-xl border border-border-strong bg-white/95 px-5 py-3.5 text-sm font-semibold text-primary shadow-sm backdrop-blur-sm"
+            >
+              View details
+            </Link>
           </div>
         </div>
       </div>

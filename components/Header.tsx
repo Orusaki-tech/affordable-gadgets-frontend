@@ -416,7 +416,7 @@ function HeaderContent() {
               className="ag-nav-pill"
               onMouseEnter={closeMegaMenu}
             >
-              Financing / BNPL
+              Financing
             </Link>
             <Link
               href="/articles"
@@ -502,7 +502,7 @@ function HeaderContent() {
                 </Link>
               ))}
               <Link href="/financing" className="rounded-lg px-2 py-2.5 text-sm font-medium" onClick={closeMobileMenu}>
-                Financing / BNPL
+                Financing
               </Link>
               <Link href="/articles" className="rounded-lg px-2 py-2.5 text-sm font-medium" onClick={closeMobileMenu}>
                 Blog

@@ -34,6 +34,23 @@ import 'swiper/css/navigation';
 const HOMEPAGE_VIDEOS_PAGE_SIZE = 24;
 const IMAGE_SIZES = '(max-width:640px) 233px, 247px';
 
+const VIDEO_BADGES = [
+  { label: '100% Health', tone: 'green' },
+  { label: 'Camera Test', tone: 'light' },
+  { label: 'Grade A Unbox', tone: 'green' },
+  { label: 'Audio Lab', tone: 'amber' },
+] as const;
+
+function videoBadgeFor(product: PublicProductList, videoIndex: number) {
+  const haystack = `${product.product_name ?? ''} ${product.brand ?? ''}`.toLowerCase();
+  if (/battery|health|cycle/.test(haystack)) return VIDEO_BADGES[0];
+  if (/camera|pixel|photo/.test(haystack)) return VIDEO_BADGES[1];
+  if (/audio|buds|airpods|speaker|headphone/.test(haystack)) return VIDEO_BADGES[3];
+  if (/unbox|new|grade/.test(haystack)) return VIDEO_BADGES[2];
+  const id = typeof product.id === 'number' ? product.id : 0;
+  return VIDEO_BADGES[(id + videoIndex) % VIDEO_BADGES.length];
+}
+
 async function fetchHomepageVideoProducts(): Promise<PublicProductList[]> {
   const res = await ApiService.apiV1PublicProductsList(
     undefined,
@@ -126,6 +143,7 @@ function PosterImageFallback({
       className={className}
       sizes={IMAGE_SIZES}
       fill
+      fit="cover"
       onError={() => {
         if (safeIdx < urls.length - 1) setIdx((i) => i + 1);
       }}
@@ -247,7 +265,11 @@ function HomepageVideoSlide({
   };
 
   const showPlay = !isPlaying;
-  const playClassMods = showPlay ? 'group-hover:hidden' : 'home-product-videos__play--hidden';
+  const playClassMods = showPlay ? '' : 'home-product-videos__play--hidden';
+  const badge = videoBadgeFor(product, videoIndex);
+  const metaLine = product.brand?.trim()
+    ? `${product.brand.trim()} · CBD Hub`
+    : 'CBD Hub';
 
   const onMediaKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -268,14 +290,19 @@ function HomepageVideoSlide({
           aria-label={isPlaying ? `Video playing: ${name}` : `Play video: ${name}`}
         >
           <div className="home-product-videos__media-wrap">
-            <span
-              className={`home-product-videos__play ${playClassMods}`}
-              aria-hidden
-            >
-              <svg className="ml-1 h-5 w-5 sm:h-6 sm:w-6" viewBox="0 0 24 24" fill="currentColor">
+            <span className={`home-product-videos__play ${playClassMods}`} aria-hidden>
+              <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
             </span>
+
+            {showPlay ? (
+              <span
+                className={`home-product-videos__badge home-product-videos__badge--${badge.tone}`}
+              >
+                {badge.label}
+              </span>
+            ) : null}
 
             {resolved.mode === 'file' && (
               <video
@@ -359,11 +386,9 @@ function HomepageVideoSlide({
           </div>
         </div>
       </div>
-      <Link
-        href={href}
-        className="home-product-videos__caption mt-2 block text-[11px] font-bold leading-snug text-gray-900 sm:text-xs"
-      >
-        {name}
+      <Link href={href} className="home-product-videos__caption mt-2 block">
+        <span className="home-product-videos__caption-title">{name}</span>
+        <span className="home-product-videos__meta">{metaLine}</span>
       </Link>
     </div>
   );

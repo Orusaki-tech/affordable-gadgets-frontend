@@ -139,43 +139,6 @@
   visibility: hidden;
 }
 
-/* Bottom-left status labels — compact caption size */
-.home-product-videos__badge {
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  z-index: 4;
-  display: inline-flex;
-  align-items: center;
-  max-width: calc(100% - 56px);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-  text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-}
-
-.home-product-videos__badge--green {
-  background: #22c55e;
-  color: #fff;
-}
-
-.home-product-videos__badge--light {
-  background: #fff;
-  color: #111;
-}
-
-.home-product-videos__badge--amber {
-  background: #f5e642;
-  color: #111;
-}
-
 .home-product-videos__meta {
   margin-top: 4px;
   font-size: 12px;

@@ -34,23 +34,6 @@ import 'swiper/css/navigation';
 const HOMEPAGE_VIDEOS_PAGE_SIZE = 24;
 const IMAGE_SIZES = '(max-width:640px) 233px, 247px';
 
-const VIDEO_BADGES = [
-  { label: '100% Health', tone: 'green' },
-  { label: 'Camera Test', tone: 'light' },
-  { label: 'Grade A Unbox', tone: 'green' },
-  { label: 'Audio Lab', tone: 'amber' },
-] as const;
-
-function videoBadgeFor(product: PublicProductList, videoIndex: number) {
-  const haystack = `${product.product_name ?? ''} ${product.brand ?? ''}`.toLowerCase();
-  if (/battery|health|cycle/.test(haystack)) return VIDEO_BADGES[0];
-  if (/camera|pixel|photo/.test(haystack)) return VIDEO_BADGES[1];
-  if (/audio|buds|airpods|speaker|headphone/.test(haystack)) return VIDEO_BADGES[3];
-  if (/unbox|new|grade/.test(haystack)) return VIDEO_BADGES[2];
-  const id = typeof product.id === 'number' ? product.id : 0;
-  return VIDEO_BADGES[(id + videoIndex) % VIDEO_BADGES.length];
-}
-
 async function fetchHomepageVideoProducts(): Promise<PublicProductList[]> {
   const res = await ApiService.apiV1PublicProductsList(
     undefined,
@@ -284,7 +267,6 @@ function HomepageVideoSlide({
 
   const showPlay = !isPlaying;
   const playClassMods = showPlay ? '' : 'home-product-videos__play--hidden';
-  const badge = videoBadgeFor(product, videoIndex);
   const metaLine = product.brand?.trim()
     ? `${product.brand.trim()} · CBD Hub`
     : 'CBD Hub';
@@ -313,14 +295,6 @@ function HomepageVideoSlide({
                 <path d="M8 5v14l11-7z" />
               </svg>
             </span>
-
-            {showPlay ? (
-              <span
-                className={`home-product-videos__badge home-product-videos__badge--${badge.tone}`}
-              >
-                {badge.label}
-              </span>
-            ) : null}
 
             {resolved.mode === 'file' && (
               <video

@@ -30,16 +30,16 @@ const BANDS = [
 
 export function HomeBudgetMatcher() {
   return (
-    <section className="mx-auto mt-14 max-w-[1400px] px-4 lg:px-6">
+    <section className="ag-section">
       <div className="home-section-panel">
         <div className="mb-6 max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-wider text-secondary">
+          <p className="ag-type-eyebrow text-secondary">
             Dynamic Catalog Finder
           </p>
-          <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+          <h2 className="ag-type-h2 mt-1">
             Smart Phone Budget Matcher
           </h2>
-          <p className="mt-2 text-sm text-secondary">
+          <p className="ag-type-body mt-2">
             Pick a price band and we&apos;ll show live stock that fits your budget.
           </p>
         </div>

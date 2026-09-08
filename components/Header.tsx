@@ -244,20 +244,20 @@ function HeaderContent() {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="ag-chip ag-chip--lime ag-chip--cta hidden gap-1.5 sm:inline-flex"
+              className="ag-btn ag-btn--lime hidden sm:inline-flex"
             >
-              <MaterialIcon name="chat" className="text-[16px]" />
+              <MaterialIcon name="chat" className="text-[1rem]" />
               WhatsApp Inquiry
             </a>
 
             <Link
               href="/wishlist"
-              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-primary hover:bg-surface-muted"
+              className="ag-icon-btn relative"
               aria-label={wishlistCount > 0 ? `Wishlist, ${wishlistCount} items` : 'Wishlist'}
             >
-              <MaterialIcon name="favorite" className="text-[22px]" />
+              <MaterialIcon name="favorite" className="text-[1.375rem]" />
               {wishlistCount > 0 ? (
-                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[0.625rem] font-bold text-white">
                   {wishlistCount}
                 </span>
               ) : null}
@@ -265,12 +265,12 @@ function HeaderContent() {
 
             <Link
               href="/cart"
-              className="site-header__cart relative inline-flex h-10 w-10 items-center justify-center rounded-full text-primary hover:bg-surface-muted"
+              className="site-header__cart ag-icon-btn relative"
               aria-label={itemCount > 0 ? `Cart, ${itemCount} items` : 'Cart'}
             >
-              <MaterialIcon name="shopping_bag" className="text-[22px]" />
+              <MaterialIcon name="shopping_bag" className="text-[1.375rem]" />
               {itemCount > 0 ? (
-                <span className="site-header__cart-badge absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-promo-lime">
+                <span className="site-header__cart-badge absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[0.625rem] font-bold text-promo-lime">
                   {itemCount}
                 </span>
               ) : null}
@@ -280,12 +280,12 @@ function HeaderContent() {
               <div className="site-header__account-menu relative">
                 <button
                   type="button"
-                  className="site-header__account inline-flex h-10 items-center gap-1 rounded-full px-2 hover:bg-surface-muted"
+                  className="site-header__account ag-icon-btn ag-icon-btn--label"
                   aria-label="Account menu"
                   onClick={() => setIsAccountMenuOpen((prev) => !prev)}
                 >
-                  <MaterialIcon name="person" className="text-[22px]" />
-                  <span className="hidden text-xs font-semibold lg:inline">Account</span>
+                  <MaterialIcon name="person" className="text-[1.375rem]" />
+                  <span className="hidden text-type-eyebrow font-semibold normal-case tracking-normal lg:inline">Account</span>
                 </button>
                 {isAccountMenuOpen && (
                   <div className="absolute right-0 z-50 mt-2 min-w-[160px] rounded-xl border border-border-hairline bg-white p-2 shadow-lg">
@@ -311,23 +311,23 @@ function HeaderContent() {
             ) : (
               <button
                 type="button"
-                className="site-header__account inline-flex h-10 items-center gap-1 rounded-full px-2 hover:bg-surface-muted"
+                className="site-header__account ag-icon-btn ag-icon-btn--label"
                 aria-label="Sign in"
                 onClick={() => setIsAuthModalOpen(true)}
               >
-                <MaterialIcon name="person" className="text-[22px]" />
-                <span className="hidden text-xs font-semibold lg:inline">Sign In</span>
+                <MaterialIcon name="person" className="text-[1.375rem]" />
+                <span className="hidden text-type-eyebrow font-semibold normal-case tracking-normal lg:inline">Sign In</span>
               </button>
             )}
 
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="site-header__menu-button inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface-muted lg:hidden"
+              className="site-header__menu-button ag-icon-btn lg:hidden"
               aria-label="Toggle menu"
               aria-expanded={isMobileMenuOpen}
             >
-              <MaterialIcon name={isMobileMenuOpen ? 'close' : 'menu'} className="text-[22px]" />
+              <MaterialIcon name={isMobileMenuOpen ? 'close' : 'menu'} className="text-[1.375rem]" />
             </button>
           </div>
         </div>
@@ -514,10 +514,10 @@ function HeaderContent() {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-promo-lime px-3 py-2.5 text-sm font-bold text-primary"
+                className="ag-btn ag-btn--lime ag-btn--block mt-2"
                 onClick={closeMobileMenu}
               >
-                <MaterialIcon name="chat" className="text-[18px]" />
+                <MaterialIcon name="chat" className="text-[1.125rem]" />
                 WhatsApp Inquiry
               </a>
             </div>

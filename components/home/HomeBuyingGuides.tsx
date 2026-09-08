@@ -60,14 +60,14 @@ export async function HomeBuyingGuides() {
   if (!guides.length) return null;
 
   return (
-    <section className="home-buying-guides mx-auto mt-14 max-w-[1400px] px-4 lg:px-6">
+    <section className="home-buying-guides ag-section">
       <div className="home-section-panel">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-stock-green">
+            <p className="ag-type-eyebrow text-stock-green">
               Tech Knowledge Hub
             </p>
-            <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+            <h2 className="ag-type-h2 mt-1">
               Tech Buying Guides &amp; Insights
             </h2>
           </div>

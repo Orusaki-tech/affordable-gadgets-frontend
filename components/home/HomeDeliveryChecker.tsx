@@ -33,16 +33,16 @@ export function HomeDeliveryChecker() {
   }, [query, rates]);
 
   return (
-    <section className="mx-auto mt-14 mb-8 max-w-[1400px] px-4 lg:px-6">
+    <section className="ag-section ag-section--end">
       <div className="home-section-panel">
         <div className="mb-5 max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-wider text-secondary">
+          <p className="ag-type-eyebrow text-secondary">
             Countrywide Logistics
           </p>
-          <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+          <h2 className="ag-type-h2 mt-1">
             Check Delivery Rates
           </h2>
-          <p className="mt-2 text-sm text-secondary">
+          <p className="ag-type-body mt-2">
             Search your county or ward to estimate shipping before checkout.
           </p>
         </div>

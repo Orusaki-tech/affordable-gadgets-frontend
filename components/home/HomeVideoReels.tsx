@@ -7,14 +7,14 @@ import { HomeProductVideos } from '@/components/HomeProductVideos';
 /** Vertical-reel style wrapper around existing product video feed. */
 export function HomeVideoReels() {
   return (
-    <section className="mx-auto mt-14 max-w-[1400px] px-4 lg:px-6">
+    <section className="ag-section">
       <div className="home-section-panel">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-secondary">
+            <p className="ag-type-eyebrow text-secondary">
               Verified Tech Unboxings
             </p>
-            <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+            <h2 className="ag-type-h2 mt-1">
               Real Devices in Nairobi
             </h2>
           </div>

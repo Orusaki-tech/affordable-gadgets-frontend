@@ -10,6 +10,7 @@ import { getPlaceholderProductImage, convertToYouTubeEmbed } from '@/lib/utils/p
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { useQueryClient } from '@tanstack/react-query';
 import { ProductCarousel } from './ProductCarousel';
+import { CommunityVerifiedHub } from '@/components/home/CommunityVerifiedHub';
 import { apiBaseUrl } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
 
@@ -54,15 +55,18 @@ interface ReviewCustomerProfile {
 
 interface ReviewsShowcaseProps {
   productId?: number;
+  /** Homepage community hub layout inspired by verified unboxing bento. */
+  variant?: 'default' | 'hub';
 }
 
-export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
+export function ReviewsShowcase({ productId, variant = 'default' }: ReviewsShowcaseProps) {
   const queryClient = useQueryClient();
+  const isHub = variant === 'hub' && !productId;
   const productReviewsQuery = useProductReviews(productId ?? 0, {
     page_size: 10,
     enabled: Boolean(productId),
   });
-  const allReviewsQuery = useAllReviews({ page_size: 10 });
+  const allReviewsQuery = useAllReviews({ page_size: isHub ? 12 : 10 });
   const reviewsQuery = productId ? productReviewsQuery : allReviewsQuery;
   const { data, isLoading, error } = reviewsQuery;
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
@@ -84,6 +88,7 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const reviews = data?.results ?? [];
+  const totalReviewCount = data?.count ?? reviews.length;
   const selectedEligibleItem = eligibleItems.find((item) => item.product_id === selectedProductId) || null;
 
   const prefillProductCache = (productIdToCache: number, product: PublicProduct | null) => {
@@ -483,9 +488,22 @@ export function ReviewsShowcase({ productId }: ReviewsShowcaseProps) {
   }
 
   return (
-    <div className="reviews-showcase">
-      {reviewActionHeader}
-      {content}
+    <div className={isHub ? 'reviews-showcase reviews-showcase--hub' : 'reviews-showcase'}>
+      {isHub ? (
+        <CommunityVerifiedHub
+          reviews={reviews}
+          totalCount={totalReviewCount}
+          isLoading={isLoading}
+          error={error}
+          onLeaveReview={openReviewModal}
+          onOpenReview={setSelectedReview}
+        />
+      ) : (
+        <>
+          {reviewActionHeader}
+          {content}
+        </>
+      )}
 
       {selectedReview && (
         <div

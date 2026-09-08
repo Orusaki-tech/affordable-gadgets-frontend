@@ -151,13 +151,13 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
   };
 
   return (
-    <section className="home-redesign__hero mx-auto max-w-[1400px] px-4 pt-6 lg:px-6 lg:pt-8">
+    <section className="home-redesign__hero ag-section ag-section--flush-top">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
-        {/* Left: search + budget matcher (budget card fills column height) */}
-        <div className="flex flex-col gap-4 rounded-2xl bg-promo-lime p-5 shadow-sm sm:p-6 lg:col-span-4 lg:min-h-[520px]">
+        {/* Budget / search — below banner on mobile, left column on desktop */}
+        <div className="order-2 flex flex-col gap-4 rounded-2xl bg-promo-lime p-5 shadow-sm sm:p-6 lg:order-1 lg:col-span-4 lg:min-h-[520px]">
           <form onSubmit={onSearch}>
             <div className="flex items-center gap-2 rounded-xl bg-white p-2.5 shadow-sm">
-              <MaterialIcon name="search" className="text-[20px] text-secondary" />
+              <MaterialIcon name="search" className="text-[1.25rem] text-secondary" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -169,15 +169,15 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
           </form>
 
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-primary">Search to start shopping</h2>
-            <p className="mt-1 text-sm text-primary/75">
+            <h2 className="ag-type-h3">Search to start shopping</h2>
+            <p className="ag-type-body mt-1 text-primary/75">
               Type a product name above — or set a budget and browse live stock.
             </p>
           </div>
 
           <div className="flex flex-1 flex-col rounded-xl bg-white/70 p-4 backdrop-blur-sm sm:p-5">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-primary">
+              <p className="ag-type-eyebrow text-primary">
                 Instant Budget Match
               </p>
               <p className="text-sm font-bold text-primary">
@@ -211,35 +211,35 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
             </p>
             <Link
               href={budgetHref}
-              className="mt-auto inline-flex w-full items-center justify-center gap-1 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-promo-lime"
+              className="ag-btn ag-btn--primary ag-btn--block mt-auto"
             >
               Show devices in budget
-              <MaterialIcon name="arrow_forward" className="text-[16px]" />
+              <MaterialIcon name="arrow_forward" className="text-[1rem]" />
             </Link>
           </div>
         </div>
 
-        {/* Right: promotional banner only — Pre Order + View details */}
-        <div className="relative min-h-[420px] overflow-hidden rounded-2xl bg-surface-canvas shadow-sm sm:min-h-[480px] lg:col-span-8 lg:min-h-[520px]">
-          <div className="absolute inset-0">
+        {/* Promo banner — first on mobile, full-width 16:9 so art isn’t tiny/cropped */}
+        <div className="home-redesign__hero-banner order-1 relative w-full overflow-hidden rounded-2xl bg-surface-canvas shadow-sm lg:order-2 lg:col-span-8 lg:min-h-[520px]">
+          <div className="home-redesign__hero-banner-media relative aspect-[16/9] w-full lg:absolute lg:inset-0 lg:aspect-auto lg:h-full">
             <CloudinaryImage
               src={displayBannerSrc}
               alt={activePromotion?.title ?? 'Featured promotion'}
               preset="homepageHero"
               fit="cover"
               sizes="(max-width: 1024px) 100vw, 66vw"
-              className="object-cover"
+              className="home-redesign__hero-banner-img"
               fill
               priority
               onError={() => setBannerImageFailed(true)}
             />
           </div>
 
-          <div className="absolute bottom-6 left-6 z-20 flex flex-wrap items-center gap-3 sm:bottom-8 sm:left-8">
+          <div className="absolute bottom-4 left-4 z-20 flex flex-wrap items-center gap-2 sm:bottom-8 sm:left-8 sm:gap-3">
             <button
               type="button"
               onClick={() => setPreOrderOpen(true)}
-              className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#f5e642] px-6 text-sm font-bold text-primary shadow-md"
+              className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#f5e642] px-5 text-sm font-bold text-primary shadow-md sm:px-6"
             >
               Pre Order Now
               <MaterialIcon name="arrow_forward" className="text-[18px]" />

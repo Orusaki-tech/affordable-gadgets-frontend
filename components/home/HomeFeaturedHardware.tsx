@@ -19,19 +19,19 @@ export function HomeFeaturedHardware() {
   return (
     <section
       id="featured-products"
-      className="home-redesign__featured mx-auto mt-12 max-w-[1400px] scroll-mt-28 px-4 lg:px-6"
+      className="home-redesign__featured ag-section ag-section--tight scroll-mt-28"
     >
       <div className="home-section-panel">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-stock-green">
+            <p className="ag-type-eyebrow text-stock-green">
               In Stock &amp; Dispatched Today
             </p>
-            <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+            <h2 className="ag-type-h2 mt-1">
               Featured Hardware Highlights
             </h2>
             {!isLoading ? (
-              <p className="mt-1 text-sm text-secondary">
+              <p className="ag-type-body mt-1">
                 Showing {showing} of {total} certified flagships
               </p>
             ) : null}

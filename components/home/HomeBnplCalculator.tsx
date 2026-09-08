@@ -20,17 +20,17 @@ export function HomeBnplCalculator() {
   }, [devicePrice, depositPercent, weeks]);
 
   return (
-    <section className="mx-auto mt-14 max-w-[1400px] px-4 lg:px-6">
-      <div className="grid grid-cols-1 gap-6 overflow-hidden rounded-2xl bg-obsidian-dark p-6 text-white lg:grid-cols-2 lg:p-8">
+    <section className="ag-section">
+      <div className="grid grid-cols-1 gap-6 overflow-hidden rounded-2xl bg-obsidian-dark p-panel text-white lg:grid-cols-2 lg:p-panel-lg">
         <div>
-          <p className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-promo-lime">
-            <MaterialIcon name="payments" className="text-[14px]" />
+          <p className="ag-type-eyebrow inline-flex items-center gap-1.5 text-promo-lime">
+            <MaterialIcon name="payments" className="text-[0.875rem]" />
             Lipa Mdogo Mdogo Available
           </p>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
+          <h2 className="ag-type-h2 ag-type-h2--on-dark mt-2">
             Buy Now, Pay Later (BNPL) Calculator
           </h2>
-          <p className="mt-3 text-sm text-white/75">
+          <p className="ag-type-body mt-3 text-white/75">
             Get instant device financing through certified Kenyan fintech partners. Pick your
             smartphone price, set your upfront deposit, and estimate weekly installments.
           </p>
@@ -48,10 +48,10 @@ export function HomeBnplCalculator() {
           </div>
           <Link
             href="/financing"
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-promo-lime px-5 py-3 text-sm font-bold text-primary"
+            className="ag-btn ag-btn--lime mt-6"
           >
             Browse financing devices
-            <MaterialIcon name="arrow_forward" className="text-[18px]" />
+            <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
           </Link>
         </div>
 

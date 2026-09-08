@@ -95,18 +95,18 @@ export function HomeBundles() {
   }
 
   return (
-    <section className="mx-auto mt-14 max-w-[1400px] px-4 lg:px-6">
+    <section className="ag-section">
       <div className="home-section-panel">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-badge-bundle-orange">
+            <p className="ag-type-eyebrow text-badge-bundle-orange">
               Hardware Packages
             </p>
-            <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+            <h2 className="ag-type-h2 mt-1">
               Curated Ecosystem Bundles
             </h2>
             <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-stock-green">
-              <MaterialIcon name="verified" className="text-[16px]" />
+              <MaterialIcon name="verified" className="text-[1rem]" />
               Includes free Nairobi delivery on eligible packages
             </p>
           </div>

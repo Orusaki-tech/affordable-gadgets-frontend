@@ -3,9 +3,78 @@ import Image from 'next/image';
 import { brandConfig, getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { MaterialIcon } from '@/components/MaterialIcon';
 
+type SocialNetwork = 'facebook' | 'x' | 'tiktok' | 'instagram' | 'other';
+
+function detectSocialNetwork(url: string): SocialNetwork {
+  const host = url.toLowerCase();
+  if (host.includes('facebook.com') || host.includes('fb.com')) return 'facebook';
+  if (host.includes('tiktok.com')) return 'tiktok';
+  if (host.includes('instagram.com')) return 'instagram';
+  if (host.includes('x.com') || host.includes('twitter.com')) return 'x';
+  return 'other';
+}
+
+function socialLabel(network: SocialNetwork): string {
+  switch (network) {
+    case 'facebook':
+      return 'Facebook';
+    case 'x':
+      return 'X (Twitter)';
+    case 'tiktok':
+      return 'TikTok';
+    case 'instagram':
+      return 'Instagram';
+    default:
+      return 'Social link';
+  }
+}
+
+function SocialGlyph({ network }: { network: SocialNetwork }) {
+  const common = {
+    width: 18,
+    height: 18,
+    viewBox: '0 0 24 24',
+    fill: 'currentColor' as const,
+    'aria-hidden': true as const,
+  };
+
+  switch (network) {
+    case 'facebook':
+      return (
+        <svg {...common}>
+          <path d="M14 8h2.5V4.5H14c-2.2 0-4 1.8-4 4V11H7.5v3.5H10V22h3.5v-7.5h2.3L16.5 11H13.5V8.5c0-.3.2-.5.5-.5z" />
+        </svg>
+      );
+    case 'x':
+      return (
+        <svg {...common}>
+          <path d="M18.9 2H22l-6.8 7.8L23 22h-6.5l-5.1-6.7L5.7 22H2.6l7.3-8.3L1 2h6.7l4.6 6.1L18.9 2zm-1.1 18h1.8L6.3 3.9H4.4L17.8 20z" />
+        </svg>
+      );
+    case 'instagram':
+      return (
+        <svg {...common}>
+          <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9zm9.75 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+        </svg>
+      );
+    case 'tiktok':
+      return (
+        <svg {...common}>
+          <path d="M19.6 7.3a6.8 6.8 0 0 1-3.9-1.2v8.1a5.9 5.9 0 1 1-5.1-5.8v3a2.9 2.9 0 1 0 2.1 2.8V2.5h3c.2 1.6 1.2 3 2.6 3.8a6.7 6.7 0 0 0 3.3.9v3a8.4 8.4 0 0 1-2-.9z" />
+        </svg>
+      );
+    default:
+      return <MaterialIcon name="public" className="text-[18px]" />;
+  }
+}
+
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const whatsappUrl = getBusinessWhatsAppUrl();
+  const socialLinks = (brandConfig.business.sameAs || []).map((url) => {
+    const network = detectSocialNetwork(url);
+    return { url, network, label: socialLabel(network) };
+  });
 
   return (
     <footer className="site-footer w-full bg-surface-container-low mt-16 text-on-surface">
@@ -44,16 +113,17 @@ export function Footer() {
               <span className="ag-tag">6–12M Warranty</span>
             </div>
             <div className="flex items-center gap-3 pt-2">
-              {(brandConfig.business.sameAs || []).map((url) => (
+              {socialLinks.map(({ url, network, label }) => (
                 <a
                   key={url}
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-secondary transition hover:text-primary"
-                  aria-label="Social link"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border-hairline text-secondary transition hover:border-primary hover:text-primary"
+                  aria-label={label}
+                  title={label}
                 >
-                  <MaterialIcon name="share" className="text-[18px]" />
+                  <SocialGlyph network={network} />
                 </a>
               ))}
             </div>

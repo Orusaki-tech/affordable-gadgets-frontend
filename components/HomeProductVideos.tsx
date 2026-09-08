@@ -21,7 +21,9 @@ import type { PublicProductList } from '@/lib/api/generated';
 import { brandConfig } from '@/lib/config/brand';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import {
+  getProductVideoLinks,
   resolveProductVideoMedia,
+  resolveProductVideoMediaAtIndex,
   youtubePosterCandidatesFromLink,
   type ResolvedProductVideo,
 } from '@/lib/utils/productVideo';
@@ -145,12 +147,14 @@ function ChevronNavIcon({ flip }: { flip?: boolean }) {
 
 function HomepageVideoSlide({
   product,
+  videoIndex,
   playingKey,
   setPlayingKey,
   registerVideo,
   deckKey,
 }: {
   product: PublicProductList;
+  videoIndex: number;
   playingKey: string | null;
   setPlayingKey: Dispatch<SetStateAction<string | null>>;
   registerVideo: (key: string, el: HTMLVideoElement | null) => void;
@@ -159,12 +163,14 @@ function HomepageVideoSlide({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const youtubeIframeRef = useRef<HTMLIFrameElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
-  const resolved = resolveProductVideoMedia(product);
+  const resolved = resolveProductVideoMediaAtIndex(product, videoIndex);
   const name = product.product_name ?? 'Product';
   const href = getProductHref(product);
-  const slideKey = `${deckKey}-${product.id}`;
+  const slideKey = `${deckKey}-${product.id}-${videoIndex}`;
   const isPlaying = playingKey === slideKey;
-  const ytCandidates = product.product_video_url ? youtubePosterCandidatesFromLink(product.product_video_url) : [];
+  const links = getProductVideoLinks(product);
+  const videoUrl = links[videoIndex]?.url || product.product_video_url || '';
+  const ytCandidates = videoUrl ? youtubePosterCandidatesFromLink(videoUrl) : [];
   const posterUrls = [
     ...ytCandidates,
     ...(product.primary_image ? [product.primary_image] : []),
@@ -459,17 +465,22 @@ export function HomeProductVideos() {
               nextEl: nextNavSelector,
             }}
           >
-            {products.map((product) => (
-              <SwiperSlide key={product.id} className="!w-auto">
-                <HomepageVideoSlide
-                  product={product}
-                  playingKey={playingKey}
-                  setPlayingKey={setPlayingKey}
-                  registerVideo={registerVideo}
-                  deckKey={deckKey}
-                />
-              </SwiperSlide>
-            ))}
+            {products.flatMap((product) => {
+              const links = getProductVideoLinks(product);
+              const videoCount = links.length || 1;
+              return Array.from({ length: videoCount }, (_, i) => (
+                <SwiperSlide key={`${product.id}-${i}`} className="!w-auto">
+                  <HomepageVideoSlide
+                    product={product}
+                    videoIndex={i}
+                    playingKey={playingKey}
+                    setPlayingKey={setPlayingKey}
+                    registerVideo={registerVideo}
+                    deckKey={deckKey}
+                  />
+                </SwiperSlide>
+              ));
+            })}
           </Swiper>
         </div>
       </div>

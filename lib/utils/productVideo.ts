@@ -126,6 +126,23 @@ export function getProductVideoLinks(product?: ProductWithVideos | null): Produc
   return legacy ? [{ id: null, url: legacy, title: '', display_order: 0 }] : [];
 }
 
+/** Resolve a specific video by index from a product's video list. */
+export function resolveProductVideoMediaAtIndex(
+  product: ProductWithVideos | null | undefined,
+  index: number
+): ResolvedProductVideo | null {
+  if (!product) return null;
+  const links = getProductVideoLinks(product);
+  const link = links[index];
+  if (!link?.url) return null;
+  if (isDirectVideoFileUrl(link.url)) return { mode: 'file', src: link.url };
+  const y = youtubeEmbedUrlFromLink(link.url, false);
+  if (y) return { mode: 'embed', src: y };
+  const v = vimeoEmbedUrl(link.url, false);
+  if (v) return { mode: 'embed', src: v };
+  return null;
+}
+
 export function resolveProductVideoMedia(
   product: ProductWithVideos | null | undefined
 ): ResolvedProductVideo | null {

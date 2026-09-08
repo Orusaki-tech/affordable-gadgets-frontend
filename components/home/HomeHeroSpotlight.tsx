@@ -12,8 +12,6 @@ import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 
 const IPHONE_18_PRO_MAX_SLUG = 'apple-iphone-18-pro-max';
-const IPHONE_HERO_IMAGE =
-  'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1788773195/products-banners/iphone.jpg';
 const HERO_PROMOTION_PLACEHOLDER_IMAGE =
   'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773069898/pixel8_cd7p2f.png';
 const HERO_AUTOPLAY_INTERVAL_MS = 6000;
@@ -140,7 +138,6 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
 
   const displayBannerSrc =
     activeBannerSrc && !bannerImageFailed ? activeBannerSrc : HERO_PROMOTION_PLACEHOLDER_IMAGE;
-  const promoHref = activePromotion ? getPromotionHref(activePromotion) : '/promotions';
 
   const budgetHref = useMemo(() => {
     if (budget <= 20000) return '/products?max_price=20000';
@@ -161,7 +158,7 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
   return (
     <section className="home-redesign__hero mx-auto max-w-[1400px] px-4 pt-6 lg:px-6 lg:pt-8">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
-        {/* Left: search + original promotional image + budget matcher */}
+        {/* Left: search + budget matcher */}
         <div className="flex flex-col gap-4 rounded-2xl bg-promo-lime p-5 shadow-sm sm:p-6 lg:col-span-4">
           <form onSubmit={onSearch}>
             <div className="flex items-center gap-2 rounded-xl bg-white p-2.5 shadow-sm">
@@ -176,37 +173,14 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
             </div>
           </form>
 
-          <Link
-            href={promoHref}
-            className="overflow-hidden rounded-xl bg-white shadow-sm"
-            aria-label={activePromotion?.title ?? 'Current promotion'}
-          >
-            <div className="relative aspect-[4/3] w-full bg-surface-muted">
-              <CloudinaryImage
-                src={displayBannerSrc}
-                alt={activePromotion?.title ?? 'Promotions'}
-                preset="productThumb"
-                fit="cover"
-                sizes="(max-width: 1024px) 100vw, 420px"
-                className="object-cover"
-                fill
-                onError={() => setBannerImageFailed(true)}
-              />
-            </div>
-            <div className="p-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-secondary">
-                Current promotion
-              </p>
-              <p className="mt-1 line-clamp-2 text-sm font-bold text-primary">
-                {activePromotion?.title ?? 'Search to start shopping'}
-              </p>
-              <p className="mt-1 text-xs text-secondary">
-                Type a product name above, or tap to open this promo.
-              </p>
-            </div>
-          </Link>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-primary">Search to start shopping</h2>
+            <p className="mt-1 text-sm text-primary/75">
+              Type a product name above — or use Instant Budget Match below.
+            </p>
+          </div>
 
-          <div className="rounded-xl bg-white/70 p-4 backdrop-blur-sm">
+          <div className="mt-auto rounded-xl bg-white/70 p-4 backdrop-blur-sm">
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-bold uppercase tracking-wider text-primary">
                 Instant Budget Match
@@ -247,15 +221,24 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
           </div>
         </div>
 
-        {/* Right: dominant banner with CTAs pinned bottom-left above the art */}
+        {/* Right: promotional banner (homepage_hero) + launch copy / CTAs */}
         <div className="relative min-h-[420px] overflow-hidden rounded-2xl bg-surface-canvas shadow-sm sm:min-h-[480px] lg:col-span-8 lg:min-h-[520px]">
+          <div className="pointer-events-none absolute inset-0">
+            <CloudinaryImage
+              src={displayBannerSrc}
+              alt={activePromotion?.title ?? 'Featured promotion'}
+              preset="homepageHero"
+              fit="cover"
+              sizes="(max-width: 1024px) 100vw, 66vw"
+              className="object-cover"
+              fill
+              priority
+              onError={() => setBannerImageFailed(true)}
+            />
+          </div>
+          {/* Soft left wash so launch copy stays readable over the promo art */}
           <div
-            className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('${IPHONE_HERO_IMAGE}')` }}
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/95 via-white/55 to-transparent"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/92 via-white/55 to-transparent"
             aria-hidden
           />
 
@@ -315,6 +298,14 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
               >
                 View details
               </Link>
+              {activePromotion ? (
+                <Link
+                  href={getPromotionHref(activePromotion)}
+                  className="text-sm font-semibold text-primary underline-offset-2 hover:underline"
+                >
+                  View promo
+                </Link>
+              ) : null}
             </div>
 
             <p className="relative z-20 mt-4 text-[11px] font-bold uppercase tracking-[0.16em] text-secondary">

@@ -144,7 +144,7 @@ export default async function HomePage() {
     }));
 
   return (
-    <div className="home-redesign__page flex min-h-screen flex-col">
+    <div className="home-redesign__page">
       {featuredItemListItems.length > 0 && (
         <StructuredData
           type="ItemList"

@@ -213,8 +213,10 @@
   /* Reading measure only — not for whole section shells */
   --prose-max: 40rem;
   --layout-max: 87.5rem; /* legacy; shells no longer center on this */
-  /* Shared hero column height — rem so Ctrl+/- zoom scales budget + banner together */
-  --hero-panel-min-h: 32.5rem;
+  /* Sticky announce + header (+ nav on lg) — rem so it scales with the fluid root like VFRI */
+  --site-chrome-h: 6.75rem;
+  /* Floor so short phones still get a usable panel */
+  --hero-panel-min-h: 18rem;
 
   /* Storefront body: Inter (mockup), then system / Geist fallbacks. */
   --font-sans:
@@ -341,27 +343,23 @@
 }
 
 html {
-  /* Default: respect browser/OS preference; rem drives type + spacing ladders */
-  font-size: 100%;
+  /* Mobile / <lg: browser base. Desktop: VFRI linear rem ramp scales type + rem components together. */
+  font-size: 16px;
   scroll-behavior: smooth;
+  scroll-padding-top: var(--site-chrome-h);
   overflow-x: clip;
   min-height: 100dvh;
   color-scheme: light;
 }
 
 /*
- * Fluid root — density grows with viewport (VFRIA-style), not a fixed rem island.
- * rem in these calcs resolves against the browser initial size (~16px).
+ * Fluid desktop scale (VFRI) — from lg up, root grows linearly with viewport so
+ * every rem (type, card padding, gaps, control heights) scales together.
+ * 16px @1024, ~18px @1440, ~21px @1920, ~24px @2560. Cap keeps ultrawide sane.
  */
-@media (min-width: 1024px) and (max-width: 2559px) {
+@media (min-width: 1024px) {
   html {
-    font-size: calc(0.875rem + (100vw - 1024px) * 0.004725);
-  }
-}
-
-@media (min-width: 2560px) {
-  html {
-    font-size: clamp(1rem, calc(1rem + (100vw - 1024px) * 0.0054), 5.25rem);
+    font-size: clamp(16px, calc(16px + (100vw - 1024px) * 0.0054), 84px);
   }
 }
 
@@ -516,13 +514,34 @@ h3 {
 
 .ag-bleed--hero {
   background: var(--surface-canvas, #f5f5f7);
-  padding-block: var(--section-y-hero) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding-block: var(--space-4);
+}
+
+/* Desktop: hero owns the leftover viewport under sticky chrome */
+@media (min-width: 768px) {
+  .ag-bleed--hero {
+    min-height: calc(100dvh - var(--site-chrome-h));
+  }
 }
 
 @media (min-width: 1024px) {
-  .ag-bleed--hero {
-    padding-block: var(--space-8) var(--space-8);
+  :root {
+    --site-chrome-h: 8.75rem; /* announce + bar + pill nav */
   }
+
+  .ag-bleed--hero {
+    padding-block: var(--space-5);
+  }
+}
+
+.ag-bleed--hero .ag-bleed__inner {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .ag-bleed--dark {

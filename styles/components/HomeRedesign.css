@@ -2,19 +2,25 @@
   background: var(--surface-container-lowest, #fff);
   width: 100%;
   min-width: 0;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 .home-redesign__main {
   flex: 1 1 auto;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Hero: same rem height + full creative (contain) so zoom/devices keep all components */
+/* Mobile: banner owns first screen; budget stacks below by content height */
 .home-redesign__hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
   align-items: stretch;
+  width: 100%;
 }
 
 .home-redesign__hero-budget {
@@ -22,7 +28,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  height: 100%;
   min-height: var(--hero-panel-min-h);
   border-radius: var(--panel-radius);
   background: var(--promo-lime, #9fe855);
@@ -43,26 +48,35 @@
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  min-height: var(--hero-panel-min-h);
+  /* Fill most of the first viewport under chrome (banner-first mobile) */
+  min-height: calc(100dvh - var(--site-chrome-h) - 5.5rem);
   overflow: hidden;
   border-radius: var(--panel-radius);
   background: #0b0b0c;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
-/* Side-by-side earlier so moderate zoom doesn’t flip the composition */
+/* Side-by-side: both columns stretch to share the viewport-tall hero */
 @media (min-width: 768px) {
   .home-redesign__hero-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    grid-template-rows: minmax(0, 1fr);
     gap: var(--space-5);
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
   }
 
   .home-redesign__hero-budget {
     order: 1;
+    height: 100%;
+    min-height: 0;
   }
 
   .home-redesign__hero-banner {
     order: 2;
+    height: 100%;
+    min-height: 0;
   }
 }
 

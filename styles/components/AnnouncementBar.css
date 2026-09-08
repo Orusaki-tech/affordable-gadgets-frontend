@@ -1,14 +1,40 @@
 /* Announcement bar – sits above site header. Aligns with header: delivery above logo, trade in above cart/menu. */
 
-/* Match collection header banner placeholder color (gray) */
+/* Black trust bar with green accents */
 .announcement-bar {
-  background-color: #f2f3f7;
-  /* Dark text for strong contrast on the light background */
-  color: #3e3e3e;
+  background-color: #0f172a;
+  color: #e2e8f0;
   box-sizing: border-box;
   width: 100%;
-  /* Reserve height to avoid CLS during hydration. */
-  min-height: 26px;
+  min-height: 32px;
+}
+
+.announcement-bar__trust-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 6px 0;
+}
+
+.announcement-bar__trust-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.announcement-bar__trust-badge-icon {
+  color: #22c55e;
+  width: 14px;
+  height: 14px;
+}
+
+.announcement-bar__trust-badge--highlight {
+  color: #22c55e;
+  font-weight: 700;
 }
 
 .announcement-bar--placeholder {

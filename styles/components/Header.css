@@ -1,9 +1,44 @@
 .site-header {
   z-index: 50;
-  background: var(--ui-white);
-  border-bottom: 1px solid var(--ui-gray-200);
-  box-shadow: none;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   position: relative;
+}
+
+.site-header__top-bar {
+  background: #0f172a;
+  padding: 6px 0;
+}
+
+.site-header__top-bar-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.site-header__top-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.site-header__top-badge-icon {
+  color: #22c55e;
+  width: 14px;
+  height: 14px;
+}
+
+.site-header__top-badge--highlight {
+  color: #22c55e;
+  font-weight: 700;
 }
 
 .site-header--mega-open {

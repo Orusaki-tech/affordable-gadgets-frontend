@@ -1,7 +1,8 @@
 .site-footer {
-  background: #10131f;
-  color: var(--ui-white);
+  background: #0f172a;
+  color: #e2e8f0;
   margin-top: 80px;
+  border-top: 1px solid #1e293b;
 }
 
 .site-footer__container {
@@ -65,10 +66,12 @@
 }
 
 .site-footer__section-title {
-  color: var(--ui-white);
-  font-weight: 600;
+  color: #f8fafc;
+  font-weight: 700;
   margin-bottom: 16px;
-  font-size: 18px;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .site-footer__list {
@@ -78,16 +81,17 @@
 }
 
 .site-footer__link {
-  color: var(--ui-white);
+  color: #94a3b8;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  font-size: 14px;
   transition: color 200ms;
 }
 
 .site-footer__link:hover {
-  color: var(--ui-gray-400);
+  color: #22c55e;
 }
 
 .site-footer__dot {
@@ -130,7 +134,7 @@
 }
 
 .site-footer__bottom {
-  border-top: 1px solid var(--ui-gray-800);
+  border-top: 1px solid #1e293b;
   margin-top: 48px;
   padding-top: 32px;
 }

@@ -151,9 +151,10 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
   };
 
   return (
-    <section className="home-redesign__hero ag-section ag-section--flush-top">
-      {/* Explicit 1fr / 2fr on desktop — budget ~33%, banner ~66% (not equal thirds) */}
-      <div className="home-redesign__hero-grid">
+    <section className="home-redesign__hero ag-bleed ag-bleed--hero">
+      {/* Explicit 1fr / 2fr on desktop — budget ~33%, banner ~66% */}
+      <div className="ag-bleed__inner">
+        <div className="home-redesign__hero-grid">
         <div className="home-redesign__hero-budget">
           <form onSubmit={onSearch}>
             <div className="flex items-center gap-2 rounded-xl bg-white p-2.5 shadow-sm">
@@ -250,6 +251,7 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
               View details
             </Link>
           </div>
+        </div>
         </div>
       </div>
 

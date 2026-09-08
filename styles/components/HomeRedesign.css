@@ -1,9 +1,12 @@
 .home-redesign__page {
   background: var(--surface-container-lowest, #fff);
+  width: 100%;
+  min-width: 0;
 }
 
 .home-redesign__main {
   flex: 1 1 auto;
+  width: 100%;
 }
 
 /* Hero: same rem height + full creative (contain) so zoom/devices keep all components */

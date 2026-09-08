@@ -20,8 +20,8 @@ export function HomeBnplCalculator() {
   }, [devicePrice, depositPercent, weeks]);
 
   return (
-    <section className="ag-section">
-      <div className="grid grid-cols-1 gap-6 overflow-hidden rounded-2xl bg-obsidian-dark p-panel text-white lg:grid-cols-2 lg:p-panel-lg">
+    <section className="ag-bleed ag-bleed--dark ag-bleed--spaced">
+      <div className="ag-bleed__inner grid grid-cols-1 gap-6 text-white lg:grid-cols-2">
         <div>
           <p className="ag-type-eyebrow inline-flex items-center gap-1.5 text-promo-lime">
             <MaterialIcon name="payments" className="text-[0.875rem]" />

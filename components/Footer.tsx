@@ -77,8 +77,8 @@ export function Footer() {
   });
 
   return (
-    <footer className="site-footer w-full bg-surface-container-low mt-16 text-on-surface">
-      <div className="site-footer__container mx-auto max-w-[1400px] px-4 py-14 lg:px-6 lg:py-16">
+    <footer className="site-footer ag-bleed ag-bleed--footer mt-16 text-on-surface">
+      <div className="ag-bleed__inner py-14 lg:py-16">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5 lg:gap-12">
           <div className="flex flex-col gap-4 lg:col-span-2">
             <Link href="/" className="site-footer__logo-link flex items-center gap-3">

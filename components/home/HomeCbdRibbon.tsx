@@ -13,8 +13,8 @@ const THUMBS = [
 
 export function HomeCbdRibbon() {
   return (
-    <section className="ag-section ag-section--ribbon">
-      <div className="flex flex-col gap-4 rounded-2xl bg-obsidian-dark px-5 py-4 text-white sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <section className="ag-bleed ag-bleed--dark ag-bleed--ribbon">
+      <div className="ag-bleed__inner flex flex-col gap-4 text-white sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
           <div className="flex h-control-icon w-control-icon shrink-0 items-center justify-center rounded-xl bg-promo-lime text-primary">
             <MaterialIcon name="shopping_bag" className="text-[1.375rem]" />

@@ -1608,6 +1608,7 @@
 .product-detail__videos {
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
 .product-detail__videos-title {

@@ -91,11 +91,48 @@ export type ResolvedProductVideo =
   | { mode: 'file'; src: string }
   | { mode: 'embed'; src: string };
 
+export type ProductVideoLink = {
+  id?: number | null;
+  url?: string | null;
+  title?: string | null;
+  display_order?: number | null;
+};
+
+export type ProductWithVideos = Pick<
+  PublicProductList,
+  'product_video_url' | 'product_video_file_url'
+> & {
+  videos?: ProductVideoLink[] | null;
+};
+
+/** Ordered external video URLs for a product (related videos, else legacy single URL). */
+export function getProductVideoLinks(product?: ProductWithVideos | null): ProductVideoLink[] {
+  if (!product) return [];
+  const rows = Array.isArray(product.videos) ? product.videos : [];
+  const fromRelated = rows
+    .map((row, index) => ({
+      id: row?.id ?? null,
+      url: String(row?.url || '').trim(),
+      title: String(row?.title || '').trim(),
+      display_order:
+        typeof row?.display_order === 'number' && Number.isFinite(row.display_order)
+          ? row.display_order
+          : index,
+    }))
+    .filter((row) => Boolean(row.url))
+    .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+  if (fromRelated.length > 0) return fromRelated;
+  const legacy = String(product.product_video_url || '').trim();
+  return legacy ? [{ id: null, url: legacy, title: '', display_order: 0 }] : [];
+}
+
 export function resolveProductVideoMedia(
-  product: Pick<PublicProductList, 'product_video_url' | 'product_video_file_url'>
+  product: ProductWithVideos | null | undefined
 ): ResolvedProductVideo | null {
+  if (!product) return null;
   const fileUrl = product.product_video_file_url ?? null;
-  const linkUrl = product.product_video_url ?? null;
+  const links = getProductVideoLinks(product);
+  const linkUrl = links[0]?.url ?? product.product_video_url ?? null;
 
   if (fileUrl && isDirectVideoFileUrl(fileUrl)) {
     return { mode: 'file', src: fileUrl };

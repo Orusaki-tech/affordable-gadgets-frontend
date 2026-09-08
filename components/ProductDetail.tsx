@@ -31,6 +31,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getPlaceholderProductImage, getPlaceholderUnitImage, getPlaceholderVideoUrl, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
 import { getAndClearProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
+import { getProductVideoLinks } from '@/lib/utils/productVideo';
 import { PRICING_MODE } from '@/lib/constants/apiEnums';
 import { PromotionVideosDrawer } from '@/components/PromotionVideosDrawer';
 import { PreOrderModal } from '@/components/PreOrderModal';
@@ -925,17 +926,25 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     if (!product) return [];
     const id = product.id;
     if (typeof id !== 'number') return [];
+    const videoLinks = getProductVideoLinks(
+      product as {
+        product_video_url?: string | null;
+        product_video_file_url?: string | null;
+        videos?: Array<{ url?: string | null }>;
+      }
+    );
+    const primaryUrl = videoLinks[0]?.url || (product as any).product_video_url || null;
     const row: PromotionVideoProduct = {
       id,
       slug: (product as any).slug,
       product_name: product.product_name,
       primary_image: product.primary_image,
-      product_video_url: (product as any).product_video_url,
+      product_video_url: primaryUrl,
       product_video_file_url: (product as any).product_video_file_url,
     };
     const hasAnyVideo =
       (typeof row.product_video_file_url === 'string' && row.product_video_file_url.trim().length > 0) ||
-      (typeof row.product_video_url === 'string' && row.product_video_url.trim().length > 0);
+      videoLinks.length > 0;
     return hasAnyVideo ? [row] : [];
   }, [isEligibleForPromotion, product]);
 
@@ -2259,29 +2268,62 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           {activeTab === 'videos' && product && (
             <div className="product-detail__videos">
               <h3 className="product-detail__videos-title">Product Videos</h3>
-              <div className="product-detail__video-card">
-                <div className="product-detail__video-frame">
-                    <iframe
-                      src={convertToYouTubeEmbed(product.product_video_url || getPlaceholderVideoUrl(product.product_name))}
-                    className="product-detail__video-embed"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                  <div className="product-detail__video-body">
-                    <p className="product-detail__video-title">
-                      {product.product_name}
-                    </p>
-                    {product.brand && (
-                      <p className="product-detail__video-brand">{product.brand}</p>
-                    )}
-                    {!product.product_video_url && (
-                      <p className="product-detail__video-note">
-                        This is a placeholder video. The actual product video will be available soon.
+              {(() => {
+                const videoLinks = getProductVideoLinks(
+                  product as {
+                    product_video_url?: string | null;
+                    product_video_file_url?: string | null;
+                    videos?: Array<{ id?: number | null; url?: string | null; title?: string | null }>;
+                  }
+                );
+                if (videoLinks.length === 0) {
+                  return (
+                    <div className="product-detail__video-card">
+                      <div className="product-detail__video-frame">
+                        <iframe
+                          src={convertToYouTubeEmbed(getPlaceholderVideoUrl(product.product_name))}
+                          className="product-detail__video-embed"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                      <div className="product-detail__video-body">
+                        <p className="product-detail__video-title">{product.product_name}</p>
+                        {product.brand && (
+                          <p className="product-detail__video-brand">{product.brand}</p>
+                        )}
+                        <p className="product-detail__video-note">
+                          This is a placeholder video. The actual product video will be available soon.
+                        </p>
+                      </div>
+                    </div>
+                  );
+                }
+                return videoLinks.map((video, index) => (
+                  <div
+                    key={video.id ?? `${video.url}-${index}`}
+                    className="product-detail__video-card"
+                  >
+                    <div className="product-detail__video-frame">
+                      <iframe
+                        src={convertToYouTubeEmbed(video.url)}
+                        className="product-detail__video-embed"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={video.title || `${product.product_name} video ${index + 1}`}
+                      />
+                    </div>
+                    <div className="product-detail__video-body">
+                      <p className="product-detail__video-title">
+                        {video.title || product.product_name}
                       </p>
-                    )}
+                      {product.brand && (
+                        <p className="product-detail__video-brand">{product.brand}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                ));
+              })()}
             </div>
           )}
 

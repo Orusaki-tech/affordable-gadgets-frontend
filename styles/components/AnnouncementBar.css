@@ -1,5 +1,27 @@
-/* Announcement trust strip — visual styles from Tailwind on AnnouncementBar.tsx */
+/* Announcement trust strip — desktop shows all items; mobile rotates one highlight */
 .announcement-bar {
   width: 100%;
   box-sizing: border-box;
+}
+
+.announcement-bar__mobile-item {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .announcement-bar__items {
+    display: none !important;
+  }
+
+  .announcement-bar__mobile-item {
+    display: flex;
+    align-items: center;
+    min-height: 20px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .announcement-bar__right {
+    display: none !important;
+  }
 }

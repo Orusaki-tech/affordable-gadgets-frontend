@@ -1,13 +1,23 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/lib/hooks/useCart';
+import { useWishlist } from '@/lib/hooks/useWishlist';
 import { usePrefetchNavMegaProducts } from '@/lib/hooks/useProducts';
-import { brandConfig } from '@/lib/config/brand';
+import { brandConfig, getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import {
   PRIMARY_BRAND_NAV,
   MORE_BRAND_NAV,
@@ -20,13 +30,23 @@ import { createClient } from '@/lib/supabase/client';
 import { AuthChoiceModal } from './AuthChoiceModal';
 import { HeaderBrandMenu, HeaderMoreBrandsMenu } from './HeaderBrandMenu';
 import { HeaderMegaMenuPanel, MEGA_MENU_MORE_KEY } from './HeaderMegaMenuPanel';
+import { MaterialIcon } from './MaterialIcon';
+
+const BUDGET_CHIPS = [
+  { label: 'Under 20k', href: '/products?max_price=20000' },
+  { label: '20–40k', href: '/products?min_price=20000&max_price=40000' },
+  { label: '40–80k', href: '/products?min_price=40000&max_price=80000' },
+  { label: '80k+', href: '/products?min_price=80000' },
+] as const;
 
 function HeaderFallback() {
   return (
     <header className="site-header" aria-hidden>
-      <div className="site-header__inner">
-        <div className="site-header__brand">
-          <span className="site-header__logo-text">{brandConfig.name}</span>
+      <div className="site-header__inner mx-auto flex h-20 max-w-[1400px] items-center px-4 lg:px-6">
+        <div className="site-header__brand flex items-center gap-2">
+          <span className="site-header__logo-text font-semibold tracking-tight text-primary">
+            {brandConfig.name}
+          </span>
         </div>
       </div>
     </header>
@@ -43,12 +63,15 @@ export function Header() {
 
 function HeaderContent() {
   const { itemCount } = useCart();
+  const { items: wishlistItems } = useWishlist();
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const currentSearch = useMemo(() => {
     const qs = searchParams.toString();
     return qs ? `?${qs}` : '';
   }, [searchParams]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
@@ -134,7 +157,6 @@ function HeaderContent() {
 
   useEffect(() => {
     if (!openMegaMenu) return;
-
     const closeOnScroll = () => closeMegaMenu();
     window.addEventListener('scroll', closeOnScroll, { passive: true });
     window.addEventListener('wheel', closeOnScroll, { passive: true });
@@ -157,17 +179,6 @@ function HeaderContent() {
     };
   }, [openMegaMenu, closeMegaMenu]);
 
-  const openProductsFiltersHref = useMemo(() => {
-    const isOnProducts = pathname === '/products';
-    if (!isOnProducts) {
-      return '/products?openFilters=1';
-    }
-    const params = new URLSearchParams(currentSearch);
-    params.set('openFilters', '1');
-    const qs = params.toString();
-    return `/products${qs ? `?${qs}` : ''}`;
-  }, [currentSearch, pathname]);
-
   const utilityLinks = UTILITY_NAV.filter((link) => link.href !== '/');
 
   const megaMenuPrefetchEntries = useMemo(
@@ -188,27 +199,83 @@ function HeaderContent() {
     [openMegaMenu]
   );
   const isAnyMegaOpen = openMegaMenu != null;
+  const wishlistCount = wishlistItems.length;
+  const whatsappUrl = getBusinessWhatsAppUrl(
+    'Hi Affordable Gadgets — I need help finding a device.'
+  );
+
+  const onSearchSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) {
+      router.push('/products');
+      return;
+    }
+    router.push(`/products?search=${encodeURIComponent(q)}`);
+  };
 
   return (
-    <header className={`site-header${openMegaMenu ? ' site-header--mega-open' : ''}`}>
-      <div className="site-header__container">
-        <div className="site-header__bar">
-          <Link href="/" className="site-header__logo-link">
-            <div className="site-header__logo-wrap">
+    <header className={`site-header${openMegaMenu ? ' site-header--mega-open' : ''} bg-surface/90 backdrop-blur-xl`}>
+      <div className="site-header__container mx-auto max-w-[1400px] px-4 lg:px-6">
+        <div className="site-header__bar flex h-20 items-center justify-between gap-3 lg:gap-6">
+          <Link href="/" className="site-header__logo-link flex shrink-0 items-center gap-2">
+            <div className="site-header__logo-wrap flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-primary">
               <Image
                 src="/affordlogo1.svg"
-                alt={`${brandConfig.name} logo`}
-                width={60}
-                height={60}
-                className="site-header__logo"
+                alt=""
+                width={36}
+                height={36}
+                className="site-header__logo h-7 w-7 object-contain"
                 priority
               />
             </div>
-            <span className="site-header__logo-text">{brandConfig.name}</span>
+            <div className="hidden flex-col sm:flex">
+              <span className="site-header__logo-text text-sm font-bold leading-none tracking-tight text-primary">
+                Affordable Gadgets
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-secondary">
+                Nairobi · Verified Tech
+              </span>
+            </div>
           </Link>
 
+          <form
+            onSubmit={onSearchSubmit}
+            className="site-header__search hidden min-w-0 flex-1 flex-col gap-1.5 md:flex"
+            role="search"
+          >
+            <div className="flex items-center gap-2 rounded-xl border border-border-hairline bg-surface-container-lowest px-3 py-2 shadow-sm">
+              <MaterialIcon name="search" className="text-[20px] text-secondary" />
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search phones, laptops, tablets…"
+                className="w-full bg-transparent text-sm text-on-surface outline-none placeholder:text-text-muted"
+                aria-label="Search products"
+              />
+              <button
+                type="submit"
+                className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-promo-lime transition hover:bg-obsidian-dark"
+              >
+                Search
+              </button>
+            </div>
+            <div className="hidden items-center gap-2 lg:flex">
+              {BUDGET_CHIPS.map((chip) => (
+                <Link
+                  key={chip.href}
+                  href={chip.href}
+                  className="rounded-full bg-surface-container px-2.5 py-0.5 text-[11px] font-medium text-on-surface-variant transition hover:bg-promo-lime hover:text-primary"
+                >
+                  {chip.label}
+                </Link>
+              ))}
+            </div>
+          </form>
+
           <div
-            className={`site-header__nav-zone${openMegaMenu ? ' site-header__nav-zone--mega-open' : ''}`}
+            className={`site-header__nav-zone hidden xl:block${openMegaMenu ? ' site-header__nav-zone--mega-open' : ''}`}
             onMouseEnter={cancelMegaMenuClose}
             onMouseLeave={scheduleMegaMenuClose}
           >
@@ -216,11 +283,6 @@ function HeaderContent() {
               className={`site-header__nav${openMegaMenu ? ' site-header__nav--mega-open' : ''}`}
               aria-label="Main"
             >
-              <Link href="/" className="site-header__nav-link site-header__nav-link--home">
-                Home
-                <span className="site-header__nav-underline" />
-              </Link>
-
               {PRIMARY_BRAND_NAV.map((brand) => (
                 <HeaderBrandMenu
                   key={brand.brandFilter}
@@ -278,81 +340,64 @@ function HeaderContent() {
                 </Link>
               ))}
             </nav>
-
           </div>
 
-          <div className="site-header__actions">
-            <Link
-              href={openProductsFiltersHref}
-              className="site-header__icon-button site-header__icon-button--search"
-              aria-label="Search products"
-              title="Search"
+          <div className="site-header__actions flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center gap-1.5 rounded-full bg-whatsapp-emerald px-3 py-2 text-xs font-semibold text-white transition hover:bg-whatsapp-emerald-hover sm:inline-flex"
+              aria-label="Chat on WhatsApp"
             >
-              <svg className="site-header__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <MaterialIcon name="chat" className="text-[16px]" />
+              WhatsApp
+            </a>
+
+            <Link
+              href="/wishlist"
+              className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-primary transition hover:bg-surface-container"
+              aria-label={wishlistCount > 0 ? `Wishlist, ${wishlistCount} items` : 'Wishlist'}
+            >
+              <MaterialIcon name="favorite" className="text-[22px]" />
+              {wishlistCount > 0 ? (
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-promo-lime px-1 text-[10px] font-bold text-primary">
+                  {wishlistCount}
+                </span>
+              ) : null}
             </Link>
 
             <Link
               href="/cart"
-              className="site-header__cart"
+              className="site-header__cart relative inline-flex h-10 items-center gap-1 rounded-full px-2 text-primary transition hover:bg-surface-container"
               aria-label={itemCount > 0 ? `Cart, ${itemCount} items` : 'Cart'}
             >
-              <svg
-                className="site-header__cart-icon"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              {itemCount > 0 && (
-                <span className="site-header__cart-badge" aria-hidden="true">
+              <MaterialIcon name="shopping_bag" className="text-[22px]" />
+              {itemCount > 0 ? (
+                <span className="site-header__cart-badge absolute right-0 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-promo-lime">
                   {itemCount}
                 </span>
-              )}
-              <span className="site-header__cart-label" aria-hidden="true">
-                Cart
-              </span>
+              ) : null}
             </Link>
 
             {isLoggedIn ? (
-              <div className="site-header__account-menu">
+              <div className="site-header__account-menu relative">
                 <button
                   type="button"
-                  className="site-header__account"
+                  className="site-header__account inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface-container"
                   aria-label="Account menu (logged in)"
                   onClick={() => setIsAccountMenuOpen((prev) => !prev)}
                 >
-                  <svg className="site-header__account-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4M12 22a10 10 0 100-20 10 10 0 000 20z"
-                    />
-                  </svg>
-                  <span className="site-header__account-status site-header__account-status--on" />
+                  <MaterialIcon name="person" className="text-[22px]" />
                 </button>
                 {isAccountMenuOpen && (
-                  <div className="site-header__account-dropdown">
-                    <Link href="/cart" className="site-header__account-item">
+                  <div className="site-header__account-dropdown absolute right-0 z-50 mt-2 min-w-[160px] rounded-xl border border-border-hairline bg-white p-2 shadow-lg">
+                    <Link href="/cart" className="site-header__account-item block rounded-lg px-3 py-2 text-sm hover:bg-surface-muted">
                       My Orders
                     </Link>
                     <button
                       type="button"
-                      className="site-header__account-item"
+                      className="site-header__account-item block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-surface-muted"
                       onClick={async () => {
                         const supabase = createClient();
                         await supabase.auth.signOut();
@@ -369,48 +414,42 @@ function HeaderContent() {
             ) : (
               <button
                 type="button"
-                className="site-header__account"
+                className="site-header__account inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface-container"
                 aria-label="Login or create account"
                 onClick={() => setIsAuthModalOpen(true)}
               >
-                <svg className="site-header__account-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15.232 5.232a3 3 0 11-4.464 4.064 3 3 0 014.464-4.064zM4 19a8 8 0 0116 0"
-                  />
-                </svg>
-                <span className="site-header__account-status" />
+                <MaterialIcon name="person" className="text-[22px]" />
               </button>
             )}
-          </div>
 
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="site-header__menu-button"
-            aria-label="Toggle menu"
-            aria-expanded={isMobileMenuOpen}
-          >
-            <svg className="site-header__menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="site-header__menu-button inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-surface-container xl:hidden"
+              aria-label="Toggle menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <MaterialIcon name={isMobileMenuOpen ? 'close' : 'menu'} className="text-[22px]" />
+            </button>
+          </div>
         </div>
+
+        <form
+          onSubmit={onSearchSubmit}
+          className="pb-3 md:hidden"
+          role="search"
+        >
+          <div className="flex items-center gap-2 rounded-xl border border-border-hairline bg-surface-container-lowest px-3 py-2">
+            <MaterialIcon name="search" className="text-[20px] text-secondary" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search devices…"
+              className="w-full bg-transparent text-sm outline-none"
+              aria-label="Search products"
+            />
+          </div>
+        </form>
 
         {isMounted &&
           openMegaMenu &&
@@ -452,12 +491,11 @@ function HeaderContent() {
         )}
 
         {isMobileMenuOpen && (
-          <nav className="site-header__mobile-menu" aria-label="Mobile">
-            <div className="site-header__mobile-list">
-              <Link href="/" className="site-header__mobile-link" onClick={closeMobileMenu}>
+          <nav className="site-header__mobile-menu border-t border-border-hairline pb-4" aria-label="Mobile">
+            <div className="site-header__mobile-list flex flex-col gap-1 pt-3">
+              <Link href="/" className="site-header__mobile-link rounded-lg px-2 py-2.5 text-sm font-medium" onClick={closeMobileMenu}>
                 Home
               </Link>
-
               {PRIMARY_BRAND_NAV.map((brand) => (
                 <HeaderBrandMenu
                   key={brand.brandFilter}
@@ -468,34 +506,41 @@ function HeaderContent() {
                   onNavigate={closeMobileMenu}
                 />
               ))}
-
               <HeaderMoreBrandsMenu
                 brands={MORE_BRAND_NAV}
                 variant="mobile"
                 onNavigate={closeMobileMenu}
               />
-
               {SHOP_NAV.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="site-header__mobile-link"
+                  className="site-header__mobile-link rounded-lg px-2 py-2.5 text-sm font-medium"
                   onClick={closeMobileMenu}
                 >
                   {link.label}
                 </Link>
               ))}
-
               {utilityLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="site-header__mobile-link"
+                  className="site-header__mobile-link rounded-lg px-2 py-2.5 text-sm font-medium"
                   onClick={closeMobileMenu}
                 >
                   {link.label}
                 </Link>
               ))}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-whatsapp-emerald px-3 py-2.5 text-sm font-semibold text-white"
+                onClick={closeMobileMenu}
+              >
+                <MaterialIcon name="chat" className="text-[18px]" />
+                WhatsApp us
+              </a>
             </div>
           </nav>
         )}

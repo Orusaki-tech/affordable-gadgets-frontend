@@ -49,6 +49,29 @@
 @import "../styles/components/SpecialOffersServer.css";
 @import "../styles/components/StoriesCarousel.css";
 @import "../styles/components/StructuredData.css";
+@import "../styles/components/HomeRedesign.css";
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.site-header-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
 
 /* Product cards are <a class="product-card ...">. Wins over stale bundles that still ship
    `.product-card--featured { border: none }` or gray-200 on `.product-card` (CDN / old deploy). */

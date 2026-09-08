@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -7,6 +7,13 @@ import { brandConfig } from "@/lib/config/brand";
 import { StructuredData } from "@/components/StructuredData";
 import { GoogleCustomerReviewsBadge } from "@/components/GoogleCustomerReviewsBadge";
 import { AuthGate } from "@/components/AuthGate";
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,9 +88,13 @@ export default function RootLayout({
         <link rel="preconnect" href={apiOrigin} />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href={apiOrigin} />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+        />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} antialiased bg-surface text-on-surface`}
       >
         <StructuredData type="Organization" />
         <StructuredData type="WebSite" />

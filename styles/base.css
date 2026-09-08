@@ -1,13 +1,37 @@
 :root {
   /* Brand Colors */
-  --background: #ffffff;
-  --foreground: #1d1d1f;
+  --background: #f9f9fb;
+  --foreground: #1a1c1d;
 
-  --primary: #1d1d1f;
+  --primary: #030304;
   --primary-dark: #121212;
   --primary-light: #3a3a3c;
-  --secondary: #6e6e73;
+  --secondary: #5e5e63;
   --accent: #1d1d1f;
+
+  /* Mockup redesign tokens */
+  --promo-lime: #9fe855;
+  --obsidian-dark: #121212;
+  --surface-canvas: #f5f5f7;
+  --surface: #f9f9fb;
+  --surface-container: #eeeef0;
+  --surface-container-low: #f3f3f5;
+  --surface-container-high: #e8e8ea;
+  --surface-container-lowest: #ffffff;
+  --surface-muted: #f2f3f7;
+  --surface-dark: #10131f;
+  --on-surface: #1a1c1d;
+  --on-surface-variant: #46464a;
+  --on-primary: #ffffff;
+  --primary-container: #1d1d1f;
+  --whatsapp-emerald: #128c7e;
+  --whatsapp-emerald-hover: #0f7a6e;
+  --stock-green: #16a34a;
+  --stock-green-light: #ecfdf3;
+  --text-muted: #86868b;
+  --border-strong: #121212;
+  --border-hairline: #e8e8ed;
+  --badge-bundle-orange: #f97316;
 
   /* System Colors */
   --success: #34c759;
@@ -130,8 +154,10 @@
   --body-lh: 1.5;
   --tracking-tight: -0.03em;
 
-  /* System-first typography (SF on Apple devices). */
+  /* Storefront body: Inter (mockup), then system / Geist fallbacks. */
   --font-sans:
+    var(--font-inter),
+    Inter,
     -apple-system,
     BlinkMacSystemFont,
     "SF Pro Display",
@@ -163,6 +189,32 @@
   --color-primary-light: var(--primary-light);
   --color-secondary: var(--secondary);
   --color-accent: var(--accent);
+  --color-promo-lime: var(--promo-lime);
+  --color-obsidian-dark: var(--obsidian-dark);
+  --color-surface-canvas: var(--surface-canvas);
+  --color-surface: var(--surface);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-dark: var(--surface-dark);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-whatsapp-emerald: var(--whatsapp-emerald);
+  --color-whatsapp-emerald-hover: var(--whatsapp-emerald-hover);
+  --color-stock-green: var(--stock-green);
+  --color-stock-green-light: var(--stock-green-light);
+  --color-text-muted: var(--text-muted);
+  --color-border-strong: var(--border-strong);
+  --color-border-hairline: var(--border-hairline);
+  --color-badge-bundle-orange: var(--badge-bundle-orange);
+  --spacing-gutter: 16px;
+  --spacing-gutter-desktop: 24px;
+  --spacing-header-max: 1400px;
+  --spacing-container-max: 1280px;
 
   /* Brand-aligned "blue" scale to avoid legacy blue accents */
   --color-blue-50: var(--gray-50);

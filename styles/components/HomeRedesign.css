@@ -1,0 +1,7 @@
+.home-redesign__page {
+  background: var(--surface);
+}
+
+.home-redesign__main {
+  flex: 1 1 auto;
+}

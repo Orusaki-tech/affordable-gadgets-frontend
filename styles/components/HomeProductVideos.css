@@ -27,6 +27,7 @@
   /*
    Keep portrait (Shorts/Reels) proportions without letting the card get too tall.
    Height is capped responsively; media inside still covers the frame.
+   Grid homepage variant overrides max-height in HomeRedesign.css.
   */
   max-height: clamp(260px, 42vh, 440px);
   background: #111;

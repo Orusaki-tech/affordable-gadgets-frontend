@@ -5,3 +5,128 @@
 .home-redesign__main {
   flex: 1 1 auto;
 }
+
+/* Uniform chip / pill tokens used across header + homepage */
+.ag-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  border: 1px solid transparent;
+  vertical-align: middle;
+}
+
+.ag-chip--sm {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.ag-chip--muted {
+  background: var(--surface-container-lowest, #fff);
+  border-color: var(--border-hairline, #e8e8ed);
+  color: var(--on-surface-variant, #46464a);
+}
+
+.ag-chip--muted:hover {
+  border-color: var(--primary, #030304);
+  color: var(--primary, #030304);
+}
+
+.ag-chip--soft {
+  background: color-mix(in srgb, var(--primary, #030304) 10%, transparent);
+  color: var(--primary, #030304);
+  border-color: transparent;
+}
+
+.ag-chip--soft:hover {
+  background: var(--primary, #030304);
+  color: var(--promo-lime, #9fe855);
+}
+
+.ag-chip--cta {
+  height: 36px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ag-chip--dark {
+  background: var(--primary, #030304);
+  color: var(--promo-lime, #9fe855);
+  border-color: transparent;
+}
+
+.ag-chip--ghost {
+  background: color-mix(in srgb, #fff 90%, transparent);
+  color: var(--secondary, #5e5e63);
+  border-color: transparent;
+}
+
+.ag-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  background: #fff;
+  color: var(--on-surface, #1a1c1d);
+  border: 0;
+  flex-shrink: 0;
+}
+
+.ag-nav-pill:hover {
+  background: color-mix(in srgb, #fff 80%, #eee);
+}
+
+.ag-nav-pill--active {
+  background: var(--primary, #030304) !important;
+  color: #fff !important;
+}
+
+/* Mockup video grid: full 9:16, 2 / 4 columns */
+.home-product-videos--grid .home-product-videos__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (min-width: 1024px) {
+  .home-product-videos--grid .home-product-videos__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.home-product-videos--grid .home-product-videos__slide-stack {
+  width: 100% !important;
+}
+
+.home-product-videos--grid .home-product-videos__slide-inner {
+  border-radius: 16px;
+}
+
+.home-product-videos--grid .home-product-videos__media-wrap {
+  aspect-ratio: 9 / 16;
+  max-height: none;
+  width: 100%;
+}
+
+.home-product-videos--grid .home-product-videos__media-wrap video,
+.home-product-videos--grid .home-product-videos__media-wrap .home-product-videos__embed-frame {
+  max-height: none;
+}

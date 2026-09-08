@@ -24,7 +24,7 @@ export function HomeCbdRibbon() {
               <p className="text-sm font-bold text-white sm:text-base">
                 Get KSh 500 OFF Website Prices
               </p>
-              <span className="rounded-full bg-promo-lime px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+              <span className="ag-chip ag-chip--sm ag-chip--lime uppercase tracking-wider">
                 Nairobi CBD Shop
               </span>
             </div>

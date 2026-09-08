@@ -39,13 +39,13 @@ export function Footer() {
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="rounded-full bg-stock-green-light px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-stock-green">
+              <span className="ag-chip ag-chip--sm" style={{ background: 'var(--stock-green-light)', color: 'var(--stock-green)' }}>
                 M-Pesa Verified
               </span>
-              <span className="rounded-full bg-surface-container-high px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
+              <span className="ag-chip ag-chip--sm ag-chip--muted uppercase tracking-wider">
                 Lipa Polepole BNPL
               </span>
-              <span className="rounded-full bg-surface-container-high px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
+              <span className="ag-chip ag-chip--sm ag-chip--muted uppercase tracking-wider">
                 6-12M Warranty
               </span>
             </div>

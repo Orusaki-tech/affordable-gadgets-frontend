@@ -42,7 +42,8 @@ export function HomeBnplCalculator() {
               {PARTNERS.map((partner) => (
                 <span
                   key={partner}
-                  className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white"
+                  className="ag-chip ag-chip--sm"
+                  style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', borderColor: 'transparent' }}
                 >
                   {partner}
                 </span>

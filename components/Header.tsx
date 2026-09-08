@@ -232,11 +232,7 @@ function HeaderContent() {
             </div>
             <div className="hidden shrink-0 items-center gap-1.5 lg:flex">
               {BUDGET_CHIPS.map((chip) => (
-                <Link
-                  key={chip.href}
-                  href={chip.href}
-                  className="rounded-full border border-border-hairline bg-white px-3 py-1.5 text-[11px] font-semibold text-on-surface-variant transition hover:border-primary hover:text-primary"
-                >
+                <Link key={chip.href} href={chip.href} className="ag-chip ag-chip--muted">
                   {chip.label}
                 </Link>
               ))}
@@ -248,7 +244,7 @@ function HeaderContent() {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden items-center gap-1.5 rounded-full bg-promo-lime px-3.5 py-2 text-xs font-bold text-primary transition hover:brightness-95 sm:inline-flex"
+              className="ag-chip ag-chip--lime ag-chip--cta hidden gap-1.5 sm:inline-flex"
             >
               <MaterialIcon name="chat" className="text-[16px]" />
               WhatsApp Inquiry
@@ -367,11 +363,7 @@ function HeaderContent() {
           >
             <Link
               href="/products"
-              className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition ${
-                isAllDevicesActive
-                  ? 'bg-primary text-white'
-                  : 'bg-white text-on-surface hover:bg-white/80'
-              }`}
+              className={`ag-nav-pill${isAllDevicesActive ? ' ag-nav-pill--active' : ''}`}
               onMouseEnter={closeMegaMenu}
             >
               All Devices
@@ -410,8 +402,8 @@ function HeaderContent() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`site-header__nav-link shrink-0 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-on-surface hover:bg-white/80${
-                  isShopNavActive(link.href, pathname, currentSearch) ? ' site-header__nav-link--active' : ''
+                className={`ag-nav-pill site-header__nav-link${
+                  isShopNavActive(link.href, pathname, currentSearch) ? ' ag-nav-pill--active site-header__nav-link--active' : ''
                 }`}
                 onMouseEnter={closeMegaMenu}
               >
@@ -421,21 +413,21 @@ function HeaderContent() {
 
             <Link
               href="/financing"
-              className="shrink-0 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-on-surface hover:bg-white/80"
+              className="ag-nav-pill"
               onMouseEnter={closeMegaMenu}
             >
               Financing / BNPL
             </Link>
             <Link
               href="/articles"
-              className="shrink-0 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-on-surface hover:bg-white/80"
+              className="ag-nav-pill"
               onMouseEnter={closeMegaMenu}
             >
               Blog
             </Link>
             <Link
               href="/cart"
-              className="shrink-0 rounded-full bg-white px-3.5 py-1.5 text-[13px] font-semibold text-on-surface hover:bg-white/80"
+              className="ag-nav-pill"
               onMouseEnter={closeMegaMenu}
             >
               Track Order

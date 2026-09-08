@@ -369,7 +369,18 @@ function HomepageVideoSlide({
   );
 }
 
-export function HomeProductVideos() {
+export type HomeProductVideosProps = {
+  /** `grid` matches homepage mockup (2/4-col 9:16). Default keeps Swiper carousel. */
+  variant?: 'carousel' | 'grid';
+  /** Hide the built-in heading when a parent section already provides one. */
+  hideHeader?: boolean;
+};
+
+export function HomeProductVideos({
+  variant = 'carousel',
+  hideHeader = false,
+}: HomeProductVideosProps = {}) {
+  const isGrid = variant === 'grid';
   const deckKey = 'home-product-videos';
   const navUid = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const prevNavSelector = `#hpv-nav-prev-${navUid}`;
@@ -394,7 +405,32 @@ export function HomeProductVideos() {
     });
   }, [playingKey]);
 
+  const slideEntries =
+    products?.flatMap((product) => {
+      const links = getProductVideoLinks(product);
+      const videoCount = links.length || 1;
+      return Array.from({ length: videoCount }, (_, i) => ({
+        key: `${product.id}-${i}`,
+        product,
+        videoIndex: i,
+      }));
+    }) ?? [];
+
   if (isLoading) {
+    if (isGrid) {
+      return (
+        <div className="home-product-videos--grid" aria-busy>
+          <div className="home-product-videos__grid">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={`hpv-skel-${i}`}
+                className="aspect-[9/16] animate-pulse rounded-2xl bg-gray-200"
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
     return (
       <section className="bg-[#F9F9F9] py-8 scroll-mt-20" aria-labelledby="home-product-videos-heading">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -417,18 +453,43 @@ export function HomeProductVideos() {
     return null;
   }
 
+  if (isGrid) {
+    return (
+      <div className="home-product-videos--grid">
+        <div className="home-product-videos__grid">
+          {slideEntries.slice(0, 8).map((entry) => (
+            <div key={entry.key} className="min-w-0">
+              <HomepageVideoSlide
+                product={entry.product}
+                videoIndex={entry.videoIndex}
+                playingKey={playingKey}
+                setPlayingKey={setPlayingKey}
+                registerVideo={registerVideo}
+                deckKey={deckKey}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <section
       className="bg-[#F9F9F9] py-8 scroll-mt-20"
       aria-labelledby="home-product-videos-heading"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 id="home-product-videos-heading" className="text-lg font-bold text-gray-900 md:text-xl">
-          Product videos
-        </h2>
-        <p className="mt-1 max-w-3xl text-sm text-gray-600 md:text-base">
-          Find out more about your favourite devices and accessories here
-        </p>
+        {!hideHeader ? (
+          <>
+            <h2 id="home-product-videos-heading" className="text-lg font-bold text-gray-900 md:text-xl">
+              Product videos
+            </h2>
+            <p className="mt-1 max-w-3xl text-sm text-gray-600 md:text-base">
+              Find out more about your favourite devices and accessories here
+            </p>
+          </>
+        ) : null}
 
         <div className="relative mt-5 gap-3">
           <button

@@ -113,7 +113,7 @@ export function HomeHeroSpotlight() {
                   key={preset.label}
                   type="button"
                   onClick={() => setBudget(preset.value)}
-                  className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary hover:bg-primary hover:text-promo-lime"
+                  className="ag-chip ag-chip--soft"
                 >
                   {preset.label}
                 </button>
@@ -145,10 +145,10 @@ export function HomeHeroSpotlight() {
           <div className="relative z-10 flex h-full min-h-[420px] flex-col p-6 sm:min-h-[480px] sm:p-8 lg:min-h-[520px] lg:p-10">
             <div className="max-w-md">
               <div className="flex flex-wrap gap-2">
-                <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-promo-lime">
+                <span className="ag-chip ag-chip--sm ag-chip--dark uppercase tracking-wider">
                   Authorized Stockist Launch
                 </span>
-                <span className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary shadow-sm">
+                <span className="ag-chip ag-chip--sm ag-chip--ghost uppercase tracking-wider shadow-sm">
                   Global Release Window: September 2026
                 </span>
               </div>

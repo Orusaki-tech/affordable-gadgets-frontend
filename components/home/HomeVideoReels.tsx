@@ -27,7 +27,7 @@ export function HomeVideoReels() {
           <MaterialIcon name="arrow_outward" className="text-[16px]" />
         </a>
       </div>
-      <HomeProductVideos />
+      <HomeProductVideos variant="grid" hideHeader />
       <div className="mt-4">
         <Link href="/videos" className="text-sm font-semibold text-primary underline-offset-2 hover:underline">
           See all product videos

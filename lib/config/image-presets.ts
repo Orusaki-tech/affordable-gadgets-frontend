@@ -74,6 +74,14 @@ export const IMAGE_PRESETS = {
     defaultWidth: 400,
     fit: 'contain' as const,
   },
+  /** Homepage / articles blog cards — crop to fill media frame (no letterbox). */
+  blogCard: {
+    type: 'srcset',
+    widths: [400, 600, 800, 1200],
+    sizes: '(max-width: 768px) 100vw, (max-width: 1280px) 45vw, 420px',
+    defaultWidth: 800,
+    fit: 'cover' as const,
+  },
   productGallery: {
     type: 'srcset',
     widths: [400, 800, 1200, 1600],

@@ -91,6 +91,7 @@ export async function HomeBuyingGuides() {
                 <CloudinaryImage
                   src={guide.imageUrl}
                   alt={guide.title}
+                  preset="blogCard"
                   fill
                   fit="cover"
                   className="object-cover transition duration-300 group-hover:scale-[1.03]"

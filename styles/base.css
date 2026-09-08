@@ -211,6 +211,8 @@
   --panel-pad-lg: var(--space-8);
   --panel-radius: 1rem;
   --layout-max: 87.5rem; /* 1400px @ 16 */
+  /* Shared hero column height — rem so Ctrl+/- zoom scales budget + banner together */
+  --hero-panel-min-h: 32.5rem;
 
   /* Storefront body: Inter (mockup), then system / Geist fallbacks. */
   --font-sans:

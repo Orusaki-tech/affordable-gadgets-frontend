@@ -225,8 +225,8 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
               src={displayBannerSrc}
               alt={activePromotion?.title ?? 'Featured promotion'}
               preset="homepageHero"
-              fit="cover"
-              sizes="(max-width: 1024px) 100vw, 66vw"
+              fit="contain"
+              sizes="(max-width: 768px) 100vw, 66vw"
               className="home-redesign__hero-banner-img"
               fill
               priority

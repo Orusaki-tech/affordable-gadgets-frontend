@@ -244,7 +244,7 @@ function HeaderContent() {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="ag-btn ag-btn--lime hidden sm:inline-flex"
+              className="ag-chip ag-chip--lime ag-chip--cta hidden md:inline-flex"
             >
               <MaterialIcon name="chat" className="text-[1rem]" />
               WhatsApp Inquiry

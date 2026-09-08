@@ -219,8 +219,8 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
           </div>
         </div>
 
-        {/* Promo banner — first on mobile; tall frame + contain so art isn’t tiny/cropped */}
-        <div className="home-redesign__hero-banner order-1 relative w-full overflow-hidden rounded-2xl bg-surface-canvas shadow-sm lg:order-2 lg:col-span-8 lg:min-h-[520px]">
+        {/* Promo banner — first on mobile; natural image size; CTAs below on small screens */}
+        <div className="home-redesign__hero-banner order-1 relative flex w-full flex-col overflow-hidden rounded-2xl bg-surface-canvas shadow-sm lg:order-2 lg:col-span-8 lg:min-h-[520px]">
           <div className="home-redesign__hero-banner-media relative w-full lg:absolute lg:inset-0 lg:h-full">
             <CloudinaryImage
               src={displayBannerSrc}
@@ -235,7 +235,7 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
             />
           </div>
 
-          <div className="absolute bottom-4 left-4 z-20 flex flex-wrap items-center gap-2 sm:bottom-8 sm:left-8 sm:gap-3">
+          <div className="home-redesign__hero-banner-actions relative z-20 flex flex-wrap items-center gap-2 px-4 py-3 sm:gap-3 sm:px-6 sm:py-4 lg:absolute lg:bottom-8 lg:left-8 lg:p-0">
             <button
               type="button"
               onClick={() => setPreOrderOpen(true)}

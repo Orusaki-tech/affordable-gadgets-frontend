@@ -12,17 +12,17 @@ export function Footer() {
       <div className="site-footer__container mx-auto max-w-[1400px] px-4 py-14 lg:px-6 lg:py-16">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5 lg:gap-12">
           <div className="flex flex-col gap-4 lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <Link href="/" className="site-footer__logo-link flex items-center gap-3">
+              <div className="site-footer__logo-wrap relative h-16 w-16 shrink-0 overflow-hidden">
                 <Image
                   src="/affordlogo2.svg"
-                  alt=""
-                  width={28}
-                  height={28}
-                  className="h-6 w-6 object-contain"
+                  alt={`${brandConfig.name} logo`}
+                  width={100}
+                  height={100}
+                  className="site-footer__logo h-full w-full object-contain"
                 />
               </div>
-              <span className="text-sm font-bold tracking-tight text-primary">
+              <span className="site-footer__logo-text text-lg font-bold tracking-tight text-primary">
                 {brandConfig.name}
               </span>
             </Link>

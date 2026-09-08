@@ -200,25 +200,18 @@ function HeaderContent() {
       <div className="site-header__container mx-auto max-w-[1400px] px-4 lg:px-6">
         {/* Top utility row: logo | search | actions */}
         <div className="site-header__bar flex items-center gap-3 py-3 lg:gap-5">
-          <Link href="/" className="site-header__logo-link flex shrink-0 items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-primary">
+          <Link href="/" className="site-header__logo-link shrink-0">
+            <div className="site-header__logo-wrap">
               <Image
                 src="/affordlogo1.svg"
-                alt=""
-                width={40}
-                height={40}
-                className="h-7 w-7 object-contain"
+                alt={`${brandConfig.name} logo`}
+                width={60}
+                height={60}
+                className="site-header__logo"
                 priority
               />
             </div>
-            <div className="hidden flex-col sm:flex">
-              <span className="site-header__logo-text text-[15px] font-bold leading-none tracking-tight text-primary">
-                Affordable Gadgets
-              </span>
-              <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.14em] text-secondary">
-                Kenya Certified Tech
-              </span>
-            </div>
+            <span className="site-header__logo-text">{brandConfig.name}</span>
           </Link>
 
           <form

@@ -100,11 +100,27 @@
 }
 
 .site-header__logo-text {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.1;
-  color: var(--primary);
+  color: var(--ui-black);
   white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 639px) {
+  .site-header__logo-text {
+    display: none;
+  }
+}
+
+@media (min-width: 1440px) {
+  .site-header__logo-text {
+    font-size: 20px;
+    max-width: none;
+  }
 }
 
 .site-header__actions {

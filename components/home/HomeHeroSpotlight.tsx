@@ -153,8 +153,8 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
   return (
     <section className="home-redesign__hero mx-auto max-w-[1400px] px-4 pt-6 lg:px-6 lg:pt-8">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
-        {/* Left: search + budget matcher */}
-        <div className="flex flex-col gap-4 rounded-2xl bg-promo-lime p-5 shadow-sm sm:p-6 lg:col-span-4">
+        {/* Left: search + budget matcher (budget card fills column height) */}
+        <div className="flex flex-col gap-4 rounded-2xl bg-promo-lime p-5 shadow-sm sm:p-6 lg:col-span-4 lg:min-h-[520px]">
           <form onSubmit={onSearch}>
             <div className="flex items-center gap-2 rounded-xl bg-white p-2.5 shadow-sm">
               <MaterialIcon name="search" className="text-[20px] text-secondary" />
@@ -171,11 +171,11 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
           <div>
             <h2 className="text-xl font-bold tracking-tight text-primary">Search to start shopping</h2>
             <p className="mt-1 text-sm text-primary/75">
-              Type a product name above — or use Instant Budget Match below.
+              Type a product name above — or set a budget and browse live stock.
             </p>
           </div>
 
-          <div className="mt-auto rounded-xl bg-white/70 p-4 backdrop-blur-sm">
+          <div className="flex flex-1 flex-col rounded-xl bg-white/70 p-4 backdrop-blur-sm sm:p-5">
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-bold uppercase tracking-wider text-primary">
                 Instant Budget Match
@@ -191,10 +191,10 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
               step={5000}
               value={budget}
               onChange={(e) => setBudget(Number(e.target.value))}
-              className="mt-3 w-full accent-primary"
+              className="mt-4 w-full accent-primary"
               aria-label="Budget amount"
             />
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               {BUDGET_PRESETS.map((preset) => (
                 <button
                   key={preset.label}
@@ -206,9 +206,12 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
                 </button>
               ))}
             </div>
+            <p className="mt-4 text-sm text-primary/70">
+              We’ll show phones and gadgets that fit this budget, in stock for pickup or delivery.
+            </p>
             <Link
               href={budgetHref}
-              className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-promo-lime"
+              className="mt-auto inline-flex w-full items-center justify-center gap-1 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-promo-lime"
             >
               Show devices in budget
               <MaterialIcon name="arrow_forward" className="text-[16px]" />

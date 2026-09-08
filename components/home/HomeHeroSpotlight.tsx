@@ -152,9 +152,9 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
 
   return (
     <section className="home-redesign__hero ag-section ag-section--flush-top">
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
+      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12 lg:gap-5">
         {/* Budget / search — below banner on mobile, left column on desktop */}
-        <div className="order-2 flex flex-col gap-4 rounded-2xl bg-promo-lime p-5 shadow-sm sm:p-6 lg:order-1 lg:col-span-4 lg:min-h-[520px]">
+        <div className="order-2 flex h-full flex-col gap-4 rounded-2xl bg-promo-lime p-5 shadow-sm sm:p-6 lg:order-1 lg:col-span-4 lg:min-h-[520px]">
           <form onSubmit={onSearch}>
             <div className="flex items-center gap-2 rounded-xl bg-white p-2.5 shadow-sm">
               <MaterialIcon name="search" className="text-[1.25rem] text-secondary" />
@@ -219,14 +219,14 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
           </div>
         </div>
 
-        {/* Promo banner — first on mobile; natural image size; CTAs below on small screens */}
-        <div className="home-redesign__hero-banner order-1 relative flex w-full flex-col overflow-hidden rounded-2xl bg-surface-canvas shadow-sm lg:order-2 lg:col-span-8 lg:min-h-[520px]">
-          <div className="home-redesign__hero-banner-media relative w-full lg:absolute lg:inset-0 lg:h-full">
+        {/* Promo banner — edge-to-edge cover at every breakpoint; first on mobile */}
+        <div className="home-redesign__hero-banner order-1 relative w-full overflow-hidden rounded-2xl bg-surface-canvas shadow-sm lg:order-2 lg:col-span-8 lg:min-h-[520px]">
+          <div className="home-redesign__hero-banner-media">
             <CloudinaryImage
               src={displayBannerSrc}
               alt={activePromotion?.title ?? 'Featured promotion'}
               preset="homepageHero"
-              fit="contain"
+              fit="cover"
               sizes="(max-width: 1024px) 100vw, 66vw"
               className="home-redesign__hero-banner-img"
               fill
@@ -235,7 +235,7 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
             />
           </div>
 
-          <div className="home-redesign__hero-banner-actions relative z-20 flex flex-wrap items-center gap-2 px-4 py-3 sm:gap-3 sm:px-6 sm:py-4 lg:absolute lg:bottom-8 lg:left-8 lg:p-0">
+          <div className="home-redesign__hero-banner-actions">
             <button
               type="button"
               onClick={() => setPreOrderOpen(true)}

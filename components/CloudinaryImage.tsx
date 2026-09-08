@@ -4,6 +4,7 @@ import type { ImgHTMLAttributes, ReactNode } from 'react';
 import { IMAGE_PRESETS, type ImagePresetName } from '@/lib/config/image-presets';
 import {
   getCloudinaryBannerImageUrl,
+  getCloudinaryBlogCardImageUrl,
   getCloudinaryDensitySrcSet,
   getCloudinarySizedImageUrl,
   getCloudinaryWidthSrcSet,
@@ -32,10 +33,14 @@ type CloudinaryImageProps = {
 function getOptimizedSingleUrl(
   src: string,
   width: number,
-  fit: 'contain' | 'cover'
+  fit: 'contain' | 'cover',
+  aspectRatio?: string
 ): string {
   if (!isCloudinaryUrl(src)) {
     return src;
+  }
+  if (fit === 'cover' && aspectRatio === '16:10') {
+    return getCloudinaryBlogCardImageUrl(src, width);
   }
   if (fit === 'cover') {
     return getCloudinarySizedImageUrl(src, width, 'cover');
@@ -134,9 +139,13 @@ export function CloudinaryImage({
 
   if (presetConfig.type === 'srcset') {
     const presetFit = presetConfig.fit ?? fit;
+    const aspectRatio =
+      'aspectRatio' in presetConfig ? (presetConfig.aspectRatio as string | undefined) : undefined;
     const defaultWidth = presetConfig.defaultWidth;
-    const imgSrc = getOptimizedSingleUrl(src, defaultWidth, presetFit);
-    const srcSet = getCloudinaryWidthSrcSet(src, presetConfig.widths, presetFit);
+    const imgSrc = getOptimizedSingleUrl(src, defaultWidth, presetFit, aspectRatio);
+    const srcSet = getCloudinaryWidthSrcSet(src, presetConfig.widths, presetFit, {
+      aspectRatio,
+    });
 
     return withFillWrapper(
       <img

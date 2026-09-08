@@ -39,6 +39,14 @@ export function getCloudinarySizedImageUrl(
   return buildCloudinaryTransformedUrl(url, transformation);
 }
 
+/** Landscape cover crop for blog / guide cards (fills 16:10 slots without letterbox). */
+export function getCloudinaryBlogCardImageUrl(url: string, width: number): string {
+  return buildCloudinaryTransformedUrl(
+    url,
+    `f_auto,q_auto,c_fill,g_auto,w_${width},ar_16:10`
+  );
+}
+
 /** Wide banner / hero tiles — width-only scaling, `f_auto` + `q_auto` for size/quality balance. */
 export function getCloudinaryBannerImageUrl(
   url: string,
@@ -74,15 +82,21 @@ export function getCloudinaryDensitySrcSet(
 export function getCloudinaryWidthSrcSet(
   url: string,
   widths: readonly number[],
-  fit: 'cover' | 'contain' = 'contain'
+  fit: 'cover' | 'contain' = 'contain',
+  options?: { aspectRatio?: string }
 ): string {
   return widths
     .map((width) => {
-      const optimized = isCloudinaryUrl(url)
-        ? fit === 'cover'
-          ? getCloudinarySizedImageUrl(url, width, 'cover')
-          : getCloudinaryBannerImageUrl(url, width, undefined, undefined, 'contain')
-        : url;
+      let optimized = url;
+      if (isCloudinaryUrl(url)) {
+        if (fit === 'cover' && options?.aspectRatio === '16:10') {
+          optimized = getCloudinaryBlogCardImageUrl(url, width);
+        } else if (fit === 'cover') {
+          optimized = getCloudinarySizedImageUrl(url, width, 'cover');
+        } else {
+          optimized = getCloudinaryBannerImageUrl(url, width, undefined, undefined, 'contain');
+        }
+      }
       return `${optimized} ${width}w`;
     })
     .join(', ');

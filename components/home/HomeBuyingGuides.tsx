@@ -18,7 +18,7 @@ function estimateReadMinutes(title: string) {
   return Math.min(10, Math.max(4, Math.round(words / 2) + 4));
 }
 
-function guideExcerpt(title: string, category: string, productName?: string | null) {
+function guideExcerpt(category: string, productName?: string | null) {
   if (productName) {
     return `Practical tips for ${productName} buyers in Nairobi — what to check, what to skip, and how to buy with confidence.`;
   }
@@ -43,7 +43,7 @@ export async function HomeBuyingGuides() {
         imageUrl: getArticleCardImageUrl(article),
         category,
         meta: updated ? `Updated ${updated} · ${mins} min read` : `${mins} min read`,
-        excerpt: guideExcerpt(article.headline, category, article.product_name),
+        excerpt: guideExcerpt(category, article.product_name),
       };
     })
     .filter(Boolean)
@@ -60,7 +60,7 @@ export async function HomeBuyingGuides() {
   if (!guides.length) return null;
 
   return (
-    <section className="mx-auto mt-14 max-w-[1400px] px-4 lg:px-6">
+    <section className="home-buying-guides mx-auto mt-14 max-w-[1400px] px-4 lg:px-6">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-stock-green">
@@ -79,14 +79,14 @@ export async function HomeBuyingGuides() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
         {guides.map((guide) => (
           <Link
             key={guide.key}
             href={guide.href}
-            className="group flex flex-col overflow-hidden rounded-2xl border border-border-hairline bg-white shadow-sm transition hover:shadow-md"
+            className="home-buying-guides__card group flex flex-col overflow-hidden rounded-2xl border border-border-hairline bg-white shadow-sm transition hover:shadow-md"
           >
-            <div className="relative aspect-[16/10] overflow-hidden bg-surface-muted">
+            <div className="home-buying-guides__media">
               {guide.imageUrl ? (
                 <CloudinaryImage
                   src={guide.imageUrl}
@@ -94,17 +94,15 @@ export async function HomeBuyingGuides() {
                   preset="blogCard"
                   fill
                   fit="cover"
-                  className="object-cover transition duration-300 group-hover:scale-[1.03]"
+                  className="home-buying-guides__image"
                   sizes="(max-width:768px) 100vw, 33vw"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center">
-                  <MaterialIcon name="article" className="text-[40px] text-text-muted" />
+                <div className="home-buying-guides__media-fallback">
+                  <MaterialIcon name="article" className="text-[40px] text-white/50" />
                 </div>
               )}
-              <span className="absolute left-3 top-3 max-w-[85%] truncate rounded-md bg-primary px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-                {guide.category}
-              </span>
+              <span className="home-buying-guides__badge">{guide.category}</span>
             </div>
             <div className="flex flex-1 flex-col p-4 sm:p-5">
               <p className="text-xs font-medium text-secondary">{guide.meta}</p>

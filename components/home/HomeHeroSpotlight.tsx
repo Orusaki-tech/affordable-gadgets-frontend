@@ -219,14 +219,14 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
           </div>
         </div>
 
-        {/* Promo banner — first on mobile, full-width 16:9 so art isn’t tiny/cropped */}
+        {/* Promo banner — first on mobile; tall frame + contain so art isn’t tiny/cropped */}
         <div className="home-redesign__hero-banner order-1 relative w-full overflow-hidden rounded-2xl bg-surface-canvas shadow-sm lg:order-2 lg:col-span-8 lg:min-h-[520px]">
-          <div className="home-redesign__hero-banner-media relative aspect-[16/9] w-full lg:absolute lg:inset-0 lg:aspect-auto lg:h-full">
+          <div className="home-redesign__hero-banner-media relative w-full lg:absolute lg:inset-0 lg:h-full">
             <CloudinaryImage
               src={displayBannerSrc}
               alt={activePromotion?.title ?? 'Featured promotion'}
               preset="homepageHero"
-              fit="cover"
+              fit="contain"
               sizes="(max-width: 1024px) 100vw, 66vw"
               className="home-redesign__hero-banner-img"
               fill

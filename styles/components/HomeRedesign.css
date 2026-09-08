@@ -6,7 +6,7 @@
   flex: 1 1 auto;
 }
 
-/* Mobile hero banner: full-width 16:9 frame; image fills without shrinking the slot */
+/* Mobile hero banner: tall full-width frame; contain = full art, no crop */
 .home-redesign__hero-banner-media .cloudinary-image__fill {
   position: absolute;
   inset: 0;
@@ -23,17 +23,35 @@
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover !important;
-  object-position: center center !important;
 }
 
 @media (max-width: 1023px) {
   .home-redesign__hero-banner {
-    min-height: 12.5rem; /* floor so short viewports don’t collapse the art */
+    /* Match prior desktop-feel height on phones (~old 320–420px banner) */
+    min-height: clamp(20rem, 78vw, 26rem);
   }
 
   .home-redesign__hero-banner-media {
-    min-height: inherit;
+    aspect-ratio: 4 / 5;
+    width: 100%;
+    min-height: clamp(20rem, 78vw, 26rem);
+    background: var(--surface-canvas, #f5f5f7);
+  }
+
+  .home-redesign__hero-banner-media img,
+  .home-redesign__hero-banner-media .home-redesign__hero-banner-img,
+  .home-redesign__hero-banner-media .cloudinary-image__img--fill {
+    object-fit: contain !important;
+    object-position: center center !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .home-redesign__hero-banner-media img,
+  .home-redesign__hero-banner-media .home-redesign__hero-banner-img,
+  .home-redesign__hero-banner-media .cloudinary-image__img--fill {
+    object-fit: cover !important;
+    object-position: center center !important;
   }
 }
 

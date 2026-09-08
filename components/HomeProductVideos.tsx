@@ -93,7 +93,8 @@ function buildEmbedAutoplaySrc(resolved: ResolvedProductVideo): string {
     if (parsed.hostname.includes('youtube.com')) {
       parsed.searchParams.set('autoplay', '1');
       parsed.searchParams.set('playsinline', '1');
-      parsed.searchParams.set('mute', '1');
+      // User already clicked Play — start with sound (mute=0).
+      parsed.searchParams.set('mute', '0');
       parsed.searchParams.set('modestbranding', '1');
       parsed.searchParams.set('rel', '0');
       parsed.searchParams.set('enablejsapi', '1');
@@ -102,6 +103,7 @@ function buildEmbedAutoplaySrc(resolved: ResolvedProductVideo): string {
     }
     if (parsed.hostname.includes('vimeo.com')) {
       parsed.searchParams.set('autoplay', '1');
+      parsed.searchParams.set('muted', '0');
       return parsed.toString();
     }
   } catch {
@@ -203,20 +205,25 @@ function HomepageVideoSlide({
       setIsMuted(true);
       const el = videoRef.current;
       if (el) el.muted = true;
-      if (isYoutubeEmbedSrc(resolved?.src ?? '')) {
-        sendYoutubeIframeCommand(youtubeIframeRef.current, 'mute');
-      }
+      return;
     }
-  }, [isPlaying]);
+    // User-initiated play: prefer sound on.
+    setIsMuted(false);
+    const el = videoRef.current;
+    if (el) el.muted = false;
+    if (isYoutubeEmbedSrc(resolved?.src ?? '')) {
+      sendYoutubeIframeCommand(youtubeIframeRef.current, 'unMute');
+    }
+  }, [isPlaying, resolved?.src]);
 
   const setRef = useCallback(
     (el: HTMLVideoElement | null) => {
       videoRef.current = el;
-      if (el) el.muted = true;
+      if (el) el.muted = playingKey !== slideKey;
       if (resolved?.mode === 'file') registerVideo(slideKey, el);
       else registerVideo(slideKey, null);
     },
-    [registerVideo, resolved?.mode, slideKey]
+    [registerVideo, resolved?.mode, slideKey, playingKey]
   );
 
   if (!resolved) return null;
@@ -226,14 +233,25 @@ function HomepageVideoSlide({
 
   const toggle = () => {
     if (resolved.mode === 'embed') {
-      setPlayingKey((prev) => (prev === slideKey ? null : slideKey));
+      setPlayingKey((prev) => {
+        if (prev === slideKey) return null;
+        setIsMuted(false);
+        return slideKey;
+      });
       return;
     }
     const el = videoRef.current;
     if (!el) return;
     if (el.paused) {
+      el.muted = false;
+      setIsMuted(false);
       setPlayingKey(slideKey);
-      void el.play();
+      void el.play().catch(() => {
+        // Rare fallback if the browser blocks unmuted playback.
+        el.muted = true;
+        setIsMuted(true);
+        void el.play();
+      });
     } else {
       el.pause();
       setPlayingKey(null);
@@ -347,9 +365,9 @@ function HomepageVideoSlide({
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
                       onLoad={() => {
-                        // keep autoplay compliant; start muted until user explicitly unmutes
-                        sendYoutubeIframeCommand(youtubeIframeRef.current, 'mute');
-                        setIsMuted(true);
+                        // Click-to-play is a user gesture — unmute immediately.
+                        sendYoutubeIframeCommand(youtubeIframeRef.current, 'unMute');
+                        setIsMuted(false);
                       }}
                     />
                   </>

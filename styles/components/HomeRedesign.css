@@ -1,9 +1,22 @@
 .home-redesign__page {
-  background: var(--surface);
+  background: var(--surface-container-lowest, #fff);
 }
 
 .home-redesign__main {
   flex: 1 1 auto;
+}
+
+/* Soft well behind each homepage block — contrasts with white page canvas */
+.home-section-panel {
+  border-radius: 16px;
+  background: var(--surface-canvas, #f5f5f7);
+  padding: 24px;
+}
+
+@media (min-width: 640px) {
+  .home-section-panel {
+    padding: 32px;
+  }
 }
 
 /* One chip system: interactive filters / budget / nav / CTAs */

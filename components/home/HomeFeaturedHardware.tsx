@@ -21,35 +21,37 @@ export function HomeFeaturedHardware() {
       id="featured-products"
       className="home-redesign__featured mx-auto mt-12 max-w-[1400px] scroll-mt-28 px-4 lg:px-6"
     >
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-stock-green">
-            In Stock &amp; Dispatched Today
-          </p>
-          <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
-            Featured Hardware Highlights
-          </h2>
-          {!isLoading ? (
-            <p className="mt-1 text-sm text-secondary">
-              Showing {showing} of {total} certified flagships
+      <div className="home-section-panel">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-stock-green">
+              In Stock &amp; Dispatched Today
             </p>
-          ) : null}
+            <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+              Featured Hardware Highlights
+            </h2>
+            {!isLoading ? (
+              <p className="mt-1 text-sm text-secondary">
+                Showing {showing} of {total} certified flagships
+              </p>
+            ) : null}
+          </div>
+          <Link
+            href="/products?featured=1"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
+          >
+            View All
+            <MaterialIcon name="chevron_right" className="text-[18px]" />
+          </Link>
         </div>
-        <Link
-          href="/products?featured=1"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
-        >
-          View All
-          <MaterialIcon name="chevron_right" className="text-[18px]" />
-        </Link>
-      </div>
 
-      <ProductGridClient
-        featuredOnly
-        pageSize={5}
-        showPagination={false}
-        cardOptions={{ variant: 'featured' }}
-      />
+        <ProductGridClient
+          featuredOnly
+          pageSize={5}
+          showPagination={false}
+          cardOptions={{ variant: 'featured' }}
+        />
+      </div>
     </section>
   );
 }

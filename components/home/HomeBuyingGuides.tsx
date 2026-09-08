@@ -61,64 +61,66 @@ export async function HomeBuyingGuides() {
 
   return (
     <section className="home-buying-guides mx-auto mt-14 max-w-[1400px] px-4 lg:px-6">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-stock-green">
-            Tech Knowledge Hub
-          </p>
-          <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
-            Tech Buying Guides &amp; Insights
-          </h2>
-        </div>
-        <Link
-          href="/articles"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
-        >
-          Read All Articles
-          <MaterialIcon name="chevron_right" className="text-[18px]" />
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-        {guides.map((guide) => (
+      <div className="home-section-panel">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-stock-green">
+              Tech Knowledge Hub
+            </p>
+            <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+              Tech Buying Guides &amp; Insights
+            </h2>
+          </div>
           <Link
-            key={guide.key}
-            href={guide.href}
-            className="home-buying-guides__card group flex flex-col overflow-hidden rounded-2xl border border-border-hairline bg-white shadow-sm transition hover:shadow-md"
+            href="/articles"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
           >
-            <div className="home-buying-guides__media">
-              {guide.imageUrl ? (
-                <CloudinaryImage
-                  src={guide.imageUrl}
-                  alt={guide.title}
-                  preset="blogCard"
-                  fill
-                  fit="cover"
-                  className="home-buying-guides__image"
-                  sizes="(max-width:768px) 100vw, 33vw"
-                />
-              ) : (
-                <div className="home-buying-guides__media-fallback">
-                  <MaterialIcon name="article" className="text-[40px] text-white/50" />
-                </div>
-              )}
-              <span className="home-buying-guides__badge">{guide.category}</span>
-            </div>
-            <div className="flex flex-1 flex-col p-4 sm:p-5">
-              <p className="text-xs font-medium text-secondary">{guide.meta}</p>
-              <h3 className="mt-2 line-clamp-2 text-base font-bold leading-snug text-primary sm:text-lg">
-                {guide.title}
-              </h3>
-              <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">
-                {guide.excerpt}
-              </p>
-              <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-bold text-primary">
-                Read Guide
-                <MaterialIcon name="arrow_forward" className="text-[16px]" />
-              </span>
-            </div>
+            Read All Articles
+            <MaterialIcon name="chevron_right" className="text-[18px]" />
           </Link>
-        ))}
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          {guides.map((guide) => (
+            <Link
+              key={guide.key}
+              href={guide.href}
+              className="home-buying-guides__card group flex flex-col overflow-hidden rounded-2xl border border-border-hairline bg-white shadow-sm transition hover:shadow-md"
+            >
+              <div className="home-buying-guides__media">
+                {guide.imageUrl ? (
+                  <CloudinaryImage
+                    src={guide.imageUrl}
+                    alt={guide.title}
+                    preset="blogCard"
+                    fill
+                    fit="cover"
+                    className="home-buying-guides__image"
+                    sizes="(max-width:768px) 100vw, 33vw"
+                  />
+                ) : (
+                  <div className="home-buying-guides__media-fallback">
+                    <MaterialIcon name="article" className="text-[40px] text-white/50" />
+                  </div>
+                )}
+                <span className="home-buying-guides__badge">{guide.category}</span>
+              </div>
+              <div className="flex flex-1 flex-col p-4 sm:p-5">
+                <p className="text-xs font-medium text-secondary">{guide.meta}</p>
+                <h3 className="mt-2 line-clamp-2 text-base font-bold leading-snug text-primary sm:text-lg">
+                  {guide.title}
+                </h3>
+                <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">
+                  {guide.excerpt}
+                </p>
+                <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-bold text-primary">
+                  Read Guide
+                  <MaterialIcon name="arrow_forward" className="text-[16px]" />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

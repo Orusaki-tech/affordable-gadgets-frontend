@@ -31,7 +31,7 @@ const BANDS = [
 export function HomeBudgetMatcher() {
   return (
     <section className="mx-auto mt-14 max-w-[1400px] px-4 lg:px-6">
-      <div className="rounded-2xl bg-surface-canvas p-6 sm:p-8">
+      <div className="home-section-panel">
         <div className="mb-6 max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-wider text-secondary">
             Dynamic Catalog Finder

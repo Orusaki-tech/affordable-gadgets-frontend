@@ -34,7 +34,7 @@ export function HomeDeliveryChecker() {
 
   return (
     <section className="mx-auto mt-14 mb-8 max-w-[1400px] px-4 lg:px-6">
-      <div className="rounded-2xl bg-surface-canvas p-6 sm:p-8">
+      <div className="home-section-panel">
         <div className="mb-5 max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-wider text-secondary">
             Countrywide Logistics

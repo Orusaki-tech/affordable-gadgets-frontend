@@ -96,33 +96,35 @@ export function HomeBundles() {
 
   return (
     <section className="mx-auto mt-14 max-w-[1400px] px-4 lg:px-6">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-badge-bundle-orange">
-            Hardware Packages
-          </p>
-          <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
-            Curated Ecosystem Bundles
-          </h2>
-          <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-stock-green">
-            <MaterialIcon name="verified" className="text-[16px]" />
-            Includes free Nairobi delivery on eligible packages
-          </p>
+      <div className="home-section-panel">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-badge-bundle-orange">
+              Hardware Packages
+            </p>
+            <h2 className="mt-1 text-2xl font-bold tracking-tight text-primary sm:text-3xl">
+              Curated Ecosystem Bundles
+            </h2>
+            <p className="mt-1 flex items-center gap-1 text-sm font-semibold text-stock-green">
+              <MaterialIcon name="verified" className="text-[16px]" />
+              Includes free Nairobi delivery on eligible packages
+            </p>
+          </div>
         </div>
-      </div>
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 animate-pulse rounded-2xl bg-surface-container" />
-          <div className="h-48 animate-pulse rounded-2xl bg-surface-container" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {bundles.slice(0, 4).map((bundle) => (
-            <BundleCard key={bundle.id ?? bundle.title} bundle={bundle} />
-          ))}
-        </div>
-      )}
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="h-48 animate-pulse rounded-2xl bg-surface-container" />
+            <div className="h-48 animate-pulse rounded-2xl bg-surface-container" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {bundles.slice(0, 4).map((bundle) => (
+              <BundleCard key={bundle.id ?? bundle.title} bundle={bundle} />
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

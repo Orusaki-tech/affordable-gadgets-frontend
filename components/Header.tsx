@@ -98,7 +98,7 @@ function HeaderContent() {
       megaCloseTimerRef.current = null;
       setOpenMegaMenu(null);
       setMoreHoverBrand(null);
-    }, 180);
+    }, 220);
   }, [cancelMegaMenuClose]);
 
   useEffect(() => {

@@ -61,8 +61,8 @@ export function HeaderBrandMenu({
     >
       <Link
         href={brandHref}
-        className={`site-header__nav-link${
-          active || isMegaOpen ? ' site-header__nav-link--active' : ''
+        className={`ag-nav-pill site-header__nav-link${
+          active || isMegaOpen ? ' ag-nav-pill--active site-header__nav-link--active' : ''
         }`}
         aria-expanded={isMegaOpen}
         aria-haspopup="true"
@@ -127,7 +127,9 @@ export function HeaderMoreBrandsMenu({
     >
       <Link
         href="/products"
-        className={`site-header__nav-link${isMegaOpen ? ' site-header__nav-link--active' : ''}`}
+        className={`ag-nav-pill site-header__nav-link${
+          isMegaOpen ? ' ag-nav-pill--active site-header__nav-link--active' : ''
+        }`}
         aria-expanded={isMegaOpen}
         aria-haspopup="true"
         onMouseEnter={onMegaOpen}

@@ -129,74 +129,82 @@ export function HomeHeroSpotlight() {
           </div>
         </div>
 
-        {/* Right: iPhone 18 Pro Max launch spotlight */}
-        <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-surface-canvas p-6 shadow-sm sm:p-8 lg:col-span-8 lg:p-10">
-          <div className="relative z-10 max-w-xl">
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-promo-lime">
-                Authorized Stockist Launch
-              </span>
-              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary shadow-sm">
-                Global Release Window: September 2026
-              </span>
+        {/* Right: dominant banner with CTAs pinned bottom-left above the art */}
+        <div className="relative min-h-[420px] overflow-hidden rounded-2xl bg-surface-canvas shadow-sm sm:min-h-[480px] lg:col-span-8 lg:min-h-[520px]">
+          <div
+            className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url('${IPHONE_HERO_IMAGE}')` }}
+            aria-hidden
+          />
+          {/* Soft left wash so copy/CTAs stay readable without covering the banner */}
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/95 via-white/55 to-transparent"
+            aria-hidden
+          />
+
+          <div className="relative z-10 flex h-full min-h-[420px] flex-col p-6 sm:min-h-[480px] sm:p-8 lg:min-h-[520px] lg:p-10">
+            <div className="max-w-md">
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-promo-lime">
+                  Authorized Stockist Launch
+                </span>
+                <span className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary shadow-sm">
+                  Global Release Window: September 2026
+                </span>
+              </div>
+
+              <p className="mt-5 text-sm font-semibold text-secondary">Out September 9</p>
+              <h2 className="mt-1 text-3xl font-bold tracking-tight text-primary sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
+                Apple iPhone 18 Pro Max
+              </h2>
+
+              <p className="mt-3 max-w-sm text-sm text-secondary">
+                Note: WhatsApp us to join our waiting list for early discounts.
+              </p>
+              <a
+                href={whatsappWaitlist}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-whatsapp-emerald"
+              >
+                <MaterialIcon name="chat" className="text-[16px]" />
+                Direct WhatsApp Concierge
+              </a>
+
+              <div className="mt-4 flex flex-wrap gap-4 text-xs font-semibold text-on-surface-variant">
+                <span className="inline-flex items-center gap-1">
+                  <MaterialIcon name="verified" className="text-[16px] text-stock-green" />
+                  Genuine Apple KE IMEI
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <MaterialIcon name="swap_horiz" className="text-[16px] text-stock-green" />
+                  Trade-in Supported
+                </span>
+              </div>
             </div>
 
-            <p className="mt-5 text-sm font-semibold text-secondary">Out September 9</p>
-            <h2 className="mt-1 text-3xl font-bold tracking-tight text-primary sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
-              Apple iPhone 18 Pro Max
-            </h2>
-
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            {/* CTAs: bottom-left, above banner art */}
+            <div className="relative z-20 mt-auto flex flex-wrap items-center gap-3 pt-8">
               <button
                 type="button"
                 onClick={() => setPreOrderOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl bg-[#f5e642] px-6 py-3.5 text-sm font-bold text-primary shadow-sm"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#f5e642] px-6 py-3.5 text-sm font-bold text-primary shadow-md"
               >
                 Pre Order Now
                 <MaterialIcon name="arrow_forward" className="text-[18px]" />
               </button>
               <Link
                 href={`/products/${IPHONE_18_PRO_MAX_SLUG}`}
-                className="text-sm font-semibold text-primary underline-offset-2 hover:underline"
+                className="inline-flex items-center rounded-xl border border-border-strong bg-white/95 px-5 py-3.5 text-sm font-semibold text-primary shadow-sm backdrop-blur-sm"
               >
                 View details
               </Link>
             </div>
 
-            <p className="mt-4 max-w-md text-sm text-secondary">
-              Note: WhatsApp us to join our waiting list for early discounts.
+            <p className="relative z-20 mt-4 text-[11px] font-bold uppercase tracking-[0.16em] text-secondary">
+              Norwich Union House Hub — Nairobi CBD
             </p>
-            <a
-              href={whatsappWaitlist}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-whatsapp-emerald"
-            >
-              <MaterialIcon name="chat" className="text-[16px]" />
-              Direct WhatsApp Concierge
-            </a>
-
-            <div className="mt-6 flex flex-wrap gap-4 text-xs font-semibold text-on-surface-variant">
-              <span className="inline-flex items-center gap-1">
-                <MaterialIcon name="verified" className="text-[16px] text-stock-green" />
-                Genuine Apple KE IMEI
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <MaterialIcon name="swap_horiz" className="text-[16px] text-stock-green" />
-                Trade-in Supported
-              </span>
-            </div>
           </div>
-
-          <div
-            className="pointer-events-none absolute inset-y-4 right-0 w-[48%] bg-contain bg-right bg-no-repeat opacity-95"
-            style={{ backgroundImage: `url('${IPHONE_HERO_IMAGE}')` }}
-            aria-hidden
-          />
-
-          <p className="relative z-10 mt-8 text-[11px] font-bold uppercase tracking-[0.16em] text-secondary">
-            Norwich Union House Hub — Nairobi CBD
-          </p>
         </div>
       </div>
 

@@ -15,11 +15,72 @@ import { productUrl } from '@/lib/seo/urls';
 import { Suspense } from 'react';
 import { StructuredData } from '@/components/StructuredData';
 import type { Metadata } from 'next';
+import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 
 const HOME_PAGE_REVALIDATE_SECONDS = 60;
 const FEATURED_SCHEMA_PAGE_SIZE = 8;
+const HERO_PROMOTIONS_PAGE_SIZE = 50;
 
 export const revalidate = 60;
+
+function normalizeLocations(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map((item) => String(item));
+  if (typeof value === 'string') {
+    return value
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function sortPromotions(promotions: PublicPromotion[]) {
+  return [...promotions].sort((a, b) => {
+    const aPos = a.carousel_position;
+    const bPos = b.carousel_position;
+    const aHasPos = typeof aPos === 'number';
+    const bHasPos = typeof bPos === 'number';
+    if (aHasPos && bHasPos) return aPos - bPos;
+    if (aHasPos) return -1;
+    if (bHasPos) return 1;
+    return new Date(b.start_date).getTime() - new Date(a.start_date).getTime();
+  });
+}
+
+function selectHomeHeroPromotions(promotions: PublicPromotion[]) {
+  const featured = promotions.filter((promo) => {
+    const locations = normalizeLocations(
+      (promo as { display_locations?: unknown }).display_locations
+    );
+    return locations.includes('homepage_hero');
+  });
+  return sortPromotions(featured);
+}
+
+async function fetchInitialHeroPromotions(): Promise<PaginatedPublicPromotionList | undefined> {
+  const searchParams = new URLSearchParams({
+    page_size: String(HERO_PROMOTIONS_PAGE_SIZE),
+  });
+  try {
+    const response = await fetch(
+      `${brandConfig.apiBaseUrl}/api/v1/public/promotions/?${searchParams.toString()}`,
+      {
+        next: { revalidate: HOME_PAGE_REVALIDATE_SECONDS },
+        headers: { 'X-Brand-Code': brandConfig.code },
+      }
+    );
+    if (!response.ok) return undefined;
+    const data = (await response.json()) as PaginatedPublicPromotionList;
+    return {
+      ...data,
+      results: selectHomeHeroPromotions(
+        Array.isArray(data?.results) ? (data.results as PublicPromotion[]) : []
+      ),
+    };
+  } catch {
+    return undefined;
+  }
+}
 
 const resolveProductImage = (image?: string | null) => {
   if (!image) return null;
@@ -70,7 +131,10 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const featuredProducts = await fetchFeaturedProductsForSchema();
+  const [featuredProducts, initialHeroPromotionsData] = await Promise.all([
+    fetchFeaturedProductsForSchema(),
+    fetchInitialHeroPromotions(),
+  ]);
   const featuredItemListItems = featuredProducts
     .filter((p) => p.slug)
     .map((p) => ({
@@ -135,7 +199,7 @@ export default async function HomePage() {
           Affordable phones, laptops, tablets and accessories in Kenya
         </h1>
 
-        <HomeHeroSpotlight />
+        <HomeHeroSpotlight initialPromotionsData={initialHeroPromotionsData} />
         <HomeCbdRibbon />
         <HomeFeaturedHardware />
         <HomeBudgetMatcher />

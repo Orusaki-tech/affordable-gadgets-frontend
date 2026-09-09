@@ -1237,8 +1237,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <ProductTrustStamp condition={galleryStampCondition} size="detail" />
           </div>
 
-          {/* Thumbnail Gallery - show when we have at least one image (single image still shows as thumbnail) */}
-          {productImages.length > 0 && (
+          {/* Thumbnail Gallery — skip when only one image (no useful navigation) */}
+          {productImages.length > 1 && (
             <div className="product-detail__thumbnails">
               {productImages.map((img, index) => {
                 // Try to find a unit with this image to get color info
@@ -1374,7 +1374,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
             {/* Promotion Banner */}
             {isEligibleForPromotion && promotion && (
-              <div className="product-detail__promo product-detail__promo--aside">
+              <div className="product-detail__promo">
                 <div className="product-detail__promo-notch product-detail__promo-notch--left" aria-hidden />
                 <div className="product-detail__promo-row">
                   <span className="product-detail__promo-icon" aria-hidden>

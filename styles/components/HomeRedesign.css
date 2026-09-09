@@ -100,8 +100,8 @@
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
   margin: 0;
-  background: #0b0b0c;
-  border-top: 1px solid color-mix(in srgb, #fff 12%, transparent);
+  background: var(--surface-container-lowest, #fff);
+  border-top: 1px solid var(--border-hairline, #e8e8ed);
 }
 
 .home-redesign__hero-banner-actions > .ag-btn,
@@ -317,25 +317,26 @@
   color: var(--primary, #030304);
 }
 
-/* Default footer bar: dark bar needs light type (was dark-on-dark) */
+/* Default footer bar: light surface (no black strip) */
 .home-redesign__featured .product-card__footer--featured {
-  background: var(--primary, #030304);
+  background: var(--surface-container-lowest, #fff);
+  border-top: 1px solid var(--border-hairline, #e8e8ed);
 }
 
 .home-redesign__featured .product-card__footer-bar .product-card__name,
 .home-redesign__featured .product-card__footer-bar .product-card__name--featured {
-  color: #fff;
+  color: var(--on-surface, #1a1c1d);
 }
 
 .home-redesign__featured .product-card__buy-btn--featured {
-  color: var(--promo-lime, #9fe855);
-  border-color: var(--promo-lime, #9fe855);
+  color: var(--primary, #030304);
+  border-color: var(--primary, #030304);
   background: transparent;
 }
 
 .home-redesign__featured .product-card__buy-btn--featured:hover {
-  background: var(--promo-lime, #9fe855);
-  color: var(--primary, #030304);
+  background: var(--primary, #030304);
+  color: var(--promo-lime, #9fe855);
 }
 
 .home-redesign__featured .product-card__cta,

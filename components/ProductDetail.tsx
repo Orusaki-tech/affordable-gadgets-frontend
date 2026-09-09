@@ -1313,37 +1313,34 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         {/* Right Column - Product Info */}
         <div className="product-detail__info">
           <div className="product-detail__info-header-row">
-            {/* Title & Brand */}
-            <div className="product-detail__info-header">
-              <div className="product-detail__brand-row">
-                <p className="product-detail__brand">
-                  <span className="product-detail__brand-name">{product.brand}</span>
-                  {product.model_series ? (
-                    <span className="product-detail__brand-series"> • {product.model_series}</span>
-                  ) : null}
-                </p>
-                <div className="product-detail__quick-tabs" role="navigation" aria-label="Jump to product sections">
-                  {(
-                    [
-                      { id: 'overview' as TabType, label: 'Overview' },
-                      { id: 'specs' as TabType, label: 'Specs' },
-                      { id: 'reviews' as TabType, label: 'Reviews' },
-                      { id: 'videos' as TabType, label: 'Videos' },
-                      { id: 'compare' as TabType, label: 'Compare' },
-                      { id: 'blog' as TabType, label: 'Blog' },
-                    ] as const
-                  ).map(({ id, label }) => (
-                    <button
-                      key={id}
-                      type="button"
-                      onClick={() => jumpToTab(id)}
-                      className={`product-detail__quick-tab ${activeTab === id ? 'product-detail__quick-tab--active' : ''}`}
-                    >
-                      {label}
-                      {id === 'reviews' && ratingCount > 0 ? ` (${ratingCount})` : ''}
-                    </button>
-                  ))}
-                </div>
+            <div className="product-detail__info-header product-detail__hero">
+              <p className="product-detail__brand">
+                <span className="product-detail__brand-name">{product.brand}</span>
+                {product.model_series ? (
+                  <span className="product-detail__brand-series"> • {product.model_series}</span>
+                ) : null}
+              </p>
+              <div className="product-detail__quick-tabs" role="navigation" aria-label="Jump to product sections">
+                {(
+                  [
+                    { id: 'overview' as TabType, label: 'Overview' },
+                    { id: 'specs' as TabType, label: 'Specs' },
+                    { id: 'reviews' as TabType, label: 'Reviews' },
+                    { id: 'videos' as TabType, label: 'Videos' },
+                    { id: 'compare' as TabType, label: 'Compare' },
+                    { id: 'blog' as TabType, label: 'Blog' },
+                  ] as const
+                ).map(({ id, label }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => jumpToTab(id)}
+                    className={`product-detail__quick-tab ${activeTab === id ? 'product-detail__quick-tab--active' : ''}`}
+                  >
+                    {label}
+                    {id === 'reviews' && ratingCount > 0 ? ` (${ratingCount})` : ''}
+                  </button>
+                ))}
               </div>
               <h1 className="product-detail__title">
                 {product.product_name}
@@ -1354,7 +1351,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               <div className="product-detail__rating-row">
                 {ratingValue != null ? (
                   <div className="product-detail__rating">
-                    <MaterialIcon name="star" filled className="product-detail__rating-star text-[1.0625rem]" />
+                    <MaterialIcon name="star" filled className="product-detail__rating-star" />
                     <span className="product-detail__rating-value">{ratingValue.toFixed(1)}</span>
                     <button
                       type="button"
@@ -1373,11 +1370,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     Be the first to leave a review
                   </button>
                 )}
-                <span className="product-detail__rating-sep" aria-hidden>
-                  •
-                </span>
                 <div className="product-detail__dispatch">
-                  <MaterialIcon name="bolt" className="text-[1rem]" />
+                  <MaterialIcon name="bolt" className="product-detail__dispatch-icon" />
                   <span>Fast Nairobi CBD dispatch</span>
                 </div>
               </div>

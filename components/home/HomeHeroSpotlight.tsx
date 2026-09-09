@@ -157,31 +157,31 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
         <div className="home-redesign__hero-grid">
         <div className="home-redesign__hero-budget">
           <form onSubmit={onSearch}>
-            <div className="flex items-center gap-2 rounded-xl bg-white p-2.5 shadow-sm">
-              <MaterialIcon name="search" className="text-[1.25rem] text-secondary" />
+            <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm sm:p-3.5">
+              <MaterialIcon name="search" className="text-[1.35rem] text-secondary" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search products…"
-                className="w-full bg-transparent text-sm outline-none"
+                className="ag-type-body w-full bg-transparent outline-none"
                 aria-label="Search catalog"
               />
             </div>
           </form>
 
           <div>
-            <h2 className="ag-type-h3">Search to start shopping</h2>
-            <p className="ag-type-body mt-1 text-primary/75">
+            <h2 className="ag-type-h2">Search to start shopping</h2>
+            <p className="ag-type-body mt-2 text-primary/75">
               Type a product name above — or set a budget and browse live stock.
             </p>
           </div>
 
-          <div className="flex flex-1 flex-col rounded-xl bg-white/70 p-4 backdrop-blur-sm sm:p-5">
+          <div className="flex flex-1 flex-col rounded-xl bg-white/70 p-4 backdrop-blur-sm sm:p-6">
             <div className="flex items-center justify-between gap-2">
               <p className="ag-type-eyebrow text-primary">
                 Instant Budget Match
               </p>
-              <p className="text-sm font-bold text-primary">
+              <p className="ag-type-h3 font-bold text-primary">
                 KSh {budget.toLocaleString('en-KE')}
               </p>
             </div>
@@ -192,10 +192,10 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
               step={5000}
               value={budget}
               onChange={(e) => setBudget(Number(e.target.value))}
-              className="mt-4 w-full accent-primary"
+              className="mt-5 w-full accent-primary"
               aria-label="Budget amount"
             />
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap gap-2">
               {BUDGET_PRESETS.map((preset) => (
                 <button
                   key={preset.label}
@@ -207,7 +207,7 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
                 </button>
               ))}
             </div>
-            <p className="mt-4 text-sm text-primary/70">
+            <p className="ag-type-body mt-5 text-primary/70">
               We’ll show phones and gadgets that fit this budget, in stock for pickup or delivery.
             </p>
             <Link

@@ -29,7 +29,7 @@ import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getPlaceholderProductImage, getPlaceholderUnitImage, getPlaceholderVideoUrl, convertToYouTubeEmbed } from '@/lib/utils/placeholders';
+import { getPlaceholderProductImage, getPlaceholderUnitImage } from '@/lib/utils/placeholders';
 import { getAndClearProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
 import { getProductVideoLinks } from '@/lib/utils/productVideo';
 import { PRICING_MODE } from '@/lib/constants/apiEnums';
@@ -38,6 +38,7 @@ import { PreOrderModal } from '@/components/PreOrderModal';
 import { ProductTrustStamp } from '@/components/ProductTrustStamp';
 import { ProductBlogTab } from '@/components/ProductBlogTab';
 import type { PromotionVideoProduct } from '@/components/ProductVideoReel';
+import { ProductVideoReel } from '@/components/ProductVideoReel';
 import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
 import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
@@ -942,12 +943,40 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       primary_image: product.primary_image,
       product_video_url: primaryUrl,
       product_video_file_url: (product as any).product_video_file_url,
+      videos: (product as { videos?: PromotionVideoProduct['videos'] }).videos ?? null,
     };
     const hasAnyVideo =
       (typeof row.product_video_file_url === 'string' && row.product_video_file_url.trim().length > 0) ||
       videoLinks.length > 0;
     return hasAnyVideo ? [row] : [];
   }, [isEligibleForPromotion, product]);
+
+  const detailVideoProducts = useMemo<PromotionVideoProduct[]>(() => {
+    if (!product || typeof product.id !== 'number') return [];
+    const videoLinks = getProductVideoLinks(
+      product as {
+        product_video_url?: string | null;
+        product_video_file_url?: string | null;
+        videos?: PromotionVideoProduct['videos'];
+      }
+    );
+    const fileUrl = (product as { product_video_file_url?: string | null }).product_video_file_url;
+    const hasAny =
+      videoLinks.length > 0 ||
+      (typeof fileUrl === 'string' && fileUrl.trim().length > 0);
+    if (!hasAny) return [];
+    return [
+      {
+        id: product.id,
+        slug: product.slug,
+        product_name: product.product_name,
+        primary_image: product.primary_image,
+        product_video_url: videoLinks[0]?.url || (product as { product_video_url?: string | null }).product_video_url,
+        product_video_file_url: fileUrl,
+        videos: (product as { videos?: PromotionVideoProduct['videos'] }).videos ?? null,
+      },
+    ];
+  }, [product]);
 
   const isIphone18ProMaxPreorder = product?.slug === IPHONE_18_PRO_MAX_SLUG;
 
@@ -1181,32 +1210,6 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <li className="product-detail__breadcrumb-current">{product.product_name}</li>
           </ol>
         </nav>
-        <div className="product-detail__trust-strip" aria-label="Product trust signals">
-          <span className="product-detail__trust-chip product-detail__trust-chip--lime">
-            <MaterialIcon name="verified" className="product-detail__trust-chip-icon" />
-            Verified Japanese Import
-          </span>
-          <span className="product-detail__trust-chip product-detail__trust-chip--stock">
-            <span className="product-detail__trust-dot" aria-hidden />
-            Official Kenyan Stock
-          </span>
-          {product.brand?.trim() ? (
-            <span className="product-detail__trust-chip">
-              100% Original {product.brand.trim()}
-            </span>
-          ) : (
-            <span className="product-detail__trust-chip">100% Original</span>
-          )}
-          {stockCount > 0 ? (
-            <span className="product-detail__trust-chip product-detail__trust-chip--emphasis">
-              In Stock Nairobi CBD
-            </span>
-          ) : (
-            <span className="product-detail__trust-chip product-detail__trust-chip--emphasis">
-              Order on WhatsApp
-            </span>
-          )}
-        </div>
       </div>
 
       <div className="product-detail__layout">
@@ -2424,62 +2427,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           {activeTab === 'videos' && product && (
             <div className="product-detail__videos">
               <h3 className="product-detail__videos-title">Product Videos</h3>
-              {(() => {
-                const videoLinks = getProductVideoLinks(
-                  product as {
-                    product_video_url?: string | null;
-                    product_video_file_url?: string | null;
-                    videos?: Array<{ id?: number | null; url?: string | null; title?: string | null }>;
-                  }
-                );
-                if (videoLinks.length === 0) {
-                  return (
-                    <div className="product-detail__video-card">
-                      <div className="product-detail__video-frame">
-                        <iframe
-                          src={convertToYouTubeEmbed(getPlaceholderVideoUrl(product.product_name))}
-                          className="product-detail__video-embed"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      </div>
-                      <div className="product-detail__video-body">
-                        <p className="product-detail__video-title">{product.product_name}</p>
-                        {product.brand && (
-                          <p className="product-detail__video-brand">{product.brand}</p>
-                        )}
-                        <p className="product-detail__video-note">
-                          This is a placeholder video. The actual product video will be available soon.
-                        </p>
-                      </div>
-                    </div>
-                  );
-                }
-                return videoLinks.map((video, index) => (
-                  <div
-                    key={video.id ?? `${video.url}-${index}`}
-                    className="product-detail__video-card"
-                  >
-                    <div className="product-detail__video-frame">
-                      <iframe
-                        src={convertToYouTubeEmbed(video.url)}
-                        className="product-detail__video-embed"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        title={video.title || `${product.product_name} video ${index + 1}`}
-                      />
-                    </div>
-                    <div className="product-detail__video-body">
-                      <p className="product-detail__video-title">
-                        {video.title || product.product_name}
-                      </p>
-                      {product.brand && (
-                        <p className="product-detail__video-brand">{product.brand}</p>
-                      )}
-                    </div>
-                  </div>
-                ));
-              })()}
+              <ProductVideoReel
+                products={detailVideoProducts}
+                deckKey={`pdp-videos-${product.id ?? 'product'}`}
+                emptyMessage="No product videos available yet for this device."
+              />
             </div>
           )}
 

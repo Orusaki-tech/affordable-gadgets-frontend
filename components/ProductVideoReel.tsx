@@ -20,6 +20,8 @@ import { brandConfig } from '@/lib/config/brand';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import {
   resolveProductVideoMedia,
+  resolveProductVideoMediaAtIndex,
+  getProductVideoLinks,
   youtubePosterCandidatesFromLink,
   type ResolvedProductVideo,
 } from '@/lib/utils/productVideo';
@@ -40,7 +42,15 @@ export type PromotionVideoProduct = Omit<
     | 'product_video_file_url'
   >,
   'id'
-> & { id: number };
+> & {
+  id: number;
+  videos?: Array<{
+    id?: number | null;
+    url?: string | null;
+    title?: string | null;
+    display_order?: number | null;
+  }> | null;
+};
 
 function isYoutubeEmbedSrc(src: string): boolean {
   try {
@@ -136,12 +146,14 @@ function ChevronNavIcon({ flip }: { flip?: boolean }) {
 
 function VideoSlide({
   product,
+  videoIndex = 0,
   playingKey,
   setPlayingKey,
   registerVideo,
   deckKey,
 }: {
   product: PromotionVideoProduct;
+  videoIndex?: number;
   playingKey: string | null;
   setPlayingKey: Dispatch<SetStateAction<string | null>>;
   registerVideo: (key: string, el: HTMLVideoElement | null) => void;
@@ -150,13 +162,18 @@ function VideoSlide({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const youtubeIframeRef = useRef<HTMLIFrameElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
-  const resolved = resolveProductVideoMedia(product);
+  const resolved =
+    videoIndex > 0
+      ? resolveProductVideoMediaAtIndex(product, videoIndex)
+      : resolveProductVideoMedia(product) ?? resolveProductVideoMediaAtIndex(product, videoIndex);
   const resolvedVideo: ResolvedProductVideo | null = resolved;
   const name = product.product_name ?? 'Product';
   const href = getProductHref(product);
-  const slideKey = `${deckKey}-${product.id}`;
+  const slideKey = `${deckKey}-${product.id}-${videoIndex}`;
   const isPlaying = playingKey === slideKey;
-  const ytCandidates = product.product_video_url ? youtubePosterCandidatesFromLink(product.product_video_url) : [];
+  const links = getProductVideoLinks(product);
+  const videoUrl = links[videoIndex]?.url || product.product_video_url || '';
+  const ytCandidates = videoUrl ? youtubePosterCandidatesFromLink(videoUrl) : [];
   const posterUrls = [...ytCandidates, ...(product.primary_image ? [product.primary_image] : [])];
   const embedPosterUrls = posterUrls.length > 0 ? posterUrls : [];
 
@@ -334,15 +351,31 @@ function VideoSlide({
 export function ProductVideoReel({
   products,
   deckKey = 'promo-videos',
+  emptyMessage = 'No offer videos available yet.',
 }: {
   products: PromotionVideoProduct[];
   deckKey?: string;
+  emptyMessage?: string;
 }) {
   const navUid = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const prevNavSelector = `#pvr-nav-prev-${navUid}`;
   const nextNavSelector = `#pvr-nav-next-${navUid}`;
 
-  const playable = products.filter((p) => resolveProductVideoMedia(p) !== null);
+  const slideEntries = products.flatMap((product) => {
+    const links = getProductVideoLinks(product);
+    if (links.length > 0) {
+      return links.map((_, i) => ({
+        key: `${product.id}-${i}`,
+        product,
+        videoIndex: i,
+      }));
+    }
+    if (resolveProductVideoMedia(product)) {
+      return [{ key: `${product.id}-0`, product, videoIndex: 0 }];
+    }
+    return [];
+  });
+
   const videoEls = useRef<Map<string, HTMLVideoElement>>(new Map());
   const [playingKey, setPlayingKey] = useState<string | null>(null);
 
@@ -358,16 +391,16 @@ export function ProductVideoReel({
     });
   }, [playingKey]);
 
-  if (playable.length === 0) {
+  if (slideEntries.length === 0) {
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-700">
-        No offer videos available yet.
+        {emptyMessage}
       </div>
     );
   }
 
   return (
-    <div className="relative">
+    <div className="relative product-video-reel">
       <button id={prevNavSelector.slice(1)} className="home-product-videos__nav home-product-videos__nav--prev" aria-label="Previous">
         <ChevronNavIcon flip />
       </button>
@@ -385,10 +418,11 @@ export function ProductVideoReel({
           nextEl: nextNavSelector,
         }}
       >
-        {playable.map((product) => (
-          <SwiperSlide key={product.id ?? product.product_name} className="!w-auto">
+        {slideEntries.map((entry) => (
+          <SwiperSlide key={entry.key} className="!w-auto">
             <VideoSlide
-              product={product}
+              product={entry.product}
+              videoIndex={entry.videoIndex}
               playingKey={playingKey}
               setPlayingKey={setPlayingKey}
               registerVideo={registerVideo}

@@ -14,12 +14,12 @@
   flex-direction: column;
 }
 
-/* Mobile: banner owns first screen; budget stacks below by content height */
+/* Hero: poster + CTAs tight; no letterbox bars. Stack until lg. */
 .home-redesign__hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
-  align-items: stretch;
+  align-items: start;
   width: 100%;
 }
 
@@ -28,7 +28,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  min-height: var(--hero-panel-min-h);
+  min-height: 0;
   border-radius: var(--panel-radius);
   background: var(--promo-lime, #9fe855);
   padding: var(--space-5);
@@ -48,47 +48,23 @@
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  /* Fill most of the first viewport under chrome (banner-first mobile) */
-  min-height: calc(100dvh - var(--site-chrome-h) - 5.5rem);
+  height: auto;
+  min-height: 0;
   overflow: hidden;
   border-radius: var(--panel-radius);
   background: #0b0b0c;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
-/* Side-by-side: both columns stretch to share the viewport-tall hero */
-@media (min-width: 768px) {
-  .home-redesign__hero-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-    grid-template-rows: minmax(0, 1fr);
-    gap: var(--space-5);
-    flex: 1 1 auto;
-    min-height: 0;
-    height: 100%;
-  }
-
-  .home-redesign__hero-budget {
-    order: 1;
-    height: 100%;
-    min-height: 0;
-  }
-
-  .home-redesign__hero-banner {
-    order: 2;
-    height: 100%;
-    min-height: 0;
-  }
-}
-
 /*
- * Media fills remaining column height; contain keeps every part of the promo
- * (phones, titles, in-art CTAs) visible — same stability as the budget panel.
+ * Media hugs the poster aspect — cover fills the frame (no black bars).
+ * Actions sit directly under this block.
  */
 .home-redesign__hero-banner-media {
   position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
   width: 100%;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   background: #0b0b0c;
 }
@@ -109,7 +85,7 @@
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain !important;
+  object-fit: cover !important;
   object-position: center center !important;
 }
 
@@ -130,6 +106,29 @@
   .home-redesign__hero-banner-actions {
     gap: var(--space-3);
     padding: var(--space-4) var(--space-5);
+  }
+}
+
+/* Desktop only: budget | banner; both columns match banner height */
+@media (min-width: 1024px) {
+  .home-redesign__hero-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--space-5);
+    align-items: stretch;
+  }
+
+  .home-redesign__hero-budget {
+    order: 1;
+    height: auto;
+    align-self: stretch;
+  }
+
+  .home-redesign__hero-banner {
+    order: 2;
+  }
+
+  .home-redesign__hero-banner-media {
+    aspect-ratio: 2 / 1;
   }
 }
 

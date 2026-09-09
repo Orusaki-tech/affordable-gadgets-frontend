@@ -37,11 +37,6 @@ import { HeaderBrandMenu, HeaderMoreBrandsMenu } from './HeaderBrandMenu';
 import { HeaderMegaMenuPanel, MEGA_MENU_MORE_KEY } from './HeaderMegaMenuPanel';
 import { MaterialIcon } from './MaterialIcon';
 
-const BUDGET_CHIPS = [
-  { label: 'Under 20k', href: '/products?max_price=20000' },
-  { label: '20k–50k', href: '/products?min_price=20000&max_price=50000' },
-] as const;
-
 function HeaderFallback() {
   return (
     <header className="site-header" aria-hidden>
@@ -239,8 +234,8 @@ function HeaderContent() {
               <Image
                 src="/affordlogo1.svg"
                 alt={`${brandConfig.name} logo`}
-                width={60}
-                height={60}
+                width={40}
+                height={40}
                 className="site-header__logo"
                 priority
               />
@@ -253,23 +248,16 @@ function HeaderContent() {
             className="site-header__search site-header__search--desktop hidden min-w-0 flex-1 items-center gap-2 md:flex"
             role="search"
           >
-            <div className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-border-hairline bg-surface-muted px-4 py-2.5">
-              <MaterialIcon name="search" className="text-[1.25rem] text-secondary" />
+            <div className="site-header__search-field flex min-w-0 flex-1 items-center gap-2 rounded-full border border-border-hairline bg-surface-muted px-3 py-1.5">
+              <MaterialIcon name="search" className="text-[1rem] text-secondary" />
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search iPhone, Galaxy, Pixel, Sony audio…"
-                className="ag-type-body w-full bg-transparent text-on-surface outline-none placeholder:text-text-muted"
+                className="site-header__search-input w-full bg-transparent text-on-surface outline-none placeholder:text-text-muted"
                 aria-label="Search products"
               />
-            </div>
-            <div className="hidden shrink-0 items-center gap-1.5 lg:flex">
-              {BUDGET_CHIPS.map((chip) => (
-                <Link key={chip.href} href={chip.href} className="ag-chip ag-chip--muted">
-                  {chip.label}
-                </Link>
-              ))}
             </div>
           </form>
 
@@ -280,7 +268,7 @@ function HeaderContent() {
               rel="noopener noreferrer"
               className="site-header__whatsapp ag-chip ag-chip--lime ag-chip--cta"
             >
-              <MaterialIcon name="chat" className="text-[1rem]" />
+              <MaterialIcon name="chat" className="text-[0.875rem]" />
               WhatsApp Inquiry
             </a>
 

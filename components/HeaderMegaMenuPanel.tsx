@@ -131,7 +131,16 @@ function MegaProductsColumn({
     [promotionsData?.results]
   );
 
-  const products = data?.results ?? [];
+  // Skip products with no image so the mega grid never shows empty grey tiles.
+  const products = useMemo(() => {
+    const rows = data?.results ?? [];
+    return rows.filter((product) => {
+      const hasPromoImage =
+        typeof product.id === 'number' &&
+        promotionImagesByProductId.has(product.id);
+      return hasPromoImage || !!product.primary_image;
+    });
+  }, [data?.results, promotionImagesByProductId]);
 
   return (
     <div className="site-header__mega-products">

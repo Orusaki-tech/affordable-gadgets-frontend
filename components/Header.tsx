@@ -228,7 +228,7 @@ function HeaderContent() {
     >
       <div className="site-header__container ag-shell">
         {/* Top utility row: logo | search | actions */}
-        <div className="site-header__bar flex items-center gap-3 py-3 lg:gap-5">
+        <div className="site-header__bar flex items-center gap-3 py-1.5 lg:gap-4">
           <Link href="/" className="site-header__logo-link shrink-0">
             <div className="site-header__logo-wrap">
               <Image

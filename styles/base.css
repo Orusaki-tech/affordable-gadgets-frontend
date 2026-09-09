@@ -364,13 +364,13 @@ html {
 }
 
 /*
- * Fluid desktop scale (VFRI) — from lg up, root grows linearly with viewport so
- * every rem (type, padding, gaps, control heights) scales together.
- * 16px @1024 · ~18px @1440 · ~21px @1920 · ~24px @2560.
+ * Fluid desktop scale (VFRI) — slightly tighter than 16px floor so type
+ * reads denser on mid/large desks without changing mobile.
+ * 15px @1024 · ~17px @1440 · ~20px @1920 · ~23px @2560.
  */
 @media (min-width: 1024px) {
   html {
-    font-size: clamp(16px, calc(16px + (100vw - 1024px) * 0.0054), 84px);
+    font-size: clamp(15px, calc(15px + (100vw - 1024px) * 0.0054), 72px);
   }
 }
 

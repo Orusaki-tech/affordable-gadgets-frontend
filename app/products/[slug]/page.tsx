@@ -236,7 +236,7 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
       >
         <HeaderWithAnnouncement />
       </Suspense>
-      <main className="flex-1 min-w-0 py-8">
+      <main className="flex-1 min-w-0 pt-4 pb-8 bg-[var(--surface,#f9f9fb)]">
         <Suspense fallback={
           <div className="container mx-auto px-4">
             <div className="animate-pulse">

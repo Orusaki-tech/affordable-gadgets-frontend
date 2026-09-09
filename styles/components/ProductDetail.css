@@ -1709,7 +1709,7 @@
   height: 1.75rem;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.75);
-  color: #27334f;
+  color: var(--gray-800, #1d1d1f);
   display: inline-flex;
   align-items: center;
   justify-content: center;

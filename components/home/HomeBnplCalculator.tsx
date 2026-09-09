@@ -7,6 +7,7 @@ import {
   ApiService,
   OpenAPI,
   type PublicFinancingOffer,
+  type PublicProduct,
   type PublicProductList,
 } from '@/lib/api/generated';
 import { apiBaseUrl } from '@/lib/api/openapi';
@@ -17,13 +18,17 @@ import { getProductHref } from '@/lib/utils/productRoutes';
 
 const FINANCING_PRODUCTS_PAGE_SIZE = 6;
 const FINANCING_PRODUCTS_FETCH_SIZE = 12;
-const PARTNER_SAMPLE_SIZE = 6;
 
 type FinancingPartner = {
   key: string;
   name: string;
   slug?: string;
   logoUrl?: string | null;
+};
+
+type FinancingCardData = {
+  product: PublicProductList;
+  offer: PublicFinancingOffer | null;
 };
 
 type PaginatedPublicProductList = {
@@ -92,6 +97,34 @@ async function fetchActiveFinancingProviders(): Promise<FinancingPartner[]> {
     .filter((p) => p.name);
 }
 
+function moneyValue(value?: string | number | null): number | null {
+  if (value == null || value === '') return null;
+  const num = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+
+function formatKes(value?: string | number | null): string | null {
+  const num = moneyValue(value);
+  if (num == null) return null;
+  return formatPrice(num);
+}
+
+/** Prefer the lowest-deposit active offer with a weekly or monthly installment. */
+function pickOffer(offers: PublicFinancingOffer[]): PublicFinancingOffer | null {
+  if (!offers.length) return null;
+  const ranked = [...offers].sort((a, b) => {
+    const da = moneyValue(a.deposit_amount) ?? Number.POSITIVE_INFINITY;
+    const db = moneyValue(b.deposit_amount) ?? Number.POSITIVE_INFINITY;
+    return da - db;
+  });
+  return (
+    ranked.find(
+      (o) =>
+        moneyValue(o.weekly_payment) != null || moneyValue(o.monthly_payment) != null
+    ) ?? ranked[0]
+  );
+}
+
 function partnersFromOffers(offers: PublicFinancingOffer[]): FinancingPartner[] {
   const byKey = new Map<string, FinancingPartner>();
   for (const offer of offers) {
@@ -109,33 +142,46 @@ function partnersFromOffers(offers: PublicFinancingOffer[]): FinancingPartner[] 
   return Array.from(byKey.values());
 }
 
-async function fetchPartnersFromProductOffers(
+async function fetchFinancingCardDetails(
   products: PublicProductList[]
-): Promise<FinancingPartner[]> {
-  const sample = products.slice(0, PARTNER_SAMPLE_SIZE);
-  if (!sample.length) return [];
+): Promise<{ cards: FinancingCardData[]; partners: FinancingPartner[] }> {
+  if (!products.length) return { cards: [], partners: [] };
 
   OpenAPI.BASE = apiBaseUrl;
   const details = await Promise.all(
-    sample.map((product) => {
-      if (product.id == null) return Promise.resolve(null);
+    products.map((product) => {
+      if (product.id == null) return Promise.resolve(null as PublicProduct | null);
       return ApiService.apiV1PublicProductsRetrieve(product.id).catch(() => null);
     })
   );
 
-  const byKey = new Map<string, FinancingPartner>();
-  for (const detail of details) {
-    if (!detail) continue;
-    for (const partner of partnersFromOffers(detail.financing_offers ?? [])) {
-      if (!byKey.has(partner.key)) byKey.set(partner.key, partner);
+  const partnerMap = new Map<string, FinancingPartner>();
+  const cards: FinancingCardData[] = products.map((product, index) => {
+    const detail = details[index];
+    const offers = detail?.financing_offers ?? [];
+    for (const partner of partnersFromOffers(offers)) {
+      if (!partnerMap.has(partner.key)) partnerMap.set(partner.key, partner);
     }
-  }
-  return Array.from(byKey.values());
+    return {
+      product,
+      offer: pickOffer(offers),
+    };
+  });
+
+  return { cards, partners: Array.from(partnerMap.values()) };
 }
 
-function FinancingProductCard({ product }: { product: PublicProductList }) {
+function FinancingProductCard({ product, offer }: FinancingCardData) {
   const href = getProductHref(product);
-  const price = formatPrice(product.min_price ?? null);
+  const deposit = formatKes(offer?.deposit_amount);
+  const weekly = formatKes(offer?.weekly_payment);
+  const monthly = formatKes(offer?.monthly_payment);
+  const retail =
+    formatKes(offer?.retail_amount) || formatPrice(product.min_price ?? null);
+  const termLabel =
+    offer?.term_count && offer?.term_unit
+      ? `${offer.term_count} ${offer.term_unit}${offer.term_count === 1 ? '' : 's'}`
+      : null;
 
   return (
     <Link href={href} className="home-financing__product-card">
@@ -145,19 +191,43 @@ function FinancingProductCard({ product }: { product: PublicProductList }) {
             src={product.primary_image}
             alt={product.product_name || 'Financing device'}
             fill
-            className="object-contain p-2"
-            sizes="(max-width: 640px) 42vw, 140px"
+            className="object-contain p-1.5"
+            sizes="72px"
           />
         ) : (
           <span className="home-financing__product-placeholder" aria-hidden>
-            <MaterialIcon name="smartphone" className="text-[1.5rem]" />
+            <MaterialIcon name="smartphone" className="text-[1.25rem]" />
           </span>
         )}
       </div>
       <div className="home-financing__product-body">
         <p className="home-financing__product-name">{product.product_name}</p>
-        <p className="home-financing__product-price">{price}</p>
-        <p className="home-financing__product-meta">Lipa mdogo mdogo</p>
+        <p className="home-financing__product-price">{retail}</p>
+        <div className="home-financing__product-terms">
+          {deposit ? (
+            <span>
+              Deposit <strong>{deposit}</strong>
+            </span>
+          ) : null}
+          {weekly ? (
+            <span>
+              Weekly <strong>{weekly}</strong>
+            </span>
+          ) : null}
+          {monthly ? (
+            <span>
+              Monthly <strong>{monthly}</strong>
+            </span>
+          ) : null}
+          {!deposit && !weekly && !monthly ? (
+            <span className="home-financing__product-meta">Lipa mdogo mdogo</span>
+          ) : null}
+        </div>
+        {termLabel || offer?.provider_name ? (
+          <p className="home-financing__product-meta">
+            {[offer?.provider_name, termLabel].filter(Boolean).join(' · ')}
+          </p>
+        ) : null}
       </div>
     </Link>
   );
@@ -205,29 +275,23 @@ export function HomeBnplCalculator() {
     retry: false,
   });
 
-  const offerPartnersQuery = useQuery({
-    queryKey: [
-      'financing-partners-from-offers',
-      'homepage',
-      products.map((p) => p.id).join(','),
-    ],
-    queryFn: () => fetchPartnersFromProductOffers(products),
-    enabled:
-      products.length > 0 &&
-      !providersQuery.isLoading &&
-      (providersQuery.isError || (providersQuery.data?.length ?? 0) === 0),
+  const detailsQuery = useQuery({
+    queryKey: ['financing-card-details', 'homepage', products.map((p) => p.id).join(',')],
+    queryFn: () => fetchFinancingCardDetails(products),
+    enabled: products.length > 0,
     staleTime: 60_000,
   });
 
+  const cards = detailsQuery.data?.cards ?? products.map((product) => ({ product, offer: null }));
   const partners =
     (providersQuery.data?.length ?? 0) > 0
       ? providersQuery.data!
-      : (offerPartnersQuery.data ?? []);
+      : (detailsQuery.data?.partners ?? []);
 
   const isLoading =
     productsQuery.isLoading ||
-    providersQuery.isLoading ||
-    (offerPartnersQuery.isFetching && partners.length === 0);
+    (products.length > 0 && detailsQuery.isLoading) ||
+    (providersQuery.isLoading && partners.length === 0);
 
   if (!isLoading && (productsQuery.isError || products.length === 0)) {
     return null;
@@ -290,12 +354,16 @@ export function HomeBnplCalculator() {
             Available financing devices
           </p>
           <div className="home-financing__products">
-            {isLoading && products.length === 0
+            {isLoading && cards.length === 0
               ? Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="home-financing__product-card home-financing__skeleton" />
                 ))
-              : products.map((product) => (
-                  <FinancingProductCard key={product.id} product={product} />
+              : cards.map((card) => (
+                  <FinancingProductCard
+                    key={card.product.id}
+                    product={card.product}
+                    offer={card.offer}
+                  />
                 ))}
           </div>
           <p className="mt-3 text-[0.6875rem] text-white/50">

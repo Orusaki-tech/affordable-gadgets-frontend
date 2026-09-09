@@ -549,21 +549,30 @@
 
 .home-financing__products {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: 1fr;
+  gap: 0.625rem;
   margin-top: 0.875rem;
 }
 
 @media (min-width: 640px) {
+  .home-financing__products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
   .home-financing__products {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 .home-financing__product-card {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: center;
+  min-height: 0;
+  padding: 0.625rem;
   border-radius: 0.75rem;
   background: color-mix(in srgb, #000 30%, transparent);
   overflow: hidden;
@@ -579,8 +588,12 @@
 
 .home-financing__product-media {
   position: relative;
-  aspect-ratio: 1;
-  background: color-mix(in srgb, #fff 4%, transparent);
+  width: 4.5rem;
+  height: 4.5rem;
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: color-mix(in srgb, #fff 8%, transparent);
 }
 
 .home-financing__product-placeholder {
@@ -596,31 +609,47 @@
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  padding: 0.625rem 0.75rem 0.75rem;
-  text-align: center;
+  min-width: 0;
+  padding: 0;
+  text-align: left;
 }
 
 .home-financing__product-name {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1.25;
   color: #fff;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .home-financing__product-price {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--promo-lime, #9fe855);
 }
 
+.home-financing__product-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.625rem;
+  margin-top: 0.15rem;
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  color: color-mix(in srgb, #fff 72%, transparent);
+}
+
+.home-financing__product-terms strong {
+  font-weight: 700;
+  color: #fff;
+}
+
 .home-financing__product-meta {
-  margin: 0;
+  margin: 0.1rem 0 0;
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -629,7 +658,7 @@
 }
 
 .home-financing__skeleton {
-  min-height: 9.5rem;
+  min-height: 5.75rem;
   pointer-events: none;
   animation: home-financing-pulse 1.2s ease-in-out infinite;
 }

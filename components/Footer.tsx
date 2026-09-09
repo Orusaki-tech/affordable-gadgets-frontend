@@ -64,7 +64,7 @@ function SocialGlyph({ network }: { network: SocialNetwork }) {
         </svg>
       );
     default:
-      return <MaterialIcon name="public" className="text-[18px]" />;
+      return <MaterialIcon name="public" className="text-[1.125rem]" />;
   }
 }
 
@@ -101,7 +101,7 @@ export function Footer() {
               warranty, and dispatched countrywide.
             </p>
             <div className="flex items-start gap-2 text-sm text-secondary">
-              <MaterialIcon name="pin_drop" className="mt-0.5 text-[18px] text-stock-green" />
+              <MaterialIcon name="pin_drop" className="mt-0.5 text-[1.125rem] text-stock-green" />
               <span>
                 Physical Hub: {brandConfig.business.address.streetAddress},{' '}
                 {brandConfig.business.address.addressLocality}, Kenya
@@ -132,19 +132,19 @@ export function Footer() {
           <div className="flex flex-col gap-3">
             <span className="text-sm font-bold text-primary">Customer Tools</span>
             <Link href="/cart" className="flex items-center gap-1 text-sm text-secondary transition hover:text-primary">
-              <MaterialIcon name="lock_reset" className="text-[16px]" />
+              <MaterialIcon name="lock_reset" className="text-[1rem]" />
               Track / view orders
             </Link>
             <Link href="/budget-search" className="flex items-center gap-1 text-sm text-secondary transition hover:text-primary">
-              <MaterialIcon name="tune" className="text-[16px]" />
+              <MaterialIcon name="tune" className="text-[1rem]" />
               Shop by budget
             </Link>
             <Link href="/financing" className="flex items-center gap-1 text-sm text-secondary transition hover:text-primary">
-              <MaterialIcon name="payments" className="text-[16px]" />
+              <MaterialIcon name="payments" className="text-[1rem]" />
               Financing
             </Link>
             <Link href="/wishlist" className="flex items-center gap-1 text-sm text-secondary transition hover:text-primary">
-              <MaterialIcon name="favorite" className="text-[16px]" />
+              <MaterialIcon name="favorite" className="text-[1rem]" />
               Wishlist
             </Link>
           </div>

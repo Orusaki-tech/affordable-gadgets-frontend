@@ -34,7 +34,7 @@
 }
 
 .promo-videos-drawer__kicker {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   color: var(--gray-500);
   text-transform: uppercase;
@@ -42,7 +42,7 @@
 }
 
 .promo-videos-drawer__title {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 800;
   color: var(--gray-900);
   margin-top: 4px;
@@ -51,7 +51,7 @@
 
 .promo-videos-drawer__subtitle {
   margin-top: 6px;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--gray-600);
   line-height: 1.35;
 }

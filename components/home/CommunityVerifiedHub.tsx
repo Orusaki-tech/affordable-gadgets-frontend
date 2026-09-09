@@ -61,7 +61,7 @@ function formatRelative(dateString?: string | null): string {
 
 function Stars({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md' }) {
   const filled = Math.max(0, Math.min(5, Math.round(rating)));
-  const cls = size === 'md' ? 'text-[20px]' : 'text-[14px]';
+  const cls = size === 'md' ? 'text-[1.25rem]' : 'text-[0.875rem]';
   return (
     <span className={`inline-flex items-center text-amber-400 ${cls}`}>
       {[1, 2, 3, 4, 5].map((n) => (
@@ -133,7 +133,7 @@ export function CommunityVerifiedHub({
             </span>
             <span className="community-hub__live-sep">•</span>
             <span className="community-hub__live-guarantee">
-              <MaterialIcon name="shield" className="text-[14px]" />
+              <MaterialIcon name="shield" className="text-[0.875rem]" />
               Guaranteed Grade A
             </span>
           </div>
@@ -249,12 +249,12 @@ export function CommunityVerifiedHub({
                   )}
                   <div className="community-hub__hero-scrim" />
                   <span className="community-hub__glass-badge">
-                    <MaterialIcon name="verified" className="text-[13px] text-emerald-600" />
+                    <MaterialIcon name="verified" className="text-[0.8125rem] text-emerald-600" />
                     Kenya Unboxing
                   </span>
                   <div className="community-hub__hero-shot-meta">
                     <span>
-                      <MaterialIcon name="photo_camera" className="text-[14px]" />
+                      <MaterialIcon name="photo_camera" className="text-[0.875rem]" />
                       Live Customer Shot
                     </span>
                     <span>{formatRelative(hero.date_posted)}</span>
@@ -269,7 +269,7 @@ export function CommunityVerifiedHub({
                         {hero.customer_username || (hero.is_admin_review ? 'Admin' : 'Verified Buyer')}
                       </div>
                       <div className="community-hub__reviewer-meta">
-                        <MaterialIcon name="check_circle" className="text-[14px] text-emerald-600" />
+                        <MaterialIcon name="check_circle" className="text-[0.875rem] text-emerald-600" />
                         {hero.purchase_date
                           ? 'Verified purchase'
                           : hero.is_admin_review
@@ -313,12 +313,12 @@ export function CommunityVerifiedHub({
                         <div className="text-xs font-bold text-slate-900">
                           {hero.product_name ?? 'Featured product'}
                         </div>
-                        <div className="text-[11px] text-emerald-700 font-semibold">View full story</div>
+                        <div className="text-[0.6875rem] text-emerald-700 font-semibold">View full story</div>
                       </div>
                     </div>
                     <span className="community-hub__mini-cta">
                       View Story
-                      <MaterialIcon name="arrow_forward" className="text-[14px]" />
+                      <MaterialIcon name="arrow_forward" className="text-[0.875rem]" />
                     </span>
                   </div>
                 </div>
@@ -331,11 +331,11 @@ export function CommunityVerifiedHub({
               <button type="button" className="community-hub__compact-btn" onClick={() => onOpenReview(compact)}>
                 <div className="community-hub__compact-top">
                   <span className="community-hub__glass-badge community-hub__glass-badge--static">
-                    <MaterialIcon name="verified" className="text-[13px] text-emerald-600" />
+                    <MaterialIcon name="verified" className="text-[0.8125rem] text-emerald-600" />
                     Customer Unbox
                   </span>
                   <span className="community-hub__loc-pill">
-                    <MaterialIcon name="location_on" className="text-[13px]" />
+                    <MaterialIcon name="location_on" className="text-[0.8125rem]" />
                     Kenya delivery
                   </span>
                 </div>
@@ -359,14 +359,14 @@ export function CommunityVerifiedHub({
                     <span className="text-[var(--promo-lime,#9fe855)] font-bold">
                       {compact.product_name ?? 'Verified buy'}
                     </span>
-                    <span className="text-neutral-300 text-[11px]">{formatRelative(compact.date_posted)}</span>
+                    <span className="text-neutral-300 text-[0.6875rem]">{formatRelative(compact.date_posted)}</span>
                   </div>
                 </div>
 
                 <div className="community-hub__compact-copy">
                   <div className="flex items-center gap-1">
                     <Stars rating={Number(compact.rating)} />
-                    <span className="text-[11px] text-slate-400">Verified {Number(compact.rating).toFixed(1)}</span>
+                    <span className="text-[0.6875rem] text-slate-400">Verified {Number(compact.rating).toFixed(1)}</span>
                   </div>
                   {compact.comment ? (
                     <p className="community-hub__compact-quote">
@@ -424,15 +424,15 @@ export function CommunityVerifiedHub({
 
                   <div className="community-hub__checklist">
                     <div className="community-hub__check">
-                      <MaterialIcon name="check" className="text-[16px] text-emerald-600" />
+                      <MaterialIcon name="check" className="text-[1rem] text-emerald-600" />
                       <span>Purchase story verified</span>
                     </div>
                     <div className="community-hub__check">
-                      <MaterialIcon name="check" className="text-[16px] text-emerald-600" />
+                      <MaterialIcon name="check" className="text-[1rem] text-emerald-600" />
                       <span>{inspection.product_condition || 'Condition documented'}</span>
                     </div>
                     <div className="community-hub__check">
-                      <MaterialIcon name="check" className="text-[16px] text-emerald-600" />
+                      <MaterialIcon name="check" className="text-[1rem] text-emerald-600" />
                       <span>
                         {inspection.customer_username
                           ? `Shared by ${inspection.customer_username}`
@@ -452,7 +452,7 @@ export function CommunityVerifiedHub({
                     <span className="block text-xs font-bold text-slate-900">
                       {inspection.product_name ?? 'Featured unit'}
                     </span>
-                    <span className="text-[10px] text-slate-500">Tap to open full review</span>
+                    <span className="text-[0.625rem] text-slate-500">Tap to open full review</span>
                   </div>
                   <span className="community-hub__mini-cta community-hub__mini-cta--solid">View Unit →</span>
                 </div>
@@ -472,8 +472,8 @@ export function CommunityVerifiedHub({
                   Live Community Pulse
                 </span>
               </div>
-              <span className="text-[11px] text-neutral-400 flex items-center gap-1">
-                <MaterialIcon name="rate_review" className="text-[13px] text-[var(--promo-lime,#9fe855)]" />
+              <span className="text-[0.6875rem] text-neutral-400 flex items-center gap-1">
+                <MaterialIcon name="rate_review" className="text-[0.8125rem] text-[var(--promo-lime,#9fe855)]" />
                 Recent buyer stories
               </span>
             </div>
@@ -494,7 +494,7 @@ export function CommunityVerifiedHub({
                       <div className="text-xs font-bold text-white truncate">
                         {review.customer_username || 'Verified buyer'} · {Number(review.rating).toFixed(1)}★
                       </div>
-                      <div className="text-[11px] text-neutral-400 truncate">
+                      <div className="text-[0.6875rem] text-neutral-400 truncate">
                         {review.product_name ?? 'Product'} ·{' '}
                         {review.comment
                           ? review.comment.length > 48
@@ -504,7 +504,7 @@ export function CommunityVerifiedHub({
                       </div>
                     </div>
                   </div>
-                  <span className="text-[11px] text-neutral-400 shrink-0 font-medium">
+                  <span className="text-[0.6875rem] text-neutral-400 shrink-0 font-medium">
                     {formatRelative(review.date_posted)}
                   </span>
                 </button>

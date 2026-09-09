@@ -323,7 +323,7 @@ function VideoSlide({
       </div>
       <Link
         href={href}
-        className="home-product-videos__caption mt-2 block text-[11px] font-bold leading-snug text-gray-900 sm:text-xs"
+        className="home-product-videos__caption mt-2 block text-[0.6875rem] font-bold leading-snug text-gray-900 sm:text-xs"
       >
         {name}
       </Link>

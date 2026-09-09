@@ -58,7 +58,7 @@ export default function WishlistClient() {
         <p className="text-red-600">{error}</p>
       ) : items.length === 0 ? (
         <div className="rounded-2xl bg-surface-container-lowest p-10 text-center shadow-sm">
-          <MaterialIcon name="favorite" className="text-[40px] text-text-muted" />
+          <MaterialIcon name="favorite" className="text-[2.5rem] text-text-muted" />
           <p className="mt-3 text-lg font-semibold text-primary">No saved devices yet</p>
           <p className="mt-1 text-sm text-secondary">Tap the heart on any product to save it here.</p>
           <Link
@@ -93,7 +93,7 @@ export default function WishlistClient() {
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-text-muted">
-                      <MaterialIcon name="devices" className="text-[40px]" />
+                      <MaterialIcon name="devices" className="text-[2.5rem]" />
                     </div>
                   )}
                 </Link>
@@ -111,7 +111,7 @@ export default function WishlistClient() {
                       setItems((prev) => prev.filter((row) => row.id !== item.id));
                     }}
                   >
-                    <MaterialIcon name="delete" className="text-[18px]" />
+                    <MaterialIcon name="delete" className="text-[1.125rem]" />
                     Remove
                   </button>
                 </div>

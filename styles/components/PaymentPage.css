@@ -69,7 +69,7 @@
 }
 
 .payment-page__title {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: 8px;
   color: var(--ui-gray-900);
@@ -89,7 +89,7 @@
 }
 
 .payment-page__meta {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ui-gray-500);
 }
 

@@ -1,5 +1,5 @@
 .section-label {
-  font-size: 25px;
+  font-size: 1.5625rem;
   line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -45,7 +45,7 @@
 }
 
 .reviews-section__average {
-  font-size: 36px;
+  font-size: 2.25rem;
   font-weight: 700;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .reviews-section__star {
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 
 .reviews-section__star--filled {
@@ -69,7 +69,7 @@
 }
 
 .reviews-section__meta {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--ui-gray-600);
 }
 
@@ -85,7 +85,7 @@
 }
 
 .reviews-section__breakdown-label {
-  font-size: 12px;
+  font-size: 0.75rem;
   width: 48px;
 }
 
@@ -104,7 +104,7 @@
 }
 
 .reviews-section__breakdown-count {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--ui-gray-600);
   width: 48px;
   text-align: right;
@@ -142,16 +142,16 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 .reviews-section__reviewer {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .reviews-section__badge {
-  font-size: 10px;
+  font-size: 0.625rem;
   background: var(--ui-gray-100);
   color: var(--primary-dark);
   padding: 2px 8px;
@@ -159,12 +159,12 @@
 }
 
 .reviews-section__date {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--ui-gray-500);
 }
 
 .reviews-section__comment {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 20px;
   color: var(--ui-gray-700);
   margin-top: 12px;
@@ -203,7 +203,7 @@
   right: 8px;
   background: var(--ui-black-50);
   color: var(--ui-white);
-  font-size: 12px;
+  font-size: 0.75rem;
   padding: 4px 8px;
   border-radius: 6px;
 }
@@ -217,7 +217,7 @@
 
 .reviews-section__pagination-button {
   padding: 8px 12px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   background: var(--ui-gray-200);
   border-radius: 8px;
   border: none;
@@ -236,19 +236,19 @@
 
 @media (min-width: 768px) and (max-width: 1024px) {
   .section-label {
-    font-size: 28px;
+    font-size: 1.75rem;
   }
 }
 
 @media (min-width: 1025px) and (max-width: 1440px) {
   .section-label {
-    font-size: 32px;
+    font-size: 2rem;
   }
 }
 
 @media (min-width: 1441px) {
   .section-label {
-    font-size: 64px;
+    font-size: 4rem;
   }
 }
 
@@ -263,20 +263,20 @@
   }
 
   .reviews-section__average {
-    font-size: 48px;
+    font-size: 3rem;
   }
 
   .reviews-section__star {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 
   .reviews-section__meta {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 
   .reviews-section__breakdown-label,
   .reviews-section__breakdown-count {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
 
   .reviews-section__list {
@@ -288,28 +288,28 @@
   }
 
   .reviews-section__item-stars {
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 
   .reviews-section__reviewer {
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
 
   .reviews-section__badge {
-    font-size: 11px;
+    font-size: 0.6875rem;
   }
 
   .reviews-section__date {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
 
   .reviews-section__comment {
-    font-size: 15px;
+    font-size: 0.9375rem;
     line-height: 22px;
   }
 
   .reviews-section__pagination-button {
     padding: 8px 16px;
-    font-size: 14px;
+    font-size: 0.875rem;
   }
 }

@@ -96,23 +96,23 @@ export function HomeBnplCalculator() {
 
           <div className="mt-5 grid grid-cols-3 gap-3 text-center">
             <div className="rounded-xl bg-black/30 p-3">
-              <p className="text-[10px] uppercase tracking-wider text-white/50">Deposit</p>
+              <p className="text-[0.625rem] uppercase tracking-wider text-white/50">Deposit</p>
               <p className="mt-1 text-sm font-bold text-promo-lime">
                 KSh {deposit.toLocaleString('en-KE')}
               </p>
             </div>
             <div className="rounded-xl bg-black/30 p-3">
-              <p className="text-[10px] uppercase tracking-wider text-white/50">Financed</p>
+              <p className="text-[0.625rem] uppercase tracking-wider text-white/50">Financed</p>
               <p className="mt-1 text-sm font-bold">KSh {financed.toLocaleString('en-KE')}</p>
             </div>
             <div className="rounded-xl bg-black/30 p-3">
-              <p className="text-[10px] uppercase tracking-wider text-white/50">Est. / week</p>
+              <p className="text-[0.625rem] uppercase tracking-wider text-white/50">Est. / week</p>
               <p className="mt-1 text-sm font-bold text-promo-lime">
                 KSh {weekly.toLocaleString('en-KE')}
               </p>
             </div>
           </div>
-          <p className="mt-3 text-[11px] text-white/50">
+          <p className="mt-3 text-[0.6875rem] text-white/50">
             Estimates only — final terms are confirmed by financing partners on the financing page.
           </p>
         </div>

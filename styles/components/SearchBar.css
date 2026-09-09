@@ -17,7 +17,7 @@
 .search-bar__input {
   width: 100%;
   padding: 10px 48px 10px 16px;
-  font-size: 14px;
+  font-size: 0.875rem;
   border: 1px solid var(--ui-gray-300);
   border-radius: 30px;
   background: var(--ui-white);
@@ -95,7 +95,7 @@
 }
 
 .search-bar__suggestion-subtitle {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ui-gray-500);
   margin-top: 2px;
 }

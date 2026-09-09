@@ -26,7 +26,7 @@
 }
 
 .product-grid__error-details {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ui-gray-500);
 }
 
@@ -100,7 +100,7 @@
 }
 
 .product-grid__pagination-button {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1;
   font-weight: 700;
   padding: 10px 24px;
@@ -126,7 +126,7 @@
 }
 
 .product-grid__pagination-status {
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1;
   font-weight: 700;
   padding: 10px 24px;
@@ -157,21 +157,21 @@
 @media (min-width: 768px) and (max-width: 1024px) {
   .product-grid__pagination-button,
   .product-grid__pagination-status {
-    font-size: 15px;
+    font-size: 0.9375rem;
   }
 }
 
 @media (min-width: 1025px) and (max-width: 1440px) {
   .product-grid__pagination-button,
   .product-grid__pagination-status {
-    font-size: 16px;
+    font-size: 1rem;
   }
 }
 
 @media (min-width: 1441px) {
   .product-grid__pagination-button,
   .product-grid__pagination-status {
-    font-size: 16px;
+    font-size: 1rem;
   }
 }
 

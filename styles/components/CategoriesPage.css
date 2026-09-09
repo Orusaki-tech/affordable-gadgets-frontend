@@ -1,5 +1,5 @@
 .section-label {
-  font-size: 25px;
+  font-size: 1.5625rem;
   line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -52,7 +52,7 @@
 
 .categories-page__card-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
   padding-left: 4px; /* Matches the alignment in the screenshot */
 }
@@ -79,7 +79,7 @@
 }
 
 .categories-page__section-heading {
-  font-size: 30px;
+  font-size: 1.875rem;
   font-weight: 700;
   margin-bottom: 24px;
 }
@@ -118,7 +118,7 @@
 
 .categories-page__empty-text {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--secondary);
   min-height: 24px;
 }
@@ -139,7 +139,7 @@
 
 .categories-page__loading-text {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--secondary);
 }
 
@@ -166,19 +166,19 @@
 
 @media (min-width: 768px) and (max-width: 1024px) {
   .section-label {
-    font-size: 28px;
+    font-size: 1.75rem;
   }
 }
 
 @media (min-width: 1025px) and (max-width: 1440px) {
   .section-label {
-    font-size: 32px;
+    font-size: 2rem;
   }
 }
 
 @media (min-width: 1441px) {
   .section-label {
-    font-size: 64px;
+    font-size: 4rem;
   }
 }
 

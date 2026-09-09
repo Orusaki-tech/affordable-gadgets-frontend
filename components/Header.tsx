@@ -220,13 +220,13 @@ function HeaderContent() {
             role="search"
           >
             <div className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-border-hairline bg-surface-muted px-4 py-2.5">
-              <MaterialIcon name="search" className="text-[20px] text-secondary" />
+              <MaterialIcon name="search" className="text-[1.25rem] text-secondary" />
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search iPhone, Galaxy, Pixel, Sony audio…"
-                className="w-full bg-transparent text-sm text-on-surface outline-none placeholder:text-text-muted"
+                className="ag-type-body w-full bg-transparent text-on-surface outline-none placeholder:text-text-muted"
                 aria-label="Search products"
               />
             </div>
@@ -335,13 +335,13 @@ function HeaderContent() {
         {/* Mobile search */}
         <form onSubmit={onSearchSubmit} className="pb-3 md:hidden" role="search">
           <div className="flex items-center gap-2 rounded-full border border-border-hairline bg-surface-muted px-4 py-2.5">
-            <MaterialIcon name="search" className="text-[20px] text-secondary" />
+            <MaterialIcon name="search" className="text-[1.25rem] text-secondary" />
             <input
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search devices…"
-              className="w-full bg-transparent text-sm outline-none"
+              className="ag-type-body w-full bg-transparent outline-none"
               aria-label="Search products"
             />
           </div>

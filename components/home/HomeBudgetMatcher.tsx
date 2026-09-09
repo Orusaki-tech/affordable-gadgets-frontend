@@ -51,7 +51,7 @@ export function HomeBudgetMatcher() {
               className="flex items-center gap-3 rounded-xl bg-surface-container-lowest p-4 shadow-sm transition hover:shadow-md"
             >
               <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-promo-lime text-primary">
-                <MaterialIcon name={band.icon} className="text-[22px]" />
+                <MaterialIcon name={band.icon} className="text-[1.375rem]" />
               </span>
               <span>
                 <span className="block text-sm font-bold text-primary">{band.label}</span>

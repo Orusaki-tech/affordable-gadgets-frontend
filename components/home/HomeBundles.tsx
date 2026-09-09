@@ -33,11 +33,11 @@ function BundleCard({ bundle }: { bundle: PublicBundle }) {
     >
       <div>
         {bundle.discount_amount || bundle.discount_percentage ? (
-          <span className="mb-2 inline-flex rounded bg-badge-bundle-orange/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-badge-bundle-orange">
+          <span className="mb-2 inline-flex rounded bg-badge-bundle-orange/15 px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wider text-badge-bundle-orange">
             Package deal
           </span>
         ) : (
-          <span className="mb-2 inline-flex rounded bg-surface-container px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">
+          <span className="mb-2 inline-flex rounded bg-surface-container px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-wider text-on-surface-variant">
             {items.length || 0} units included
           </span>
         )}

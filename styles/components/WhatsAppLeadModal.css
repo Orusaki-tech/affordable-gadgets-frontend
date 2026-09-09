@@ -25,14 +25,14 @@
 
 .whatsapp-lead-modal__product-name {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9375rem;
   margin: 0 0 4px;
   color: var(--ui-gray-900);
 }
 
 .whatsapp-lead-modal__product-spec {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ui-gray-600);
 }
 
@@ -54,7 +54,7 @@
   border-radius: 10px;
   border: none;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 0.9375rem;
   cursor: pointer;
   transition: background 200ms, opacity 200ms;
 }
@@ -78,7 +78,7 @@
 }
 
 .whatsapp-lead-modal__subtitle {
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: var(--ui-gray-600);
   margin: 0 0 20px;
   line-height: 1.5;

@@ -56,13 +56,13 @@ export function AnnouncementBar(_props?: Partial<AnnouncementBarProps>) {
       role="region"
       aria-label="Site info"
     >
-      <div className="announcement-bar__container ag-shell flex h-9 items-center justify-between gap-4">
-        <div className="announcement-bar__items flex items-center gap-2 overflow-x-auto py-1 text-[12px] font-medium whitespace-nowrap">
+      <div className="announcement-bar__container ag-shell">
+        <div className="announcement-bar__items">
           {trustItems.map((item, index) => (
-            <span key={item.id} className="flex items-center gap-2">
-              {index > 0 ? <span className="text-[#77767b]">•</span> : null}
-              <span className="flex items-center gap-1 text-on-primary">
-                <MaterialIcon name={item.icon} className="text-[14px] text-promo-lime" />
+            <span key={item.id} className="announcement-bar__item">
+              {index > 0 ? <span className="announcement-bar__dot" aria-hidden>•</span> : null}
+              <span className="announcement-bar__label">
+                <MaterialIcon name={item.icon} className="announcement-bar__icon" />
                 {item.text}
               </span>
             </span>
@@ -70,11 +70,11 @@ export function AnnouncementBar(_props?: Partial<AnnouncementBarProps>) {
         </div>
 
         <div
-          className="announcement-bar__mobile-item text-[12px] font-medium text-on-primary"
+          className="announcement-bar__mobile-item"
           aria-live={isMobile ? 'polite' : 'off'}
         >
-          <span className="flex items-center gap-1.5" key={mobileItem.id}>
-            <MaterialIcon name={mobileItem.icon} className="text-[14px] text-promo-lime" />
+          <span className="announcement-bar__label" key={mobileItem.id}>
+            <MaterialIcon name={mobileItem.icon} className="announcement-bar__icon" />
             {mobileItem.id === 'phone' ? (
               <a className="hover:text-promo-lime" href={`tel:${brandConfig.business.phone}`}>
                 {mobileItem.text}
@@ -85,13 +85,13 @@ export function AnnouncementBar(_props?: Partial<AnnouncementBarProps>) {
           </span>
         </div>
 
-        <div className="announcement-bar__right hidden items-center gap-4 text-[12px] font-medium text-on-primary md:flex">
-          <span className="flex items-center gap-1">
-            <MaterialIcon name="location_on" className="text-[14px]" />
+        <div className="announcement-bar__right">
+          <span className="announcement-bar__label">
+            <MaterialIcon name="location_on" className="announcement-bar__icon" />
             CBD, Nairobi Kenya
           </span>
           <a
-            className="transition-colors hover:text-promo-lime"
+            className="announcement-bar__phone transition-colors hover:text-promo-lime"
             href={`tel:${brandConfig.business.phone}`}
           >
             {phoneDisplay}

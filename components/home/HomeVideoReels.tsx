@@ -25,7 +25,7 @@ export function HomeVideoReels() {
             className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
           >
             Follow @AffordableGadgetsKE
-            <MaterialIcon name="arrow_outward" className="text-[16px]" />
+            <MaterialIcon name="arrow_outward" className="text-[1rem]" />
           </a>
         </div>
         <HomeProductVideos variant="grid" hideHeader />

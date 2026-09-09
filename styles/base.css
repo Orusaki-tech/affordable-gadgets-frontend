@@ -275,10 +275,22 @@
   --color-border-strong: var(--border-strong);
   --color-border-hairline: var(--border-hairline);
   --color-badge-bundle-orange: var(--badge-bundle-orange);
-  --spacing-gutter: 16px;
-  --spacing-gutter-desktop: 24px;
-  --spacing-header-max: 1400px;
-  --spacing-container-max: 1280px;
+  --spacing-gutter: 1rem;
+  --spacing-gutter-desktop: 1.5rem;
+  --spacing-header-max: 87.5rem;
+  --spacing-container-max: 80rem;
+
+  /* Align Tailwind text-* utilities with the rem density ladder */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: 3.5rem;
+  --text-6xl: 4rem;
 
   /* Ladder → Tailwind theme (text-type-h2, p-panel, gap-section-y, h-control-md, …) */
   --text-type-eyebrow: var(--type-eyebrow);
@@ -343,7 +355,7 @@
 }
 
 html {
-  /* Mobile / <lg: browser base. Desktop: VFRI linear rem ramp scales type + rem components together. */
+  /* VFRI: fixed px floor below lg; desktop rem ramp scales the whole site */
   font-size: 16px;
   scroll-behavior: smooth;
   scroll-padding-top: var(--site-chrome-h);
@@ -353,15 +365,13 @@ html {
 }
 
 /*
- * Fluid desktop scale (VFRI pattern, steeper slope) — rem drives type + chrome.
- * Prior 0.0054 only reached ~18px @1440 / ~21px @1920 — too subtle next to
- * viewport-tall heroes, so panels looked hollow. This slope keeps 16px @1024
- * and actually densifies midsize/ultrawide desks:
- * 1280→~19.5 · 1440→~21 · 1920→~27 · 2560→~34 (cap 48).
+ * Fluid desktop scale (VFRI) — from lg up, root grows linearly with viewport so
+ * every rem (type, padding, gaps, control heights) scales together.
+ * 16px @1024 · ~18px @1440 · ~21px @1920 · ~24px @2560.
  */
 @media (min-width: 1024px) {
   html {
-    font-size: clamp(16px, calc(16px + (100vw - 1024px) * 0.012), 48px);
+    font-size: clamp(16px, calc(16px + (100vw - 1024px) * 0.0054), 84px);
   }
 }
 
@@ -449,6 +459,21 @@ h3 {
   font-size: var(--type-body);
   line-height: var(--body-lh);
   color: var(--secondary);
+}
+
+/* Meta / trust strip — same rem ladder as chips (scales with root) */
+.ag-type-meta {
+  margin: 0;
+  font-size: var(--type-eyebrow);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.ag-icon-sm {
+  font-size: 1rem !important;
+  width: 1rem;
+  height: 1rem;
+  line-height: 1;
 }
 
 /* Programs-style shell: full width + horizontal pad only (no centered max-width frame) */

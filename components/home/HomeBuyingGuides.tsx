@@ -76,7 +76,7 @@ export async function HomeBuyingGuides() {
             className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
           >
             Read All Articles
-            <MaterialIcon name="chevron_right" className="text-[18px]" />
+            <MaterialIcon name="chevron_right" className="text-[1.125rem]" />
           </Link>
         </div>
 
@@ -100,7 +100,7 @@ export async function HomeBuyingGuides() {
                   />
                 ) : (
                   <div className="home-buying-guides__media-fallback">
-                    <MaterialIcon name="article" className="text-[40px] text-white/50" />
+                    <MaterialIcon name="article" className="text-[2.5rem] text-white/50" />
                   </div>
                 )}
                 <span className="home-buying-guides__badge">{guide.category}</span>
@@ -115,7 +115,7 @@ export async function HomeBuyingGuides() {
                 </p>
                 <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-bold text-primary">
                   Read Guide
-                  <MaterialIcon name="arrow_forward" className="text-[16px]" />
+                  <MaterialIcon name="arrow_forward" className="text-[1rem]" />
                 </span>
               </div>
             </Link>

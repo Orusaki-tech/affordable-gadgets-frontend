@@ -48,7 +48,7 @@ export function HomeDeliveryChecker() {
         </div>
 
         <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest p-3 shadow-sm">
-          <MaterialIcon name="local_shipping" className="text-[22px] text-secondary" />
+          <MaterialIcon name="local_shipping" className="text-[1.375rem] text-secondary" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}

@@ -1,5 +1,5 @@
 .section-label {
-  font-size: 25px;
+  font-size: 1.5625rem;
   line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -31,7 +31,7 @@
 
 .product-recommendations__empty {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--ui-gray-600);
 }
 
@@ -55,19 +55,19 @@
 
 @media (min-width: 768px) and (max-width: 1024px) {
   .section-label {
-    font-size: 28px;
+    font-size: 1.75rem;
   }
 }
 
 @media (min-width: 1025px) and (max-width: 1440px) {
   .section-label {
-    font-size: 32px;
+    font-size: 2rem;
   }
 }
 
 @media (min-width: 1441px) {
   .section-label {
-    font-size: 64px;
+    font-size: 4rem;
   }
 }
 

@@ -41,7 +41,7 @@ export function HomeFeaturedHardware() {
             className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
           >
             View All
-            <MaterialIcon name="chevron_right" className="text-[18px]" />
+            <MaterialIcon name="chevron_right" className="text-[1.125rem]" />
           </Link>
         </div>
 

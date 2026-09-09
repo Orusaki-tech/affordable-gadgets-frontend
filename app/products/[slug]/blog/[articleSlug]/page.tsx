@@ -198,7 +198,7 @@ export default async function ProductBlogArticlePage({ params }: ProductBlogArti
 
           <header className="mb-8">
             <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-blue-600 mb-4">
-              <span className="bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider text-[10px]">
+              <span className="bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider text-[0.625rem]">
                 {formatArticleCategory(article.category)}
               </span>
               {article.published_at && (

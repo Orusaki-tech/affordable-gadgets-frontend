@@ -39,7 +39,7 @@
 }
 
 .preorder-modal__kicker {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   color: var(--ui-gray-500, #6b7280);
   text-transform: uppercase;
@@ -48,7 +48,7 @@
 
 .preorder-modal__title {
   margin-top: 4px;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 800;
   color: var(--ui-gray-900, #111827);
   line-height: 1.2;
@@ -56,7 +56,7 @@
 
 .preorder-modal__subtitle {
   margin-top: 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--ui-gray-600, #4b5563);
   line-height: 1.35;
 }
@@ -204,7 +204,7 @@
 }
 
 .preorder-modal__kicker {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   color: var(--ui-gray-500, #6b7280);
   text-transform: uppercase;
@@ -213,7 +213,7 @@
 
 .preorder-modal__title {
   margin-top: 4px;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 800;
   color: var(--ui-gray-900, #111827);
   line-height: 1.2;
@@ -221,7 +221,7 @@
 
 .preorder-modal__subtitle {
   margin-top: 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--ui-gray-600, #4b5563);
   line-height: 1.35;
 }

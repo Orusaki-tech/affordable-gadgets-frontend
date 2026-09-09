@@ -14,7 +14,7 @@
   flex-direction: column;
 }
 
-/* Hero: poster + CTAs tight; no letterbox bars. Stack until lg. */
+/* Hero: mobile stacks; desktop columns share height (VFRI) — poster cover + CTAs flush */
 .home-redesign__hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -56,10 +56,7 @@
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
-/*
- * Media hugs the poster aspect — cover fills the frame (no black bars).
- * Actions sit directly under this block.
- */
+/* Mobile: fixed frame; cover = no letterbox; actions directly under poster */
 .home-redesign__hero-banner-media {
   position: relative;
   flex: 0 0 auto;
@@ -98,7 +95,8 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
-  background: color-mix(in srgb, #0b0b0c 88%, transparent);
+  margin: 0;
+  background: #0b0b0c;
   border-top: 1px solid color-mix(in srgb, #fff 12%, transparent);
 }
 
@@ -119,26 +117,36 @@
   }
 }
 
-/* Desktop only: budget | banner; both columns match banner height */
+/*
+ * Desktop (VFRI): both columns stretch to the same height.
+ * Media grows with flex:1 + cover (no aspect-ratio lock → no black gutters).
+ * Actions stay glued under the poster.
+ */
 @media (min-width: 1024px) {
   .home-redesign__hero-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
     gap: var(--space-5);
     align-items: stretch;
+    min-height: 32rem;
   }
 
   .home-redesign__hero-budget {
     order: 1;
-    height: auto;
-    align-self: stretch;
+    height: 100%;
+    min-height: 100%;
   }
 
   .home-redesign__hero-banner {
     order: 2;
+    height: 100%;
+    min-height: 100%;
   }
 
   .home-redesign__hero-banner-media {
-    aspect-ratio: 2 / 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    aspect-ratio: unset;
+    height: auto;
   }
 }
 

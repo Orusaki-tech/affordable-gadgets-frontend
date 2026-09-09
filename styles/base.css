@@ -644,15 +644,15 @@ h3 {
   border-radius: 0.75rem;
 }
 
-/* Ghost on light hero CTA strip */
+/* Ghost on light hero CTA strip (legacy) */
 .home-redesign__hero-banner-actions .ag-btn--ghost {
-  background: transparent;
+  background: color-mix(in srgb, var(--promo-lime, #9fe855) 18%, #fff);
   color: var(--primary, #030304);
-  border-color: var(--border-strong, #121212);
+  border-color: transparent;
 }
 
 .home-redesign__hero-banner-actions .ag-btn--ghost:hover {
-  background: var(--surface-muted, #f3f3f5);
+  background: var(--promo-lime, #9fe855);
   color: var(--primary, #030304);
 }
 
@@ -709,8 +709,30 @@ h3 {
   }
 }
 
-/* Focus styles */
+/* Focus styles — keep high-contrast rings for buttons/links, not form fields */
 *:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
+  outline: none;
+}
+
+/* Soft focus for native bordered fields (no black outline box) */
+input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']):not([type='submit']):not([type='button']):not([type='reset']):not([type='image']):not([type='hidden']):not([type='color']):not([class*='bg-transparent']):focus,
+textarea:focus,
+select:focus {
+  border-color: var(--border-hairline, #e8e8ed);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--promo-lime, #9fe855) 22%, transparent);
+}
+
+input[class*='bg-transparent']:focus,
+input[class*='bg-transparent']:focus-visible {
+  box-shadow: none;
 }

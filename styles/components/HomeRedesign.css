@@ -45,6 +45,21 @@
   }
 }
 
+.home-redesign__hero-search {
+  transition: box-shadow 160ms ease;
+}
+
+.home-redesign__hero-search:focus-within {
+  /* Keep the soft white field look — no black focus box */
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.home-redesign__hero-search input:focus,
+.home-redesign__hero-search input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
 .home-redesign__hero-banner {
   order: 1;
   position: relative;
@@ -112,6 +127,37 @@
   max-width: none;
   justify-content: center;
   white-space: nowrap;
+}
+
+/* Match budget panel CTA language: black + lime, no yellow / heavy black outline */
+.home-redesign__hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.home-redesign__hero-cta--primary {
+  background: var(--primary, #030304);
+  color: var(--promo-lime, #9fe855);
+  border-color: transparent;
+}
+
+.home-redesign__hero-cta--primary:hover {
+  background: var(--primary-dark, #121212);
+  color: var(--promo-lime, #9fe855);
+}
+
+.home-redesign__hero-cta--secondary {
+  background: color-mix(in srgb, var(--promo-lime, #9fe855) 18%, #fff);
+  color: var(--primary, #030304);
+  border-color: transparent;
+}
+
+.home-redesign__hero-cta--secondary:hover {
+  background: var(--promo-lime, #9fe855);
+  color: var(--primary, #030304);
 }
 
 @media (min-width: 640px) {
@@ -431,23 +477,57 @@
 
 /* Homepage financing: same dark BNPL theme, products replace calculator panel */
 .home-financing__layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
   color: #fff;
 }
 
-@media (min-width: 1024px) {
-  .home-financing__layout {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
+.home-financing__intro {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  align-items: end;
+}
+
+@media (min-width: 900px) {
+  .home-financing__intro {
+    grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.9fr);
+    gap: 1.5rem;
   }
+}
+
+.home-financing__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
 .home-financing__partner-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--promo-lime, #9fe855) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--promo-lime, #9fe855) 42%, transparent);
+  color: var(--promo-lime, #9fe855);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.home-financing__partner-name {
+  white-space: nowrap;
+}
+
+.home-financing__partner-icon {
+  font-size: 0.9375rem !important;
+  color: var(--promo-lime, #9fe855);
 }
 
 .home-financing__partner-logo {
@@ -455,7 +535,7 @@
   width: 1.125rem;
   height: 1.125rem;
   flex-shrink: 0;
-  border-radius: 0.25rem;
+  border-radius: 9999px;
   overflow: hidden;
   background: #fff;
 }
@@ -556,7 +636,7 @@
 
 .home-financing__skeleton-chip {
   min-width: 5.5rem;
-  min-height: 1.5rem;
+  min-height: 2rem;
 }
 
 @keyframes home-financing-pulse {

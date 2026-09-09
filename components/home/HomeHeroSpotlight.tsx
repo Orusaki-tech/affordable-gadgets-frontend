@@ -157,7 +157,7 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
         <div className="home-redesign__hero-grid">
         <div className="home-redesign__hero-budget">
           <form onSubmit={onSearch}>
-            <div className="flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm sm:p-3.5">
+            <div className="home-redesign__hero-search flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm sm:p-3.5">
               <MaterialIcon name="search" className="text-[1.35rem] text-secondary" />
               <input
                 value={query}
@@ -239,14 +239,14 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
             <button
               type="button"
               onClick={() => setPreOrderOpen(true)}
-              className="ag-btn inline-flex items-center gap-2 rounded-xl bg-[#f5e642] font-bold text-primary shadow-md"
+              className="ag-btn ag-btn--primary home-redesign__hero-cta home-redesign__hero-cta--primary"
             >
               Pre Order Now
               <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
             </button>
             <Link
               href={`/products/${IPHONE_18_PRO_MAX_SLUG}`}
-              className="ag-btn ag-btn--ghost inline-flex items-center border font-semibold shadow-sm"
+              className="ag-btn home-redesign__hero-cta home-redesign__hero-cta--secondary"
             >
               View details
             </Link>

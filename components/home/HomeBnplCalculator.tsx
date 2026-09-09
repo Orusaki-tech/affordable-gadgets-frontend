@@ -16,6 +16,7 @@ import { formatPrice } from '@/lib/utils/format';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
 const FINANCING_PRODUCTS_PAGE_SIZE = 6;
+const FINANCING_PRODUCTS_FETCH_SIZE = 12;
 const PARTNER_SAMPLE_SIZE = 6;
 
 type FinancingPartner = {
@@ -48,7 +49,7 @@ async function fetchFinancingProducts(): Promise<PaginatedPublicProductList> {
   const qs = new URLSearchParams({
     financing: '1',
     page: '1',
-    page_size: String(FINANCING_PRODUCTS_PAGE_SIZE),
+    page_size: String(FINANCING_PRODUCTS_FETCH_SIZE),
     ordering: '-release_date',
   });
   const res = await fetch(`${base}/api/v1/public/products/?${qs.toString()}`, {
@@ -164,7 +165,7 @@ function FinancingProductCard({ product }: { product: PublicProductList }) {
 
 function PartnerChip({ partner }: { partner: FinancingPartner }) {
   return (
-    <span className="ag-tag ag-tag--on-dark home-financing__partner-chip">
+    <span className="home-financing__partner-chip">
       {partner.logoUrl ? (
         <span className="home-financing__partner-logo">
           <CloudinaryImage
@@ -175,8 +176,10 @@ function PartnerChip({ partner }: { partner: FinancingPartner }) {
             sizes="20px"
           />
         </span>
-      ) : null}
-      {partner.name}
+      ) : (
+        <MaterialIcon name="account_balance" className="home-financing__partner-icon" />
+      )}
+      <span className="home-financing__partner-name">{partner.name}</span>
     </span>
   );
 }
@@ -191,7 +194,8 @@ export function HomeBnplCalculator() {
   const products = useMemo(() => {
     const results = productsQuery.data?.results ?? [];
     const withImages = results.filter((p) => Boolean(p.primary_image));
-    return (withImages.length >= 4 ? withImages : results).slice(0, FINANCING_PRODUCTS_PAGE_SIZE);
+    const preferred = withImages.length >= FINANCING_PRODUCTS_PAGE_SIZE ? withImages : results;
+    return preferred.slice(0, FINANCING_PRODUCTS_PAGE_SIZE);
   }, [productsQuery.data?.results]);
 
   const providersQuery = useQuery({
@@ -232,49 +236,53 @@ export function HomeBnplCalculator() {
   return (
     <section className="ag-bleed ag-bleed--dark ag-bleed--spaced home-financing">
       <div className="ag-bleed__inner home-financing__layout">
-        <div>
-          <p className="ag-type-eyebrow inline-flex items-center gap-1.5 text-promo-lime">
-            <MaterialIcon name="payments" className="text-[0.875rem]" />
-            Lipa Mdogo Mdogo Available
-          </p>
-          <h2 className="ag-type-h2 ag-type-h2--on-dark mt-2">
-            Buy Now, Pay Later with certified partners
-          </h2>
-          <p className="ag-type-body mt-3 text-white/75">
-            Get instant device financing through certified Kenyan fintech partners. Browse phones
-            with live offers — final deposit and weekly terms are confirmed on each financing page.
-          </p>
-
-          <div className="mt-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
-              Financing Partners
+        <div className="home-financing__intro">
+          <div className="home-financing__copy">
+            <p className="ag-type-eyebrow inline-flex items-center gap-1.5 text-promo-lime">
+              <MaterialIcon name="payments" className="text-[0.875rem]" />
+              Lipa Mdogo Mdogo Available
             </p>
-            {isLoading && partners.length === 0 ? (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {Array.from({ length: 2 }).map((_, i) => (
-                  <span
-                    key={i}
-                    className="ag-tag ag-tag--on-dark home-financing__skeleton home-financing__skeleton-chip"
-                  />
-                ))}
-              </div>
-            ) : partners.length > 0 ? (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {partners.map((partner) => (
-                  <PartnerChip key={partner.key} partner={partner} />
-                ))}
-              </div>
-            ) : (
-              <p className="mt-2 text-sm text-white/50">
-                Partners are listed on each financing device.
-              </p>
-            )}
+            <h2 className="ag-type-h2 ag-type-h2--on-dark mt-2">
+              Buy Now, Pay Later with certified partners
+            </h2>
+            <p className="ag-type-body mt-3 text-white/75">
+              Get instant device financing through certified Kenyan fintech partners. Browse phones
+              with live offers — final deposit and weekly terms are confirmed on each financing page.
+            </p>
           </div>
 
-          <Link href="/financing" className="ag-btn ag-btn--lime mt-6">
-            Browse financing devices
-            <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
-          </Link>
+          <div className="home-financing__aside">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
+                Financing Partners
+              </p>
+              {isLoading && partners.length === 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className="home-financing__partner-chip home-financing__skeleton home-financing__skeleton-chip"
+                    />
+                  ))}
+                </div>
+              ) : partners.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {partners.map((partner) => (
+                    <PartnerChip key={partner.key} partner={partner} />
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-2 text-sm text-white/50">
+                  Partners are listed on each financing device.
+                </p>
+              )}
+            </div>
+
+            <Link href="/financing" className="ag-btn ag-btn--lime">
+              Browse financing devices
+              <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
+            </Link>
+          </div>
         </div>
 
         <div className="home-financing__panel">

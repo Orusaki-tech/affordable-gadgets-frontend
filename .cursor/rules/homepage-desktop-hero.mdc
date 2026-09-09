@@ -15,7 +15,7 @@ From **1024px up**, every desktop width must match that composition. Do not inve
 1. **Two columns** — budget (lime, ~1fr) | promo banner (~2fr), equal **stretched height**, gap between cards.
 2. **Left card** — search, “Search to start shopping”, Instant Budget Match (slider + chips), black “Show devices in budget” at bottom (`mt-auto`).
 3. **Right card** — poster fills the media area edge-to-edge (`object-fit: cover`), **no black letterbox gutters** above/below the art.
-4. **CTA bar** — solid black strip **flush under the poster** (no gap): yellow “Pre Order Now” + outline “View details”, side-by-side.
+4. **CTA bar** — solid strip **flush under the poster** (no gap): black + lime “Pre Order Now” (`ag-btn--primary` / `home-redesign__hero-cta--primary`) + soft lime “View details” (`home-redesign__hero-cta--secondary`), side-by-side. Do **not** use yellow or a heavy black outline button.
 5. Same structure at 1024 / 1280 / 1440 / 1920 / 2560 — only rem root scaling may change density, not layout.
 
 ## Do not

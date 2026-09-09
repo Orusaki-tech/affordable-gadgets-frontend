@@ -105,7 +105,8 @@
 .review-eligibility__select:focus,
 .review-eligibility__textarea:focus {
   outline: none;
-  border-color: var(--ui-gray-900);
+  border-color: var(--border-hairline, #e8e8ed);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--promo-lime, #9fe855) 22%, transparent);
 }
 
 .review-eligibility__file {

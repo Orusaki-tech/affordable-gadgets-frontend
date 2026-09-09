@@ -276,7 +276,7 @@
 
 .payment-method-modal__select {
   padding: 0.625rem 0.75rem;
-  border: 2px solid var(--ui-gray-300);
+  border: 1px solid var(--ui-gray-300);
   border-radius: 10px;
   background: var(--ui-white);
   font-size: 0.875rem;
@@ -286,7 +286,7 @@
 .payment-method-modal__input {
   flex: 1;
   padding: 0.625rem 1rem;
-  border: 2px solid var(--ui-gray-300);
+  border: 1px solid var(--ui-gray-300);
   border-radius: 10px;
   font-size: 0.875rem;
 }
@@ -294,7 +294,8 @@
 .payment-method-modal__input:focus,
 .payment-method-modal__select:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--border-hairline, #e8e8ed);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--promo-lime, #9fe855) 22%, transparent);
 }
 
 .payment-method-modal__note {

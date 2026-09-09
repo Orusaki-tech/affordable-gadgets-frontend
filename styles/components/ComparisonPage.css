@@ -38,8 +38,8 @@
 
 .comparison-page__input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--ui-ink-35);
-  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--promo-lime, #9fe855) 22%, transparent);
+  border-color: var(--border-hairline, #e8e8ed);
 }
 
 .comparison-page__suggestions {

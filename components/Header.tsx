@@ -289,7 +289,7 @@ function HeaderContent() {
                     </span>
                     <span className="site-header__account-status site-header__account-status--on" />
                   </span>
-                  <span className="hidden max-w-[8.5rem] truncate text-type-eyebrow font-semibold normal-case tracking-normal lg:inline">
+                  <span className="site-header__account-label-text hidden max-w-[8.5rem] truncate text-type-eyebrow font-semibold normal-case tracking-normal lg:inline">
                     {sessionUser?.firstName || sessionUser?.displayName || 'Signed in'}
                   </span>
                 </button>
@@ -338,7 +338,9 @@ function HeaderContent() {
                 onClick={() => setIsAuthModalOpen(true)}
               >
                 <MaterialIcon name="person" className="text-[1.375rem]" />
-                <span className="hidden text-type-eyebrow font-semibold normal-case tracking-normal lg:inline">Sign In</span>
+                <span className="site-header__account-label-text hidden text-type-eyebrow font-semibold normal-case tracking-normal lg:inline">
+                  Sign In
+                </span>
               </button>
             )}
 

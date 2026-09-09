@@ -36,6 +36,7 @@ export async function HomeBuyingGuides() {
       const category = formatArticleCategory(article.category);
       const updated = formatUpdatedLabel(article.updated_at || article.published_at);
       const mins = estimateReadMinutes(article.headline);
+      const opening = (article.opening_words || '').trim();
       return {
         key: `${article.product_slug}-${article.slug}`,
         href,
@@ -43,8 +44,8 @@ export async function HomeBuyingGuides() {
         imageUrl: getArticleCardImageUrl(article),
         category,
         meta: updated ? `Updated ${updated} · ${mins} min read` : `${mins} min read`,
-        excerpt: guideExcerpt(category, article.product_name),
-        cta: (article.opening_words || '').trim() || 'Read Guide',
+        excerpt: opening || guideExcerpt(category, article.product_name),
+        cta: 'Read article',
       };
     })
     .filter(Boolean)

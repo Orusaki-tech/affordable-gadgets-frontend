@@ -14,6 +14,7 @@ import {
   type PublicProduct,
   type PublicProductList,
 } from '@/lib/api/generated';
+import { apiBaseUrl } from '@/lib/api/openapi';
 import type { ProductTypeFilter } from '@/lib/config/nav-links';
 
 function apiQueryRetry(failureCount: number, error: unknown): boolean {
@@ -41,6 +42,7 @@ export const NAV_MEGA_PRODUCTS_PAGE_SIZE = 12;
 
 /** Fetches only products tagged "Featured" (page_size=5). Uses same list API with featured=1 for fast homepage load. */
 export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductList> {
+  OpenAPI.BASE = apiBaseUrl;
   const base = OpenAPI.BASE.replace(/\/+$/, '');
   const headers: Record<string, string> = {
     Accept: 'application/json',
@@ -111,6 +113,8 @@ export function productsQueryFn({
 }: {
   queryKey: readonly unknown[];
 }): Promise<PaginatedPublicProductList> {
+  // Guard against inventory helpers that temporarily mutate OpenAPI.BASE.
+  OpenAPI.BASE = apiBaseUrl;
   const params = (queryKey[1] ?? {}) as ProductsQueryParams;
   const {
     page,
@@ -202,8 +206,9 @@ export function useProducts(params?: ProductsQueryParams) {
 export function useInfiniteProducts(params?: Omit<ProductsQueryParams, 'page'> & { enabled?: boolean }) {
   return useInfiniteQuery<PaginatedPublicProductList>({
     queryKey: ['products', 'infinite', params],
-    queryFn: ({ pageParam }) =>
-      ApiService.apiV1PublicProductsList(
+    queryFn: ({ pageParam }) => {
+      OpenAPI.BASE = apiBaseUrl;
+      return ApiService.apiV1PublicProductsList(
         params?.brand_filter,
         undefined,
         undefined,
@@ -216,7 +221,8 @@ export function useInfiniteProducts(params?: Omit<ProductsQueryParams, 'page'> &
         params?.search,
         undefined,
         params?.type
-      ),
+      );
+    },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => (lastPage?.next ? allPages.length + 1 : undefined),
     enabled: params?.enabled ?? true,
@@ -228,7 +234,10 @@ export function useProduct(id: number, options?: { placeholderFromList?: PublicP
   const queryClient = useQueryClient();
   return useQuery<PublicProduct>({
     queryKey: ['product', id],
-    queryFn: () => ApiService.apiV1PublicProductsRetrieve(id),
+    queryFn: () => {
+      OpenAPI.BASE = apiBaseUrl;
+      return ApiService.apiV1PublicProductsRetrieve(id);
+    },
     enabled: !!id,
     staleTime: 30000, // Keep cached products fresh for short navigations
     retry: apiQueryRetry,
@@ -242,8 +251,9 @@ export function useProductBySlug(slug: string, options?: { placeholderFromList?:
   const queryClient = useQueryClient();
   return useQuery<PublicProduct>({
     queryKey: ['product', 'slug', slug],
-    queryFn: () =>
-      ApiService.apiV1PublicProductsList(
+    queryFn: () => {
+      OpenAPI.BASE = apiBaseUrl;
+      return ApiService.apiV1PublicProductsList(
         undefined,
         undefined,
         undefined,
@@ -261,7 +271,8 @@ export function useProductBySlug(slug: string, options?: { placeholderFromList?:
           return response.results[0];
         }
         throw new Error(`Product "${slug}" not found.`);
-      }),
+      });
+    },
     enabled: !!slug,
     retry: apiQueryRetry,
     retryDelay: apiQueryRetryDelay,
@@ -280,6 +291,7 @@ export function useProductUnits(
   return useQuery<PublicInventoryUnitPublic[]>({
     queryKey: ['product', productId, 'units'],
     queryFn: async () => {
+      OpenAPI.BASE = apiBaseUrl;
       const response = await ApiService.apiV1PublicProductsUnitsList(productId);
       let units: PublicInventoryUnitPublic[] = [];
       if (Array.isArray(response)) {
@@ -309,12 +321,16 @@ export function prefetchProductDetail(queryClient: QueryClient, product: PublicP
   if (id != null) {
     queryClient.prefetchQuery({
       queryKey: ['product', id],
-      queryFn: () => ApiService.apiV1PublicProductsRetrieve(id),
+      queryFn: () => {
+        OpenAPI.BASE = apiBaseUrl;
+        return ApiService.apiV1PublicProductsRetrieve(id);
+      },
       staleTime: 30000,
     });
     queryClient.prefetchQuery({
       queryKey: ['product', id, 'units'],
       queryFn: async () => {
+        OpenAPI.BASE = apiBaseUrl;
         const response = await ApiService.apiV1PublicProductsUnitsList(id);
         return Array.isArray(response) ? response : response?.results ?? [];
       },

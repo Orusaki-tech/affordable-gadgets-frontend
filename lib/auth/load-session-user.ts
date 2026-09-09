@@ -1,12 +1,19 @@
-import { OpenAPI, ProfilesService } from '@/lib/api/generated';
-import { inventoryBaseUrl } from '@/lib/api/openapi';
 import { createClient } from '@/lib/supabase/client';
+import { fetchInventoryJson } from '@/lib/api/inventory-fetch';
 import {
   buildSessionUser,
   getStoredSessionUser,
   setStoredSessionUser,
   type SessionUser,
 } from '@/lib/auth/session-user';
+
+type CustomerProfilePayload = {
+  id?: number;
+  email?: string | null;
+  username?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+};
 
 async function sessionUserFromSupabase(): Promise<Partial<SessionUser> & { fullName?: string | null } | null> {
   try {
@@ -39,10 +46,8 @@ async function sessionUserFromSupabase(): Promise<Partial<SessionUser> & { fullN
 }
 
 async function sessionUserFromProfile(): Promise<ReturnType<typeof buildSessionUser> | null> {
-  const previousBase = OpenAPI.BASE;
   try {
-    OpenAPI.BASE = inventoryBaseUrl;
-    const profile = await ProfilesService.profilesCustomerRetrieve();
+    const profile = await fetchInventoryJson<CustomerProfilePayload>('/profiles/customer/');
     return buildSessionUser({
       id: profile.id,
       email: profile.email,
@@ -52,8 +57,6 @@ async function sessionUserFromProfile(): Promise<ReturnType<typeof buildSessionU
     });
   } catch {
     return null;
-  } finally {
-    OpenAPI.BASE = previousBase;
   }
 }
 

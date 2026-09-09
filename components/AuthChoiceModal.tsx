@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Image from 'next/image';
-import { LoginService, OpenAPI, RegisterService } from '@/lib/api/generated';
 import { brandConfig } from '@/lib/config/brand';
-import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
+import { setAuthToken } from '@/lib/api/openapi';
+import { fetchInventoryJson } from '@/lib/api/inventory-fetch';
 import { createClient } from '@/lib/supabase/client';
 import { exchangeSupabaseToken } from '@/lib/supabase/auth-exchange';
 import { getAuthAttributionFields } from '@/lib/auth/attribution';
@@ -117,30 +117,27 @@ export function AuthChoiceModal({
     setAuthError(null);
     setAuthNotice(null);
     try {
-      const previousBase = OpenAPI.BASE;
-      let res: Awaited<ReturnType<typeof LoginService.loginCreate>> | null = null;
-      try {
-        OpenAPI.BASE = inventoryBaseUrl;
-        res = await LoginService.loginCreate({
+      const res = await fetchInventoryJson<{
+        token?: string;
+        email?: string;
+        user_id?: number;
+      }>('/login/', {
+        method: 'POST',
+        body: {
           username_or_email: authForm.username_or_email,
           password: authForm.password,
           ...getAuthAttributionFields(),
-        });
-      } finally {
-        // Restore API base BEFORE setAuthToken so CartProvider's cart create
-        // does not hit /api/inventory/api/v1/public/cart/.
-        OpenAPI.BASE = previousBase;
-      }
+        },
+      });
       setPendingVerificationEmail(null);
-      const token = (res as { token?: string; email?: string; user_id?: number } | null)?.token;
-      if (token) {
-        setAuthToken(token);
+      if (res?.token) {
+        setAuthToken(res.token);
         const email =
-          (res as { email?: string } | null)?.email ||
+          res.email ||
           (authForm.username_or_email.includes('@') ? authForm.username_or_email : null);
         setStoredSessionUser(
           buildSessionUser({
-            id: (res as { user_id?: number } | null)?.user_id,
+            id: res.user_id,
             email,
             username: authForm.username_or_email.includes('@') ? null : authForm.username_or_email,
           })
@@ -153,6 +150,7 @@ export function AuthChoiceModal({
       const message =
         (err as { body?: { detail?: string; error?: string } })?.body?.detail ||
         (err as { body?: { detail?: string; error?: string } })?.body?.error ||
+        (err as Error)?.message ||
         'Login failed. Please check your credentials.';
       if (String(message).toLowerCase().includes('verify your email')) {
         setAuthNotice('Please verify your email before logging in.');
@@ -171,18 +169,15 @@ export function AuthChoiceModal({
     setAuthError(null);
     setAuthNotice(null);
     try {
-      const previousBase = OpenAPI.BASE;
-      try {
-        OpenAPI.BASE = inventoryBaseUrl;
-        await RegisterService.registerCreate({
+      await fetchInventoryJson('/register/', {
+        method: 'POST',
+        body: {
           username: authForm.username,
           email: authForm.email,
           password: authForm.password,
           ...getAuthAttributionFields(),
-        } as Parameters<typeof RegisterService.registerCreate>[0]);
-      } finally {
-        OpenAPI.BASE = previousBase;
-      }
+        },
+      });
       setAuthNotice('Verification email sent. Please verify your email, then sign in to continue.');
       setPendingVerificationEmail(authForm.email);
       setAuthMode('login');
@@ -200,21 +195,13 @@ export function AuthChoiceModal({
     setAuthNotice(null);
     setIsAuthSubmitting(true);
     try {
-      const response = await fetch(`${inventoryBaseUrl}/verify-email/resend/`, {
+      const data = await fetchInventoryJson<{ message?: string }>('/verify-email/resend/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Brand-Code': brandConfig.code,
-        },
-        body: JSON.stringify({ email: pendingVerificationEmail }),
+        body: { email: pendingVerificationEmail },
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.error || 'Failed to resend verification email.');
-      }
       setAuthNotice(data?.message || 'Verification email sent.');
-    } catch (err: any) {
-      setAuthError(err?.message || 'Failed to resend verification email.');
+    } catch (err: unknown) {
+      setAuthError((err as Error)?.message || 'Failed to resend verification email.');
     } finally {
       setIsAuthSubmitting(false);
     }

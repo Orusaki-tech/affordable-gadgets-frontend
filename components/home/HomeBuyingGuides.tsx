@@ -44,6 +44,7 @@ export async function HomeBuyingGuides() {
         category,
         meta: updated ? `Updated ${updated} · ${mins} min read` : `${mins} min read`,
         excerpt: guideExcerpt(category, article.product_name),
+        cta: (article.opening_words || '').trim() || 'Read Guide',
       };
     })
     .filter(Boolean)
@@ -55,6 +56,7 @@ export async function HomeBuyingGuides() {
     category: string;
     meta: string;
     excerpt: string;
+    cta: string;
   }>;
 
   if (!guides.length) return null;
@@ -114,8 +116,8 @@ export async function HomeBuyingGuides() {
                   {guide.excerpt}
                 </p>
                 <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-bold text-primary">
-                  Read Guide
-                  <MaterialIcon name="arrow_forward" className="text-[1rem]" />
+                  <span className="line-clamp-1">{guide.cta}</span>
+                  <MaterialIcon name="arrow_forward" className="text-[1rem] shrink-0" />
                 </span>
               </div>
             </Link>

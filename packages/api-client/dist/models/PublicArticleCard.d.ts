@@ -32,4 +32,5 @@ export type PublicArticleCard = {
      * Product hero image fallback when article has no thumbnail
      */
     readonly product_primary_image?: string | null;
+    readonly opening_words?: string;
 };

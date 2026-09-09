@@ -1893,25 +1893,35 @@
   padding: 0.25rem 0.625rem;
   border-radius: 999px;
   font-size: 0.6875rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   background: #fff;
-  color: var(--gray-700, #424245);
+  color: var(--gray-600, #6e6e73);
   border: 1px solid var(--border-hairline, #e8e8ed);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  line-height: 1.2;
+}
+
+.product-detail__trust-chip--emphasis {
+  color: var(--gray-800, #1d1d1f);
+}
+
+.product-detail__trust-chip-icon {
+  font-size: 0.875rem;
+  line-height: 1;
 }
 
 .product-detail__trust-chip--lime {
   background: #f7fee7;
   color: #4d7c0f;
   border-color: rgba(163, 230, 53, 0.35);
-  font-weight: 700;
 }
 
 .product-detail__trust-chip--stock {
   background: var(--stock-green-light, #ecfdf3);
   color: var(--stock-green, #16a34a);
   border-color: rgba(22, 163, 74, 0.2);
-  font-weight: 700;
 }
 
 .product-detail__trust-dot {

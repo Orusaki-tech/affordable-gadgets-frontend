@@ -1183,23 +1183,29 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         </nav>
         <div className="product-detail__trust-strip" aria-label="Product trust signals">
           <span className="product-detail__trust-chip product-detail__trust-chip--lime">
-            <MaterialIcon name="verified" className="text-[0.875rem]" />
-            Verified stock
+            <MaterialIcon name="verified" className="product-detail__trust-chip-icon" />
+            Verified Japanese Import
           </span>
-          {stockCount > 0 ? (
-            <span className="product-detail__trust-chip product-detail__trust-chip--stock">
-              <span className="product-detail__trust-dot" aria-hidden />
-              In stock Nairobi CBD
+          <span className="product-detail__trust-chip product-detail__trust-chip--stock">
+            <span className="product-detail__trust-dot" aria-hidden />
+            Official Kenyan Stock
+          </span>
+          {product.brand?.trim() ? (
+            <span className="product-detail__trust-chip">
+              100% Original {product.brand.trim()}
             </span>
           ) : (
-            <span className="product-detail__trust-chip">Order on WhatsApp</span>
+            <span className="product-detail__trust-chip">100% Original</span>
           )}
-          {conditionLabel ? (
-            <span className="product-detail__trust-chip">{conditionLabel}</span>
-          ) : null}
-          {gradeLabel ? (
-            <span className="product-detail__trust-chip">{gradeLabel}</span>
-          ) : null}
+          {stockCount > 0 ? (
+            <span className="product-detail__trust-chip product-detail__trust-chip--emphasis">
+              In Stock Nairobi CBD
+            </span>
+          ) : (
+            <span className="product-detail__trust-chip product-detail__trust-chip--emphasis">
+              Order on WhatsApp
+            </span>
+          )}
         </div>
       </div>
 
@@ -1217,7 +1223,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               ) : null}
               {gradeLabel || conditionLabel ? (
                 <span className="product-detail__gallery-status-chip">
-                  {gradeLabel || conditionLabel}
+                  {gradeLabel
+                    ? `${gradeLabel}${conditionLabel ? ` ${conditionLabel}` : ''} Hardware`
+                    : conditionLabel}
                 </span>
               ) : null}
             </div>

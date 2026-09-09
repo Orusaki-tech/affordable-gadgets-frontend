@@ -391,7 +391,7 @@ function HeaderContent() {
           onMouseLeave={scheduleMegaMenuClose}
         >
           <nav
-            className={`site-header__nav site-header__nav--pills flex items-center gap-1.5 overflow-x-auto py-2.5${
+            className={`site-header__nav site-header__nav--pills flex items-center gap-1.5 overflow-x-auto py-1${
               openMegaMenu ? ' site-header__nav--mega-open' : ''
             }`}
             aria-label="Shop categories"

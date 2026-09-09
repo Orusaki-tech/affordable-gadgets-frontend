@@ -1421,9 +1421,11 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                       <p className="product-detail__price-current product-detail__price-current--promo">
                         {formatPrice(activePriceDisplay.currentPrice)}
                       </p>
-                      <p className="product-detail__price-old">
-                        {formatPrice(activePriceDisplay.originalPrice!)}
-                      </p>
+                      {activePriceDisplay.originalPrice != null ? (
+                        <p className="product-detail__price-old">
+                          {formatPrice(activePriceDisplay.originalPrice)}
+                        </p>
+                      ) : null}
                       {priceSavings > 0 ? (
                         <span className="product-detail__price-save">
                           Save {formatPrice(priceSavings)}

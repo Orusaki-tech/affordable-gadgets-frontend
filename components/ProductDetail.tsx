@@ -42,6 +42,7 @@ import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
 import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
 import { AuthChoiceModal } from '@/components/AuthChoiceModal';
+import { MaterialIcon } from '@/components/MaterialIcon';
 import { getApiErrorInfo } from '@/lib/utils/apiError';
 
 const IPHONE_18_PRO_MAX_SLUG = 'apple-iphone-18-pro-max';
@@ -1130,24 +1131,96 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     );
   }
 
+  const stockCount = Number(product.available_units_count ?? 0);
+  const ratingValue =
+    typeof product.average_rating === 'number' && product.average_rating > 0
+      ? product.average_rating
+      : null;
+  const ratingCount = Number(product.review_count ?? 0);
+  const conditionLabel =
+    selectedUnitData?.condition === 'N'
+      ? 'Brand New'
+      : selectedUnitData?.condition === 'R'
+        ? 'Refurbished'
+        : selectedUnitData?.condition === 'P'
+          ? 'Pre-owned'
+          : selectedUnitData?.condition || null;
+  const gradeLabel =
+    typeof selectedUnitData?.grade === 'string' && selectedUnitData.grade
+      ? `Grade ${selectedUnitData.grade}`
+      : null;
+  const priceSavings =
+    activePriceDisplay?.hasPromotion &&
+    activePriceDisplay.originalPrice != null &&
+    activePriceDisplay.currentPrice != null
+      ? Math.max(0, Number(activePriceDisplay.originalPrice) - Number(activePriceDisplay.currentPrice))
+      : 0;
+  const financingFromMonthly = (() => {
+    const offers = product.financing_offers ?? [];
+    const withMonthly = offers.find(
+      (o) => o.monthly_payment != null && String(o.monthly_payment).trim() !== ''
+    );
+    if (!withMonthly?.monthly_payment) return null;
+    const amount = Number(withMonthly.monthly_payment);
+    if (!Number.isFinite(amount)) return null;
+    return {
+      amount,
+      provider: withMonthly.provider_name || 'financing partners',
+    };
+  })();
+
   return (
     <div className="product-detail">
-      {/* Breadcrumb */}
-      <nav className="product-detail__breadcrumb">
-        <ol className="product-detail__breadcrumb-list">
-          <li><Link href="/" className="product-detail__breadcrumb-link">Home</Link></li>
-          <li className="product-detail__breadcrumb-separator">/</li>
-          <li><Link href="/products" className="product-detail__breadcrumb-link">Products</Link></li>
-          <li className="product-detail__breadcrumb-separator">/</li>
-          <li className="product-detail__breadcrumb-current">{product.product_name}</li>
-        </ol>
-      </nav>
+      <div className="product-detail__topbar">
+        <nav className="product-detail__breadcrumb" aria-label="Breadcrumb">
+          <ol className="product-detail__breadcrumb-list">
+            <li><Link href="/" className="product-detail__breadcrumb-link">Home</Link></li>
+            <li className="product-detail__breadcrumb-separator">/</li>
+            <li><Link href="/products" className="product-detail__breadcrumb-link">Products</Link></li>
+            <li className="product-detail__breadcrumb-separator">/</li>
+            <li className="product-detail__breadcrumb-current">{product.product_name}</li>
+          </ol>
+        </nav>
+        <div className="product-detail__trust-strip" aria-label="Product trust signals">
+          <span className="product-detail__trust-chip product-detail__trust-chip--lime">
+            <MaterialIcon name="verified" className="text-[0.875rem]" />
+            Verified stock
+          </span>
+          {stockCount > 0 ? (
+            <span className="product-detail__trust-chip product-detail__trust-chip--stock">
+              <span className="product-detail__trust-dot" aria-hidden />
+              In stock Nairobi CBD
+            </span>
+          ) : (
+            <span className="product-detail__trust-chip">Order on WhatsApp</span>
+          )}
+          {conditionLabel ? (
+            <span className="product-detail__trust-chip">{conditionLabel}</span>
+          ) : null}
+          {gradeLabel ? (
+            <span className="product-detail__trust-chip">{gradeLabel}</span>
+          ) : null}
+        </div>
+      </div>
 
       <div className="product-detail__layout">
         {/* Left Column - Images */}
         <div className="product-detail__gallery">
           {/* Main Image */}
           <div className="product-detail__gallery-main">
+            <div className="product-detail__gallery-status">
+              {stockCount > 0 ? (
+                <span className="product-detail__gallery-status-chip product-detail__gallery-status-chip--stock">
+                  <span className="product-detail__trust-dot" aria-hidden />
+                  Kimathi Hub: Ready for Dispatch
+                </span>
+              ) : null}
+              {gradeLabel || conditionLabel ? (
+                <span className="product-detail__gallery-status-chip">
+                  {gradeLabel || conditionLabel}
+                </span>
+              ) : null}
+            </div>
             <CloudinaryImage
               src={
                 (mainImageLoadFailed ? getPlaceholderProductImage(product.product_name) : mainDisplayImage) ||
@@ -1155,7 +1228,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               }
               alt={product.product_name}
               preset="productGallery"
-              sizes="(max-width: 1024px) 100vw, 50vw"
+              sizes="(max-width: 1024px) 100vw, 42vw"
               className="product-detail__gallery-image"
               priority
               fill
@@ -1207,6 +1280,23 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               })}
             </div>
           )}
+
+        <div className="product-detail__showroom">
+          <div className="product-detail__showroom-copy">
+            <span className="product-detail__showroom-icon" aria-hidden>
+              <MaterialIcon name="storefront" className="text-[1.125rem]" />
+            </span>
+            <div>
+              <p className="product-detail__showroom-title">Kimathi House Room 504 CBD Showroom</p>
+              <p className="product-detail__showroom-meta">
+                Ready for in-person physical testing before payment
+              </p>
+            </div>
+          </div>
+          <span className="product-detail__showroom-badge">
+            {stockCount > 0 ? 'In stock hub' : 'Order hub'}
+          </span>
+        </div>
         </div>
 
         {/* Right Column - Product Info */}
@@ -1214,15 +1304,72 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           <div className="product-detail__info-header-row">
             {/* Title & Brand */}
             <div className="product-detail__info-header">
+              <div className="product-detail__brand-row">
+                <p className="product-detail__brand">
+                  <span className="product-detail__brand-name">{product.brand}</span>
+                  {product.model_series ? (
+                    <span className="product-detail__brand-series"> • {product.model_series}</span>
+                  ) : null}
+                </p>
+                <div className="product-detail__quick-tabs" role="navigation" aria-label="Jump to product sections">
+                  {(
+                    [
+                      { id: 'overview' as TabType, label: 'Overview' },
+                      { id: 'specs' as TabType, label: 'Specs' },
+                      { id: 'reviews' as TabType, label: 'Reviews' },
+                      { id: 'videos' as TabType, label: 'Videos' },
+                      { id: 'compare' as TabType, label: 'Compare' },
+                      { id: 'blog' as TabType, label: 'Blog' },
+                    ] as const
+                  ).map(({ id, label }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => jumpToTab(id)}
+                      className={`product-detail__quick-tab ${activeTab === id ? 'product-detail__quick-tab--active' : ''}`}
+                    >
+                      {label}
+                      {id === 'reviews' && ratingCount > 0 ? ` (${ratingCount})` : ''}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <h1 className="product-detail__title">
                 {product.product_name}
                 {selectedUnitData && selectedUnitData.storage_gb && (
-                  <span className="product-detail__title-storage"> - {selectedUnitData.storage_gb}GB -</span>
+                  <span className="product-detail__title-storage"> - {selectedUnitData.storage_gb}GB</span>
                 )}
               </h1>
-              <p className="product-detail__brand">
-                <span className="product-detail__brand-name">{product.brand}</span> {product.model_series && <span className="product-detail__brand-series">• {product.model_series}</span>}
-              </p>
+              <div className="product-detail__rating-row">
+                {ratingValue != null ? (
+                  <div className="product-detail__rating">
+                    <MaterialIcon name="star" filled className="product-detail__rating-star text-[1.0625rem]" />
+                    <span className="product-detail__rating-value">{ratingValue.toFixed(1)}</span>
+                    <button
+                      type="button"
+                      className="product-detail__rating-count"
+                      onClick={() => jumpToTab('reviews')}
+                    >
+                      ({ratingCount} verified reviews)
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="product-detail__rating-count"
+                    onClick={() => jumpToTab('reviews')}
+                  >
+                    Be the first to leave a review
+                  </button>
+                )}
+                <span className="product-detail__rating-sep" aria-hidden>
+                  •
+                </span>
+                <div className="product-detail__dispatch">
+                  <MaterialIcon name="bolt" className="text-[1rem]" />
+                  <span>Fast Nairobi CBD dispatch</span>
+                </div>
+              </div>
             </div>
 
             {/* Promotion Banner */}
@@ -1262,53 +1409,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             )}
           </div>
 
-          {financingAvailable && (
-            <div className="product-detail__promo" style={{ marginTop: 12 }}>
-              <div className="product-detail__promo-row">
-                <span className="product-detail__promo-icon" aria-hidden>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M2.75 6A3.25 3.25 0 0 1 6 2.75h12A3.25 3.25 0 0 1 21.25 6v12A3.25 3.25 0 0 1 18 21.25H6A3.25 3.25 0 0 1 2.75 18V6Zm3.25-.75A.75.75 0 0 0 5.25 6v.5h13.5V6a.75.75 0 0 0-.75-.75H6Zm12.75 4H5.25V18c0 .414.336.75.75.75h12a.75.75 0 0 0 .75-.75V9.25Zm-10.5 3a1.25 1.25 0 1 0 0 2.5h3.5a1.25 1.25 0 1 0 0-2.5h-3.5Z" />
-                  </svg>
-                </span>
-                <div className="product-detail__promo-body">
-                  <h3 className="product-detail__promo-title">Buy Now, Pay Later</h3>
-                  <p className="product-detail__promo-copy">
-                    Financing available for this product. View offers and request a call back.
-                  </p>
-                </div>
-                <div className="product-detail__promo-cta-wrap">
-                  <button
-                    type="button"
-                    className="product-detail__promo-cta"
-                    onClick={() => setIsFinancingOpen(true)}
-                  >
-                    View offers
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="product-detail__quick-tabs" role="navigation" aria-label="Jump to product sections">
-            {(
-              [
-                { id: 'overview' as TabType, label: 'Overview' },
-                { id: 'reviews' as TabType, label: 'Leave a review' },
-                { id: 'videos' as TabType, label: 'Videos' },
-                { id: 'compare' as TabType, label: 'Compare' },
-                { id: 'blog' as TabType, label: 'Blog' },
-              ] as const
-            ).map(({ id, label }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => jumpToTab(id)}
-                className={`product-detail__quick-tab ${activeTab === id ? 'product-detail__quick-tab--active' : ''}`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          {/* financing note sits under CTAs */}
 
           <div className="product-detail__price-cta-row">
             {/* Price - Single Price Display */}
@@ -1316,13 +1417,18 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               {activePriceDisplay ? (
                 <div className="product-detail__price">
                   {activePriceDisplay.hasPromotion ? (
-                    <div>
+                    <div className="product-detail__price-stack">
                       <p className="product-detail__price-current product-detail__price-current--promo">
                         {formatPrice(activePriceDisplay.currentPrice)}
                       </p>
                       <p className="product-detail__price-old">
                         {formatPrice(activePriceDisplay.originalPrice!)}
                       </p>
+                      {priceSavings > 0 ? (
+                        <span className="product-detail__price-save">
+                          Save {formatPrice(priceSavings)}
+                        </span>
+                      ) : null}
                     </div>
                   ) : (
                     <p className="product-detail__price-current">
@@ -1336,7 +1442,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   usePromotionPrice &&
                   promotionMinPrice !== null &&
                   promotionMaxPrice !== null ? (
-                    <div>
+                    <div className="product-detail__price-stack">
                       <p className="product-detail__price-current product-detail__price-current--promo">
                         {promotionMinPrice === promotionMaxPrice
                           ? formatPrice(promotionMinPrice)
@@ -1356,6 +1462,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     </p>
                   )}
                 </div>
+              ) : null}
+              {activePriceDisplay ||
+              (product.min_price !== null && product.max_price !== null) ? (
+                <p className="product-detail__price-guarantee">
+                  <MaterialIcon name="local_offer" className="text-[1rem]" />
+                  Nairobi CBD Best Price Guaranteed
+                </p>
               ) : null}
               {canChoosePromotionPrice && activePromoPrice !== null && (
                 <div
@@ -1477,12 +1590,17 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   >
                     <path d="M19.05 4.91A10.05 10.05 0 0 0 12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.74.46 3.44 1.32 4.94L2 22l5.27-1.38a9.9 9.9 0 0 0 4.76 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01zM12.04 20.15h-.01a8.23 8.23 0 0 1-4.2-1.15l-.3-.18-3.13.82.83-3.05-.2-.31a8.22 8.22 0 0 1-1.27-4.37c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.83 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.55-3.7 8.24-8.21 8.24zm4.52-6.16c-.25-.12-1.47-.72-1.69-.8-.23-.08-.39-.12-.56.12-.16.25-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.12-1.05-.39-2-1.24-.74-.66-1.24-1.48-1.39-1.73-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.16.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.49-.41-.42-.56-.43h-.48c-.16 0-.43.06-.66.31-.23.25-.86.84-.86 2.05 0 1.21.88 2.38 1 2.54.12.16 1.73 2.64 4.19 3.7.59.25 1.05.4 1.41.51.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29z" />
                   </svg>
-                  Message on WhatsApp
+                  Message on WhatsApp to Pre-Order / Reserve
                 </button>
               ) : null;
 
               if (hasStock) {
                 const nothingSelected = !selectedUnit && !selectedVariant;
+                const buyLabel = selectedUnit
+                  ? activePriceDisplay
+                    ? `Buy Now with M-Pesa / Card • ${formatPrice(activePriceDisplay.currentPrice)}`
+                    : 'Buy Now with M-Pesa / Card'
+                  : 'Select a Variant First';
                 return (
                   <div className="product-detail__cta product-detail__cta--inline">
                     <button
@@ -1492,11 +1610,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                         !selectedUnit && !nothingSelected ? 'product-detail__cta-button--disabled' : ''
                       }${nothingSelected ? ' product-detail__cta-button--suggest' : ''}`}
                     >
-                      {selectedUnit ? (
-                        'Add to cart'
-                      ) : (
-                        'Select a Variant First'
-                      )}
+                      {buyLabel}
                     </button>
                     {whatsAppButton}
                   </div>
@@ -1538,6 +1652,34 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               <span className="product-detail__cta-alert-text">Added to cart successfully!</span>
             </div>
           )}
+
+          {financingAvailable ? (
+            <div className="product-detail__bnpl-note">
+              <div className="product-detail__bnpl-note-copy">
+                <MaterialIcon name="calendar_month" className="text-[1.0625rem]" />
+                <span>
+                  Lipa Polepole
+                  {financingFromMonthly ? (
+                    <>
+                      : <strong>From {formatPrice(financingFromMonthly.amount)}/mo</strong>
+                      {financingFromMonthly.provider
+                        ? ` via ${financingFromMonthly.provider}`
+                        : ''}
+                    </>
+                  ) : (
+                    ': Financing available for this device'
+                  )}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="product-detail__bnpl-note-link"
+                onClick={() => setIsFinancingOpen(true)}
+              >
+                Calculate
+              </button>
+            </div>
+          ) : null}
 
           {/* Product Condition Badge */}
           {selectedUnitData && (
@@ -1794,8 +1936,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             <div className="product-detail__units">
               <div className="product-detail__units-toggle">
                 <span className="product-detail__units-heading">
-                  View All Available Units ({filteredUnits.length})
+                  View All Available Units
                 </span>
+                {filteredUnits.length > 0 ? (
+                  <span className="product-detail__units-stock-pill">
+                    {filteredUnits.length} In Stock
+                  </span>
+                ) : null}
                 {conditionFilterChips.length > 0 && (
                   <div
                     className="product-detail__units-condition-chips"
@@ -1878,31 +2025,23 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
           {/* Comes With Section */}
           <div className="product-detail__includes">
-            <p className="product-detail__includes-title">Comes with</p>
+            <p className="product-detail__includes-title">Affordable Gadgets KE Commitment</p>
             <div className="product-detail__includes-list">
               <div className="product-detail__includes-item">
-                <svg className="product-detail__includes-icon product-detail__includes-icon--success" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>6-12 months warranty</span>
+                <MaterialIcon name="verified_user" />
+                <span>6-12 Mo Warranty</span>
               </div>
               <div className="product-detail__includes-item">
-                <svg className="product-detail__includes-icon product-detail__includes-icon--primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-                <span>Affordable shipping</span>
+                <MaterialIcon name="local_shipping" />
+                <span>Affordable Shipping</span>
               </div>
               <div className="product-detail__includes-item">
-                <svg className="product-detail__includes-icon product-detail__includes-icon--primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
-                </svg>
-                <span>1–2 days delivery</span>
+                <MaterialIcon name="bolt" />
+                <span>1–2 Days Delivery</span>
               </div>
               <div className="product-detail__includes-item">
-                <svg className="product-detail__includes-icon product-detail__includes-icon--primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5 9 6.343 9 8s1.343 3 3 3zm0 0c-2.21 0-4 1.343-4 3v1a1 1 0 001 1h6a1 1 0 001-1v-1c0-1.657-1.79-3-4-3z" />
-                </svg>
-                <span>Secure payments</span>
+                <MaterialIcon name="lock" />
+                <span>Secure Payments</span>
               </div>
             </div>
             <div className="product-detail__payments">
@@ -1928,8 +2067,15 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       {accessories && accessories.length > 0 && (
         <div className="product-detail__accessories">
           <div className="product-detail__accessories-header">
-            <h2 className="product-detail__accessories-title">Recommended Accessories</h2>
-            <span className="product-detail__accessories-count">{accessories.length} items</span>
+            <div>
+              <h2 className="product-detail__accessories-title">Recommended Accessories</h2>
+              <p className="product-detail__accessories-subtitle">
+                Compatible essentials for {product.product_name}
+              </p>
+            </div>
+            <span className="product-detail__accessories-count">
+              View All ({accessories.length}) →
+            </span>
           </div>
           <div className="product-detail__accessories-list">
             {accessories.map((accessory, index) => {
@@ -2013,7 +2159,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                     }}
                     disabled={!canAdd}
                   >
-                    Add to cart
+                    Add
                   </button>
                 </div>
               );
@@ -2029,9 +2175,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
           <nav className="product-detail__tabs-list">
             {[
               { id: 'overview' as TabType, label: 'Overview' },
-              { id: 'specs' as TabType, label: 'Specifications' },
-              { id: 'reviews' as TabType, label: 'Reviews' },
-              { id: 'videos' as TabType, label: 'Videos' },
+              { id: 'specs' as TabType, label: 'Technical Specs' },
+              { id: 'reviews' as TabType, label: ratingCount > 0 ? `Customer Reviews (${ratingCount})` : 'Customer Reviews' },
+              { id: 'videos' as TabType, label: 'Video Demo' },
               { id: 'compare' as TabType, label: 'Compare' },
               { id: 'blog' as TabType, label: 'Blog' },
             ].map((tab) => (

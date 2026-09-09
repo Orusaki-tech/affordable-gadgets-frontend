@@ -39,7 +39,15 @@ export function ProductRecommendations({ productId }: ProductRecommendationsProp
     // Keep the section mounted to avoid CLS after hydration.
     return (
       <div className="product-recommendations product-recommendations--empty" aria-live="polite">
-        <h2 className="product-recommendations__title section-label">You May Also Like</h2>
+        <div className="product-recommendations__header">
+          <div>
+            <h2 className="product-recommendations__title section-label">You May Also Like</h2>
+            <p className="product-recommendations__subtitle">
+              Explore verified flagships and premium mid-rangers
+            </p>
+          </div>
+          <span className="product-recommendations__badge">Trending In Kenya</span>
+        </div>
         <p className="product-recommendations__empty">No similar products to show right now.</p>
       </div>
     );
@@ -47,7 +55,15 @@ export function ProductRecommendations({ productId }: ProductRecommendationsProp
 
   return (
     <div className="product-recommendations">
-      <h2 className="product-recommendations__title section-label">You May Also Like</h2>
+      <div className="product-recommendations__header">
+        <div>
+          <h2 className="product-recommendations__title section-label">You May Also Like</h2>
+          <p className="product-recommendations__subtitle">
+            Explore verified flagships and premium mid-rangers
+          </p>
+        </div>
+        <span className="product-recommendations__badge">Trending In Kenya</span>
+      </div>
       <div className="product-recommendations__grid">
         {recommendations.map((product) => (
           <ProductCard key={product.id} product={product} />

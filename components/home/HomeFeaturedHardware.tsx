@@ -28,7 +28,7 @@ export function HomeFeaturedHardware() {
               In Stock &amp; Dispatched Today
             </p>
             <h2 className="ag-type-h2 mt-1">
-              Featured Hardware Highlights
+              Featured Product Highlights
             </h2>
             {!isLoading ? (
               <p className="ag-type-body mt-1">

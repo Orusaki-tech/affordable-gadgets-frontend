@@ -15,7 +15,7 @@ export function HomeVideoReels() {
               Verified Tech Unboxings
             </p>
             <h2 className="ag-type-h2 mt-1">
-              Real Devices in Nairobi
+              Videos about your favourite device
             </h2>
           </div>
           <a

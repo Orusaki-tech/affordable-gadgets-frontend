@@ -188,7 +188,7 @@
   vertical-align: middle;
   gap: var(--control-gap);
   flex-shrink: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .ag-chip--muted {

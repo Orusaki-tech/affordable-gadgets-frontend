@@ -1193,7 +1193,10 @@
 .site-header__nav--pills .site-header__nav-link--active,
 .site-header__nav--pills .ag-nav-pill--active,
 .site-header__nav--pills .site-header__brand-menu:hover .site-header__nav-link,
-.site-header__nav--pills .site-header__brand-menu:hover .ag-nav-pill {
+.site-header__nav--pills .site-header__brand-menu:hover .ag-nav-pill,
+.site-header__nav--pills .ag-nav-pill:hover,
+.site-header__nav--pills .site-header__nav-link:hover,
+.site-header__nav--pills a:hover {
   background: var(--primary) !important;
   color: #fff !important;
 }

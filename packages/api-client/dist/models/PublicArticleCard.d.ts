@@ -32,5 +32,8 @@ export type PublicArticleCard = {
      * Product hero image fallback when article has no thumbnail
      */
     readonly product_primary_image?: string | null;
+    /**
+     * First prose words of the article body for homepage card CTAs
+     */
     readonly opening_words?: string;
 };

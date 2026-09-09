@@ -891,6 +891,9 @@
 
 .site-header__menu-button {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   padding: 0.5rem;
   border-radius: 10px;
   background: transparent;
@@ -901,6 +904,28 @@
 
 .site-header__menu-button:hover {
   background: var(--ui-gray-100);
+}
+
+/* WhatsApp CTA: desktop/tablet only — .ag-chip display must not override this */
+.site-header__whatsapp {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .site-header__whatsapp {
+    display: inline-flex !important;
+  }
+}
+
+/* Hide header search below md (hero budget search covers mobile) */
+.site-header__search--desktop {
+  display: none !important;
+}
+
+@media (min-width: 768px) {
+  .site-header__search--desktop {
+    display: flex !important;
+  }
 }
 
 .site-header__menu-icon {

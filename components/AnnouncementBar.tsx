@@ -9,7 +9,7 @@ export type AnnouncementBarProps = {
   dismissible?: boolean;
 };
 
-const MOBILE_BREAKPOINT_QUERY = '(max-width: 640px)';
+const MOBILE_BREAKPOINT_QUERY = '(max-width: 1023px)';
 const MOBILE_ROTATION_MS = 2600;
 
 const trustItems = [

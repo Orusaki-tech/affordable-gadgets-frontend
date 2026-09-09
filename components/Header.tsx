@@ -216,7 +216,7 @@ function HeaderContent() {
 
           <form
             onSubmit={onSearchSubmit}
-            className="site-header__search hidden min-w-0 flex-1 items-center gap-2 md:flex"
+            className="site-header__search site-header__search--desktop hidden min-w-0 flex-1 items-center gap-2 md:flex"
             role="search"
           >
             <div className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-border-hairline bg-surface-muted px-4 py-2.5">
@@ -244,7 +244,7 @@ function HeaderContent() {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="ag-chip ag-chip--lime ag-chip--cta hidden md:inline-flex"
+              className="site-header__whatsapp ag-chip ag-chip--lime ag-chip--cta"
             >
               <MaterialIcon name="chat" className="text-[1rem]" />
               WhatsApp Inquiry
@@ -323,7 +323,7 @@ function HeaderContent() {
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="site-header__menu-button ag-icon-btn lg:hidden"
+              className="site-header__menu-button ag-icon-btn"
               aria-label="Toggle menu"
               aria-expanded={isMobileMenuOpen}
             >
@@ -332,22 +332,7 @@ function HeaderContent() {
           </div>
         </div>
 
-        {/* Mobile search */}
-        <form onSubmit={onSearchSubmit} className="pb-3 md:hidden" role="search">
-          <div className="flex items-center gap-2 rounded-full border border-border-hairline bg-surface-muted px-4 py-2.5">
-            <MaterialIcon name="search" className="text-[1.25rem] text-secondary" />
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search devices…"
-              className="ag-type-body w-full bg-transparent outline-none"
-              aria-label="Search products"
-            />
-          </div>
-        </form>
-
-        {/* Pill category nav — mockup second row */}
+        {/* Pill category nav — mockup second row (search lives in hero / menu on small screens) */}
         <div
           className={`site-header__nav-zone -mx-[var(--section-x)] hidden border-t border-border-hairline bg-surface-muted/80 px-[var(--section-x)] md:-mx-[var(--section-x-lg)] md:px-[var(--section-x-lg)] lg:block${
             openMegaMenu ? ' site-header__nav-zone--mega-open' : ''

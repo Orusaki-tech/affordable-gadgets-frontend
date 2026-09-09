@@ -246,7 +246,7 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
             </button>
             <Link
               href={`/products/${IPHONE_18_PRO_MAX_SLUG}`}
-              className="ag-btn ag-btn--ghost inline-flex items-center border border-border-strong bg-white/95 font-semibold text-primary shadow-sm backdrop-blur-sm"
+              className="ag-btn ag-btn--ghost inline-flex items-center border font-semibold shadow-sm"
             >
               View details
             </Link>

@@ -644,6 +644,18 @@ h3 {
   border-radius: 0.75rem;
 }
 
+/* Ghost on dark hero bar — readable outline, not a white slab */
+.home-redesign__hero-banner-actions .ag-btn--ghost {
+  background: transparent;
+  color: #fff;
+  border-color: color-mix(in srgb, #fff 70%, transparent);
+}
+
+.home-redesign__hero-banner-actions .ag-btn--ghost:hover {
+  background: color-mix(in srgb, #fff 12%, transparent);
+  color: #fff;
+}
+
 .ag-icon-btn {
   display: inline-flex;
   align-items: center;

@@ -3,32 +3,32 @@
 }
 
 .match-score__title {
-  margin-bottom: 32px;
+  margin-bottom: 2rem;
 }
 
 .match-score__panel {
   background: var(--ui-white);
-  padding: 24px;
+  padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 1px 2px var(--ui-black-05);
-  margin-bottom: 32px;
+  margin-bottom: 2rem;
 }
 
 .match-score__panel-title {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .match-score__grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 1.5rem;
 }
 
 .match-score__field {
   display: grid;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .match-score__label {
@@ -38,12 +38,12 @@
 
 .match-score__row {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .match-score__input {
   flex: 1;
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
   border: 1px solid var(--ui-gray-200);
   border-radius: 10px;
 }
@@ -51,11 +51,11 @@
 .match-score__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .match-score__chip {
-  padding: 4px 12px;
+  padding: 0.25rem 0.75rem;
   border-radius: 8px;
   background: var(--ui-gray-200);
   color: var(--ui-gray-700);
@@ -71,12 +71,12 @@
 .match-score__checkbox {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .match-score__checkbox-input {
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
 }
 
 .match-score__checkbox-label {
@@ -85,8 +85,8 @@
 }
 
 .match-score__submit {
-  margin-top: 24px;
-  padding: 12px 24px;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
   background: var(--primary);
   color: var(--ui-white);
   border-radius: 10px;
@@ -103,17 +103,17 @@
 .match-score__results-title {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .match-score__results-list {
   display: grid;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .match-score__card {
   background: var(--ui-white);
-  padding: 24px;
+  padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 1px 2px var(--ui-black-05);
 }
@@ -122,7 +122,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .match-score__card-title {
@@ -139,13 +139,13 @@
 
 .match-score__card-subtitle {
   color: var(--ui-gray-600);
-  margin-top: 4px;
+  margin-top: 0.25rem;
 }
 
 .match-score__card-price {
   font-size: 1.125rem;
   font-weight: 600;
-  margin-top: 8px;
+  margin-top: 0.5rem;
 }
 
 .match-score__score {
@@ -164,10 +164,10 @@
 }
 
 .match-score__breakdown {
-  margin-top: 16px;
+  margin-top: 1rem;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
   font-size: 0.875rem;
 }
 

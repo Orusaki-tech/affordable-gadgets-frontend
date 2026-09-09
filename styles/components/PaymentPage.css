@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   background: var(--ui-gray-50);
-  padding: 16px;
+  padding: 1rem;
 }
 
 .payment-page__card {
@@ -13,30 +13,30 @@
   box-shadow: 0 16px 32px var(--ui-black-12);
   max-width: 28rem;
   width: 100%;
-  padding: 32px;
+  padding: 2rem;
   text-align: center;
 }
 
 .payment-page__section {
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .payment-page__logo {
   display: flex;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .payment-page__logo-image {
   object-fit: contain;
-  height: 64px;
+  height: 4rem;
   width: auto;
 }
 
 .payment-page__icon {
-  margin: 0 auto 16px;
-  width: 64px;
-  height: 64px;
+  margin: 0 auto 1rem;
+  width: 4rem;
+  height: 4rem;
   border-radius: 9999px;
   display: flex;
   align-items: center;
@@ -56,8 +56,8 @@
 }
 
 .payment-page__icon-svg {
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
 }
 
 .payment-page__icon-svg--success {
@@ -71,7 +71,7 @@
 .payment-page__title {
   font-size: 1.125rem;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
   color: var(--ui-gray-900);
 }
 
@@ -85,7 +85,7 @@
 
 .payment-page__text {
   color: var(--ui-gray-600);
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .payment-page__meta {
@@ -100,7 +100,7 @@
 
 .payment-page__actions {
   display: grid;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .payment-page__primary {
@@ -109,7 +109,7 @@
   background: var(--primary);
   color: var(--ui-white);
   border-radius: 10px;
-  padding: 10px 16px;
+  padding: 0.625rem 1rem;
   border: none;
   cursor: pointer;
   font-weight: 600;
@@ -127,7 +127,7 @@
   background: var(--ui-gray-200);
   color: var(--ui-gray-800);
   border-radius: 10px;
-  padding: 10px 16px;
+  padding: 0.625rem 1rem;
   font-weight: 600;
   text-decoration: none;
   transition: background 200ms;
@@ -138,8 +138,8 @@
 }
 
 .payment-page__spinner {
-  width: 32px;
-  height: 32px;
+  width: 2rem;
+  height: 2rem;
   color: var(--primary);
   animation: payment-page-spin 1s linear infinite;
 }

@@ -1,13 +1,13 @@
 .hero-promotions {
   position: relative;
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .hero-promotions__desktop {
   display: none;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
   align-items: stretch;
 }
 
@@ -18,7 +18,7 @@
 .hero-promotions__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
 }
 
 .hero-promotions__tile {
@@ -71,8 +71,8 @@
 
 .hero-promotions__mobile {
   display: grid;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 @media (min-width: 1024px) {

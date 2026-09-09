@@ -453,7 +453,7 @@ export function HomeProductVideos({
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-7 w-56 animate-pulse rounded bg-gray-200" />
           <div className="mt-2 h-4 max-w-xl animate-pulse rounded bg-gray-100" />
-          <div className="mt-5 flex gap-[15px] overflow-hidden">
+          <div className="mt-5 flex gap-[0.9375rem] overflow-hidden">
             {[...Array(5)].map((_, i) => (
               <div
                 key={`hpv-skel-${i}`}

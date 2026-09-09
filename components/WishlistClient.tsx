@@ -41,7 +41,7 @@ export default function WishlistClient() {
   }, []);
 
   return (
-    <main className="mx-auto w-full max-w-[1400px] flex-1 px-4 py-10 lg:px-6">
+    <main className="mx-auto w-full max-w-[87.5rem] flex-1 px-4 py-10 lg:px-6">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-secondary">Saved devices</p>

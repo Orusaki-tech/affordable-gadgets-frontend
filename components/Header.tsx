@@ -288,7 +288,7 @@ function HeaderContent() {
                   <span className="hidden text-type-eyebrow font-semibold normal-case tracking-normal lg:inline">Account</span>
                 </button>
                 {isAccountMenuOpen && (
-                  <div className="absolute right-0 z-50 mt-2 min-w-[160px] rounded-xl border border-border-hairline bg-white p-2 shadow-lg">
+                  <div className="absolute right-0 z-50 mt-2 min-w-[10rem] rounded-xl border border-border-hairline bg-white p-2 shadow-lg">
                     <Link href="/cart" className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-muted">
                       My Orders
                     </Link>

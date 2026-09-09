@@ -170,18 +170,18 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
           </form>
 
           <div>
-            <h2 className="ag-type-h2">Search to start shopping</h2>
-            <p className="ag-type-body mt-2 text-primary/75">
+            <h2 className="ag-type-h3">Search to start shopping</h2>
+            <p className="ag-type-body mt-1 text-primary/75">
               Type a product name above — or set a budget and browse live stock.
             </p>
           </div>
 
-          <div className="flex flex-1 flex-col rounded-xl bg-white/70 p-4 backdrop-blur-sm sm:p-6">
+          <div className="flex flex-1 flex-col rounded-xl bg-white/70 p-4 backdrop-blur-sm sm:p-5">
             <div className="flex items-center justify-between gap-2">
               <p className="ag-type-eyebrow text-primary">
                 Instant Budget Match
               </p>
-              <p className="ag-type-h3 font-bold text-primary">
+              <p className="text-base font-bold text-primary">
                 KSh {budget.toLocaleString('en-KE')}
               </p>
             </div>

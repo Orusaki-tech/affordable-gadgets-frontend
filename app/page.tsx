@@ -206,7 +206,7 @@ export default async function HomePage() {
         <HomeBundles />
         <HomeBnplCalculator />
         <HomeVideoReels />
-        <Suspense fallback={<div className="min-h-[200px]" aria-hidden />}>
+        <Suspense fallback={<div className="min-h-[12.5rem]" aria-hidden />}>
           <HomeBuyingGuides />
         </Suspense>
         <HomeReviews />

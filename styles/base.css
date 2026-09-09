@@ -155,21 +155,21 @@
   --tracking-tight: -0.03em;
 
   /*
-   * Density ladders (rem) — scale with fluid html root (VFRI-style).
-   * Hierarchy is intentional: display ≫ h2 ≫ body ≫ eyebrow/controls.
+   * Density ladders (rem) — VFRI proportions: body/nav stay readable,
+   * display is for true heroes only (not every section title).
    */
-  --text-xs: 0.8125rem; /* ~13 @ 16 */
-  --text-sm: 0.9375rem; /* 15 */
-  --text-md: 1.0625rem; /* 17 */
-  --text-lg: 1.25rem; /* 20 */
-  --text-xl: 1.5rem; /* 24 */
-  --text-2xl: 1.875rem; /* 30 */
-  --text-3xl: 2.25rem; /* 36 */
-  --text-4xl: 3rem; /* 48 — VFRI-ish display */
+  --text-xs: 0.75rem; /* 12 @ 16 */
+  --text-sm: 0.875rem; /* 14 */
+  --text-md: 1rem; /* 16 */
+  --text-lg: 1.125rem; /* 18 */
+  --text-xl: 1.25rem; /* 20 */
+  --text-2xl: 1.5rem; /* 24 */
+  --text-3xl: 1.875rem; /* 30 */
+  --text-4xl: 2.25rem; /* 36 */
 
   --type-eyebrow: var(--text-xs);
-  --type-body: var(--text-md);
-  --type-body-lg: var(--text-lg);
+  --type-body: var(--text-sm);
+  --type-body-lg: var(--text-md);
   --type-h3: var(--text-xl);
   --type-h2: var(--text-2xl);
   --type-h2-lg: var(--text-3xl);
@@ -177,18 +177,18 @@
   --type-display: var(--text-4xl);
 
   /* Controls: chips/nav = md; WhatsApp / primary CTAs = lg */
-  --control-sm-h: 2rem;
-  --control-md-h: 2.375rem;
-  --control-lg-h: 3.25rem;
-  --control-icon-h: 2.75rem;
-  --control-sm-px: 0.75rem;
-  --control-md-px: 1rem;
-  --control-lg-px: 1.5rem;
+  --control-sm-h: 1.75rem;
+  --control-md-h: 2rem;
+  --control-lg-h: 2.75rem;
+  --control-icon-h: 2.5rem;
+  --control-sm-px: 0.625rem;
+  --control-md-px: 0.75rem;
+  --control-lg-px: 1.25rem;
   --control-sm-fs: var(--text-xs);
-  --control-md-fs: var(--text-sm);
-  --control-lg-fs: var(--text-md);
+  --control-md-fs: 0.75rem;
+  --control-lg-fs: var(--text-sm);
   --control-radius: 9999px;
-  --control-gap: 0.5rem;
+  --control-gap: 0.375rem;
 
   /* Spacing ladder */
   --space-1: 0.25rem;
@@ -203,7 +203,7 @@
   --space-14: 3.5rem;
 
   --section-x: var(--space-6); /* ~px-6 */
-  --section-x-lg: var(--space-12); /* ~md:px-12 — Programs-style pad, no second max-width frame */
+  --section-x-lg: var(--space-12); /* ~md: px-12 — Programs-style pad, no second max-width frame */
   --section-y: var(--space-14);
   --section-y-tight: var(--space-12);
   --section-y-hero: var(--space-6);
@@ -233,8 +233,7 @@
     Arial,
     sans-serif;
 
-  --font-mono:
-    ui-monospace,
+  --font-mono: ui-monospace,
     SFMono-Regular,
     Menlo,
     Monaco,
@@ -281,16 +280,16 @@
   --spacing-container-max: 80rem;
 
   /* Align Tailwind text-* utilities with the rem density ladder */
-  --text-xs: 0.8125rem;
-  --text-sm: 0.9375rem;
-  --text-base: 1.0625rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.5rem;
-  --text-2xl: 1.875rem;
-  --text-3xl: 2.25rem;
-  --text-4xl: 3rem;
-  --text-5xl: 3.5rem;
-  --text-6xl: 4rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
 
   /* Ladder → Tailwind theme (text-type-h2, p-panel, gap-section-y, h-control-md, …) */
   --text-type-eyebrow: var(--type-eyebrow);

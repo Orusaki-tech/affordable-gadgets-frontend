@@ -1,8 +1,8 @@
 /* PDP: top-right seal. Cards: bottom-right, smaller; hover-only on fine pointers, always on touch. */
 .product-trust-stamp {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 0.75rem;
+  right: 0.75rem;
   z-index: 2;
   pointer-events: none;
   line-height: 0;
@@ -46,8 +46,8 @@
 .product-trust-stamp--card {
   top: auto;
   /* Keep above bottom CTAs (hover add-to-cart / buy buttons) */
-  bottom: 56px;
-  right: 10px;
+  bottom: 3.5rem;
+  right: 0.625rem;
   width: clamp(19px, 7vw, 28px);
   opacity: 1;
   transition: opacity 0.2s ease;
@@ -57,7 +57,7 @@
 
 @media (min-width: 640px) {
   .product-trust-stamp--card {
-    bottom: 60px;
+    bottom: 3.75rem;
     width: clamp(21px, 5.5vw, 30px);
   }
 }

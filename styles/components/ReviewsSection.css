@@ -6,20 +6,20 @@
 }
 
 .reviews-section {
-  margin-top: 48px;
+  margin-top: 3rem;
 }
 
 .reviews-section__title {
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .reviews-section__title--tight {
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .reviews-section__status {
   text-align: center;
-  padding: 32px 0;
+  padding: 2rem 0;
 }
 
 .reviews-section__status--muted {
@@ -33,15 +33,15 @@
 .reviews-section__summary {
   background: var(--ui-gray-50);
   border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .reviews-section__summary-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .reviews-section__average {
@@ -52,8 +52,8 @@
 .reviews-section__stars {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 8px;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .reviews-section__star {
@@ -75,25 +75,25 @@
 
 .reviews-section__breakdown {
   display: grid;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .reviews-section__breakdown-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .reviews-section__breakdown-label {
   font-size: 0.75rem;
-  width: 48px;
+  width: 3rem;
 }
 
 .reviews-section__breakdown-bar {
   flex: 1;
   background: var(--ui-gray-200);
   border-radius: 9999px;
-  height: 8px;
+  height: 0.5rem;
   overflow: hidden;
 }
 
@@ -106,18 +106,18 @@
 .reviews-section__breakdown-count {
   font-size: 0.75rem;
   color: var(--ui-gray-600);
-  width: 48px;
+  width: 3rem;
   text-align: right;
 }
 
 .reviews-section__list {
   display: grid;
-  gap: 20px;
+  gap: 1.25rem;
 }
 
 .reviews-section__item {
   border-bottom: 1px solid var(--ui-gray-200);
-  padding-bottom: 20px;
+  padding-bottom: 1.25rem;
 }
 
 .reviews-section__item:last-child {
@@ -128,20 +128,20 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .reviews-section__item-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .reviews-section__item-stars {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   font-size: 0.8125rem;
 }
 
@@ -154,7 +154,7 @@
   font-size: 0.625rem;
   background: var(--ui-gray-100);
   color: var(--primary-dark);
-  padding: 2px 8px;
+  padding: 0.125rem 0.5rem;
   border-radius: 6px;
 }
 
@@ -167,12 +167,12 @@
   font-size: 0.875rem;
   line-height: 20px;
   color: var(--ui-gray-700);
-  margin-top: 12px;
-  margin-bottom: 12px;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .reviews-section__video {
-  margin-top: 16px;
+  margin-top: 1rem;
   display: flex;
   justify-content: flex-start;
 }
@@ -181,7 +181,7 @@
   position: relative;
   aspect-ratio: 16 / 9;
   width: 100%;
-  max-width: 448px;
+  max-width: 28rem;
   border-radius: 12px;
   overflow: hidden;
   background: var(--ui-gray-100);
@@ -199,24 +199,24 @@
 
 .reviews-section__video-badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 0.5rem;
+  right: 0.5rem;
   background: var(--ui-black-50);
   color: var(--ui-white);
   font-size: 0.75rem;
-  padding: 4px 8px;
+  padding: 0.25rem 0.5rem;
   border-radius: 6px;
 }
 
 .reviews-section__pagination {
   display: flex;
   justify-content: center;
-  gap: 16px;
-  margin-top: 32px;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
 .reviews-section__pagination-button {
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem;
   font-size: 0.8125rem;
   background: var(--ui-gray-200);
   border-radius: 8px;
@@ -254,12 +254,12 @@
 
 @media (min-width: 640px) {
   .reviews-section__title--tight {
-    margin-bottom: 24px;
+    margin-bottom: 1.5rem;
   }
 
   .reviews-section__summary {
-    padding: 24px;
-    margin-bottom: 32px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
   }
 
   .reviews-section__average {
@@ -280,11 +280,11 @@
   }
 
   .reviews-section__list {
-    gap: 24px;
+    gap: 1.5rem;
   }
 
   .reviews-section__item {
-    padding-bottom: 24px;
+    padding-bottom: 1.5rem;
   }
 
   .reviews-section__item-stars {
@@ -309,7 +309,7 @@
   }
 
   .reviews-section__pagination-button {
-    padding: 8px 16px;
+    padding: 0.5rem 1rem;
     font-size: 0.875rem;
   }
 }

@@ -25,7 +25,7 @@
 }
 
 .recently-viewed__placeholder-body {
-  padding: 20px;
+  padding: 1.25rem;
 }
 
 .recently-viewed__placeholder-line {
@@ -35,18 +35,18 @@
 }
 
 .recently-viewed__placeholder-line--title {
-  height: 16px;
-  margin-bottom: 12px;
+  height: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .recently-viewed__placeholder-line--subtitle {
-  height: 12px;
+  height: 0.75rem;
   width: 66%;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .recently-viewed__placeholder-line--price {
-  height: 24px;
+  height: 1.5rem;
   width: 50%;
 }
 

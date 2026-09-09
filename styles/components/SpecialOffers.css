@@ -10,19 +10,19 @@
 }
 
 .special-offers__title {
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .special-offers__heading {
   font-size: 1.875rem;
   font-weight: 700;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .special-offers__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
 }
 
 .special-offers__grid--loading {
@@ -41,12 +41,12 @@
 
 .special-offers__empty {
   text-align: center;
-  padding: 48px 0;
+  padding: 3rem 0;
 }
 
 .special-offers__empty-text {
   color: var(--ui-gray-600);
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .special-offers__empty-link {
@@ -63,7 +63,7 @@
   display: block;
   border-radius: 16px;
   background: var(--ui-lime-400-80);
-  padding: 24px;
+  padding: 1.5rem;
   overflow: hidden;
   box-shadow: 0 1px 2px var(--ui-black-05);
   transition: box-shadow 200ms;
@@ -92,7 +92,7 @@
 
 @media (max-width: 767px) {
   .special-offers__promo {
-    padding: 2px;
+    padding: 0.125rem;
   }
 }
 

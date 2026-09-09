@@ -7,24 +7,24 @@
   --apple-text: #1d1d1f;
   --apple-blue: #0071e3;
   --apple-blue-hover: #0076df;
-  --apple-grid-gap: 12px;
-  --apple-tile-min-height: 580px;
-  --apple-headline-size: 40px;
+  --apple-grid-gap: 0.75rem;
+  --apple-tile-min-height: 36.25rem;
+  --apple-headline-size: 2.5rem;
   --apple-headline-lh: 1.1;
-  --apple-card-title-size: 21px;
-  --apple-card-min-height: 380px;
+  --apple-card-title-size: 1.3125rem;
+  --apple-card-min-height: 23.75rem;
   --apple-pill-font: 12px;
-  --apple-pill-pad-y: 4px;
-  --apple-pill-pad-x: 11px;
-  --apple-pill-radius: 980px;
+  --apple-pill-pad-y: 0.25rem;
+  --apple-pill-pad-x: 0.6875rem;
+  --apple-pill-radius: 61.25rem;
   width: 100%;
   color: var(--apple-text);
 }
 
 .category-discovery__hero {
   --hero-image-inset-top: calc(
-    48px + var(--apple-headline-size) * var(--apple-headline-lh) + 14px +
-      var(--apple-pill-pad-y) * 2 + 12px * 1.3333733333 + 8px
+    48px + var(--apple-headline-size) * var(--apple-headline-lh) + 0.875rem +
+      var(--apple-pill-pad-y) * 2 + 0.75rem * 1.3333733333 + 0.5rem
   );
   position: relative;
   width: 100%;
@@ -42,8 +42,8 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  max-width: min(100%, 360px);
-  padding: 48px 32px 0;
+  max-width: min(100%, 22.5rem);
+  padding: 3rem 2rem 0;
   text-align: left;
 }
 
@@ -51,7 +51,7 @@
   position: absolute;
   top: var(--hero-image-inset-top);
   right: 0;
-  bottom: 24px;
+  bottom: 1.5rem;
   left: 26%;
   display: flex;
   align-items: flex-start;
@@ -78,7 +78,7 @@
 }
 
 .category-discovery__hero-link {
-  margin-top: 14px;
+  margin-top: 0.875rem;
   text-decoration: none;
 }
 
@@ -146,7 +146,7 @@
 .category-discovery__card-header {
   position: relative;
   z-index: 1;
-  padding: 32px 24px 0;
+  padding: 2rem 1.5rem 0;
   text-align: left;
 }
 
@@ -155,7 +155,7 @@
 }
 
 .category-discovery__card-title {
-  margin: 0 0 10px;
+  margin: 0 0 0.625rem;
   font-size: var(--apple-card-title-size);
   line-height: 1.1666666667;
   font-weight: 600;
@@ -167,9 +167,9 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 8px 16px 0;
+  padding: 0.5rem 1rem 0;
   margin-top: auto;
-  min-height: 220px;
+  min-height: 13.75rem;
   background-color: var(--apple-bg);
 }
 
@@ -191,7 +191,7 @@
   width: 100%;
   max-width: 100%;
   height: auto;
-  max-height: 300px;
+  max-height: 18.75rem;
   object-fit: contain;
   object-position: bottom center;
 }
@@ -203,14 +203,14 @@
 /* Mobile: swipeable product strip inside multi-image cards */
 @media (max-width: 767px) {
   .category-discovery {
-    --apple-tile-min-height: 500px;
-    --apple-headline-size: 32px;
+    --apple-tile-min-height: 31.25rem;
+    --apple-headline-size: 2rem;
   }
 
   .category-discovery__hero {
     --hero-image-inset-top: calc(
-      32px + var(--apple-headline-size) * var(--apple-headline-lh) + 14px +
-        var(--apple-pill-pad-y) * 2 + 12px * 1.3333733333 + 8px
+      32px + var(--apple-headline-size) * var(--apple-headline-lh) + 0.875rem +
+        var(--apple-pill-pad-y) * 2 + 0.75rem * 1.3333733333 + 0.5rem
     );
     display: flex;
     flex-direction: column;
@@ -219,22 +219,22 @@
 
   .category-discovery__hero-content {
     max-width: none;
-    padding: 32px 24px 0;
+    padding: 2rem 1.5rem 0;
   }
 
   .category-discovery__hero-picture {
     position: static;
     left: auto;
     flex: 1;
-    padding: 8px 16px 24px;
+    padding: 0.5rem 1rem 1.5rem;
   }
 
   .category-discovery {
-    --apple-card-min-height: 360px;
+    --apple-card-min-height: 22.5rem;
   }
 
   .category-discovery__card-header {
-    padding: 28px 20px 0;
+    padding: 1.75rem 1.25rem 0;
   }
 
   .category-discovery__card-media--multi {
@@ -244,7 +244,7 @@
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     gap: 0;
-    padding: 0 0 8px;
+    padding: 0 0 0.5rem;
   }
 
   .category-discovery__card-media--multi::-webkit-scrollbar {
@@ -254,12 +254,12 @@
   .category-discovery__card-media--multi .category-discovery__card-image-wrap {
     flex: 0 0 85%;
     scroll-snap-align: center;
-    padding: 0 8px;
+    padding: 0 0.5rem;
   }
 }
 
 @media (max-width: 1068px) and (min-width: 768px) {
   .category-discovery {
-    --apple-tile-min-height: 490px;
+    --apple-tile-min-height: 30.625rem;
   }
 }

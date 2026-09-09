@@ -250,7 +250,7 @@
 .home-product-videos--grid .home-product-videos__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
 }
 
 @media (min-width: 1024px) {
@@ -339,7 +339,7 @@
 
 .home-redesign__featured .product-carousel__track,
 .home-redesign__featured .home-sections__grid--products {
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 /* Homepage buying guides — media fills frame edge-to-edge */
@@ -381,11 +381,11 @@
 
 .home-buying-guides__badge {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 0.75rem;
+  left: 0.75rem;
   z-index: 2;
   max-width: calc(100% - 24px);
-  padding: 5px 8px;
+  padding: 0.3125rem 0.5rem;
   border-radius: 6px;
   background: #030304;
   color: #fff;

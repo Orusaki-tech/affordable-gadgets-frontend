@@ -6,26 +6,26 @@
 }
 
 .product-recommendations {
-  margin-top: 48px;
+  margin-top: 3rem;
 }
 
 .product-recommendations__title {
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .product-recommendations__title-skel {
-  height: 28px;
-  width: min(320px, 70%);
+  height: 1.75rem;
+  width: min(20rem, 70%);
   border-radius: 10px;
   background: var(--ui-gray-200);
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .product-recommendations__card-skel {
   border-radius: 16px;
   background: var(--ui-gray-200);
   aspect-ratio: 4 / 5;
-  min-height: 260px;
+  min-height: 16.25rem;
   animation: product-recommendations-pulse 1.6s ease-in-out infinite;
 }
 
@@ -38,7 +38,7 @@
 .product-recommendations__grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 1.5rem;
 }
 
 @media (min-width: 640px) {

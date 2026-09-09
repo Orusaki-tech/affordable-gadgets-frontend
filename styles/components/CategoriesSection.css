@@ -30,7 +30,7 @@
 .categories-section__grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 1.5rem;
 }
 
 .categories-section__card {
@@ -46,7 +46,7 @@
 
 .categories-section__media {
   aspect-ratio: 4 / 3;
-  min-height: 160px;
+  min-height: 10rem;
   position: relative;
   overflow: hidden;
   background: var(--ui-gray-100);
@@ -60,11 +60,11 @@
 }
 
 .categories-section__content {
-  padding: 14px 12px;
+  padding: 0.875rem 0.75rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 /* Primary: category label — 14px max */
@@ -84,14 +84,14 @@
   display: inline-flex;
   align-items: center;
   color: var(--ui-gray-600, #4b5563);
-  gap: 4px;
+  gap: 0.25rem;
   font-size: 0.6875rem;
   font-weight: 500;
 }
 
 .categories-section__cta-icon {
-  width: 11px;
-  height: 11px;
+  width: 0.6875rem;
+  height: 0.6875rem;
 }
 
 @media (min-width: 640px) {
@@ -103,7 +103,7 @@
 @media (min-width: 1024px) {
   .categories-section__grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 32px;
+    gap: 2rem;
   }
 }
 

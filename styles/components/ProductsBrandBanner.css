@@ -27,11 +27,11 @@
 
 @media (max-width: 767px) {
   .products-page__header--fullbleed {
-    padding: 0 12px;
+    padding: 0 0.75rem;
   }
 
   .products-page__header--fullbleed + .products-page__body {
-    padding-top: 12px;
+    padding-top: 0.75rem;
   }
 
   .products-brand-banner {
@@ -44,7 +44,7 @@
 @media (min-width: 768px) {
   .products-brand-banner {
     aspect-ratio: auto;
-    height: 288px; /* Tailwind min-h-72 — Back Market carousel at 1280px viewport */
+    height: 18rem; /* Tailwind min-h-72 — Back Market carousel at 1280px viewport */
   }
 
   .products-brand-banner__image {

@@ -1,24 +1,24 @@
 .stories-carousel {
   position: relative;
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .stories-carousel__desktop {
   display: none;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
   align-items: stretch;
 }
 
 .stories-carousel__mobile {
   display: grid;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .stories-carousel__mobile-section {
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .stories-carousel__banner {
@@ -28,7 +28,7 @@
 .stories-carousel__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
 }
 
 .stories-carousel__carousel {
@@ -88,7 +88,7 @@
 .stories-carousel__skeleton {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .stories-carousel__skeleton-banner,
@@ -101,7 +101,7 @@
 .stories-carousel__skeleton-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 1rem;
 }
 
 .stories-carousel__modal {
@@ -113,7 +113,7 @@
   justify-content: center;
   background: var(--ui-black-80);
   backdrop-filter: blur(6px);
-  padding: 16px;
+  padding: 1rem;
 }
 
 .stories-carousel__modal-panel {
@@ -129,11 +129,11 @@
 
 .stories-carousel__modal-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 1rem;
+  right: 1rem;
   z-index: 1;
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 9999px;
   background: var(--ui-white-10);
   color: var(--ui-white);
@@ -150,8 +150,8 @@
 }
 
 .stories-carousel__modal-close-icon {
-  width: 24px;
-  height: 24px;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .stories-carousel__modal-embed {
@@ -165,7 +165,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 16px;
+  padding: 1rem;
   background: linear-gradient(to top, var(--ui-black-60), transparent);
 }
 

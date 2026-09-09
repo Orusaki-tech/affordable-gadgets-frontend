@@ -31,13 +31,12 @@
 .samsung-carousel-item {
   opacity: 0;
   transform: translateY(20%);
-  animation:
-    samsungOpacity 0.2s linear forwards,
+  animation: samsungOpacity 0.2s linear forwards,
     samsungTranslate 0.5s cubic-bezier(0, 0.18, 0.07, 1) forwards;
 }
 
 .samsung-progressbar {
-  margin-top: 35px;
+  margin-top: 2.1875rem;
   display: block;
 }
 
@@ -45,14 +44,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 60px;
+  gap: 3.75rem;
 }
 
 .samsung-progressbar-bar {
   position: relative;
   border-radius: 1000px;
-  width: 562px;
-  height: 2px;
+  width: 35.125rem;
+  height: 0.125rem;
   background-color: var(--ui-black-10);
   overflow: hidden;
 }
@@ -73,15 +72,15 @@
 .samsung-progressbar-arrows {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
 }
 
 .samsung-progressbar-arrow {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 9999px;
   border: 1px solid var(--ui-black-20);
   background: var(--ui-white);
@@ -96,8 +95,8 @@
 }
 
 .samsung-progressbar-icon {
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1440px) {

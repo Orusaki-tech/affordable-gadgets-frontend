@@ -39,7 +39,7 @@ export const HomeProductVideosClient = dynamic(
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-6 w-48 animate-pulse rounded bg-gray-200" />
           <div className="mt-3 h-4 max-w-lg animate-pulse rounded bg-gray-100" />
-          <div className="mt-5 flex gap-[15px]">
+          <div className="mt-5 flex gap-[0.9375rem]">
             {[...Array(5)].map((_, i) => (
               <div
                 key={`home-videos-skel-${i}`}
@@ -100,7 +100,7 @@ export const BrandCarouselClient = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[88px] w-full animate-pulse rounded-lg bg-gray-200/70" aria-hidden />
+      <div className="h-[5.5rem] w-full animate-pulse rounded-lg bg-gray-200/70" aria-hidden />
     ),
   }
 );
@@ -110,7 +110,7 @@ export const ImageCarouselClient = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[220px] w-full animate-pulse rounded-2xl bg-gray-200/70" aria-hidden />
+      <div className="h-[13.75rem] w-full animate-pulse rounded-2xl bg-gray-200/70" aria-hidden />
     ),
   }
 );
@@ -123,7 +123,7 @@ export const CategoryDiscoverySectionClient = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="min-h-[320px] w-full animate-pulse rounded-2xl bg-gray-200/70" aria-hidden />
+      <div className="min-h-[20rem] w-full animate-pulse rounded-2xl bg-gray-200/70" aria-hidden />
     ),
   }
 );

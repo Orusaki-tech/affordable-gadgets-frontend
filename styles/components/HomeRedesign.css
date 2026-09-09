@@ -14,7 +14,11 @@
   flex-direction: column;
 }
 
-/* Hero: mobile stacks; desktop columns share height (VFRI) — poster cover + CTAs flush */
+/*
+ * Hero: mobile stacks; desktop columns share height (VFRI).
+ * LOCKED TARGET (all desktop ≥1024): docs/design-targets/homepage-desktop-hero.png
+ * Equal-height cards · poster cover (no letterbox) · CTAs flush under poster.
+ */
 .home-redesign__hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

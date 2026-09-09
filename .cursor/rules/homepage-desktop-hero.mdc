@@ -1,0 +1,30 @@
+---
+description: Homepage desktop hero must match the locked design target at every desktop width
+globs: components/home/HomeHeroSpotlight.tsx,styles/components/HomeRedesign.css,styles/base.css
+alwaysApply: false
+---
+
+# Homepage desktop hero — locked target
+
+**Reference:** `docs/design-targets/homepage-desktop-hero.png`
+
+From **1024px up**, every desktop width must match that composition. Do not invent a different hero layout per breakpoint.
+
+## Required composition
+
+1. **Two columns** — budget (lime, ~1fr) | promo banner (~2fr), equal **stretched height**, gap between cards.
+2. **Left card** — search, “Search to start shopping”, Instant Budget Match (slider + chips), black “Show devices in budget” at bottom (`mt-auto`).
+3. **Right card** — poster fills the media area edge-to-edge (`object-fit: cover`), **no black letterbox gutters** above/below the art.
+4. **CTA bar** — solid black strip **flush under the poster** (no gap): yellow “Pre Order Now” + outline “View details”, side-by-side.
+5. Same structure at 1024 / 1280 / 1440 / 1920 / 2560 — only rem root scaling may change density, not layout.
+
+## Do not
+
+- Lock desktop media to a fixed `aspect-ratio` that leaves black empty bands when the column stretches.
+- Use `object-fit: contain` on the desktop hero poster (causes letterboxing).
+- Detach CTAs from the poster or stack them on desktop.
+- Change column order or drop equal-height stretch on desktop.
+
+## Mobile / tablet (&lt;1024)
+
+Stack is OK (banner first, budget below). Poster + CTAs still flush; CTAs stay side-by-side. Header: no WhatsApp/search on small screens; hamburger visible.

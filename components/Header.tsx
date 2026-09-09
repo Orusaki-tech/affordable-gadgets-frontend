@@ -156,39 +156,11 @@ function HeaderContent() {
 
   useEffect(() => {
     if (!openMegaMenu) return;
-    // Opening the menu can remove the scrollbar (body lock) and fire a
-    // spurious scroll; ignore briefly. Do not close on wheel — trackpads
-    // fire wheel continuously while the pointer is still over the menu.
-    let armed = false;
-    const armTimer = window.setTimeout(() => {
-      armed = true;
-    }, 100);
-    const closeOnScroll = () => {
-      if (!armed) return;
-      closeMegaMenu();
-    };
-    window.addEventListener('scroll', closeOnScroll, { passive: true });
-    return () => {
-      window.clearTimeout(armTimer);
-      window.removeEventListener('scroll', closeOnScroll);
-    };
-  }, [openMegaMenu, closeMegaMenu]);
-
-  useEffect(() => {
-    if (!openMegaMenu) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') closeMegaMenu();
     };
-    const previousOverflow = document.body.style.overflow;
-    const scrollbarGap = window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.overflow = 'hidden';
-    if (scrollbarGap > 0) {
-      document.body.style.paddingRight = `${scrollbarGap}px`;
-    }
     window.addEventListener('keydown', onKeyDown);
     return () => {
-      document.body.style.overflow = previousOverflow;
-      document.body.style.paddingRight = '';
       window.removeEventListener('keydown', onKeyDown);
     };
   }, [openMegaMenu, closeMegaMenu]);

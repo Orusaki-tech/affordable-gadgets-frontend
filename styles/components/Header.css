@@ -1210,41 +1210,39 @@
   }
 }
 
-/* Pill category row — chip geometry from rem control ladder (scales with root) */
+/* Category nav row — plain text links (no chip shells) */
 .site-header__nav--pills {
   display: flex !important;
   height: auto !important;
   width: 100% !important;
   justify-content: flex-start !important;
   align-items: center !important;
-  gap: var(--control-gap) !important;
+  gap: 0.75rem !important;
 }
 
 .site-header__nav--pills .site-header__brand-menu {
-  height: var(--control-md-h) !important;
+  height: auto !important;
   align-items: center;
 }
 
 .site-header__nav--pills a,
-.site-header__nav--pills .ag-nav-pill,
-.site-header__nav--pills .ag-chip,
 .site-header__nav--pills .site-header__nav-link {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   box-sizing: border-box !important;
-  height: var(--control-md-h) !important;
-  min-height: var(--control-md-h) !important;
-  max-height: var(--control-md-h) !important;
-  padding: 0 var(--control-md-px) !important;
-  border-radius: var(--control-radius) !important;
-  background: #fff !important;
-  font-size: var(--control-md-fs) !important;
-  font-weight: 600 !important;
-  line-height: 1 !important;
-  color: var(--on-surface) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 0.25rem 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  font-size: 0.6875rem !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  color: var(--ui-gray-700, #374151) !important;
   white-space: nowrap !important;
-  border: 1px solid transparent !important;
+  border: none !important;
   gap: 0 !important;
 }
 
@@ -1254,14 +1252,12 @@
 
 .site-header__nav--pills .site-header__brand-menu--active .site-header__nav-link,
 .site-header__nav--pills .site-header__nav-link--active,
-.site-header__nav--pills .ag-nav-pill--active,
 .site-header__nav--pills .site-header__brand-menu:hover .site-header__nav-link,
-.site-header__nav--pills .site-header__brand-menu:hover .ag-nav-pill,
-.site-header__nav--pills .ag-nav-pill:hover,
 .site-header__nav--pills .site-header__nav-link:hover,
 .site-header__nav--pills a:hover {
-  background: var(--primary) !important;
-  color: #fff !important;
+  background: transparent !important;
+  color: var(--primary, #030304) !important;
+  font-weight: 600 !important;
 }
 
 @media (min-width: 1024px) {

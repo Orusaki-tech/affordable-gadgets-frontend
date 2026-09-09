@@ -410,7 +410,7 @@ function HeaderContent() {
           >
             <Link
               href="/products"
-              className={`ag-nav-pill site-header__nav-link${isAllDevicesActive ? ' ag-nav-pill--active site-header__nav-link--active' : ''}`}
+              className={`site-header__nav-link${isAllDevicesActive ? ' site-header__nav-link--active' : ''}`}
               onMouseEnter={closeMegaMenu}
             >
               All Devices
@@ -449,8 +449,8 @@ function HeaderContent() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`ag-nav-pill site-header__nav-link${
-                  isShopNavActive(link.href, pathname, currentSearch) ? ' ag-nav-pill--active site-header__nav-link--active' : ''
+                className={`site-header__nav-link${
+                  isShopNavActive(link.href, pathname, currentSearch) ? ' site-header__nav-link--active' : ''
                 }`}
                 onMouseEnter={closeMegaMenu}
               >
@@ -460,21 +460,21 @@ function HeaderContent() {
 
             <Link
               href="/financing"
-              className="ag-nav-pill site-header__nav-link"
+              className="site-header__nav-link"
               onMouseEnter={closeMegaMenu}
             >
               Financing
             </Link>
             <Link
               href="/articles"
-              className="ag-nav-pill site-header__nav-link"
+              className="site-header__nav-link"
               onMouseEnter={closeMegaMenu}
             >
               Blog
             </Link>
             <Link
               href="/cart"
-              className="ag-nav-pill site-header__nav-link"
+              className="site-header__nav-link"
               onMouseEnter={closeMegaMenu}
             >
               Track Order

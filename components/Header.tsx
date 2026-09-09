@@ -26,6 +26,12 @@ import {
 } from '@/lib/config/nav-links';
 import { clearAuthToken } from '@/lib/api/openapi';
 import { createClient } from '@/lib/supabase/client';
+import {
+  clearStoredSessionUser,
+  getStoredSessionUser,
+  type SessionUser,
+} from '@/lib/auth/session-user';
+import { refreshSessionUser } from '@/lib/auth/load-session-user';
 import { AuthChoiceModal } from './AuthChoiceModal';
 import { HeaderBrandMenu, HeaderMoreBrandsMenu } from './HeaderBrandMenu';
 import { HeaderMegaMenuPanel, MEGA_MENU_MORE_KEY } from './HeaderMegaMenuPanel';
@@ -67,6 +73,7 @@ function HeaderContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [sessionUser, setSessionUser] = useState<SessionUser | null>(null);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [openMegaMenu, setOpenMegaMenu] = useState<string | null>(null);
@@ -122,17 +129,29 @@ function HeaderContent() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const readAuth = () => setIsLoggedIn(!!localStorage.getItem('auth_token'));
+    const readAuth = () => {
+      const loggedIn = !!localStorage.getItem('auth_token');
+      setIsLoggedIn(loggedIn);
+      setSessionUser(loggedIn ? getStoredSessionUser() : null);
+      if (loggedIn) {
+        void refreshSessionUser().then((user) => {
+          if (user) setSessionUser(user);
+        });
+      }
+    };
     readAuth();
     const handleAuthChange = () => readAuth();
+    const handleUserChange = () => setSessionUser(getStoredSessionUser());
     const handleStorage = (event: StorageEvent) => {
-      if (event.key === 'auth_token') setIsLoggedIn(!!event.newValue);
+      if (event.key === 'auth_token' || event.key === 'auth_user') readAuth();
     };
     window.addEventListener('storage', handleStorage);
     window.addEventListener('auth-token-changed', handleAuthChange);
+    window.addEventListener('auth-user-changed', handleUserChange);
     return () => {
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener('auth-token-changed', handleAuthChange);
+      window.removeEventListener('auth-user-changed', handleUserChange);
     };
   }, []);
 
@@ -296,29 +315,57 @@ function HeaderContent() {
                 <button
                   type="button"
                   className="site-header__account ag-icon-btn ag-icon-btn--label"
-                  aria-label="Account menu"
+                  aria-label={
+                    sessionUser
+                      ? `Account menu for ${sessionUser.displayName}`
+                      : 'Account menu'
+                  }
+                  aria-expanded={isAccountMenuOpen}
                   onClick={() => setIsAccountMenuOpen((prev) => !prev)}
                 >
-                  <MaterialIcon name="person" className="text-[1.375rem]" />
-                  <span className="hidden text-type-eyebrow font-semibold normal-case tracking-normal lg:inline">Account</span>
+                  <span className="site-header__account-avatar-wrap" aria-hidden="true">
+                    <span className="site-header__account-avatar">
+                      {sessionUser?.initials || 'U'}
+                    </span>
+                    <span className="site-header__account-status site-header__account-status--on" />
+                  </span>
+                  <span className="hidden max-w-[8.5rem] truncate text-type-eyebrow font-semibold normal-case tracking-normal lg:inline">
+                    {sessionUser?.firstName || sessionUser?.displayName || 'Signed in'}
+                  </span>
                 </button>
                 {isAccountMenuOpen && (
-                  <div className="absolute right-0 z-50 mt-2 min-w-[10rem] rounded-xl border border-border-hairline bg-white p-2 shadow-lg">
-                    <Link href="/cart" className="block rounded-lg px-3 py-2 text-sm hover:bg-surface-muted">
+                  <div className="site-header__account-dropdown">
+                    <div className="site-header__account-identity">
+                      <p className="site-header__account-identity-name">
+                        {sessionUser?.displayName || 'Signed in'}
+                      </p>
+                      {sessionUser?.email ? (
+                        <p className="site-header__account-identity-email">{sessionUser.email}</p>
+                      ) : (
+                        <p className="site-header__account-identity-email">You are signed in</p>
+                      )}
+                    </div>
+                    <Link
+                      href="/cart"
+                      className="site-header__account-item"
+                      onClick={() => setIsAccountMenuOpen(false)}
+                    >
                       My Orders
                     </Link>
                     <button
                       type="button"
-                      className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-surface-muted"
+                      className="site-header__account-item site-header__account-item--muted"
                       onClick={async () => {
                         const supabase = createClient();
                         await supabase.auth.signOut();
                         clearAuthToken();
+                        clearStoredSessionUser();
+                        setSessionUser(null);
                         setIsLoggedIn(false);
                         setIsAccountMenuOpen(false);
                       }}
                     >
-                      Logout
+                      Log out
                     </button>
                   </div>
                 )}
@@ -467,8 +514,15 @@ function HeaderContent() {
         {isAuthModalOpen && (
           <AuthChoiceModal
             onClose={() => setIsAuthModalOpen(false)}
+            returnTo={`${pathname}${currentSearch}` || '/'}
+            title="Welcome back"
+            description="Sign in to track orders, save your wishlist, and check out faster."
             onAuthSuccess={() => {
               setIsLoggedIn(true);
+              setSessionUser(getStoredSessionUser());
+              void refreshSessionUser().then((user) => {
+                if (user) setSessionUser(user);
+              });
               setIsAuthModalOpen(false);
             }}
           />

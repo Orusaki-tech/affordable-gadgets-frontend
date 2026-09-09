@@ -1,12 +1,24 @@
 import { apiBaseUrl, setAuthToken } from '@/lib/api/openapi';
+import { buildSessionUser, setStoredSessionUser } from '@/lib/auth/session-user';
 import { getSessionKey } from '@/lib/tracking';
 import { getStoredUTMParams } from '@/lib/utm';
+
+type SupabaseExchangeResult = {
+  token: string;
+  user?: {
+    id?: number;
+    username?: string;
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+  };
+};
 
 /**
  * Exchange a Supabase session token for a Django auth token
  * by calling the backend's /api/auth/supabase/ endpoint.
  */
-export async function exchangeSupabaseToken(accessToken: string): Promise<{ token: string } | null> {
+export async function exchangeSupabaseToken(accessToken: string): Promise<SupabaseExchangeResult | null> {
   try {
     const utm = getStoredUTMParams();
     const body: Record<string, unknown> = {
@@ -32,9 +44,20 @@ export async function exchangeSupabaseToken(accessToken: string): Promise<{ toke
       return null;
     }
 
-    const data = await resp.json();
+    const data = (await resp.json()) as SupabaseExchangeResult;
     if (data?.token) {
       setAuthToken(data.token);
+      if (data.user) {
+        setStoredSessionUser(
+          buildSessionUser({
+            id: data.user.id,
+            email: data.user.email,
+            username: data.user.username,
+            firstName: data.user.first_name,
+            lastName: data.user.last_name,
+          })
+        );
+      }
       return data;
     }
     return null;

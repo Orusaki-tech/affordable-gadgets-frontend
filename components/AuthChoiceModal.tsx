@@ -8,6 +8,8 @@ import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
 import { createClient } from '@/lib/supabase/client';
 import { exchangeSupabaseToken } from '@/lib/supabase/auth-exchange';
 import { getAuthAttributionFields } from '@/lib/auth/attribution';
+import { buildSessionUser, setStoredSessionUser } from '@/lib/auth/session-user';
+import { refreshSessionUser } from '@/lib/auth/load-session-user';
 
 interface AuthChoiceModalProps {
   onClose: () => void;
@@ -15,6 +17,8 @@ interface AuthChoiceModalProps {
   initialEmail?: string;
   title?: string;
   description?: string;
+  /** Where to return after Google OAuth (defaults to current path). */
+  returnTo?: string;
 }
 
 export function AuthChoiceModal({
@@ -23,6 +27,7 @@ export function AuthChoiceModal({
   initialEmail,
   title = 'Continue to Payment',
   description = 'Sign in to your account to continue.',
+  returnTo,
 }: AuthChoiceModalProps) {
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -127,9 +132,20 @@ export function AuthChoiceModal({
         OpenAPI.BASE = previousBase;
       }
       setPendingVerificationEmail(null);
-      const token = (res as { token?: string } | null)?.token;
+      const token = (res as { token?: string; email?: string; user_id?: number } | null)?.token;
       if (token) {
         setAuthToken(token);
+        const email =
+          (res as { email?: string } | null)?.email ||
+          (authForm.username_or_email.includes('@') ? authForm.username_or_email : null);
+        setStoredSessionUser(
+          buildSessionUser({
+            id: (res as { user_id?: number } | null)?.user_id,
+            email,
+            username: authForm.username_or_email.includes('@') ? null : authForm.username_or_email,
+          })
+        );
+        void refreshSessionUser();
       }
       onAuthSuccess();
       onClose();
@@ -211,10 +227,15 @@ export function AuthChoiceModal({
     setAuthError(null);
     try {
       const supabase = createClient();
+      const nextPath =
+        returnTo ||
+        (typeof window !== 'undefined'
+          ? `${window.location.pathname}${window.location.search}` || '/'
+          : '/');
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/checkout`,
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
         },
       });
       if (error) {
@@ -225,7 +246,7 @@ export function AuthChoiceModal({
       setAuthError('Failed to initiate Google sign in.');
       setGoogleLoading(false);
     }
-  }, []);
+  }, [returnTo]);
 
   // On mount, check if returning from Google OAuth callback
   useEffect(() => {
@@ -236,6 +257,7 @@ export function AuthChoiceModal({
         setGoogleLoading(true);
         const result = await exchangeSupabaseToken(session.access_token);
         if (result?.token) {
+          await refreshSessionUser();
           onAuthSuccess();
           onClose();
         } else {

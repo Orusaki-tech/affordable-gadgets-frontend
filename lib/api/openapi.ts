@@ -42,6 +42,9 @@ export const setAuthToken = (token: string) => {
 export const clearAuthToken = () => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('auth_token');
+    // Keep identity cleanup next to token clear so header UI resets.
+    localStorage.removeItem('auth_user');
     window.dispatchEvent(new Event('auth-token-changed'));
+    window.dispatchEvent(new Event('auth-user-changed'));
   }
 };

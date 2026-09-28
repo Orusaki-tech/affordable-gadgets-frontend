@@ -1,14 +1,21 @@
+'use client';
+
 import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import { brandConfig } from '@/lib/config/brand';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
+import { StudioBlockChrome } from '@/components/studio/StudioBlockChrome';
+import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
+import { studioPath } from '@/lib/studio/paths';
 
 export interface BlogCardProps {
   imageUrl: string;
   category: string;
   title: string;
   href: string;
+  articleId?: number | null;
+  articleSlug?: string | null;
 }
 
 function resolveImageUrl(path?: string | null) {
@@ -17,9 +24,18 @@ function resolveImageUrl(path?: string | null) {
   return `${brandConfig.apiBaseUrl}${path}`;
 }
 
-export function BlogCard({ imageUrl, category, title, href }: BlogCardProps) {
-  return (
-    <Link href={href} className="blog-card">
+export function BlogCard({
+  imageUrl,
+  category,
+  title,
+  href,
+  articleId,
+  articleSlug,
+}: BlogCardProps) {
+  const studioEdit = useStudioEditOptional();
+  const canEdit = Boolean(studioEdit?.canEdit);
+  const card = (
+    <Link href={studioPath(href)} className="blog-card">
       <div className="blog-card__image-wrap">
         <CloudinaryImage
           src={resolveImageUrl(imageUrl)}
@@ -36,5 +52,20 @@ export function BlogCard({ imageUrl, category, title, href }: BlogCardProps) {
         <h3 className="blog-card__title">{title}</h3>
       </div>
     </Link>
+  );
+
+  if (!canEdit || (!articleId && !articleSlug)) {
+    return card;
+  }
+
+  return (
+    <StudioBlockChrome
+      label={title}
+      onEdit={() => {
+        void studioEdit?.openEditArticle({ id: articleId, slug: articleSlug });
+      }}
+    >
+      {card}
+    </StudioBlockChrome>
   );
 }

@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { MaterialIcon } from '@/components/MaterialIcon';
+import { HomeBuyingGuideCard } from '@/components/home/HomeBuyingGuideCard';
 import { fetchFeaturedArticles, getArticleCardImageUrl } from '@/lib/blog/articlePage';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import { getArticleHref } from '@/lib/utils/blogRoutes';
@@ -46,6 +46,8 @@ export async function HomeBuyingGuides() {
         meta: updated ? `Updated ${updated} · ${mins} min read` : `${mins} min read`,
         excerpt: opening || guideExcerpt(category, article.product_name),
         cta: 'Read article',
+        articleId: (article as { id?: number }).id ?? null,
+        articleSlug: article.slug ?? null,
       };
     })
     .filter(Boolean)
@@ -58,6 +60,8 @@ export async function HomeBuyingGuides() {
     meta: string;
     excerpt: string;
     cta: string;
+    articleId: number | null;
+    articleSlug: string | null;
   }>;
 
   if (!guides.length) return null;
@@ -67,12 +71,8 @@ export async function HomeBuyingGuides() {
       <div className="home-section-panel">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="ag-type-eyebrow text-stock-green">
-              Tech Knowledge Hub
-            </p>
-            <h2 className="ag-type-h2 mt-1">
-              Tech Buying Guides &amp; Insights
-            </h2>
+            <p className="ag-type-eyebrow text-stock-green">Tech Knowledge Hub</p>
+            <h2 className="ag-type-h2 mt-1">Tech Buying Guides &amp; Insights</h2>
           </div>
           <Link
             href="/articles"
@@ -85,43 +85,7 @@ export async function HomeBuyingGuides() {
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {guides.map((guide) => (
-            <Link
-              key={guide.key}
-              href={guide.href}
-              className="home-buying-guides__card group flex flex-col overflow-hidden rounded-2xl border border-border-hairline bg-white shadow-sm transition hover:shadow-md"
-            >
-              <div className="home-buying-guides__media">
-                {guide.imageUrl ? (
-                  <CloudinaryImage
-                    src={guide.imageUrl}
-                    alt={guide.title}
-                    preset="blogCard"
-                    fill
-                    fit="cover"
-                    className="home-buying-guides__image"
-                    sizes="(max-width:768px) 100vw, 33vw"
-                  />
-                ) : (
-                  <div className="home-buying-guides__media-fallback">
-                    <MaterialIcon name="article" className="text-[2.5rem] text-white/50" />
-                  </div>
-                )}
-                <span className="home-buying-guides__badge">{guide.category}</span>
-              </div>
-              <div className="flex flex-1 flex-col p-4 sm:p-5">
-                <p className="text-xs font-medium text-secondary">{guide.meta}</p>
-                <h3 className="mt-2 line-clamp-2 text-base font-bold leading-snug text-primary sm:text-lg">
-                  {guide.title}
-                </h3>
-                <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-secondary">
-                  {guide.excerpt}
-                </p>
-                <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-bold text-primary">
-                  <span className="line-clamp-1">{guide.cta}</span>
-                  <MaterialIcon name="arrow_forward" className="text-[1rem] shrink-0" />
-                </span>
-              </div>
-            </Link>
+            <HomeBuyingGuideCard key={guide.key} guide={guide} />
           ))}
         </div>
       </div>

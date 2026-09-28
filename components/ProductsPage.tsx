@@ -12,6 +12,7 @@ import { ProductFilters, FilterState } from './ProductFilters';
 import { ProductsBrandBanner } from './ProductsBrandBanner';
 import { getBrandBannerConfig } from '@/lib/config/products-brand-banners';
 import { getProductHref } from '@/lib/utils/productRoutes';
+import { studioPath } from '@/lib/studio/paths';
 import { CATEGORY_CARDS } from '@/lib/config/categories';
 import { trackSearch } from '@/lib/tracking';
 import Link from 'next/link';
@@ -105,7 +106,7 @@ function ProductsPageInner({
 
       const paramString = params.toString();
       const hash = typeof window !== 'undefined' ? window.location.hash : '';
-      const nextUrl = `/products${paramString ? `?${paramString}` : ''}${hash}`;
+      const nextUrl = studioPath(`/products${paramString ? `?${paramString}` : ''}${hash}`);
       if (typeof window !== 'undefined') {
         const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
         if (currentUrl === nextUrl) {
@@ -166,7 +167,7 @@ function ProductsPageInner({
     const params = new URLSearchParams(window.location.search);
     params.delete('openFilters');
     const qs = params.toString();
-    router.replace(`/products${qs ? `?${qs}` : ''}`, { scroll: false });
+    router.replace(studioPath(`/products${qs ? `?${qs}` : ''}`), { scroll: false });
   }, [openFilters, router]);
 
   useEffect(() => {

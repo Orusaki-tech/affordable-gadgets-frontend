@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { StudioAuthProvider } from '@/components/studio/StudioAuthContext';
 import { StudioShell } from '@/components/studio/StudioShell';
 import {
+  installStudioHistoryGuard,
   isStudioBrowserPath,
   isStudioLoginPath,
   prefixStudioPath,
@@ -29,7 +30,13 @@ export function StudioRootGate({ children }: { children: ReactNode }) {
     return () => setStudioRoutingEnabled(false);
   }, [inStudio, isLogin]);
 
-  // Keep same-origin navigations under /studio while editing.
+  // Keep Next.js router.push/replace under /studio (filters, cart, search, etc.).
+  useEffect(() => {
+    if (!inStudio || isLogin) return;
+    return installStudioHistoryGuard();
+  }, [inStudio, isLogin]);
+
+  // Keep same-origin <a>/<Link> navigations under /studio while editing.
   // Capture + stopImmediatePropagation so Next.js <Link> cannot also push the bare shop URL.
   useEffect(() => {
     if (!inStudio || isLogin) return;

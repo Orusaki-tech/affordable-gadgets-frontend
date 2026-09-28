@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
+import { StudioPromoTile } from '@/components/studio/StudioPromoTile';
 import { brandConfig } from '@/lib/config/brand';
 import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
@@ -83,11 +83,14 @@ export async function HeroPromotions() {
     <div className="hero-promotions">
       <div className="hero-promotions__desktop">
         <div className="hero-promotions__banner-column">
-          <div
-            className="hero-promotions__tile hero-promotions__tile--banner"
-          >
+          <div className="hero-promotions__tile hero-promotions__tile--banner">
             {bannerItem && bannerImageSrc ? (
-              <Link href={getPromotionHref(bannerItem)} className="hero-promotions__link">
+              <StudioPromoTile
+                promotionId={bannerItem.id}
+                title={bannerItem.title}
+                href={getPromotionHref(bannerItem)}
+                className="hero-promotions__link"
+              >
                 <CloudinaryImage
                   src={bannerImageSrc}
                   alt={bannerItem.title}
@@ -98,7 +101,7 @@ export async function HeroPromotions() {
                   priority
                   fill
                 />
-              </Link>
+              </StudioPromoTile>
             ) : (
               <div className="hero-promotions__placeholder" />
             )}
@@ -110,8 +113,10 @@ export async function HeroPromotions() {
             ? gridItems.map((promotion) => {
                 const imageSrc = promotion.banner_image_url || promotion.banner_image;
                 return (
-                  <Link
+                  <StudioPromoTile
                     key={promotion.id ?? promotion.title}
+                    promotionId={promotion.id}
+                    title={promotion.title}
                     href={getPromotionHref(promotion)}
                     className="hero-promotions__tile"
                   >
@@ -127,7 +132,7 @@ export async function HeroPromotions() {
                     ) : (
                       <div className="hero-promotions__placeholder" />
                     )}
-                  </Link>
+                  </StudioPromoTile>
                 );
               })
             : [...Array(4)].map((_, i) => (
@@ -141,7 +146,9 @@ export async function HeroPromotions() {
 
       <div className="hero-promotions__mobile">
         {bannerItem && bannerImageSrc ? (
-          <Link
+          <StudioPromoTile
+            promotionId={bannerItem.id}
+            title={bannerItem.title}
             href={getPromotionHref(bannerItem)}
             className="hero-promotions__tile hero-promotions__tile--banner"
           >
@@ -155,7 +162,7 @@ export async function HeroPromotions() {
               priority
               fill
             />
-          </Link>
+          </StudioPromoTile>
         ) : (
           <div className="hero-promotions__tile hero-promotions__tile--placeholder" />
         )}
@@ -165,8 +172,10 @@ export async function HeroPromotions() {
             ? gridItems.map((promotion) => {
                 const imageSrc = promotion.banner_image_url || promotion.banner_image;
                 return (
-                  <Link
+                  <StudioPromoTile
                     key={promotion.id ?? promotion.title}
+                    promotionId={promotion.id}
+                    title={promotion.title}
                     href={getPromotionHref(promotion)}
                     className="hero-promotions__tile"
                   >
@@ -182,7 +191,7 @@ export async function HeroPromotions() {
                     ) : (
                       <div className="hero-promotions__placeholder" />
                     )}
-                  </Link>
+                  </StudioPromoTile>
                 );
               })
             : [...Array(4)].map((_, i) => (

@@ -314,3 +314,76 @@ export async function deleteStudioProduct(id: number): Promise<void> {
     );
   }
 }
+
+export type StudioArticle = {
+  id: number;
+  slug?: string;
+  category?: string;
+  headline?: string;
+  body?: string;
+  seo_title?: string;
+  seo_description?: string;
+  is_published?: boolean;
+  is_primary?: boolean;
+  product?: number | null;
+  product_name?: string | null;
+  product_slug?: string | null;
+  thumbnail_image?: string | null;
+};
+
+export type StudioPaginatedArticles = {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: StudioArticle[];
+};
+
+export async function retrieveStudioArticle(id: number): Promise<StudioArticle> {
+  return studioFetchJson<StudioArticle>(`/articles/${id}/`);
+}
+
+export async function findStudioArticleBySlug(slug: string): Promise<StudioArticle | null> {
+  const trimmed = slug.trim();
+  if (!trimmed) return null;
+  const data = await studioFetchJson<StudioPaginatedArticles>(
+    `/articles/?search=${encodeURIComponent(trimmed)}&page_size=50`
+  );
+  return data.results.find((article) => article.slug === trimmed) ?? data.results[0] ?? null;
+}
+
+export async function patchStudioArticle(
+  id: number,
+  data: Record<string, string | boolean | number | null | undefined>
+): Promise<StudioArticle> {
+  return studioFetchJson<StudioArticle>(`/articles/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export type StudioPromotion = {
+  id: number;
+  title?: string;
+  description?: string;
+  is_active?: boolean;
+  discount_percentage?: string | number | null;
+  discount_amount?: string | number | null;
+  start_date?: string;
+  end_date?: string | null;
+  banner_image?: string | null;
+  banner_image_url?: string | null;
+};
+
+export async function retrieveStudioPromotion(id: number): Promise<StudioPromotion> {
+  return studioFetchJson<StudioPromotion>(`/promotions/${id}/`);
+}
+
+export async function patchStudioPromotion(
+  id: number,
+  data: Record<string, string | boolean | number | null | undefined>
+): Promise<StudioPromotion> {
+  return studioFetchJson<StudioPromotion>(`/promotions/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}

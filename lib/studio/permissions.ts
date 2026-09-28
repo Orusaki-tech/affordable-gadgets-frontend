@@ -48,16 +48,25 @@ export function getStudioCapabilities(
     };
   }
 
-  if (isMM || isSP) {
+  if (isMM) {
+    return {
+      canRead: true,
+      canCreate: false,
+      canDelete: false,
+      canFullEdit: false,
+      canContentEdit: true,
+      readOnlyReason: null,
+    };
+  }
+
+  if (isSP) {
     return {
       canRead: true,
       canCreate: false,
       canDelete: false,
       canFullEdit: false,
       canContentEdit: false,
-      readOnlyReason: isMM
-        ? 'Marketing managers can view products here but manage promotions in the ops admin.'
-        : 'Sales staff have read-only access in Studio. Use ops admin for reservations.',
+      readOnlyReason: 'Sales staff have read-only access in Studio. Use ops admin for reservations.',
     };
   }
 

@@ -7,6 +7,7 @@ import { StructuredData } from '@/components/StructuredData';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { ProductBlogBody } from '@/components/ProductBlogMarkdown';
+import { StudioArticleEditButton } from '@/components/studio/StudioPdpEditButton';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import {
   fetchArticleBySlug,
@@ -137,6 +138,10 @@ export default async function StandaloneBlogPage({ params }: StandaloneBlogPageP
           </nav>
 
           <header className="mb-8">
+            <StudioArticleEditButton
+              articleId={(article as { id?: number }).id}
+              articleSlug={canonicalArticleSlug}
+            />
             <div className="flex flex-wrap items-center gap-3 text-sm font-medium text-blue-600 mb-4">
               <span className="bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider text-[0.625rem]">
                 {formatArticleCategory(article.category)}

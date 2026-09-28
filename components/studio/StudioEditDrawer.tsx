@@ -2,23 +2,23 @@
 
 import { useEffect } from 'react';
 import { StudioProductEditor } from '@/components/studio/StudioProductEditor';
-import type { StudioProduct } from '@/lib/studio/api';
+import { StudioArticleEditor } from '@/components/studio/StudioArticleEditor';
+import { StudioPromotionEditor } from '@/components/studio/StudioPromotionEditor';
+import type { StudioArticle, StudioProduct, StudioPromotion } from '@/lib/studio/api';
+
+export type StudioEditResource =
+  | { kind: 'product'; mode: 'create' | 'edit'; product?: StudioProduct | null }
+  | { kind: 'article'; article: StudioArticle }
+  | { kind: 'promotion'; promotion: StudioPromotion };
 
 type StudioEditDrawerProps = {
   open: boolean;
-  mode: 'create' | 'edit';
-  product?: StudioProduct | null;
+  resource: StudioEditResource | null;
   onClose: () => void;
-  onSaved: (product: StudioProduct) => void;
+  onSaved: () => void | Promise<void>;
 };
 
-export function StudioEditDrawer({
-  open,
-  mode,
-  product,
-  onClose,
-  onSaved,
-}: StudioEditDrawerProps) {
+export function StudioEditDrawer({ open, resource, onClose, onSaved }: StudioEditDrawerProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -32,10 +32,19 @@ export function StudioEditDrawer({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || !resource) return null;
+
+  const label =
+    resource.kind === 'product'
+      ? resource.mode === 'create'
+        ? 'New product'
+        : 'Edit product'
+      : resource.kind === 'article'
+        ? 'Edit article'
+        : 'Edit promotion';
 
   return (
-    <div className="studio-drawer" role="dialog" aria-modal="true" aria-label="Edit product">
+    <div className="studio-drawer" role="dialog" aria-modal="true" aria-label={label}>
       <button type="button" className="studio-drawer__backdrop" aria-label="Close" onClick={onClose} />
       <div className="studio-drawer__panel">
         <div className="studio-drawer__top">
@@ -46,14 +55,34 @@ export function StudioEditDrawer({
             </svg>
           </button>
         </div>
-        <StudioProductEditor
-          mode={mode}
-          product={product}
-          onSaved={(saved) => {
-            onSaved(saved);
-            onClose();
-          }}
-        />
+        {resource.kind === 'product' && (
+          <StudioProductEditor
+            mode={resource.mode}
+            product={resource.product}
+            onSaved={async () => {
+              await onSaved();
+              onClose();
+            }}
+          />
+        )}
+        {resource.kind === 'article' && (
+          <StudioArticleEditor
+            article={resource.article}
+            onSaved={async () => {
+              await onSaved();
+              onClose();
+            }}
+          />
+        )}
+        {resource.kind === 'promotion' && (
+          <StudioPromotionEditor
+            promotion={resource.promotion}
+            onSaved={async () => {
+              await onSaved();
+              onClose();
+            }}
+          />
+        )}
       </div>
     </div>
   );

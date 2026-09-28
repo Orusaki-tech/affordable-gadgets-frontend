@@ -53,6 +53,8 @@ export function ProductBlogTab({
             category={article.category || 'buying_guide'}
             title={article.headline}
             href={href}
+            articleId={(article as { id?: number }).id}
+            articleSlug={article.slug}
           />
         </div>
       );

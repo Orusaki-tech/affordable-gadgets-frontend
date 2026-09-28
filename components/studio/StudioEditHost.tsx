@@ -11,13 +11,18 @@ import {
 } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
-import { StudioEditDrawer } from '@/components/studio/StudioEditDrawer';
+import {
+  StudioEditDrawer,
+  type StudioEditResource,
+} from '@/components/studio/StudioEditDrawer';
 import { useStudioAuthOptional } from '@/components/studio/StudioAuthContext';
 import {
   deleteStudioProduct,
+  findStudioArticleBySlug,
+  retrieveStudioArticle,
   retrieveStudioProduct,
+  retrieveStudioPromotion,
   StudioApiError,
-  type StudioProduct,
 } from '@/lib/studio/api';
 import { isStudioBrowserPath } from '@/lib/studio/paths';
 import type { PublicProduct } from '@/lib/api/generated';
@@ -26,9 +31,13 @@ type StudioEditHostValue = {
   canEdit: boolean;
   canDelete: boolean;
   canCreate: boolean;
-  openCreate: () => void;
-  openEdit: (product: Pick<PublicProduct, 'id' | 'product_name'> | number) => Promise<void>;
+  openCreateProduct: () => void;
+  openEditProduct: (
+    product: Pick<PublicProduct, 'id' | 'product_name'> | number
+  ) => Promise<void>;
   deleteProduct: (product: Pick<PublicProduct, 'id' | 'product_name'>) => Promise<void>;
+  openEditArticle: (ref: { id?: number | null; slug?: string | null }) => Promise<void>;
+  openEditPromotion: (id: number) => Promise<void>;
 };
 
 const StudioEditContext = createContext<StudioEditHostValue | undefined>(undefined);
@@ -38,8 +47,8 @@ export function useStudioEditOptional(): StudioEditHostValue | undefined {
 }
 
 /**
- * Global in-place product editor for the mirrored storefront under /studio.
- * Mounted once in StudioShell so every page (home, catalog, PDP cards, etc.) can edit.
+ * Global in-place editors for the mirrored storefront under /studio.
+ * Products, articles, and promotions share one drawer host.
  */
 export function StudioEditHost({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -50,8 +59,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('edit');
-  const [editing, setEditing] = useState<StudioProduct | null>(null);
+  const [resource, setResource] = useState<StudioEditResource | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const capabilities = studio?.capabilities;
@@ -62,21 +70,19 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
   const canDelete = Boolean(capabilities?.canDelete);
   const canCreate = Boolean(capabilities?.canCreate);
 
-  const openCreate = useCallback(() => {
-    setDrawerMode('create');
-    setEditing(null);
+  const openCreateProduct = useCallback(() => {
+    setResource({ kind: 'product', mode: 'create', product: null });
     setDrawerOpen(true);
   }, []);
 
-  const openEdit = useCallback(
+  const openEditProduct = useCallback(
     async (product: Pick<PublicProduct, 'id' | 'product_name'> | number) => {
       const id = typeof product === 'number' ? product : product.id;
       if (!id) return;
       setError(null);
-      setDrawerMode('edit');
       try {
         const full = await retrieveStudioProduct(id);
-        setEditing(full);
+        setResource({ kind: 'product', mode: 'edit', product: full });
         setDrawerOpen(true);
       } catch (err) {
         setError(
@@ -114,6 +120,53 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     [canDelete, queryClient]
   );
 
+  const openEditArticle = useCallback(
+    async (ref: { id?: number | null; slug?: string | null }) => {
+      setError(null);
+      try {
+        const full =
+          ref.id != null
+            ? await retrieveStudioArticle(ref.id)
+            : ref.slug
+              ? await findStudioArticleBySlug(ref.slug)
+              : null;
+        if (!full) {
+          setError('Could not find article for editing');
+          return;
+        }
+        setResource({ kind: 'article', article: full });
+        setDrawerOpen(true);
+      } catch (err) {
+        setError(
+          err instanceof StudioApiError
+            ? err.message
+            : err instanceof Error
+              ? err.message
+              : 'Could not load article for editing'
+        );
+      }
+    },
+    []
+  );
+
+  const openEditPromotion = useCallback(async (id: number) => {
+    if (!id) return;
+    setError(null);
+    try {
+      const full = await retrieveStudioPromotion(id);
+      setResource({ kind: 'promotion', promotion: full });
+      setDrawerOpen(true);
+    } catch (err) {
+      setError(
+        err instanceof StudioApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : 'Could not load promotion for editing'
+      );
+    }
+  }, []);
+
   // Deep-link: /studio/products?new=1 or ?edit=<id>
   useEffect(() => {
     if (!active || !capabilities) return;
@@ -122,28 +175,47 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     if (!isNew && !editId) return;
 
     if (isNew && capabilities.canCreate) {
-      openCreate();
+      openCreateProduct();
     } else if (editId) {
       const id = Number(editId);
       if (Number.isFinite(id) && id > 0) {
-        void openEdit(id);
+        void openEditProduct(id);
       }
     }
 
     const clean = pathname?.startsWith('/studio') ? pathname : '/studio/products';
     router.replace(clean, { scroll: false });
-  }, [active, capabilities, searchParams, openCreate, openEdit, router, pathname]);
+  }, [
+    active,
+    capabilities,
+    searchParams,
+    openCreateProduct,
+    openEditProduct,
+    router,
+    pathname,
+  ]);
 
   const value = useMemo<StudioEditHostValue>(
     () => ({
       canEdit,
       canDelete,
       canCreate,
-      openCreate,
-      openEdit,
+      openCreateProduct,
+      openEditProduct,
       deleteProduct,
+      openEditArticle,
+      openEditPromotion,
     }),
-    [canEdit, canDelete, canCreate, openCreate, openEdit, deleteProduct]
+    [
+      canEdit,
+      canDelete,
+      canCreate,
+      openCreateProduct,
+      openEditProduct,
+      deleteProduct,
+      openEditArticle,
+      openEditPromotion,
+    ]
   );
 
   if (!active) {
@@ -163,17 +235,15 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       {children}
       <StudioEditDrawer
         open={drawerOpen}
-        mode={drawerMode}
-        product={editing}
+        resource={resource}
         onClose={() => {
           setDrawerOpen(false);
-          setEditing(null);
+          setResource(null);
         }}
         onSaved={async () => {
           await queryClient.invalidateQueries({ queryKey: ['products'] });
           await queryClient.invalidateQueries({ queryKey: ['product'] });
-          // PDP data is often cached outside list queries — refresh the live page.
-          if (pathname?.includes('/products/')) {
+          if (pathname?.includes('/products/') || pathname?.includes('/blog/') || pathname?.includes('/articles')) {
             window.location.reload();
           }
         }}

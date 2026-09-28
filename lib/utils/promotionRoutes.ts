@@ -1,4 +1,5 @@
 import type { PublicPromotion } from '@/lib/api/generated';
+import { studioPath } from '@/lib/studio/paths';
 import { getProductHref } from '@/lib/utils/productRoutes';
 
 type PromotionLinkSource = {
@@ -32,7 +33,7 @@ export function getPromotionHref(promotion: PromotionLinkSource): string {
     return getProductHref(undefined, { fallbackId: firstProductId, promotionId });
   }
   if (promotionId) {
-    return `/products?promotion=${promotionId}`;
+    return studioPath(`/products?promotion=${promotionId}`);
   }
-  return '/products';
+  return studioPath('/products');
 }

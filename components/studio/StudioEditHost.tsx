@@ -448,6 +448,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
           await queryClient.invalidateQueries({ queryKey: ['products'] });
           await queryClient.invalidateQueries({ queryKey: ['articles'] });
           await queryClient.refetchQueries({ queryKey: ['products', 'featured'] });
+          await queryClient.refetchQueries({ queryKey: ['articles', 'featured'] });
           if (isPicker) {
             setRefreshOnClose(true);
             return;

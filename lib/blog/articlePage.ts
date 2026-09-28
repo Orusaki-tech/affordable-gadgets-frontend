@@ -7,7 +7,7 @@ import type { ArticleProductTypeCode } from '@/lib/blog/articleHubs';
 /** Match homepage ISR (`app/page.tsx` revalidate=60) so What's New thumbnails don't stay stale for an hour. */
 export const BLOG_REVALIDATE = 60;
 /** Keep in sync with FEATURED_PRODUCTS_PAGE_SIZE in lib/hooks/useProducts.ts */
-const FEATURED_ARTICLES_PAGE_SIZE = 5;
+export const FEATURED_ARTICLES_PAGE_SIZE = 24;
 
 async function publicApiHeaders(): Promise<Record<string, string>> {
   return {

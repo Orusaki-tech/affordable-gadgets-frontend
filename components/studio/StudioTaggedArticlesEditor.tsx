@@ -262,8 +262,8 @@ export function StudioTaggedArticlesEditor({
             Choose featured blogs
           </h2>
           <p className="studio-editor__hint studio-editor__hint--tight">
-            Featured blogs appear under Tech Buying Guides on the storefront. Close this panel to
-            refresh the homepage preview.
+            Only articles with the Featured tag appear here and under Tech Buying Guides. Changes
+            update the carousel behind this panel immediately.
           </p>
         </div>
       </div>

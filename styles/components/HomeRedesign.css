@@ -430,6 +430,55 @@
   gap: 0.75rem;
 }
 
+/* Homepage buying guides carousel */
+.home-buying-guides__carousel {
+  width: 100%;
+}
+
+.home-buying-guides__carousel--loading {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 1023px) {
+  .home-buying-guides__carousel--loading {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .home-buying-guides__carousel--loading {
+    grid-template-columns: 1fr;
+  }
+}
+
+.home-buying-guides__skeleton {
+  min-height: 22rem;
+  border-radius: 1rem;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e6e6e6 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: home-buying-guides-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes home-buying-guides-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.home-buying-guides__slide {
+  height: 100%;
+}
+
+.home-buying-guides__slide .home-buying-guides__card,
+.home-buying-guides__slide .studio-block-chrome {
+  height: 100%;
+}
+
 /* Homepage buying guides — media fills frame edge-to-edge */
 .home-buying-guides__media {
   position: relative;

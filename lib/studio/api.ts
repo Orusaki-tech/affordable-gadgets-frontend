@@ -797,7 +797,8 @@ export async function setStudioProductTagIds(
 
 /**
  * Add or remove a named tag on a product.
- * Removal uses remove_tags (by name/slug) so empty tag_ids and duplicate tag rows both clear.
+ * Removal prefers remove_tags (by name/slug); falls back to update_content tag_ids
+ * when that endpoint is not deployed yet.
  */
 export async function setStudioProductTagged(
   productId: number,
@@ -811,16 +812,45 @@ export async function setStudioProductTagged(
   }
 
   if (!options.enabled) {
-    const saved = await studioFetchJson<StudioProduct>(
-      `/products/${productId}/remove_tags/`,
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          names: [options.tagName],
-          slugs: [options.tagSlug],
-        }),
+    try {
+      const saved = await studioFetchJson<StudioProduct>(
+        `/products/${productId}/remove_tags/`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            names: [options.tagName],
+            slugs: [options.tagSlug],
+          }),
+        }
+      );
+      if (saved.tags == null) {
+        return retrieveStudioProduct(productId);
       }
-    );
+      return saved;
+    } catch (err) {
+      // Older API builds may not have remove_tags yet — fall back to tag_ids rewrite.
+      if (!(err instanceof StudioApiError) || (err.status !== 404 && err.status !== 405)) {
+        throw err;
+      }
+    }
+
+    const product = await retrieveStudioProduct(productId);
+    const currentTags = product.tags || [];
+    const matchesTarget = (tag: { id?: number; name?: string; slug?: string }) => {
+      if (tag.id != null && tag.id === ensured.id) return true;
+      const name = tag.name?.toLowerCase() || '';
+      const slug = tag.slug?.toLowerCase() || '';
+      return (
+        name === options.tagName.toLowerCase() ||
+        slug === options.tagSlug.toLowerCase() ||
+        slug === options.tagName.toLowerCase()
+      );
+    };
+    const nextIds = currentTags
+      .filter((t) => !matchesTarget(t))
+      .map((t) => t.id)
+      .filter((id): id is number => typeof id === 'number');
+    const saved = await setStudioProductTagIds(productId, nextIds);
     if (saved.tags == null) {
       return retrieveStudioProduct(productId);
     }

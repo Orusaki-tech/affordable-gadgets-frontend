@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { OpenAPI } from '@/lib/api/generated';
 import {
   ensureStudioTag,
   listStudioProducts,
@@ -18,7 +19,7 @@ export type StudioTaggedSectionConfig = {
   key: StudioSectionTagKey;
   tagName: string;
   tagSlug: string;
-  /** @deprecated kept for type compatibility; picker uses inventory ?tag= */
+  /** Public storefront query — same source as the homepage section. */
   listQuery: string;
   title: string;
   description: string;
@@ -32,10 +33,10 @@ export const STUDIO_SECTION_TAGS: Record<StudioSectionTagKey, StudioTaggedSectio
     key: 'featured',
     tagName: 'Featured',
     tagSlug: 'featured',
-    listQuery: 'featured=1&page_size=50&page=1',
+    listQuery: 'featured=1&page_size=100&page=1',
     title: 'Featured Product Highlights',
     description:
-      'Products with the Featured tag appear here and on /products?featured=1.',
+      'Only products with the Featured tag appear here and on /products?featured=1.',
     currentHeading: 'Currently featured',
     searchLabel: 'Search catalog',
     emptySelected: 'Nothing featured yet. Search the catalog below and click Add.',
@@ -44,10 +45,10 @@ export const STUDIO_SECTION_TAGS: Record<StudioSectionTagKey, StudioTaggedSectio
     key: 'video',
     tagName: 'Video',
     tagSlug: 'video',
-    listQuery: 'homepage_videos=1&page_size=50&page=1',
+    listQuery: 'homepage_videos=1&page_size=100&page=1',
     title: 'Verified Tech Unboxings',
     description:
-      'Products with the Video tag (and a product video) appear in this homepage section.',
+      'Only products with the Video tag (and a product video) appear in this homepage section.',
     currentHeading: 'Currently in videos',
     searchLabel: 'Search catalog',
     emptySelected:
@@ -67,6 +68,41 @@ type StudioTaggedProductsEditorProps = {
   onSaved?: () => void | Promise<void>;
 };
 
+/**
+ * Same public curated list the homepage uses — never invent untagged products.
+ * cache: no-store + bust so Remove does not resurrect a stale list.
+ */
+async function fetchPublicTaggedProducts(listQuery: string): Promise<ListedProduct[]> {
+  const base = OpenAPI.BASE.replace(/\/+$/, '');
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    ...(typeof OpenAPI.HEADERS === 'function'
+      ? await OpenAPI.HEADERS({} as never)
+      : (OpenAPI.HEADERS ?? {})),
+  };
+  const bust = `_=${Date.now()}`;
+  const res = await fetch(`${base}/api/v1/public/products/?${listQuery}&${bust}`, {
+    credentials: 'omit',
+    headers,
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error(`Section products request failed: ${res.status}`);
+  const data = await res.json();
+  return (
+    (data.results ?? []) as Array<{
+      id?: number;
+      product_name?: string;
+      primary_image?: string | null;
+    }>
+  )
+    .filter((p) => typeof p.id === 'number')
+    .map((p) => ({
+      id: p.id!,
+      product_name: p.product_name || `Product #${p.id}`,
+      image: p.primary_image || null,
+    }));
+}
+
 export function StudioTaggedProductsEditor({
   section,
   roleHint,
@@ -84,22 +120,8 @@ export function StudioTaggedProductsEditor({
   const [msg, setMsg] = useState<string | null>(null);
 
   const refreshSelected = useCallback(async () => {
-    // Auth inventory list (no public CDN/browser cache) — matches live tags immediately.
-    const data = await listStudioProducts({
-      tag: config.tagSlug,
-      page: 1,
-      pageSize: 100,
-    });
-    setSelected(
-      (data.results ?? [])
-        .filter((p): p is StudioProduct & { id: number } => typeof p.id === 'number')
-        .map((p) => ({
-          id: p.id,
-          product_name: p.product_name || `Product #${p.id}`,
-          image: studioProductImageUrl(p),
-        }))
-    );
-  }, [config.tagSlug]);
+    setSelected(await fetchPublicTaggedProducts(config.listQuery));
+  }, [config.listQuery]);
 
   useEffect(() => {
     let cancelled = false;
@@ -168,7 +190,6 @@ export function StudioTaggedProductsEditor({
     setBusyId(productId);
     setError(null);
     setMsg(null);
-    // Optimistic UI so Remove feels instant.
     if (!enabled) {
       setSelected((prev) => prev.filter((p) => p.id !== productId));
     }
@@ -188,21 +209,8 @@ export function StudioTaggedProductsEditor({
           `Could not remove the ${config.tagName} tag. The product may still be tagged in admin.`
         );
       }
-      if (enabled && saved.id) {
-        setSelected((prev) => {
-          if (prev.some((p) => p.id === saved.id)) return prev;
-          return [
-            ...prev,
-            {
-              id: saved.id!,
-              product_name: saved.product_name || `Product #${saved.id}`,
-              image: studioProductImageUrl(saved),
-            },
-          ];
-        });
-      } else if (!enabled) {
-        setSelected((prev) => prev.filter((p) => p.id !== productId));
-      }
+      // Re-read public curated list so the picker always matches the storefront.
+      await refreshSelected();
       setMsg(enabled ? `Added (${config.tagName} tag)` : `Removed (${config.tagName} tag)`);
       await onSaved?.();
     } catch (err) {

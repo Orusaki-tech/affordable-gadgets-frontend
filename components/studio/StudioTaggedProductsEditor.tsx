@@ -19,10 +19,12 @@ export type StudioTaggedSectionConfig = {
   key: StudioSectionTagKey;
   tagName: string;
   tagSlug: string;
-  /** Public list query that returns products currently in this section. */
   listQuery: string;
   title: string;
   description: string;
+  currentHeading: string;
+  searchLabel: string;
+  emptySelected: string;
 };
 
 export const STUDIO_SECTION_TAGS: Record<StudioSectionTagKey, StudioTaggedSectionConfig> = {
@@ -33,7 +35,10 @@ export const STUDIO_SECTION_TAGS: Record<StudioSectionTagKey, StudioTaggedSectio
     listQuery: 'featured=1&page_size=50&page=1',
     title: 'Featured Product Highlights',
     description:
-      'Products with the Featured tag appear in Featured Product Highlights and /products?featured=1. Browse below to add or remove.',
+      'Products with the Featured tag appear here and on /products?featured=1.',
+    currentHeading: 'Currently featured',
+    searchLabel: 'Search catalog',
+    emptySelected: 'Nothing featured yet. Search the catalog below and click Add.',
   },
   video: {
     key: 'video',
@@ -42,7 +47,11 @@ export const STUDIO_SECTION_TAGS: Record<StudioSectionTagKey, StudioTaggedSectio
     listQuery: 'homepage_videos=1&page_size=50&page=1',
     title: 'Verified Tech Unboxings',
     description:
-      'Products with the Video tag (and a product video) appear in this homepage section. Browse below to choose which ones show.',
+      'Products with the Video tag (and a product video) appear in this homepage section.',
+    currentHeading: 'Currently in videos',
+    searchLabel: 'Search catalog',
+    emptySelected:
+      'No video products yet. Search below and add products that have (or will have) videos.',
   },
 };
 
@@ -205,10 +214,8 @@ export function StudioTaggedProductsEditor({
     <div className="studio-editor">
       <div className="studio-editor__header">
         <h2 className="studio-editor__title">{config.title}</h2>
-        <p className="studio-editor__hint">{roleHint || config.description}</p>
-        <p className="studio-editor__hint">
-          Tag used: <strong>{config.tagName}</strong>
-        </p>
+        {roleHint ? <p className="studio-editor__hint">{roleHint}</p> : null}
+        <p className="studio-editor__hint">{config.description}</p>
       </div>
 
       {error && (
@@ -223,11 +230,11 @@ export function StudioTaggedProductsEditor({
       )}
 
       <section className="studio-featured-picker">
-        <h3 className="studio-images__title">In this section ({selected.length})</h3>
+        <h3 className="studio-images__title">
+          {config.currentHeading} ({selected.length})
+        </h3>
         {selected.length === 0 ? (
-          <p className="studio-images__empty">
-            Nothing tagged yet. Search the catalog below and click Add.
-          </p>
+          <p className="studio-images__empty">{config.emptySelected}</p>
         ) : (
           <ul className="studio-featured-picker__list">
             {selected.map((product) => (
@@ -254,9 +261,9 @@ export function StudioTaggedProductsEditor({
       </section>
 
       <section className="studio-featured-picker">
-        <h3 className="studio-images__title">Browse catalog</h3>
+        <h3 className="studio-images__title">{config.searchLabel}</h3>
         <label className="studio-field studio-field--full">
-          <span>Search products to add</span>
+          <span className="sr-only">Search products</span>
           <input
             className="studio-input"
             value={search}

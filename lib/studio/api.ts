@@ -406,6 +406,7 @@ export type StudioArticle = {
   product_name?: string | null;
   product_slug?: string | null;
   thumbnail_image?: string | null;
+  tags?: Array<{ id?: number; name?: string; slug?: string }>;
 };
 
 export type StudioPaginatedArticles = {
@@ -414,6 +415,17 @@ export type StudioPaginatedArticles = {
   previous: string | null;
   results: StudioArticle[];
 };
+
+export async function listStudioArticles(params: {
+  page?: number;
+  search?: string;
+}): Promise<StudioPaginatedArticles> {
+  const query = new URLSearchParams();
+  if (params.page) query.set('page', String(params.page));
+  if (params.search?.trim()) query.set('search', params.search.trim());
+  query.set('page_size', '50');
+  return studioFetchJson<StudioPaginatedArticles>(`/articles/?${query.toString()}`);
+}
 
 export async function retrieveStudioArticle(id: number): Promise<StudioArticle> {
   return studioFetchJson<StudioArticle>(`/articles/${id}/`);
@@ -430,7 +442,7 @@ export async function findStudioArticleBySlug(slug: string): Promise<StudioArtic
 
 export async function patchStudioArticle(
   id: number,
-  data: Record<string, string | Blob | boolean | number | null | undefined>
+  data: Record<string, string | Blob | boolean | number | null | undefined | number[]>
 ): Promise<StudioArticle> {
   const hasFile = Object.values(data).some((value) => typeof Blob !== 'undefined' && value instanceof Blob);
   if (hasFile) {
@@ -446,6 +458,38 @@ export async function patchStudioArticle(
     method: 'PATCH',
     body: JSON.stringify(data),
   });
+}
+
+export function studioArticleHasTag(
+  article: StudioArticle,
+  tagName: string,
+  tagId?: number
+): boolean {
+  const tags = article.tags || [];
+  return tags.some((tag) => {
+    if (tagId != null && tag.id === tagId) return true;
+    return (
+      tag.name?.toLowerCase() === tagName.toLowerCase() ||
+      tag.slug?.toLowerCase() === tagName.toLowerCase()
+    );
+  });
+}
+
+export async function setStudioArticleTagged(
+  articleId: number,
+  options: { tagName: string; tagSlug: string; enabled: boolean; tagId?: number }
+): Promise<StudioArticle> {
+  const tag = options.tagId
+    ? { id: options.tagId }
+    : await ensureStudioTag(options.tagName, options.tagSlug);
+  const article = await retrieveStudioArticle(articleId);
+  const currentIds = (article.tags || [])
+    .map((t) => t.id)
+    .filter((id): id is number => typeof id === 'number');
+  const next = options.enabled
+    ? Array.from(new Set([...currentIds, tag.id]))
+    : currentIds.filter((id) => id !== tag.id);
+  return patchStudioArticle(articleId, { tag_ids: next });
 }
 
 export type StudioPromotion = {

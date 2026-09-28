@@ -15,6 +15,8 @@ import { getProductHref } from '@/lib/utils/productRoutes';
 import { CATEGORY_CARDS } from '@/lib/config/categories';
 import { trackSearch } from '@/lib/tracking';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
+import type { PublicProduct } from '@/lib/api/generated';
 
 type ProductCardOptions = {
   variant?: 'default' | 'minimal' | 'featured';
@@ -28,9 +30,11 @@ type ProductCardOptions = {
 
 interface ProductsPageProps {
   cardOptions?: ProductCardOptions;
+  /** Optional custom card renderer (e.g. Studio edit chrome around ProductCard). */
+  renderProductCard?: (product: PublicProduct) => ReactNode;
 }
 
-export function ProductsPage({ cardOptions }: ProductsPageProps) {
+export function ProductsPage({ cardOptions, renderProductCard }: ProductsPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const searchParamsRef = useRef<string>('');
@@ -461,9 +465,13 @@ export function ProductsPage({ cardOptions }: ProductsPageProps) {
           ) : (
             <>
               <div id="products-grid" className="products-page__grid">
-                {filteredResults.map((product) => (
-                  <ProductCard key={product.id} product={product} {...cardOptions} />
-                ))}
+                {filteredResults.map((product) =>
+                  renderProductCard ? (
+                    <div key={product.id}>{renderProductCard(product)}</div>
+                  ) : (
+                    <ProductCard key={product.id} product={product} {...cardOptions} />
+                  )
+                )}
               </div>
 
               {/* Pagination */}

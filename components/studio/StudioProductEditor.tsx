@@ -1,7 +1,6 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useStudioAuth } from '@/components/studio/StudioAuthContext';
 import {
   createStudioProduct,
@@ -72,7 +71,6 @@ function toFormState(product?: StudioProduct | null): FormState {
 
 export function StudioProductEditor({ mode, product, onSaved }: StudioProductEditorProps) {
   const { capabilities } = useStudioAuth();
-  const router = useRouter();
   const [form, setForm] = useState<FormState>(() => toFormState(product));
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -125,7 +123,6 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
         const created = await createStudioProduct(payload);
         setSavedMsg('Created');
         onSaved?.(created);
-        router.replace(`/studio/products/${created.id}`);
         return;
       }
 

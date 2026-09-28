@@ -30,11 +30,7 @@ export function StudioShell({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!isAuthenticated) {
-    return <>{children}</>;
-  }
-
-  if (isLogin) {
+  if (!isAuthenticated || isLogin) {
     return <>{children}</>;
   }
 
@@ -42,55 +38,38 @@ export function StudioShell({ children }: { children: ReactNode }) {
     user?.username || profile?.username || user?.email || profile?.email || 'Staff';
 
   return (
-    <div className="studio-shell">
-      <header className="studio-shell__header">
-        <div className="studio-shell__brand">
-          <Link href="/studio/products" className="studio-shell__logo">
-            Visual Studio
-          </Link>
-          <span className="studio-shell__eyebrow">Staff only · mirrors storefront</span>
+    <div className="studio-mirror-root">
+      <div className="studio-float-bar" role="banner">
+        <div className="studio-float-bar__left">
+          <span className="studio-float-bar__mark">Studio</span>
+          <span className="studio-float-bar__hint">Live storefront · edit in place</span>
         </div>
-        <nav className="studio-shell__nav" aria-label="Studio">
-          <Link
-            href="/studio/products"
-            className={`studio-shell__nav-link${
-              pathname?.startsWith('/studio/products') ? ' is-active' : ''
-            }`}
-          >
-            Products
-          </Link>
+        <div className="studio-float-bar__actions">
           {capabilities.canCreate && (
-            <Link
-              href="/studio/products/new"
-              className={`studio-shell__nav-link${
-                pathname === '/studio/products/new' ? ' is-active' : ''
-              }`}
-            >
+            <Link href="/studio/products?new=1" className="studio-float-bar__btn studio-float-bar__btn--lime">
               Add product
             </Link>
           )}
           <a
-            href="/"
+            href="/products"
             target="_blank"
             rel="noopener noreferrer"
-            className="studio-shell__nav-link"
+            className="studio-float-bar__btn"
           >
-            View shop
+            Shop view
           </a>
-        </nav>
-        <div className="studio-shell__user">
-          <span className="studio-shell__user-name">{displayName}</span>
-          <button type="button" className="studio-shell__logout" onClick={logout}>
+          <span className="studio-float-bar__user">{displayName}</span>
+          <button type="button" className="studio-float-bar__btn" onClick={logout}>
             Log out
           </button>
         </div>
-      </header>
+      </div>
       {capabilities.readOnlyReason && (
-        <div className="studio-shell__banner" role="status">
+        <div className="studio-shell__banner studio-shell__banner--float" role="status">
           {capabilities.readOnlyReason}
         </div>
       )}
-      <main className="studio-shell__main">{children}</main>
+      <div className="studio-mirror-pad">{children}</div>
     </div>
   );
 }

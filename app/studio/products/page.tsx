@@ -1,12 +1,7 @@
 'use client';
 
-import { StudioProductGrid } from '@/components/studio/StudioProductGrid';
-import { useStudioAuth } from '@/components/studio/StudioAuthContext';
+import { StudioStorefrontProducts } from '@/components/studio/StudioStorefrontProducts';
 
 export default function StudioProductsPage() {
-  const { isAuthenticated, loading } = useStudioAuth();
-  if (loading || !isAuthenticated) {
-    return <p className="studio-sub">Loading…</p>;
-  }
-  return <StudioProductGrid />;
+  return <StudioStorefrontProducts />;
 }

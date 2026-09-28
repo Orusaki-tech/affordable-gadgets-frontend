@@ -46,6 +46,7 @@ type StudioEditHostValue = {
   openEditBundle: (id: number) => Promise<void>;
   openEditFinancingProvider: (id: number) => Promise<void>;
   openEditDeliveryRate: (id: number) => Promise<void>;
+  openEditFeaturedProducts: () => void;
 };
 
 const StudioEditContext = createContext<StudioEditHostValue | undefined>(undefined);
@@ -297,6 +298,16 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     [capabilities?.canEditDeliveryRates]
   );
 
+  const openEditFeaturedProducts = useCallback(() => {
+    if (!capabilities?.canEditFeaturedSelection) {
+      setError('Your role cannot edit featured product highlights.');
+      return;
+    }
+    setError(null);
+    setResource({ kind: 'featuredProducts' });
+    setDrawerOpen(true);
+  }, [capabilities?.canEditFeaturedSelection]);
+
   const value = useMemo<StudioEditHostValue | null>(() => {
     if (!capabilities || !isAuthenticated) return null;
     return {
@@ -304,6 +315,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       canEdit: Boolean(
         capabilities.canFullEditProduct ||
           capabilities.canContentEditProduct ||
+          capabilities.canEditFeaturedSelection ||
           capabilities.canEditArticles ||
           capabilities.canEditPromotions ||
           capabilities.canEditBundles ||
@@ -320,6 +332,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       openEditBundle,
       openEditFinancingProvider,
       openEditDeliveryRate,
+      openEditFeaturedProducts,
     };
   }, [
     capabilities,
@@ -332,6 +345,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     openEditBundle,
     openEditFinancingProvider,
     openEditDeliveryRate,
+    openEditFeaturedProducts,
   ]);
 
   if (!value || !capabilities) {

@@ -578,3 +578,72 @@ export async function patchStudioDeliveryRate(
     body: JSON.stringify(data),
   });
 }
+
+export type StudioTag = {
+  id: number;
+  name?: string;
+  slug?: string;
+};
+
+const FEATURED_TAG_NAME = 'Featured';
+
+export async function listStudioTags(): Promise<StudioTag[]> {
+  const data = await studioFetchJson<StudioTag[] | { results?: StudioTag[] }>('/tags/');
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
+}
+
+export async function ensureStudioFeaturedTag(): Promise<StudioTag> {
+  const tags = await listStudioTags();
+  const existing = tags.find(
+    (tag) =>
+      tag.name?.toLowerCase() === FEATURED_TAG_NAME.toLowerCase() ||
+      tag.slug?.toLowerCase() === 'featured'
+  );
+  if (existing?.id) return existing;
+  return studioFetchJson<StudioTag>('/tags/', {
+    method: 'POST',
+    body: JSON.stringify({ name: FEATURED_TAG_NAME, slug: 'featured' }),
+  });
+}
+
+export function studioProductHasFeaturedTag(product: StudioProduct, featuredTagId?: number): boolean {
+  const tags = product.tags || [];
+  return tags.some((tag) => {
+    if (featuredTagId != null && tag.id === featuredTagId) return true;
+    return (
+      tag.name?.toLowerCase() === FEATURED_TAG_NAME.toLowerCase() ||
+      tag.slug?.toLowerCase() === 'featured'
+    );
+  });
+}
+
+/** Set product tags via update_content (CC/IM). Replaces the full tag set. */
+export async function setStudioProductTagIds(
+  productId: number,
+  tagIds: number[]
+): Promise<StudioProduct> {
+  return studioFetchJson<StudioProduct>(`/products/${productId}/update_content/`, {
+    method: 'PATCH',
+    body: JSON.stringify({ tag_ids: tagIds }),
+  });
+}
+
+export async function setStudioProductFeatured(
+  productId: number,
+  featured: boolean,
+  featuredTagId?: number
+): Promise<StudioProduct> {
+  const tag = featuredTagId
+    ? { id: featuredTagId }
+    : await ensureStudioFeaturedTag();
+  const product = await retrieveStudioProduct(productId);
+  const currentIds = (product.tags || [])
+    .map((t) => t.id)
+    .filter((id): id is number => typeof id === 'number');
+  const next = featured
+    ? Array.from(new Set([...currentIds, tag.id]))
+    : currentIds.filter((id) => id !== tag.id);
+  return setStudioProductTagIds(productId, next);
+}
+

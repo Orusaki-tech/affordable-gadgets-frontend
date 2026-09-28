@@ -7,6 +7,7 @@ import { StudioPromotionEditor } from '@/components/studio/StudioPromotionEditor
 import { StudioBundleEditor } from '@/components/studio/StudioBundleEditor';
 import { StudioFinancingProviderEditor } from '@/components/studio/StudioFinancingProviderEditor';
 import { StudioDeliveryRateEditor } from '@/components/studio/StudioDeliveryRateEditor';
+import { StudioFeaturedProductsEditor } from '@/components/studio/StudioFeaturedProductsEditor';
 import type {
   StudioArticle,
   StudioBundle,
@@ -22,7 +23,8 @@ export type StudioEditResource =
   | { kind: 'promotion'; promotion: StudioPromotion }
   | { kind: 'bundle'; bundle: StudioBundle }
   | { kind: 'financingProvider'; provider: StudioFinancingProvider }
-  | { kind: 'deliveryRate'; rate: StudioDeliveryRate };
+  | { kind: 'deliveryRate'; rate: StudioDeliveryRate }
+  | { kind: 'featuredProducts' };
 
 type StudioEditDrawerProps = {
   open: boolean;
@@ -48,6 +50,8 @@ function resourceLabel(resource: StudioEditResource): string {
       return `Financing · ${resource.provider.name || resource.provider.id}`;
     case 'deliveryRate':
       return `Delivery · ${resource.rate.county || resource.rate.id}`;
+    case 'featuredProducts':
+      return 'Featured Product Highlights';
     default:
       return 'Edit';
   }
@@ -158,6 +162,14 @@ export function StudioEditDrawer({
             onSaved={async () => {
               await onSaved();
               onClose();
+            }}
+          />
+        )}
+        {active.kind === 'featuredProducts' && (
+          <StudioFeaturedProductsEditor
+            roleHint={roleHint}
+            onSaved={async () => {
+              await onSaved();
             }}
           />
         )}

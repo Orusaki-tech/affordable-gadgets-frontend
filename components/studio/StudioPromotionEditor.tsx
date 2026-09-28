@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import {
   patchStudioPromotion,
+  resolveStudioImageUrl,
   StudioApiError,
   type StudioPromotion,
 } from '@/lib/studio/api';
@@ -22,6 +23,8 @@ export function StudioPromotionEditor({ promotion, onSaved }: StudioPromotionEdi
   const [discountAmount, setDiscountAmount] = useState(
     promotion.discount_amount != null ? String(promotion.discount_amount) : ''
   );
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -35,20 +38,36 @@ export function StudioPromotionEditor({ promotion, onSaved }: StudioPromotionEdi
     setDiscountAmount(
       promotion.discount_amount != null ? String(promotion.discount_amount) : ''
     );
+    setBannerFile(null);
+    setBannerPreview(null);
   }, [promotion]);
+
+  useEffect(() => {
+    return () => {
+      if (bannerPreview) URL.revokeObjectURL(bannerPreview);
+    };
+  }, [bannerPreview]);
+
+  const currentBanner =
+    bannerPreview ||
+    resolveStudioImageUrl(promotion.banner_image_url, [promotion.banner_image]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     setSaving(true);
     try {
-      const saved = await patchStudioPromotion(promotion.id, {
+      const payload: Record<string, string | Blob | boolean | number | null | undefined> = {
         title: title.trim(),
         description: description.trim(),
         is_active: isActive,
         discount_percentage: discountPercentage.trim() || null,
         discount_amount: discountAmount.trim() || null,
-      });
+      };
+      if (bannerFile) {
+        payload.banner_image = bannerFile;
+      }
+      const saved = await patchStudioPromotion(promotion.id, payload);
       onSaved?.(saved);
     } catch (err) {
       setError(
@@ -89,6 +108,34 @@ export function StudioPromotionEditor({ promotion, onSaved }: StudioPromotionEdi
           inputMode="decimal"
         />
       </label>
+
+      <div className="studio-images studio-images--single">
+        <div className="studio-images__head">
+          <h3 className="studio-images__title">Banner image</h3>
+          <label className="studio-btn studio-btn--ghost studio-images__upload">
+            {bannerFile ? 'Change image' : 'Upload image'}
+            <input
+              type="file"
+              accept="image/*"
+              disabled={saving}
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                if (bannerPreview) URL.revokeObjectURL(bannerPreview);
+                setBannerFile(file);
+                setBannerPreview(file ? URL.createObjectURL(file) : null);
+                e.target.value = '';
+              }}
+            />
+          </label>
+        </div>
+        {currentBanner ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={currentBanner} alt="" className="studio-images__preview" />
+        ) : (
+          <p className="studio-images__empty">No banner yet.</p>
+        )}
+      </div>
+
       <label className="studio-field studio-field--checkbox">
         <input
           type="checkbox"

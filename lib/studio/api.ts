@@ -315,6 +315,79 @@ export async function deleteStudioProduct(id: number): Promise<void> {
   }
 }
 
+export type StudioProductImage = {
+  id: number;
+  image_url?: string | null;
+  image?: string | null;
+  is_primary?: boolean;
+  alt_text?: string;
+  display_order?: number;
+};
+
+function appendFormValue(
+  form: FormData,
+  key: string,
+  value: string | Blob | boolean | number | null | undefined
+) {
+  if (value === undefined) return;
+  if (value === null) {
+    form.append(key, '');
+    return;
+  }
+  if (typeof value === 'boolean') {
+    form.append(key, value ? 'true' : 'false');
+    return;
+  }
+  form.append(key, value as string | Blob);
+}
+
+export async function uploadStudioProductImages(
+  productId: number,
+  files: File[],
+  options?: { makePrimary?: boolean; altText?: string }
+): Promise<StudioProductImage[]> {
+  const form = new FormData();
+  files.forEach((file) => form.append('images', file));
+  if (options?.makePrimary) form.append('make_primary', 'true');
+  if (options?.altText) form.append('alt_text', options.altText);
+  return studioFetchJson<StudioProductImage[]>(`/products/${productId}/images/upload/`, {
+    method: 'POST',
+    body: form,
+    multipart: true,
+  });
+}
+
+export async function setStudioProductPrimaryImage(
+  productId: number,
+  imageId: number
+): Promise<void> {
+  await studioFetchJson(`/products/${productId}/images/set-primary/`, {
+    method: 'POST',
+    body: JSON.stringify({ image_id: imageId }),
+  });
+}
+
+export async function deleteStudioProductImages(
+  productId: number,
+  imageIds: number[]
+): Promise<void> {
+  await studioFetchJson(`/products/${productId}/images/delete/`, {
+    method: 'POST',
+    body: JSON.stringify({ image_ids: imageIds }),
+  });
+}
+
+export function resolveStudioImageUrl(
+  raw?: string | null,
+  fallbacks?: Array<string | null | undefined>
+): string | null {
+  const candidates = [raw, ...(fallbacks || [])].filter(Boolean) as string[];
+  const first = candidates[0];
+  if (!first) return null;
+  if (first.startsWith('http') || first.startsWith('blob:')) return first;
+  return `${apiRoot()}${first.startsWith('/') ? first : `/${first}`}`;
+}
+
 export type StudioArticle = {
   id: number;
   slug?: string;
@@ -353,8 +426,18 @@ export async function findStudioArticleBySlug(slug: string): Promise<StudioArtic
 
 export async function patchStudioArticle(
   id: number,
-  data: Record<string, string | boolean | number | null | undefined>
+  data: Record<string, string | Blob | boolean | number | null | undefined>
 ): Promise<StudioArticle> {
+  const hasFile = Object.values(data).some((value) => typeof Blob !== 'undefined' && value instanceof Blob);
+  if (hasFile) {
+    const form = new FormData();
+    Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
+    return studioFetchJson<StudioArticle>(`/articles/${id}/`, {
+      method: 'PATCH',
+      body: form,
+      multipart: true,
+    });
+  }
   return studioFetchJson<StudioArticle>(`/articles/${id}/`, {
     method: 'PATCH',
     body: JSON.stringify(data),
@@ -380,8 +463,18 @@ export async function retrieveStudioPromotion(id: number): Promise<StudioPromoti
 
 export async function patchStudioPromotion(
   id: number,
-  data: Record<string, string | boolean | number | null | undefined>
+  data: Record<string, string | Blob | boolean | number | null | undefined>
 ): Promise<StudioPromotion> {
+  const hasFile = Object.values(data).some((value) => typeof Blob !== 'undefined' && value instanceof Blob);
+  if (hasFile) {
+    const form = new FormData();
+    Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
+    return studioFetchJson<StudioPromotion>(`/promotions/${id}/`, {
+      method: 'PATCH',
+      body: form,
+      multipart: true,
+    });
+  }
   return studioFetchJson<StudioPromotion>(`/promotions/${id}/`, {
     method: 'PATCH',
     body: JSON.stringify(data),

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StudioProductEditor } from '@/components/studio/StudioProductEditor';
 import { StudioArticleEditor } from '@/components/studio/StudioArticleEditor';
 import { StudioPromotionEditor } from '@/components/studio/StudioPromotionEditor';
@@ -19,6 +19,12 @@ type StudioEditDrawerProps = {
 };
 
 export function StudioEditDrawer({ open, resource, onClose, onSaved }: StudioEditDrawerProps) {
+  const [active, setActive] = useState<StudioEditResource | null>(resource);
+
+  useEffect(() => {
+    setActive(resource);
+  }, [resource]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -32,14 +38,14 @@ export function StudioEditDrawer({ open, resource, onClose, onSaved }: StudioEdi
     };
   }, [open, onClose]);
 
-  if (!open || !resource) return null;
+  if (!open || !active) return null;
 
   const label =
-    resource.kind === 'product'
-      ? resource.mode === 'create'
+    active.kind === 'product'
+      ? active.mode === 'create'
         ? 'New product'
         : 'Edit product'
-      : resource.kind === 'article'
+      : active.kind === 'article'
         ? 'Edit article'
         : 'Edit promotion';
 
@@ -55,28 +61,33 @@ export function StudioEditDrawer({ open, resource, onClose, onSaved }: StudioEdi
             </svg>
           </button>
         </div>
-        {resource.kind === 'product' && (
+        {active.kind === 'product' && (
           <StudioProductEditor
-            mode={resource.mode}
-            product={resource.product}
-            onSaved={async () => {
+            mode={active.mode}
+            product={active.product}
+            onSaved={async (saved) => {
               await onSaved();
+              if (active.mode === 'create') {
+                // Stay open so staff can upload images right away.
+                setActive({ kind: 'product', mode: 'edit', product: saved });
+                return;
+              }
               onClose();
             }}
           />
         )}
-        {resource.kind === 'article' && (
+        {active.kind === 'article' && (
           <StudioArticleEditor
-            article={resource.article}
+            article={active.article}
             onSaved={async () => {
               await onSaved();
               onClose();
             }}
           />
         )}
-        {resource.kind === 'promotion' && (
+        {active.kind === 'promotion' && (
           <StudioPromotionEditor
-            promotion={resource.promotion}
+            promotion={active.promotion}
             onSaved={async () => {
               await onSaved();
               onClose();

@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import {
   patchStudioArticle,
+  resolveStudioImageUrl,
   StudioApiError,
   type StudioArticle,
 } from '@/lib/studio/api';
@@ -19,6 +20,8 @@ export function StudioArticleEditor({ article, onSaved }: StudioArticleEditorPro
   const [seoDescription, setSeoDescription] = useState(article.seo_description || '');
   const [body, setBody] = useState(article.body || '');
   const [isPublished, setIsPublished] = useState(article.is_published ?? true);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -29,21 +32,36 @@ export function StudioArticleEditor({ article, onSaved }: StudioArticleEditorPro
     setSeoDescription(article.seo_description || '');
     setBody(article.body || '');
     setIsPublished(article.is_published ?? true);
+    setThumbnailFile(null);
+    setThumbnailPreview(null);
   }, [article]);
+
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    };
+  }, [thumbnailPreview]);
+
+  const currentThumb =
+    thumbnailPreview || resolveStudioImageUrl(article.thumbnail_image);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     setSaving(true);
     try {
-      const saved = await patchStudioArticle(article.id, {
+      const payload: Record<string, string | Blob | boolean | null | undefined> = {
         headline: headline.trim(),
         slug: slug.trim(),
         seo_title: seoTitle.trim(),
         seo_description: seoDescription.trim(),
         body,
         is_published: isPublished,
-      });
+      };
+      if (thumbnailFile) {
+        payload.thumbnail_image = thumbnailFile;
+      }
+      const saved = await patchStudioArticle(article.id, payload);
       onSaved?.(saved);
     } catch (err) {
       setError(
@@ -84,6 +102,34 @@ export function StudioArticleEditor({ article, onSaved }: StudioArticleEditorPro
         <span>Body (markdown)</span>
         <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={12} />
       </label>
+
+      <div className="studio-images studio-images--single">
+        <div className="studio-images__head">
+          <h3 className="studio-images__title">Thumbnail</h3>
+          <label className="studio-btn studio-btn--ghost studio-images__upload">
+            {thumbnailFile ? 'Change image' : 'Upload image'}
+            <input
+              type="file"
+              accept="image/*"
+              disabled={saving}
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+                setThumbnailFile(file);
+                setThumbnailPreview(file ? URL.createObjectURL(file) : null);
+                e.target.value = '';
+              }}
+            />
+          </label>
+        </div>
+        {currentThumb ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={currentThumb} alt="" className="studio-images__preview" />
+        ) : (
+          <p className="studio-images__empty">No thumbnail yet.</p>
+        )}
+      </div>
+
       <label className="studio-field studio-field--checkbox">
         <input
           type="checkbox"

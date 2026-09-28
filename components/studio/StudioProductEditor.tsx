@@ -9,6 +9,7 @@ import {
   StudioApiError,
   type StudioProduct,
 } from '@/lib/studio/api';
+import { StudioProductImages } from '@/components/studio/StudioProductImages';
 
 const PRODUCT_TYPES = [
   { value: 'PH', label: 'Phone' },
@@ -71,21 +72,26 @@ function toFormState(product?: StudioProduct | null): FormState {
 
 export function StudioProductEditor({ mode, product, onSaved }: StudioProductEditorProps) {
   const { capabilities } = useStudioAuth();
+  const [activeMode, setActiveMode] = useState(mode);
   const [form, setForm] = useState<FormState>(() => toFormState(product));
+  const [currentProduct, setCurrentProduct] = useState<StudioProduct | null>(product ?? null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    setActiveMode(mode);
     setForm(toFormState(product));
-  }, [product]);
+    setCurrentProduct(product ?? null);
+  }, [mode, product]);
 
   const canEdit = useMemo(() => {
-    if (mode === 'create') return capabilities.canCreate;
+    if (activeMode === 'create') return capabilities.canCreate;
     return capabilities.canFullEdit || capabilities.canContentEdit;
-  }, [mode, capabilities]);
+  }, [activeMode, capabilities]);
 
-  const contentOnly = mode === 'edit' && !capabilities.canFullEdit && capabilities.canContentEdit;
+  const contentOnly =
+    activeMode === 'edit' && !capabilities.canFullEdit && capabilities.canContentEdit;
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -116,17 +122,20 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
     };
 
     try {
-      if (mode === 'create') {
+      if (activeMode === 'create') {
         if (!payload.product_name) {
           throw new StudioApiError('Product name is required', 400, null);
         }
         const created = await createStudioProduct(payload);
-        setSavedMsg('Created');
+        setActiveMode('edit');
+        setCurrentProduct(created);
+        setSavedMsg('Created — add images below, then close when done');
         onSaved?.(created);
         return;
       }
 
-      if (!product?.id) {
+      const productId = currentProduct?.id ?? product?.id;
+      if (!productId) {
         throw new StudioApiError('Missing product id', 400, null);
       }
 
@@ -136,10 +145,11 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
         Object.entries(payload).forEach(([key, value]) => {
           if (CONTENT_KEYS.has(key)) contentPayload[key] = value;
         });
-        saved = await updateStudioProductContent(product.id, contentPayload);
+        saved = await updateStudioProductContent(productId, contentPayload);
       } else {
-        saved = await patchStudioProduct(product.id, payload);
+        saved = await patchStudioProduct(productId, payload);
       }
+      setCurrentProduct(saved);
       setSavedMsg('Saved');
       onSaved?.(saved);
     } catch (err) {
@@ -155,7 +165,7 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
     }
   };
 
-  if (!canEdit && mode === 'create') {
+  if (!canEdit && activeMode === 'create') {
     return (
       <div className="studio-alert" role="status">
         Your role cannot create products.
@@ -170,11 +180,11 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
     <form className="studio-editor" onSubmit={handleSubmit}>
       <div className="studio-editor__header">
         <h2 className="studio-editor__title">
-          {mode === 'create' ? 'New product' : 'Edit product'}
+          {activeMode === 'create' ? 'New product' : 'Edit product'}
         </h2>
         {contentOnly && (
           <p className="studio-editor__hint">
-            Content-creator mode: name, descriptions, SEO, and publish only.
+            Content-creator mode: name, descriptions, SEO, images, and publish.
           </p>
         )}
       </div>
@@ -325,6 +335,23 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
         </label>
       </div>
 
+      {currentProduct?.id ? (
+        <StudioProductImages
+          productId={currentProduct.id}
+          productName={currentProduct.product_name || form.product_name}
+          initialImages={currentProduct.images}
+          disabled={fieldDisabled}
+          onChanged={(next) => {
+            setCurrentProduct(next);
+            setSavedMsg('Images updated');
+          }}
+        />
+      ) : (
+        activeMode === 'create' && (
+          <p className="studio-editor__hint">Save the product first, then upload images.</p>
+        )
+      )}
+
       {error && (
         <div className="studio-alert" role="alert">
           {error}
@@ -339,7 +366,7 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
       {canEdit && (
         <div className="studio-editor__actions">
           <button type="submit" className="studio-btn studio-btn--lime" disabled={saving}>
-            {saving ? 'Saving…' : mode === 'create' ? 'Create product' : 'Save changes'}
+            {saving ? 'Saving…' : activeMode === 'create' ? 'Create product' : 'Save changes'}
           </button>
         </div>
       )}

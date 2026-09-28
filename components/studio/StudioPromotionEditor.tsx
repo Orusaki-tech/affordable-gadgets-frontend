@@ -196,12 +196,12 @@ export function StudioPromotionEditor({
         <input type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
       </label>
       <label className="studio-field">
-        <span>Carousel position</span>
+        <span>Hero / carousel order</span>
         <input
           value={carouselPosition}
           onChange={(e) => setCarouselPosition(e.target.value)}
           inputMode="numeric"
-          placeholder="1 = primary banner"
+          placeholder="1 = first on homepage hero"
         />
       </label>
 

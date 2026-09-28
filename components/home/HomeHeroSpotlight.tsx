@@ -6,14 +6,13 @@ import { useRouter } from 'next/navigation';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { MaterialIcon } from '@/components/MaterialIcon';
 import { PreOrderModal } from '@/components/PreOrderModal';
-import { StudioBlockChrome } from '@/components/studio/StudioBlockChrome';
 import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 import { brandConfig } from '@/lib/config/brand';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { studioPath } from '@/lib/studio/paths';
+import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 
-const IPHONE_18_PRO_MAX_SLUG = 'apple-iphone-18-pro-max';
 const HERO_PROMOTION_PLACEHOLDER_IMAGE =
   'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773069898/pixel8_cd7p2f.png';
 const HERO_AUTOPLAY_INTERVAL_MS = 6000;
@@ -73,6 +72,13 @@ function getHeroBannerSrc(promotion: PublicPromotion | null): string | null {
   );
 }
 
+function primaryCtaLabel(promotion: PublicPromotion | null): string {
+  const title = promotion?.title?.trim() || '';
+  if (/pre[-\s]?order/i.test(title)) return 'Pre Order Now';
+  if (/early bird|campaign|launch/i.test(title)) return 'Learn more';
+  return 'Shop offer';
+}
+
 type HomeHeroSpotlightProps = {
   initialPromotionsData?: PaginatedPublicPromotionList;
 };
@@ -115,7 +121,8 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
 
   const rotationIndexRef = useRef(0);
   useEffect(() => {
-    if (promoIds.length <= 1) return;
+    // Pause autoplay in Studio so editors control what they see.
+    if (canEditPromos || promoIds.length <= 1) return;
     if (activePromotionId === null || !promoIds.includes(activePromotionId)) {
       setActivePromotionId(promoIds[0] ?? null);
       rotationIndexRef.current = 0;
@@ -127,7 +134,7 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
       setActivePromotionId(promoIds[rotationIndexRef.current] ?? null);
     }, HERO_AUTOPLAY_INTERVAL_MS);
     return () => window.clearInterval(interval);
-  }, [promoIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [promoIdsKey, canEditPromos]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activePromotion = useMemo(() => {
     if (!promotions.length) return null;
@@ -143,190 +150,220 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
   const displayBannerSrc =
     activeBannerSrc && !bannerImageFailed ? activeBannerSrc : HERO_PROMOTION_PLACEHOLDER_IMAGE;
 
+  const detailsHref = useMemo(
+    () => (activePromotion ? getPromotionHref(activePromotion) : studioPath('/products')),
+    [activePromotion]
+  );
+
   const budgetHref = useMemo(() => {
-    if (budget <= 20000) return '/products?max_price=20000';
-    if (budget <= 50000) return `/products?min_price=20000&max_price=${budget}`;
-    return `/products?min_price=${Math.max(50000, budget - 20000)}&max_price=${budget + 20000}`;
+    if (budget <= 20000) return studioPath('/products?max_price=20000');
+    if (budget <= 50000) return studioPath(`/products?min_price=20000&max_price=${budget}`);
+    return studioPath(
+      `/products?min_price=${Math.max(50000, budget - 20000)}&max_price=${budget + 20000}`
+    );
   }, [budget]);
 
   const onSearch = (event: FormEvent) => {
     event.preventDefault();
     const q = query.trim();
-    router.push(q ? `/products?search=${encodeURIComponent(q)}` : '/products');
+    router.push(q ? studioPath(`/products?search=${encodeURIComponent(q)}`) : studioPath('/products'));
   };
 
   return (
     <section className="home-redesign__hero ag-bleed ag-bleed--hero">
-      {/* Explicit 1fr / 2fr on desktop — budget ~33%, banner ~66% */}
       <div className="ag-bleed__inner">
         <div className="home-redesign__hero-grid">
-        <div className="home-redesign__hero-budget">
-          <form onSubmit={onSearch}>
-            <div className="home-redesign__hero-search flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm sm:p-3.5">
-              <MaterialIcon name="search" className="text-[1.35rem] text-secondary" />
+          <div className="home-redesign__hero-budget">
+            {canEditPromos ? (
+              <p className="studio-hero-budget-note" role="note">
+                Budget finder is shop UI (not a promotion). Edit the banner on the right — that
+                controls homepage hero creatives and placement.
+              </p>
+            ) : null}
+            <form onSubmit={onSearch}>
+              <div className="home-redesign__hero-search flex items-center gap-2 rounded-xl bg-white p-3 shadow-sm sm:p-3.5">
+                <MaterialIcon name="search" className="text-[1.35rem] text-secondary" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search products…"
+                  className="ag-type-body w-full bg-transparent outline-none"
+                  aria-label="Search catalog"
+                />
+              </div>
+            </form>
+
+            <div>
+              <h2 className="ag-type-h3">Search to start shopping</h2>
+              <p className="ag-type-body mt-1 text-primary/75">
+                Type a product name above — or set a budget and browse live stock.
+              </p>
+            </div>
+
+            <div className="flex flex-1 flex-col rounded-xl bg-white/70 p-4 backdrop-blur-sm sm:p-5">
+              <div className="flex items-center justify-between gap-2">
+                <p className="ag-type-eyebrow text-primary">Instant Budget Match</p>
+                <p className="text-base font-bold text-primary">
+                  KSh {budget.toLocaleString('en-KE')}
+                </p>
+              </div>
               <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search products…"
-                className="ag-type-body w-full bg-transparent outline-none"
-                aria-label="Search catalog"
+                type="range"
+                min={10000}
+                max={150000}
+                step={5000}
+                value={budget}
+                onChange={(e) => setBudget(Number(e.target.value))}
+                className="mt-5 w-full accent-primary"
+                aria-label="Budget amount"
               />
+              <div className="mt-5 flex flex-wrap gap-2">
+                {BUDGET_PRESETS.map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => setBudget(preset.value)}
+                    className="ag-chip ag-chip--soft"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+              <p className="ag-type-body mt-5 text-primary/70">
+                We’ll show phones and gadgets that fit this budget, in stock for pickup or delivery.
+              </p>
+              <Link href={budgetHref} className="ag-btn ag-btn--primary ag-btn--block mt-auto">
+                Show devices in budget
+                <MaterialIcon name="arrow_forward" className="text-[1rem]" />
+              </Link>
             </div>
-          </form>
-
-          <div>
-            <h2 className="ag-type-h3">Search to start shopping</h2>
-            <p className="ag-type-body mt-1 text-primary/75">
-              Type a product name above — or set a budget and browse live stock.
-            </p>
           </div>
 
-          <div className="flex flex-1 flex-col rounded-xl bg-white/70 p-4 backdrop-blur-sm sm:p-5">
-            <div className="flex items-center justify-between gap-2">
-              <p className="ag-type-eyebrow text-primary">
-                Instant Budget Match
-              </p>
-              <p className="text-base font-bold text-primary">
-                KSh {budget.toLocaleString('en-KE')}
-              </p>
-            </div>
-            <input
-              type="range"
-              min={10000}
-              max={150000}
-              step={5000}
-              value={budget}
-              onChange={(e) => setBudget(Number(e.target.value))}
-              className="mt-5 w-full accent-primary"
-              aria-label="Budget amount"
-            />
-            <div className="mt-5 flex flex-wrap gap-2">
-              {BUDGET_PRESETS.map((preset) => (
-                <button
-                  key={preset.label}
-                  type="button"
-                  onClick={() => setBudget(preset.value)}
-                  className="ag-chip ag-chip--soft"
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
-            <p className="ag-type-body mt-5 text-primary/70">
-              We’ll show phones and gadgets that fit this budget, in stock for pickup or delivery.
-            </p>
-            <Link
-              href={budgetHref}
-              className="ag-btn ag-btn--primary ag-btn--block mt-auto"
-            >
-              Show devices in budget
-              <MaterialIcon name="arrow_forward" className="text-[1rem]" />
-            </Link>
-          </div>
-        </div>
-
-        <div className="home-redesign__hero-banner">
-          {(() => {
-            const banner = (
-              <>
-                <div className="home-redesign__hero-banner-media">
-                  <CloudinaryImage
-                    src={displayBannerSrc}
-                    alt={activePromotion?.title ?? 'Featured promotion'}
-                    preset="homepageHero"
-                    fit="cover"
-                    sizes="(max-width: 1023px) 100vw, 66vw"
-                    className="home-redesign__hero-banner-img"
-                    fill
-                    priority
-                    onError={() => setBannerImageFailed(true)}
-                  />
-                </div>
-
-                <div className="home-redesign__hero-banner-actions">
+          <div className="home-redesign__hero-banner-stack">
+            <div className="home-redesign__hero-banner">
+              {canEditPromos && activePromotion?.id ? (
+                <div className="studio-editable-card__chrome studio-hero-banner__chrome">
                   <button
                     type="button"
-                    onClick={() => setPreOrderOpen(true)}
-                    className="ag-btn ag-btn--primary home-redesign__hero-cta home-redesign__hero-cta--primary"
+                    className="studio-icon-btn studio-icon-btn--edit"
+                    title={`Edit ${activePromotion.title} · ${studioEdit?.capabilities.roleLabel || 'Studio'}`}
+                    aria-label={`Edit hero banner ${activePromotion.title}`}
+                    onClick={() => void studioEdit?.openEditPromotion(activePromotion.id!)}
                   >
-                    Pre Order Now
-                    <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
+                    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden fill="currentColor">
+                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" />
+                    </svg>
+                    <span>Edit banner</span>
                   </button>
-                  <Link
-                    href={studioPath(`/products/${IPHONE_18_PRO_MAX_SLUG}`)}
-                    className="ag-btn home-redesign__hero-cta home-redesign__hero-cta--secondary"
-                  >
-                    View details
-                  </Link>
                 </div>
+              ) : null}
 
-                {canEditPromos && promotions.length > 1 ? (
-                  <div className="studio-hero-banner__dots" role="tablist" aria-label="Hero banners">
-                    {promotions.map((promo) => {
-                      const id = promo.id;
-                      if (typeof id !== 'number') return null;
-                      const active = id === activePromotion?.id;
+              <div className="home-redesign__hero-banner-media">
+                <CloudinaryImage
+                  src={displayBannerSrc}
+                  alt={activePromotion?.title ?? 'Featured promotion'}
+                  preset="homepageHero"
+                  fit="cover"
+                  sizes="(max-width: 1023px) 100vw, 66vw"
+                  className="home-redesign__hero-banner-img"
+                  fill
+                  priority
+                  onError={() => setBannerImageFailed(true)}
+                />
+              </div>
+
+              <div className="home-redesign__hero-banner-actions">
+                <button
+                  type="button"
+                  onClick={() => setPreOrderOpen(true)}
+                  className="ag-btn ag-btn--primary home-redesign__hero-cta home-redesign__hero-cta--primary"
+                >
+                  {primaryCtaLabel(activePromotion)}
+                  <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
+                </button>
+                <Link
+                  href={detailsHref}
+                  className="ag-btn home-redesign__hero-cta home-redesign__hero-cta--secondary"
+                >
+                  View details
+                </Link>
+              </div>
+
+              {promotions.length > 1 ? (
+                <div className="studio-hero-banner__dots" role="tablist" aria-label="Hero banners">
+                  {promotions.map((promo) => {
+                    const id = promo.id;
+                    if (typeof id !== 'number') return null;
+                    const active = id === activePromotion?.id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        role="tab"
+                        aria-selected={active}
+                        className={`studio-hero-banner__dot${active ? ' studio-hero-banner__dot--active' : ''}`}
+                        title={promo.title}
+                        onClick={() => setActivePromotionId(id)}
+                      />
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+
+            {canEditPromos ? (
+              <div className="studio-hero-placement" role="region" aria-label="Homepage hero placement">
+                <p className="studio-hero-placement__label">
+                  Homepage hero carousel — order uses each promotion’s carousel position (1 = first).
+                  Tick <strong>Homepage hero</strong> in the editor to place a promo here.
+                </p>
+                {promotions.length === 0 ? (
+                  <p className="studio-hero-placement__empty">
+                    No promotions with location “Homepage hero” yet. Create or edit a promotion and
+                    enable that location.
+                  </p>
+                ) : (
+                  <ul className="studio-hero-placement__list">
+                    {promotions.map((promo, index) => {
+                      if (!promo.id) return null;
+                      const isActive = promo.id === activePromotion?.id;
                       return (
-                        <button
-                          key={id}
-                          type="button"
-                          role="tab"
-                          aria-selected={active}
-                          className={`studio-hero-banner__dot${active ? ' studio-hero-banner__dot--active' : ''}`}
-                          title={promo.title}
-                          onClick={() => setActivePromotionId(id)}
-                        />
+                        <li key={promo.id}>
+                          <button
+                            type="button"
+                            className={`studio-hero-placement__item${isActive ? ' studio-hero-placement__item--active' : ''}`}
+                            onClick={() => {
+                              setActivePromotionId(promo.id!);
+                              void studioEdit?.openEditPromotion(promo.id!);
+                            }}
+                          >
+                            <span className="studio-hero-placement__pos">
+                              #{promo.carousel_position ?? index + 1}
+                            </span>
+                            <span className="studio-hero-placement__title">{promo.title}</span>
+                            <span className="studio-icon-btn studio-icon-btn--edit">
+                              <span>Edit</span>
+                            </span>
+                          </button>
+                        </li>
                       );
                     })}
-                  </div>
-                ) : null}
-              </>
-            );
-
-            if (!canEditPromos || !activePromotion?.id) {
-              return banner;
-            }
-
-            return (
-              <StudioBlockChrome
-                label={activePromotion.title || 'Hero banner'}
-                roleHint={studioEdit?.capabilities.roleLabel}
-                className="studio-hero-banner"
-                onEdit={() => {
-                  void studioEdit?.openEditPromotion(activePromotion.id!);
-                }}
-              >
-                {banner}
-              </StudioBlockChrome>
-            );
-          })()}
-
-          {canEditPromos && promotions.length > 0 ? (
-            <ul className="studio-hero-banner__list" aria-label="Edit homepage hero banners">
-              {promotions.map((promo) => {
-                if (!promo.id) return null;
-                return (
-                  <li key={promo.id}>
-                    <button
-                      type="button"
-                      className="studio-icon-btn studio-icon-btn--edit"
-                      onClick={() => void studioEdit?.openEditPromotion(promo.id!)}
-                    >
-                      <span>Edit · {promo.title}</span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : null}
-        </div>
+                  </ul>
+                )}
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
 
       <PreOrderModal
         open={preOrderOpen}
-        title="Pre-order iPhone 18 Pro Max"
-        subtitle="Secure your unit — we will confirm deposit and pickup or delivery options."
+        title={
+          activePromotion?.title
+            ? `${activePromotion.title}`
+            : 'Request this offer'
+        }
+        subtitle="We will confirm deposit, pickup, or delivery options."
         onClose={() => setPreOrderOpen(false)}
       />
     </section>

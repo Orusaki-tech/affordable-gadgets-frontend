@@ -12,6 +12,7 @@ import {
   type StudioSectionTagKey,
 } from '@/components/studio/StudioTaggedProductsEditor';
 import { StudioTaggedArticlesEditor } from '@/components/studio/StudioTaggedArticlesEditor';
+import { StudioBrandBannerEditor } from '@/components/studio/StudioBrandBannerEditor';
 import type {
   StudioArticle,
   StudioBundle,
@@ -30,6 +31,7 @@ export type StudioEditResource =
   | { kind: 'deliveryRate'; rate: StudioDeliveryRate }
   | { kind: 'taggedProducts'; section: StudioSectionTagKey }
   | { kind: 'taggedArticles' }
+  | { kind: 'brandBanner'; brandFilter: string }
   /** @deprecated prefer taggedProducts + section: 'featured' */
   | { kind: 'featuredProducts' };
 
@@ -65,6 +67,8 @@ function resourceLabel(resource: StudioEditResource): string {
         : 'Featured Product Highlights';
     case 'taggedArticles':
       return 'Tech Buying Guides & Insights';
+    case 'brandBanner':
+      return `${resource.brandFilter} brand banner`;
     default:
       return 'Edit';
   }
@@ -116,6 +120,8 @@ export function StudioEditDrawer({
             <p className="studio-drawer__eyebrow">
               {active.kind === 'promotion'
                 ? 'Edit promotion'
+                : active.kind === 'brandBanner'
+                  ? 'Edit brand banner'
                 : active.kind === 'taggedProducts' || active.kind === 'taggedArticles' || active.kind === 'featuredProducts'
                   ? 'Choose content'
                   : 'In-place edit'}
@@ -202,6 +208,15 @@ export function StudioEditDrawer({
         )}
         {active.kind === 'taggedArticles' && (
           <StudioTaggedArticlesEditor
+            roleHint={roleHint}
+            onSaved={async () => {
+              await onSaved();
+            }}
+          />
+        )}
+        {active.kind === 'brandBanner' && (
+          <StudioBrandBannerEditor
+            brandFilter={active.brandFilter}
             roleHint={roleHint}
             onSaved={async () => {
               await onSaved();

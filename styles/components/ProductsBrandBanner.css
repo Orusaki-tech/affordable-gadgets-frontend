@@ -52,3 +52,15 @@
     object-position: center;
   }
 }
+
+.products-brand-banner__empty {
+  display: grid;
+  place-items: center;
+  min-height: 8rem;
+  height: 100%;
+  padding: 1rem;
+  color: var(--on-surface-variant, #46464a);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+}

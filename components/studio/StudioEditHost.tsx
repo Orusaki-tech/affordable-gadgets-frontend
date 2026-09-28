@@ -49,6 +49,7 @@ type StudioEditHostValue = {
   openEditFeaturedProducts: () => void;
   openEditVideoProducts: () => void;
   openEditFeaturedArticles: () => void;
+  openEditBrandBanner: (brandFilter: string) => void;
 };
 
 const StudioEditContext = createContext<StudioEditHostValue | undefined>(undefined);
@@ -342,6 +343,24 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     setDrawerOpen(true);
   }, [capabilities?.canEditArticles]);
 
+  const openEditBrandBanner = useCallback(
+    (brandFilter: string) => {
+      if (!capabilities?.canEditPromotions) {
+        setError('Your role cannot edit brand banners (Marketing / Content).');
+        return;
+      }
+      const brand = brandFilter.trim();
+      if (!brand) {
+        setError('Missing brand filter for banner edit.');
+        return;
+      }
+      setError(null);
+      setResource({ kind: 'brandBanner', brandFilter: brand });
+      setDrawerOpen(true);
+    },
+    [capabilities?.canEditPromotions]
+  );
+
   const value = useMemo<StudioEditHostValue | null>(() => {
     if (!capabilities || !isAuthenticated) return null;
     return {
@@ -370,6 +389,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       openEditFeaturedProducts,
       openEditVideoProducts,
       openEditFeaturedArticles,
+      openEditBrandBanner,
     };
   }, [
     capabilities,
@@ -385,6 +405,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     openEditFeaturedProducts,
     openEditVideoProducts,
     openEditFeaturedArticles,
+    openEditBrandBanner,
   ]);
 
   if (!value || !capabilities) {
@@ -420,7 +441,8 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
           const isPicker =
             kind === 'taggedProducts' ||
             kind === 'taggedArticles' ||
-            kind === 'featuredProducts';
+            kind === 'featuredProducts' ||
+            kind === 'brandBanner';
           if (isPicker) {
             // Keep the picker open; refresh the storefront mirror when the drawer closes.
             setRefreshOnClose(true);

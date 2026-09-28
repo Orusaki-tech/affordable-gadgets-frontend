@@ -507,12 +507,37 @@ export type StudioPromotion = {
   banner_image?: string | null;
   banner_image_url?: string | null;
   display_locations?: string[] | string | null;
+  listing_brand?: string | null;
   carousel_position?: number | null;
   featured_product?: number | null;
+  promotion_code?: string | null;
 };
+
+export async function listStudioPromotions(params?: {
+  page?: number;
+  is_active?: boolean;
+}): Promise<{ count: number; results: StudioPromotion[]; next: string | null }> {
+  const query = new URLSearchParams();
+  query.set('page_size', '100');
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.is_active != null) query.set('is_active', params.is_active ? 'true' : 'false');
+  return studioFetchJson(`/promotions/?${query.toString()}`);
+}
 
 export async function retrieveStudioPromotion(id: number): Promise<StudioPromotion> {
   return studioFetchJson<StudioPromotion>(`/promotions/${id}/`);
+}
+
+export async function createStudioPromotion(
+  data: Record<string, string | Blob | boolean | number | null | undefined | string[]>
+): Promise<StudioPromotion> {
+  const form = new FormData();
+  Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
+  return studioFetchJson<StudioPromotion>('/promotions/', {
+    method: 'POST',
+    body: form,
+    multipart: true,
+  });
 }
 
 export async function patchStudioPromotion(
@@ -529,6 +554,39 @@ export async function patchStudioPromotion(
     body: form,
     multipart: true,
   });
+}
+
+export function brandBannerPromotionCode(brandFilter: string): string {
+  const slug = brandFilter.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return `BRAND-BANNER-${slug}`.toUpperCase();
+}
+
+export function studioPromotionHasLocation(promotion: StudioPromotion, location: string): boolean {
+  const raw = promotion.display_locations;
+  const list = Array.isArray(raw)
+    ? raw.map(String)
+    : typeof raw === 'string'
+      ? raw.split(',').map((s) => s.trim())
+      : [];
+  return list.includes(location);
+}
+
+export async function findStudioBrandBannerPromotion(
+  brandFilter: string
+): Promise<StudioPromotion | null> {
+  const code = brandBannerPromotionCode(brandFilter);
+  const data = await listStudioPromotions({ page: 1 });
+  const results = data.results ?? [];
+  const byCode = results.find((p) => (p.promotion_code || '').toUpperCase() === code);
+  if (byCode) return byCode;
+  const needle = brandFilter.trim().toLowerCase();
+  return (
+    results.find(
+      (p) =>
+        studioPromotionHasLocation(p, 'brand_banner') &&
+        (p.listing_brand || '').trim().toLowerCase() === needle
+    ) ?? null
+  );
 }
 
 export type StudioBundle = {

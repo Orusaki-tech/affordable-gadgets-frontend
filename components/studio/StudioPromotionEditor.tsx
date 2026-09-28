@@ -14,6 +14,7 @@ const LOCATION_OPTIONS = [
   { value: 'special_offers', label: 'Special offers', hint: 'Offers block' },
   { value: 'flash_sales', label: 'Flash sales', hint: 'Timed deals' },
   { value: 'cbd_ribbon', label: 'CBD ribbon', hint: 'Top ribbon' },
+  { value: 'brand_banner', label: 'Brand banner', hint: 'Products brand page' },
 ] as const;
 
 type StudioPromotionEditorProps = {

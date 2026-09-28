@@ -118,7 +118,15 @@ export function getBrandBannerConfig(
 ): ProductsBrandBannerConfig | undefined {
   const key = brandFilter.trim().toLowerCase();
   if (!key) return undefined;
-  return PRODUCTS_BRAND_BANNERS[key];
+  const known = PRODUCTS_BRAND_BANNERS[key];
+  if (known) return known;
+  // Allow Studio upload for any brand_filter even without a static seed.
+  const title = brandFilter.trim();
+  return {
+    brandFilter: title,
+    title,
+    subtitle: `${title} devices and accessories.`,
+  };
 }
 
 export function getBrandBannerTitleForMetadata(brandFilter: string): string | undefined {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { OpenAPI } from '@/lib/api/generated';
 import {
   ensureStudioTag,
   listStudioArticles,
@@ -23,6 +24,39 @@ type StudioTaggedArticlesEditorProps = {
   roleHint?: string;
   onSaved?: () => void | Promise<void>;
 };
+
+/** Same public curated list as homepage buying guides — Featured-tagged only. */
+async function fetchPublicFeaturedArticles(): Promise<ListedArticle[]> {
+  const base = OpenAPI.BASE.replace(/\/+$/, '');
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    ...(typeof OpenAPI.HEADERS === 'function'
+      ? await OpenAPI.HEADERS({} as never)
+      : (OpenAPI.HEADERS ?? {})),
+  };
+  const res = await fetch(
+    `${base}/api/v1/public/articles/?tag=featured&page_size=50&page=1&_=${Date.now()}`,
+    { credentials: 'omit', headers, cache: 'no-store' }
+  );
+  if (!res.ok) throw new Error(`Featured articles request failed: ${res.status}`);
+  const data = await res.json();
+  return (
+    (data.results ?? []) as Array<{
+      id?: number;
+      headline?: string;
+      thumbnail_image?: string | null;
+      product_primary_image?: string | null;
+      product_name?: string | null;
+    }>
+  )
+    .filter((a) => typeof a.id === 'number')
+    .map((a) => ({
+      id: a.id!,
+      headline: a.headline || `Article #${a.id}`,
+      image: a.thumbnail_image || a.product_primary_image || null,
+      productName: a.product_name || null,
+    }));
+}
 
 function articleThumb(article: StudioArticle): string | null {
   return resolveStudioImageUrl(article.thumbnail_image);
@@ -98,21 +132,7 @@ export function StudioTaggedArticlesEditor({
   }, []);
 
   const refreshFeatured = useCallback(async () => {
-    const data = await listStudioArticles({
-      page: 1,
-      publishedOnly: true,
-      tag: 'featured',
-    });
-    setSelected(
-      (data.results ?? [])
-        .filter((a): a is StudioArticle & { id: number } => typeof a.id === 'number')
-        .map((a) => ({
-          id: a.id,
-          headline: a.headline || `Article #${a.id}`,
-          image: articleThumb(a),
-          productName: a.product_name || null,
-        }))
-    );
+    setSelected(await fetchPublicFeaturedArticles());
   }, []);
 
   useEffect(() => {

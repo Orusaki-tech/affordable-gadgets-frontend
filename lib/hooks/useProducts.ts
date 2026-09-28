@@ -40,7 +40,7 @@ export const FEATURED_PRODUCTS_PAGE_SIZE = 24;
 /** Latest products shown in header brand mega-menus. */
 export const NAV_MEGA_PRODUCTS_PAGE_SIZE = 12;
 
-/** Fetches only products tagged "Featured" (page_size=5). Uses same list API with featured=1 for fast homepage load. */
+/** Fetches products tagged "Featured" for the homepage carousel. */
 export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductList> {
   OpenAPI.BASE = apiBaseUrl;
   const base = OpenAPI.BASE.replace(/\/+$/, '');
@@ -67,7 +67,7 @@ export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductLis
   return res.json();
 }
 
-/** Hook for homepage featured section: returns only 5 products tagged "Featured" for fast load. */
+/** Hook for homepage featured section: Featured-tagged products only. */
 export function useFeaturedProducts() {
   return useQuery<PaginatedPublicProductList>({
     queryKey: ['products', 'featured'],
@@ -104,6 +104,8 @@ export type ProductsQueryParams = {
   max_price?: number;
   ordering?: string;
   promotion?: number;
+  /** When true, only products tagged Featured (same as homepage /products?featured=1). */
+  featured?: boolean;
   enabled?: boolean;
 };
 
@@ -126,10 +128,11 @@ export function productsQueryFn({
     max_price,
     ordering,
     promotion,
+    featured,
   } = params;
   return ApiService.apiV1PublicProductsList(
     brand_filter,
-    undefined,
+    featured ? true : undefined,
     undefined,
     max_price,
     min_price,
@@ -210,7 +213,7 @@ export function useInfiniteProducts(params?: Omit<ProductsQueryParams, 'page'> &
       OpenAPI.BASE = apiBaseUrl;
       return ApiService.apiV1PublicProductsList(
         params?.brand_filter,
-        undefined,
+        params?.featured ? true : undefined,
         undefined,
         params?.max_price,
         params?.min_price,

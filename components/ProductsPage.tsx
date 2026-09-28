@@ -45,6 +45,10 @@ function ProductsPageInner({
   const searchParamsRef = useRef<string>('');
   const promotionId = searchParams.get('promotion');
   const openFilters = searchParams.get('openFilters');
+  const featuredOnly =
+    searchParams.get('featured') === '1' ||
+    searchParams.get('featured') === 'true' ||
+    searchParams.get('featured') === 'yes';
   const categoryTilesRef = useRef<HTMLDivElement | null>(null);
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const currentBrandFilter = (searchParams.get('brand_filter') || searchParams.get('brand') || '')
@@ -284,6 +288,7 @@ function ProductsPageInner({
     max_price: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
     ordering: sort,
     promotion: promotionId ? parseInt(promotionId) : undefined, // Backend will filter by promotion
+    featured: featuredOnly || undefined,
   });
 
   // Prefetch promotion when in URL so product detail page has it in cache when user clicks through
@@ -312,6 +317,7 @@ function ProductsPageInner({
             max_price: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
             ordering: sort,
             promotion: promotionId ? parseInt(promotionId) : undefined,
+            featured: featuredOnly || undefined,
           },
         ],
         queryFn: productsQueryFn,
@@ -321,7 +327,7 @@ function ProductsPageInner({
     // Prefetch detail + units for first 4 visible products so first-row clicks are instant
     const firstFew = data.results.slice(0, 4);
     firstFew.forEach((product) => prefetchProductDetail(queryClient, product));
-  }, [data?.next, data?.results, page, filters, debouncedSearch, sort, promotionId, queryClient]);
+  }, [data?.next, data?.results, page, filters, debouncedSearch, sort, promotionId, featuredOnly, queryClient]);
 
   // Do not re-filter by type/brand here: the list API already applies `type` and `brand_filter`
   // (backend uses icontains for brand). Client-side exact brand matching hid valid rows

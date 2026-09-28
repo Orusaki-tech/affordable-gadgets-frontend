@@ -829,7 +829,7 @@ export async function setStudioProductTagged(
       return saved;
     } catch (err) {
       // Older API builds may not have remove_tags yet — fall back to tag_ids rewrite.
-      if (!(err instanceof StudioApiError) || (err.status !== 404 && err.status !== 405)) {
+      if (!(err instanceof StudioApiError) || ![403, 404, 405].includes(err.status)) {
         throw err;
       }
     }

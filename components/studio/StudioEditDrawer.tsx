@@ -11,6 +11,7 @@ import {
   StudioTaggedProductsEditor,
   type StudioSectionTagKey,
 } from '@/components/studio/StudioTaggedProductsEditor';
+import { StudioTaggedArticlesEditor } from '@/components/studio/StudioTaggedArticlesEditor';
 import type {
   StudioArticle,
   StudioBundle,
@@ -28,6 +29,7 @@ export type StudioEditResource =
   | { kind: 'financingProvider'; provider: StudioFinancingProvider }
   | { kind: 'deliveryRate'; rate: StudioDeliveryRate }
   | { kind: 'taggedProducts'; section: StudioSectionTagKey }
+  | { kind: 'taggedArticles' }
   /** @deprecated prefer taggedProducts + section: 'featured' */
   | { kind: 'featuredProducts' };
 
@@ -61,6 +63,8 @@ function resourceLabel(resource: StudioEditResource): string {
       return resource.section === 'video'
         ? 'Verified Tech Unboxings'
         : 'Featured Product Highlights';
+    case 'taggedArticles':
+      return 'Tech Buying Guides & Insights';
     default:
       return 'Edit';
   }
@@ -184,6 +188,14 @@ export function StudioEditDrawer({
         {section && (
           <StudioTaggedProductsEditor
             section={section}
+            roleHint={roleHint}
+            onSaved={async () => {
+              await onSaved();
+            }}
+          />
+        )}
+        {active.kind === 'taggedArticles' && (
+          <StudioTaggedArticlesEditor
             roleHint={roleHint}
             onSaved={async () => {
               await onSaved();

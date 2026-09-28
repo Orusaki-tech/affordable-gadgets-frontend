@@ -104,7 +104,7 @@ export function getStudioCapabilities(
   if (canFullEditProduct) editable.push('products (full)');
   else if (canContentEditProduct) editable.push('product content, images, videos');
   if (canEditFeaturedSelection) editable.push('featured highlights', 'homepage videos');
-  if (canEditArticles) editable.push('articles');
+  if (canEditArticles) editable.push('articles', 'homepage guides');
   if (canEditPromotions) editable.push('promotions');
   if (canEditBundles) editable.push('bundles');
   if (canEditFinancing) editable.push('financing');

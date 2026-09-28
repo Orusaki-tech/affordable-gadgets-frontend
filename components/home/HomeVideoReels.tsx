@@ -46,6 +46,11 @@ export function HomeVideoReels() {
           </div>
         </div>
         <HomeProductVideos variant="grid" hideHeader />
+        {canSelect ? (
+          <p className="mt-3 text-sm text-secondary">
+            Tip: products need the Video tag and at least one product video to appear here.
+          </p>
+        ) : null}
         <div className="mt-4">
           <Link
             href="/videos"

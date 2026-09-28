@@ -48,6 +48,7 @@ type StudioEditHostValue = {
   openEditDeliveryRate: (id: number) => Promise<void>;
   openEditFeaturedProducts: () => void;
   openEditVideoProducts: () => void;
+  openEditFeaturedArticles: () => void;
 };
 
 const StudioEditContext = createContext<StudioEditHostValue | undefined>(undefined);
@@ -319,6 +320,16 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     setDrawerOpen(true);
   }, [capabilities?.canEditVideoSelection]);
 
+  const openEditFeaturedArticles = useCallback(() => {
+    if (!capabilities?.canEditArticles) {
+      setError('Your role cannot choose homepage buying guides.');
+      return;
+    }
+    setError(null);
+    setResource({ kind: 'taggedArticles' });
+    setDrawerOpen(true);
+  }, [capabilities?.canEditArticles]);
+
   const value = useMemo<StudioEditHostValue | null>(() => {
     if (!capabilities || !isAuthenticated) return null;
     return {
@@ -346,6 +357,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       openEditDeliveryRate,
       openEditFeaturedProducts,
       openEditVideoProducts,
+      openEditFeaturedArticles,
     };
   }, [
     capabilities,
@@ -360,6 +372,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     openEditDeliveryRate,
     openEditFeaturedProducts,
     openEditVideoProducts,
+    openEditFeaturedArticles,
   ]);
 
   if (!value || !capabilities) {
@@ -395,7 +408,9 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
         onSaved={async () => {
           await queryClient.invalidateQueries();
           const path = typeof window !== 'undefined' ? window.location.pathname : '';
+          const isStudioHome = path === '/studio' || path === '/studio/';
           if (
+            isStudioHome ||
             path.includes('/products/') ||
             path.includes('/blog/') ||
             path.includes('/articles') ||

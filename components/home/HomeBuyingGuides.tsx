@@ -1,9 +1,8 @@
-import Link from 'next/link';
-import { MaterialIcon } from '@/components/MaterialIcon';
-import { HomeBuyingGuideCard } from '@/components/home/HomeBuyingGuideCard';
 import { fetchFeaturedArticles, getArticleCardImageUrl } from '@/lib/blog/articlePage';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import { getArticleHref } from '@/lib/utils/blogRoutes';
+import { HomeBuyingGuidesClient } from '@/components/home/HomeBuyingGuidesClient';
+import type { HomeBuyingGuideCardData } from '@/components/home/HomeBuyingGuideCard';
 
 function formatUpdatedLabel(iso?: string | null) {
   const raw = iso || null;
@@ -27,7 +26,6 @@ function guideExcerpt(category: string, productName?: string | null) {
 
 export async function HomeBuyingGuides() {
   const articles = await fetchFeaturedArticles();
-  if (!articles.length) return null;
 
   const guides = articles
     .map((article) => {
@@ -48,47 +46,10 @@ export async function HomeBuyingGuides() {
         cta: 'Read article',
         articleId: (article as { id?: number }).id ?? null,
         articleSlug: article.slug ?? null,
-      };
+      } satisfies HomeBuyingGuideCardData;
     })
     .filter(Boolean)
-    .slice(0, 3) as Array<{
-    key: string;
-    href: string;
-    title: string;
-    imageUrl: string | null;
-    category: string;
-    meta: string;
-    excerpt: string;
-    cta: string;
-    articleId: number | null;
-    articleSlug: string | null;
-  }>;
+    .slice(0, 3) as HomeBuyingGuideCardData[];
 
-  if (!guides.length) return null;
-
-  return (
-    <section className="home-buying-guides ag-section">
-      <div className="home-section-panel">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="ag-type-eyebrow text-stock-green">Tech Knowledge Hub</p>
-            <h2 className="ag-type-h2 mt-1">Tech Buying Guides &amp; Insights</h2>
-          </div>
-          <Link
-            href="/articles"
-            className="inline-flex items-center gap-1 text-sm font-semibold text-primary"
-          >
-            Read All Articles
-            <MaterialIcon name="chevron_right" className="text-[1.125rem]" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-          {guides.map((guide) => (
-            <HomeBuyingGuideCard key={guide.key} guide={guide} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
+  return <HomeBuyingGuidesClient guides={guides} />;
 }

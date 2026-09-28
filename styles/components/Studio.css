@@ -338,6 +338,11 @@
   color: var(--primary, #030304);
 }
 
+.studio-featured-picker__meta {
+  font-weight: 500;
+  color: var(--on-surface-variant, #46464a);
+}
+
 .studio-alert--ok {
   background: #ecfdf5;
   color: #065f46;

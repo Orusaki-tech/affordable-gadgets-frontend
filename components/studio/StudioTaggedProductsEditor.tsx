@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { OpenAPI } from '@/lib/api/generated';
 import {
   ensureStudioTag,
   listStudioProducts,
@@ -19,6 +18,7 @@ export type StudioTaggedSectionConfig = {
   key: StudioSectionTagKey;
   tagName: string;
   tagSlug: string;
+  /** @deprecated kept for type compatibility; picker uses inventory ?tag= */
   listQuery: string;
   title: string;
   description: string;
@@ -67,35 +67,6 @@ type StudioTaggedProductsEditorProps = {
   onSaved?: () => void | Promise<void>;
 };
 
-async function fetchSectionProducts(listQuery: string): Promise<ListedProduct[]> {
-  const base = OpenAPI.BASE.replace(/\/+$/, '');
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
-    ...(typeof OpenAPI.HEADERS === 'function'
-      ? await OpenAPI.HEADERS({} as never)
-      : (OpenAPI.HEADERS ?? {})),
-  };
-  const res = await fetch(`${base}/api/v1/public/products/?${listQuery}`, {
-    credentials: 'omit',
-    headers,
-  });
-  if (!res.ok) throw new Error(`Section products request failed: ${res.status}`);
-  const data = await res.json();
-  return (
-    (data.results ?? []) as Array<{
-      id?: number;
-      product_name?: string;
-      primary_image?: string | null;
-    }>
-  )
-    .filter((p) => typeof p.id === 'number')
-    .map((p) => ({
-      id: p.id!,
-      product_name: p.product_name || `Product #${p.id}`,
-      image: p.primary_image || null,
-    }));
-}
-
 export function StudioTaggedProductsEditor({
   section,
   roleHint,
@@ -113,8 +84,22 @@ export function StudioTaggedProductsEditor({
   const [msg, setMsg] = useState<string | null>(null);
 
   const refreshSelected = useCallback(async () => {
-    setSelected(await fetchSectionProducts(config.listQuery));
-  }, [config.listQuery]);
+    // Auth inventory list (no public CDN/browser cache) — matches live tags immediately.
+    const data = await listStudioProducts({
+      tag: config.tagSlug,
+      page: 1,
+      pageSize: 100,
+    });
+    setSelected(
+      (data.results ?? [])
+        .filter((p): p is StudioProduct & { id: number } => typeof p.id === 'number')
+        .map((p) => ({
+          id: p.id,
+          product_name: p.product_name || `Product #${p.id}`,
+          image: studioProductImageUrl(p),
+        }))
+    );
+  }, [config.tagSlug]);
 
   useEffect(() => {
     let cancelled = false;
@@ -183,7 +168,7 @@ export function StudioTaggedProductsEditor({
     setBusyId(productId);
     setError(null);
     setMsg(null);
-    // Optimistic UI so Remove feels instant even before public list refreshes.
+    // Optimistic UI so Remove feels instant.
     if (!enabled) {
       setSelected((prev) => prev.filter((p) => p.id !== productId));
     }
@@ -203,7 +188,21 @@ export function StudioTaggedProductsEditor({
           `Could not remove the ${config.tagName} tag. The product may still be tagged in admin.`
         );
       }
-      await refreshSelected();
+      if (enabled && saved.id) {
+        setSelected((prev) => {
+          if (prev.some((p) => p.id === saved.id)) return prev;
+          return [
+            ...prev,
+            {
+              id: saved.id!,
+              product_name: saved.product_name || `Product #${saved.id}`,
+              image: studioProductImageUrl(saved),
+            },
+          ];
+        });
+      } else if (!enabled) {
+        setSelected((prev) => prev.filter((p) => p.id !== productId));
+      }
       setMsg(enabled ? `Added (${config.tagName} tag)` : `Removed (${config.tagName} tag)`);
       await onSaved?.();
     } catch (err) {

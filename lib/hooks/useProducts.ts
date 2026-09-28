@@ -34,8 +34,8 @@ export type PaginatedPublicProductList = PaginatedPublicProductListList;
 /** Number of items to fetch for the first request (visible above the fold). Next page is prefetched after this loads. */
 export const PRODUCTS_VISIBLE_PAGE_SIZE = 20;
 
-/** Number of featured products to load on the homepage for fast first paint (under 3s). */
-export const FEATURED_PRODUCTS_PAGE_SIZE = 5;
+/** Number of featured products to load on the homepage carousel. */
+export const FEATURED_PRODUCTS_PAGE_SIZE = 24;
 
 /** Latest products shown in header brand mega-menus. */
 export const NAV_MEGA_PRODUCTS_PAGE_SIZE = 12;

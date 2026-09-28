@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { OpenAPI } from '@/lib/api/generated';
 import {
   ensureStudioTag,
   listStudioArticles,
@@ -24,38 +23,6 @@ type StudioTaggedArticlesEditorProps = {
   roleHint?: string;
   onSaved?: () => void | Promise<void>;
 };
-
-async function fetchPublicFeaturedArticles(): Promise<ListedArticle[]> {
-  const base = OpenAPI.BASE.replace(/\/+$/, '');
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
-    ...(typeof OpenAPI.HEADERS === 'function'
-      ? await OpenAPI.HEADERS({} as never)
-      : (OpenAPI.HEADERS ?? {})),
-  };
-  const res = await fetch(
-    `${base}/api/v1/public/articles/?tag=featured&page_size=50&page=1`,
-    { credentials: 'omit', headers, cache: 'no-store' }
-  );
-  if (!res.ok) throw new Error(`Featured articles request failed: ${res.status}`);
-  const data = await res.json();
-  return (
-    (data.results ?? []) as Array<{
-      id?: number;
-      headline?: string;
-      thumbnail_image?: string | null;
-      product_primary_image?: string | null;
-      product_name?: string | null;
-    }>
-  )
-    .filter((a) => typeof a.id === 'number')
-    .map((a) => ({
-      id: a.id!,
-      headline: a.headline || `Article #${a.id}`,
-      image: a.thumbnail_image || a.product_primary_image || null,
-      productName: a.product_name || null,
-    }));
-}
 
 function articleThumb(article: StudioArticle): string | null {
   return resolveStudioImageUrl(article.thumbnail_image);
@@ -131,7 +98,21 @@ export function StudioTaggedArticlesEditor({
   }, []);
 
   const refreshFeatured = useCallback(async () => {
-    setSelected(await fetchPublicFeaturedArticles());
+    const data = await listStudioArticles({
+      page: 1,
+      publishedOnly: true,
+      tag: 'featured',
+    });
+    setSelected(
+      (data.results ?? [])
+        .filter((a): a is StudioArticle & { id: number } => typeof a.id === 'number')
+        .map((a) => ({
+          id: a.id,
+          headline: a.headline || `Article #${a.id}`,
+          image: articleThumb(a),
+          productName: a.product_name || null,
+        }))
+    );
   }, []);
 
   useEffect(() => {
@@ -198,7 +179,22 @@ export function StudioTaggedArticlesEditor({
           'Could not remove the Featured tag. The article may still be tagged in admin.'
         );
       }
-      await refreshFeatured();
+      if (enabled && saved.id) {
+        setSelected((prev) => {
+          if (prev.some((a) => a.id === saved.id)) return prev;
+          return [
+            ...prev,
+            {
+              id: saved.id!,
+              headline: saved.headline || `Article #${saved.id}`,
+              image: articleThumb(saved),
+              productName: saved.product_name || null,
+            },
+          ];
+        });
+      } else if (!enabled) {
+        setSelected((prev) => prev.filter((a) => a.id !== articleId));
+      }
       setMsg(enabled ? 'Featured on homepage' : 'Removed from homepage');
       await onSaved?.();
     } catch (err) {

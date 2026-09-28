@@ -233,12 +233,17 @@ export function studioProductImageUrl(product: StudioProduct): string | null {
 export async function listStudioProducts(params: {
   page?: number;
   search?: string;
+  /** Filter by tag name or slug (Featured, video, …). */
+  tag?: string;
+  pageSize?: number;
 }): Promise<StudioPaginatedProducts> {
   const query = new URLSearchParams();
   if (params.page) query.set('page', String(params.page));
   if (params.search?.trim()) query.set('search', params.search.trim());
+  if (params.tag?.trim()) query.set('tag', params.tag.trim());
+  query.set('page_size', String(params.pageSize ?? 50));
   const qs = query.toString();
-  return studioFetchJson<StudioPaginatedProducts>(`/products/${qs ? `?${qs}` : ''}`);
+  return studioFetchJson<StudioPaginatedProducts>(`/products/?${qs}`);
 }
 
 export async function retrieveStudioProduct(id: number): Promise<StudioProduct> {
@@ -420,11 +425,13 @@ export async function listStudioArticles(params: {
   page?: number;
   search?: string;
   publishedOnly?: boolean;
+  tag?: string;
 }): Promise<StudioPaginatedArticles> {
   const query = new URLSearchParams();
   if (params.page) query.set('page', String(params.page));
   if (params.search?.trim()) query.set('search', params.search.trim());
   if (params.publishedOnly) query.set('is_published', 'true');
+  if (params.tag?.trim()) query.set('tag', params.tag.trim());
   query.set('page_size', '50');
   query.set('ordering', '-updated_at');
   return studioFetchJson<StudioPaginatedArticles>(`/articles/?${query.toString()}`);
@@ -790,7 +797,7 @@ export async function setStudioProductTagIds(
 
 /**
  * Add or remove a named tag on a product.
- * Removal matches by tag id OR name/slug so duplicate "Featured" rows still clear.
+ * Removal uses remove_tags (by name/slug) so empty tag_ids and duplicate tag rows both clear.
  */
 export async function setStudioProductTagged(
   productId: number,
@@ -803,34 +810,30 @@ export async function setStudioProductTagged(
     throw new StudioApiError('Tag is missing an id', 400, ensured);
   }
 
-  const product = await retrieveStudioProduct(productId);
-  const currentTags = product.tags || [];
-  const matchesTarget = (tag: { id?: number; name?: string; slug?: string }) => {
-    if (tag.id != null && tag.id === ensured.id) return true;
-    const name = tag.name?.toLowerCase() || '';
-    const slug = tag.slug?.toLowerCase() || '';
-    return (
-      name === options.tagName.toLowerCase() ||
-      slug === options.tagSlug.toLowerCase() ||
-      slug === options.tagName.toLowerCase()
+  if (!options.enabled) {
+    const saved = await studioFetchJson<StudioProduct>(
+      `/products/${productId}/remove_tags/`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          names: [options.tagName],
+          slugs: [options.tagSlug],
+        }),
+      }
     );
-  };
-
-  let nextIds: number[];
-  if (options.enabled) {
-    const kept = currentTags
-      .map((t) => t.id)
-      .filter((id): id is number => typeof id === 'number');
-    nextIds = Array.from(new Set([...kept, ensured.id]));
-  } else {
-    nextIds = currentTags
-      .filter((t) => !matchesTarget(t))
-      .map((t) => t.id)
-      .filter((id): id is number => typeof id === 'number');
+    if (saved.tags == null) {
+      return retrieveStudioProduct(productId);
+    }
+    return saved;
   }
 
+  const product = await retrieveStudioProduct(productId);
+  const currentTags = product.tags || [];
+  const kept = currentTags
+    .map((t) => t.id)
+    .filter((id): id is number => typeof id === 'number');
+  const nextIds = Array.from(new Set([...kept, ensured.id]));
   const saved = await setStudioProductTagIds(productId, nextIds);
-  // Prefer the write response; if tags omitted, re-fetch to confirm.
   if (saved.tags == null) {
     return retrieveStudioProduct(productId);
   }

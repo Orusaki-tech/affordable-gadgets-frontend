@@ -14,8 +14,9 @@ export function HomeFeaturedHardware() {
   const canSelect = Boolean(studioEdit?.capabilities.canEditFeaturedSelection);
   const { data, isLoading, isError } = useFeaturedProducts();
   const products = data?.results ?? [];
-  const total = data?.count ?? products.length;
-  const showing = Math.min(5, products.length);
+  const total =
+    typeof data?.count === 'number' && data.count >= 0 ? data.count : products.length;
+  const showing = products.length;
 
   if (!isLoading && (isError || products.length === 0) && !canSelect) {
     return null;
@@ -69,7 +70,7 @@ export function HomeFeaturedHardware() {
         {isLoading || products.length > 0 ? (
           <ProductGridClient
             featuredOnly
-            pageSize={5}
+            pageSize={24}
             showPagination={false}
             cardOptions={{ variant: 'featured', studioAllowDelete: false }}
           />

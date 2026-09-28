@@ -7,8 +7,8 @@ import { StudioShell } from '@/components/studio/StudioShell';
 import {
   isStudioBrowserPath,
   isStudioLoginPath,
+  prefixStudioPath,
   setStudioRoutingEnabled,
-  studioPath,
 } from '@/lib/studio/paths';
 
 /**
@@ -21,12 +21,16 @@ export function StudioRootGate({ children }: { children: ReactNode }) {
   const inStudio = isStudioBrowserPath(pathname);
   const isLogin = isStudioLoginPath(pathname);
 
+  // Sync during render so studioPath()/getProductHref work on the same tick as clicks.
+  setStudioRoutingEnabled(inStudio && !isLogin);
+
   useEffect(() => {
     setStudioRoutingEnabled(inStudio && !isLogin);
     return () => setStudioRoutingEnabled(false);
   }, [inStudio, isLogin]);
 
   // Keep same-origin navigations under /studio while editing.
+  // Capture + stopImmediatePropagation so Next.js <Link> cannot also push the bare shop URL.
   useEffect(() => {
     if (!inStudio || isLogin) return;
 
@@ -51,11 +55,13 @@ export function StudioRootGate({ children }: { children: ReactNode }) {
       }
       if (url.origin !== window.location.origin) return;
 
-      const next = studioPath(`${url.pathname}${url.search}${url.hash}`);
-      const current = `${url.pathname}${url.search}${url.hash}`;
-      if (next === current) return;
+      // Already a studio URL — let Next handle it.
+      if (isStudioBrowserPath(url.pathname)) return;
 
+      const next = prefixStudioPath(`${url.pathname}${url.search}${url.hash}`);
       event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
       router.push(next);
     };
 

@@ -13,9 +13,8 @@ export function isStudioRoutingEnabled() {
   return studioRoutingEnabled;
 }
 
-/** Prefix an internal href for Studio, or return unchanged. */
-export function studioPath(href: string): string {
-  if (!studioRoutingEnabled) return href;
+/** Always prefix an internal shop href with /studio (no enable flag). */
+export function prefixStudioPath(href: string): string {
   const trimmed = href.trim();
   if (!trimmed) return trimmed;
   if (
@@ -31,12 +30,21 @@ export function studioPath(href: string): string {
   }
   if (trimmed.startsWith('/studio')) return trimmed;
 
-  const [pathPart, query = ''] = trimmed.split('?');
+  const hashIndex = trimmed.indexOf('#');
+  const hash = hashIndex >= 0 ? trimmed.slice(hashIndex) : '';
+  const withoutHash = hashIndex >= 0 ? trimmed.slice(0, hashIndex) : trimmed;
+  const [pathPart, query = ''] = withoutHash.split('?');
   const path = pathPart || '/';
   const qs = query ? `?${query}` : '';
 
-  if (path === '/') return `/studio${qs}`;
-  return `/studio${path.startsWith('/') ? path : `/${path}`}${qs}`;
+  if (path === '/') return `/studio${qs}${hash}`;
+  return `/studio${path.startsWith('/') ? path : `/${path}`}${qs}${hash}`;
+}
+
+/** Prefix an internal href for Studio when routing is enabled, or return unchanged. */
+export function studioPath(href: string): string {
+  if (!studioRoutingEnabled) return href;
+  return prefixStudioPath(href);
 }
 
 export function isStudioBrowserPath(pathname: string | null | undefined): boolean {

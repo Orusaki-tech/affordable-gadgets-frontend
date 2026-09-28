@@ -36,6 +36,7 @@ import { AuthChoiceModal } from './AuthChoiceModal';
 import { HeaderBrandMenu, HeaderMoreBrandsMenu } from './HeaderBrandMenu';
 import { HeaderMegaMenuPanel, MEGA_MENU_MORE_KEY } from './HeaderMegaMenuPanel';
 import { MaterialIcon } from './MaterialIcon';
+import { studioPath } from '@/lib/studio/paths';
 
 function HeaderFallback() {
   return (
@@ -201,7 +202,7 @@ function HeaderContent() {
       <div className="site-header__container ag-shell">
         {/* Top utility row: logo | search | actions */}
         <div className="site-header__bar flex items-center gap-3 py-1.5 lg:gap-4">
-          <Link href="/" className="site-header__logo-link shrink-0">
+          <Link href={studioPath('/')} className="site-header__logo-link shrink-0">
             <div className="site-header__logo-wrap">
               <Image
                 src="/affordlogo1.svg"

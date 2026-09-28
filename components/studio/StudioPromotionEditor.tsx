@@ -9,11 +9,11 @@ import {
 } from '@/lib/studio/api';
 
 const LOCATION_OPTIONS = [
-  { value: 'homepage_hero', label: 'Homepage hero' },
-  { value: 'stories_carousel', label: 'Stories carousel' },
-  { value: 'special_offers', label: 'Special offers' },
-  { value: 'flash_sales', label: 'Flash sales' },
-  { value: 'cbd_ribbon', label: 'CBD ribbon' },
+  { value: 'homepage_hero', label: 'Homepage hero', hint: 'Main carousel' },
+  { value: 'stories_carousel', label: 'Stories', hint: 'Story strip' },
+  { value: 'special_offers', label: 'Special offers', hint: 'Offers block' },
+  { value: 'flash_sales', label: 'Flash sales', hint: 'Timed deals' },
+  { value: 'cbd_ribbon', label: 'CBD ribbon', hint: 'Top ribbon' },
 ] as const;
 
 type StudioPromotionEditorProps = {
@@ -110,7 +110,7 @@ export function StudioPromotionEditor({
     e.preventDefault();
     setError(null);
     if (locations.length === 0) {
-      setError('Select at least one display location (same as ops admin).');
+      setError('Pick at least one place this promo should appear.');
       return;
     }
     setSaving(true);
@@ -148,84 +148,35 @@ export function StudioPromotionEditor({
   };
 
   return (
-    <form className="studio-editor" onSubmit={handleSubmit}>
-      <div className="studio-editor__header">
-        <h2 className="studio-editor__title">Edit promotion</h2>
-        <p className="studio-editor__hint">
-          {roleHint || 'Uses the same /api/inventory/promotions/ endpoint as ops admin.'}
-        </p>
-        <p className="studio-editor__hint">
-          Editing: <strong>{promotion.title || `Promotion #${promotion.id}`}</strong>
-        </p>
+    <form className="studio-editor studio-editor--flush" onSubmit={handleSubmit}>
+      <div className="studio-editor__toolbar">
+        <div>
+          <p className="studio-editor__kicker">{roleHint || 'Promotion'}</p>
+          <h2 className="studio-editor__title studio-editor__title--compact">
+            {title.trim() || promotion.title || `Promotion #${promotion.id}`}
+          </h2>
+        </div>
+        <label className={`studio-switch${isActive ? ' is-on' : ''}`}>
+          <input
+            type="checkbox"
+            checked={isActive}
+            onChange={(e) => setIsActive(e.target.checked)}
+          />
+          <span>{isActive ? 'Active' : 'Off'}</span>
+        </label>
       </div>
 
-      <label className="studio-field">
-        <span>Title</span>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} required />
-      </label>
-      <label className="studio-field">
-        <span>Description</span>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
-      </label>
-      <label className="studio-field">
-        <span>Discount %</span>
-        <input
-          value={discountPercentage}
-          onChange={(e) => setDiscountPercentage(e.target.value)}
-          inputMode="decimal"
-        />
-      </label>
-      <label className="studio-field">
-        <span>Discount amount (KES)</span>
-        <input
-          value={discountAmount}
-          onChange={(e) => setDiscountAmount(e.target.value)}
-          inputMode="decimal"
-        />
-      </label>
-      <label className="studio-field">
-        <span>Start</span>
-        <input
-          type="datetime-local"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-      </label>
-      <label className="studio-field">
-        <span>End</span>
-        <input type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-      </label>
-      <label className="studio-field">
-        <span>Hero / carousel order</span>
-        <input
-          value={carouselPosition}
-          onChange={(e) => setCarouselPosition(e.target.value)}
-          inputMode="numeric"
-          placeholder="1 = first on homepage hero"
-        />
-      </label>
-
-      <fieldset className="studio-field">
-        <legend>Display locations</legend>
-        <div className="studio-check-list">
-          {LOCATION_OPTIONS.map((opt) => (
-            <label key={opt.value} className="studio-field studio-field--checkbox">
-              <input
-                type="checkbox"
-                checked={locations.includes(opt.value)}
-                onChange={() => toggleLocation(opt.value)}
-              />
-              <span>{opt.label}</span>
-            </label>
-          ))}
+      {error && (
+        <div className="studio-alert" role="alert">
+          {error}
         </div>
-      </fieldset>
+      )}
 
-      <div className="studio-images studio-images--single">
-        <div className="studio-images__head">
-          <h3 className="studio-images__title">Banner image</h3>
+      <section className="studio-editor__section">
+        <div className="studio-editor__section-head">
+          <h3>Banner</h3>
           <label className="studio-btn studio-btn--ghost studio-images__upload">
-            {bannerFile ? 'Change image' : 'Upload image'}
+            {bannerFile ? 'Replace' : currentBanner ? 'Change' : 'Upload'}
             <input
               type="file"
               accept="image/*"
@@ -242,28 +193,127 @@ export function StudioPromotionEditor({
         </div>
         {currentBanner ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={currentBanner} alt="" className="studio-images__preview" />
+          <img src={currentBanner} alt="" className="studio-images__preview studio-images__preview--banner" />
         ) : (
-          <p className="studio-images__empty">No banner yet.</p>
+          <div className="studio-dropzone">Drop or upload a hero banner</div>
         )}
-      </div>
+      </section>
 
-      <label className="studio-field studio-field--checkbox">
-        <input
-          type="checkbox"
-          checked={isActive}
-          onChange={(e) => setIsActive(e.target.checked)}
-        />
-        <span>Active</span>
-      </label>
-      {error && (
-        <div className="studio-alert" role="alert">
-          {error}
+      <section className="studio-editor__section">
+        <h3 className="studio-editor__section-title">Basics</h3>
+        <div className="studio-editor__stack">
+          <label className="studio-field">
+            <span>Title</span>
+            <input
+              className="studio-input"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </label>
+          <label className="studio-field">
+            <span>Description</span>
+            <textarea
+              className="studio-textarea"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              placeholder="Optional short line for the promo"
+            />
+          </label>
         </div>
-      )}
-      <button type="submit" className="studio-btn studio-btn--primary" disabled={saving}>
-        {saving ? 'Saving…' : 'Save promotion'}
-      </button>
+      </section>
+
+      <section className="studio-editor__section">
+        <h3 className="studio-editor__section-title">Offer</h3>
+        <div className="studio-editor__grid">
+          <label className="studio-field">
+            <span>Discount %</span>
+            <input
+              className="studio-input"
+              value={discountPercentage}
+              onChange={(e) => setDiscountPercentage(e.target.value)}
+              inputMode="decimal"
+              placeholder="0"
+            />
+          </label>
+          <label className="studio-field">
+            <span>Amount (KES)</span>
+            <input
+              className="studio-input"
+              value={discountAmount}
+              onChange={(e) => setDiscountAmount(e.target.value)}
+              inputMode="decimal"
+              placeholder="0"
+            />
+          </label>
+        </div>
+      </section>
+
+      <section className="studio-editor__section">
+        <h3 className="studio-editor__section-title">Schedule & order</h3>
+        <div className="studio-editor__grid">
+          <label className="studio-field">
+            <span>Starts</span>
+            <input
+              className="studio-input"
+              type="datetime-local"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </label>
+          <label className="studio-field">
+            <span>Ends</span>
+            <input
+              className="studio-input"
+              type="datetime-local"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </label>
+          <label className="studio-field studio-field--full">
+            <span>Hero order</span>
+            <input
+              className="studio-input"
+              value={carouselPosition}
+              onChange={(e) => setCarouselPosition(e.target.value)}
+              inputMode="numeric"
+              placeholder="1"
+            />
+            <span className="studio-field__help">1 = first slide on the homepage hero</span>
+          </label>
+        </div>
+      </section>
+
+      <section className="studio-editor__section">
+        <h3 className="studio-editor__section-title">Where it shows</h3>
+        <p className="studio-editor__hint studio-editor__hint--tight">
+          Toggle the surfaces that should render this promo.
+        </p>
+        <div className="studio-chip-grid" role="group" aria-label="Display locations">
+          {LOCATION_OPTIONS.map((opt) => {
+            const on = locations.includes(opt.value);
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                className={`studio-chip${on ? ' is-on' : ''}`}
+                aria-pressed={on}
+                onClick={() => toggleLocation(opt.value)}
+              >
+                <span className="studio-chip__label">{opt.label}</span>
+                <span className="studio-chip__hint">{opt.hint}</span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <div className="studio-editor__footer">
+        <button type="submit" className="studio-btn studio-btn--primary studio-btn--block" disabled={saving}>
+          {saving ? 'Saving…' : 'Save promotion'}
+        </button>
+      </div>
     </form>
   );
 }

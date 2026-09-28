@@ -50,7 +50,7 @@ function resourceLabel(resource: StudioEditResource): string {
     case 'article':
       return `Article · ${resource.article.headline || resource.article.slug || resource.article.id}`;
     case 'promotion':
-      return `Promotion · ${resource.promotion.title || resource.promotion.id}`;
+      return resource.promotion.title || `Promotion #${resource.promotion.id}`;
     case 'bundle':
       return `Bundle · ${resource.bundle.title || resource.bundle.id}`;
     case 'financingProvider':
@@ -113,7 +113,13 @@ export function StudioEditDrawer({
       <div className="studio-drawer__panel">
         <div className="studio-drawer__top">
           <div>
-            <p className="studio-drawer__eyebrow">In-place edit</p>
+            <p className="studio-drawer__eyebrow">
+              {active.kind === 'promotion'
+                ? 'Edit promotion'
+                : active.kind === 'taggedProducts' || active.kind === 'taggedArticles' || active.kind === 'featuredProducts'
+                  ? 'Choose content'
+                  : 'In-place edit'}
+            </p>
             <p className="studio-drawer__context">{label}</p>
           </div>
           <button type="button" className="studio-icon-btn" onClick={onClose} aria-label="Close editor">

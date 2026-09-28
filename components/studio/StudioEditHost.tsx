@@ -400,7 +400,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       <StudioEditDrawer
         open={drawerOpen}
         resource={resource}
-        roleHint={capabilities.editableSummary}
+        roleHint={capabilities.roleLabel}
         onClose={() => {
           setDrawerOpen(false);
           setResource(null);

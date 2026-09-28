@@ -21,7 +21,7 @@ interface ProductGridProps {
   pageSize?: number;
   showPagination?: boolean;
   cardOptions?: ProductCardOptions;
-  /** When true, fetches only 5 products tagged "Featured" for fast homepage load. */
+  /** When true, fetches Featured-tagged products for the homepage carousel. */
   featuredOnly?: boolean;
 }
 

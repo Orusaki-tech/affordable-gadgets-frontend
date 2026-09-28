@@ -438,15 +438,17 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
         roleHint={capabilities.roleLabel}
         onClose={closeDrawer}
         onSaved={async () => {
-          await queryClient.invalidateQueries();
           const kind = resource?.kind;
           const isPicker =
             kind === 'taggedProducts' ||
             kind === 'taggedArticles' ||
             kind === 'featuredProducts' ||
             kind === 'brandBanner';
+          // Refetch curated sections immediately so the mirror behind the drawer matches.
+          await queryClient.invalidateQueries({ queryKey: ['products'] });
+          await queryClient.invalidateQueries({ queryKey: ['articles'] });
+          await queryClient.refetchQueries({ queryKey: ['products', 'featured'] });
           if (isPicker) {
-            // Keep the picker open; refresh the storefront mirror when the drawer closes.
             setRefreshOnClose(true);
             return;
           }

@@ -51,10 +51,11 @@ export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductLis
       ? await OpenAPI.HEADERS({} as never)
       : (OpenAPI.HEADERS ?? {})),
   };
-  const url = `${base}/api/v1/public/products/?featured=1&page_size=${FEATURED_PRODUCTS_PAGE_SIZE}&page=1`;
+  const url = `${base}/api/v1/public/products/?featured=1&page_size=${FEATURED_PRODUCTS_PAGE_SIZE}&page=1&_=${Date.now()}`;
   const res = await fetch(url, {
     credentials: 'omit',
     headers,
+    cache: 'no-store',
   });
   if (!res.ok) {
     const text = await res.text();
@@ -72,7 +73,8 @@ export function useFeaturedProducts() {
   return useQuery<PaginatedPublicProductList>({
     queryKey: ['products', 'featured'],
     queryFn: fetchFeaturedProducts,
-    staleTime: 30000,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 }
 

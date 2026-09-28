@@ -192,7 +192,7 @@ function HeaderContent() {
   const onSearchSubmit = (event: FormEvent) => {
     event.preventDefault();
     const q = searchQuery.trim();
-    router.push(q ? `/products?search=${encodeURIComponent(q)}` : '/products');
+    router.push(studioPath(q ? `/products?search=${encodeURIComponent(q)}` : '/products'));
   };
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { OpenAPI } from '@/lib/api/generated';
 import {
   ensureStudioTag,
@@ -25,7 +25,7 @@ type StudioTaggedArticlesEditorProps = {
   onSaved?: () => void | Promise<void>;
 };
 
-async function fetchFeaturedArticles(): Promise<ListedArticle[]> {
+async function fetchPublicFeaturedArticles(): Promise<ListedArticle[]> {
   const base = OpenAPI.BASE.replace(/\/+$/, '');
   const headers: Record<string, string> = {
     Accept: 'application/json',
@@ -35,7 +35,7 @@ async function fetchFeaturedArticles(): Promise<ListedArticle[]> {
   };
   const res = await fetch(
     `${base}/api/v1/public/articles/?tag=featured&page_size=50&page=1`,
-    { credentials: 'omit', headers }
+    { credentials: 'omit', headers, cache: 'no-store' }
   );
   if (!res.ok) throw new Error(`Featured articles request failed: ${res.status}`);
   const data = await res.json();
@@ -61,22 +61,77 @@ function articleThumb(article: StudioArticle): string | null {
   return resolveStudioImageUrl(article.thumbnail_image);
 }
 
+function ArticleRow({
+  id,
+  headline,
+  image,
+  meta,
+  featured,
+  busy,
+  onToggle,
+}: {
+  id: number;
+  headline: string;
+  image?: string | null;
+  meta?: string | null;
+  featured: boolean;
+  busy: boolean;
+  onToggle: (id: number, next: boolean) => void;
+}) {
+  return (
+    <li className="studio-featured-picker__row">
+      {image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={image} alt="" className="studio-featured-picker__thumb" />
+      ) : (
+        <span className="studio-featured-picker__thumb studio-featured-picker__thumb--empty" />
+      )}
+      <span className="studio-featured-picker__name">
+        {headline}
+        {meta ? <span className="studio-featured-picker__meta"> · {meta}</span> : null}
+      </span>
+      <button
+        type="button"
+        className={featured ? 'studio-btn--ghost' : 'studio-icon-btn studio-icon-btn--edit'}
+        disabled={busy}
+        onClick={() => onToggle(id, !featured)}
+      >
+        {busy ? '…' : featured ? 'Remove' : 'Feature'}
+      </button>
+    </li>
+  );
+}
+
 export function StudioTaggedArticlesEditor({
   roleHint,
   onSaved,
 }: StudioTaggedArticlesEditorProps) {
   const [tag, setTag] = useState<StudioTag | null>(null);
   const [selected, setSelected] = useState<ListedArticle[]>([]);
-  const [search, setSearch] = useState('');
-  const [results, setResults] = useState<StudioArticle[]>([]);
+  const [catalog, setCatalog] = useState<StudioArticle[]>([]);
+  const [filter, setFilter] = useState('');
   const [loading, setLoading] = useState(true);
-  const [searching, setSearching] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
-  const refreshSelected = useCallback(async () => {
-    setSelected(await fetchFeaturedArticles());
+  const loadCatalog = useCallback(async (pageNum: number, append: boolean) => {
+    const data = await listStudioArticles({
+      page: pageNum,
+      search: undefined,
+      publishedOnly: true,
+    });
+    const rows = data.results ?? [];
+    setCatalog((prev) => (append ? [...prev, ...rows] : rows));
+    setHasNext(Boolean(data.next));
+    setPage(pageNum);
+  }, []);
+
+  const refreshFeatured = useCallback(async () => {
+    setSelected(await fetchPublicFeaturedArticles());
   }, []);
 
   useEffect(() => {
@@ -88,7 +143,7 @@ export function StudioTaggedArticlesEditor({
         const ensured = await ensureStudioTag('Featured', 'featured');
         if (cancelled) return;
         setTag(ensured);
-        await refreshSelected();
+        await Promise.all([refreshFeatured(), loadCatalog(1, false)]);
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -96,7 +151,7 @@ export function StudioTaggedArticlesEditor({
               ? err.message
               : err instanceof Error
                 ? err.message
-                : 'Could not load featured articles'
+                : 'Could not load articles'
           );
         }
       } finally {
@@ -106,41 +161,18 @@ export function StudioTaggedArticlesEditor({
     return () => {
       cancelled = true;
     };
-  }, [refreshSelected]);
+  }, [loadCatalog, refreshFeatured]);
 
-  useEffect(() => {
-    const q = search.trim();
-    if (q.length < 2) {
-      setResults([]);
-      return;
-    }
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      void (async () => {
-        setSearching(true);
-        try {
-          const data = await listStudioArticles({ search: q, page: 1 });
-          if (!cancelled) setResults(data.results ?? []);
-        } catch (err) {
-          if (!cancelled) {
-            setError(
-              err instanceof StudioApiError
-                ? err.message
-                : err instanceof Error
-                  ? err.message
-                  : 'Search failed'
-            );
-          }
-        } finally {
-          if (!cancelled) setSearching(false);
-        }
-      })();
-    }, 300);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [search]);
+  const selectedIds = useMemo(() => new Set(selected.map((a) => a.id)), [selected]);
+
+  const filteredCatalog = useMemo(() => {
+    const q = filter.trim().toLowerCase();
+    if (!q) return catalog;
+    return catalog.filter((article) => {
+      const hay = `${article.headline || ''} ${article.product_name || ''} ${article.slug || ''}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }, [catalog, filter]);
 
   const toggle = async (articleId: number, enabled: boolean) => {
     setBusyId(articleId);
@@ -153,8 +185,8 @@ export function StudioTaggedArticlesEditor({
         enabled,
         tagId: tag?.id,
       });
-      await refreshSelected();
-      setMsg(enabled ? 'Added (Featured tag)' : 'Removed (Featured tag)');
+      await refreshFeatured();
+      setMsg(enabled ? 'Featured on homepage' : 'Removed from homepage');
       await onSaved?.();
     } catch (err) {
       setError(
@@ -169,19 +201,41 @@ export function StudioTaggedArticlesEditor({
     }
   };
 
+  const loadMore = async () => {
+    setLoadingMore(true);
+    setError(null);
+    try {
+      await loadCatalog(page + 1, true);
+    } catch (err) {
+      setError(
+        err instanceof StudioApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : 'Could not load more articles'
+      );
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
   if (loading) {
-    return <p className="studio-editor__hint">Loading Tech Buying Guides…</p>;
+    return <p className="studio-editor__hint">Loading blogs…</p>;
   }
 
   return (
-    <div className="studio-editor">
-      <div className="studio-editor__header">
-        <h2 className="studio-editor__title">Tech Buying Guides & Insights</h2>
-        {roleHint ? <p className="studio-editor__hint">{roleHint}</p> : null}
-        <p className="studio-editor__hint">
-          Articles with the Featured tag appear in this homepage section. Browse below to add or
-          remove.
-        </p>
+    <div className="studio-editor studio-editor--flush">
+      <div className="studio-editor__toolbar">
+        <div>
+          <p className="studio-editor__kicker">{roleHint || 'Homepage blogs'}</p>
+          <h2 className="studio-editor__title studio-editor__title--compact">
+            Choose featured blogs
+          </h2>
+          <p className="studio-editor__hint studio-editor__hint--tight">
+            Featured blogs appear under Tech Buying Guides on the storefront. Close this panel to
+            refresh the homepage preview.
+          </p>
+        </div>
       </div>
 
       {error && (
@@ -195,92 +249,73 @@ export function StudioTaggedArticlesEditor({
         </div>
       )}
 
-      <section className="studio-featured-picker">
-        <h3 className="studio-images__title">Currently featured ({selected.length})</h3>
+      <section className="studio-editor__section">
+        <h3 className="studio-editor__section-title">Currently featured ({selected.length})</h3>
         {selected.length === 0 ? (
-          <p className="studio-images__empty">
-            No Featured articles yet. Search below and click Add.
-          </p>
+          <p className="studio-images__empty">None yet. Pick blogs from the list below.</p>
         ) : (
           <ul className="studio-featured-picker__list">
             {selected.map((article) => (
-              <li key={article.id} className="studio-featured-picker__row">
-                {article.image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={article.image} alt="" className="studio-featured-picker__thumb" />
-                ) : (
-                  <span className="studio-featured-picker__thumb studio-featured-picker__thumb--empty" />
-                )}
-                <span className="studio-featured-picker__name">
-                  {article.headline}
-                  {article.productName ? (
-                    <span className="studio-featured-picker__meta"> · {article.productName}</span>
-                  ) : null}
-                </span>
-                <button
-                  type="button"
-                  className="studio-btn--ghost"
-                  disabled={busyId === article.id}
-                  onClick={() => void toggle(article.id, false)}
-                >
-                  {busyId === article.id ? '…' : 'Remove'}
-                </button>
-              </li>
+              <ArticleRow
+                key={article.id}
+                id={article.id}
+                headline={article.headline}
+                image={article.image}
+                meta={article.productName}
+                featured
+                busy={busyId === article.id}
+                onToggle={toggle}
+              />
             ))}
           </ul>
         )}
       </section>
 
-      <section className="studio-featured-picker">
-        <h3 className="studio-images__title">Search articles</h3>
+      <section className="studio-editor__section">
+        <h3 className="studio-editor__section-title">All blogs</h3>
         <label className="studio-field studio-field--full">
-          <span className="sr-only">Search articles</span>
+          <span className="sr-only">Filter blogs</span>
           <input
             className="studio-input"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Type at least 2 characters…"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder="Filter listed blogs…"
             autoFocus
           />
         </label>
-        {searching && <p className="studio-editor__hint">Searching…</p>}
         <ul className="studio-featured-picker__list">
-          {results.map((article) => {
+          {filteredCatalog.map((article) => {
             if (!article.id) return null;
-            const isInSection =
-              selected.some((f) => f.id === article.id) ||
+            const featured =
+              selectedIds.has(article.id) ||
               studioArticleHasTag(article, 'Featured', tag?.id);
-            const image = articleThumb(article);
             return (
-              <li key={article.id} className="studio-featured-picker__row">
-                {image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={image} alt="" className="studio-featured-picker__thumb" />
-                ) : (
-                  <span className="studio-featured-picker__thumb studio-featured-picker__thumb--empty" />
-                )}
-                <span className="studio-featured-picker__name">
-                  {article.headline || `Article #${article.id}`}
-                  {article.product_name ? (
-                    <span className="studio-featured-picker__meta"> · {article.product_name}</span>
-                  ) : null}
-                </span>
-                <button
-                  type="button"
-                  className={
-                    isInSection ? 'studio-btn--ghost' : 'studio-icon-btn studio-icon-btn--edit'
-                  }
-                  disabled={busyId === article.id}
-                  onClick={() => void toggle(article.id, !isInSection)}
-                >
-                  {busyId === article.id ? '…' : isInSection ? 'Remove' : 'Add'}
-                </button>
-              </li>
+              <ArticleRow
+                key={article.id}
+                id={article.id}
+                headline={article.headline || `Article #${article.id}`}
+                image={articleThumb(article)}
+                meta={article.product_name}
+                featured={featured}
+                busy={busyId === article.id}
+                onToggle={toggle}
+              />
             );
           })}
         </ul>
-        {search.trim().length >= 2 && !searching && results.length === 0 ? (
-          <p className="studio-images__empty">No articles matched that search.</p>
+        {filteredCatalog.length === 0 ? (
+          <p className="studio-images__empty">No blogs match that filter.</p>
+        ) : null}
+        {hasNext && !filter.trim() ? (
+          <button
+            type="button"
+            className="studio-btn studio-btn--ghost studio-btn--block"
+            style={{ marginTop: '0.75rem' }}
+            disabled={loadingMore}
+            onClick={() => void loadMore()}
+          >
+            {loadingMore ? 'Loading…' : 'Load more blogs'}
+          </button>
         ) : null}
       </section>
     </div>

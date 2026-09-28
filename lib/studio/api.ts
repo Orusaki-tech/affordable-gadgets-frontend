@@ -419,11 +419,14 @@ export type StudioPaginatedArticles = {
 export async function listStudioArticles(params: {
   page?: number;
   search?: string;
+  publishedOnly?: boolean;
 }): Promise<StudioPaginatedArticles> {
   const query = new URLSearchParams();
   if (params.page) query.set('page', String(params.page));
   if (params.search?.trim()) query.set('search', params.search.trim());
+  if (params.publishedOnly) query.set('is_published', 'true');
   query.set('page_size', '50');
+  query.set('ordering', '-updated_at');
   return studioFetchJson<StudioPaginatedArticles>(`/articles/?${query.toString()}`);
 }
 

@@ -105,9 +105,21 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [resource, setResource] = useState<StudioEditResource | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [refreshOnClose, setRefreshOnClose] = useState(false);
 
   const capabilities = studio?.capabilities;
   const isAuthenticated = Boolean(studio?.isAuthenticated);
+
+  const closeDrawer = useCallback(() => {
+    const shouldRefresh = refreshOnClose;
+    setDrawerOpen(false);
+    setResource(null);
+    setRefreshOnClose(false);
+    if (shouldRefresh && typeof window !== 'undefined') {
+      void queryClient.invalidateQueries();
+      window.location.reload();
+    }
+  }, [queryClient, refreshOnClose]);
 
   const openCreateProduct = useCallback(() => {
     if (!capabilities?.canCreateProduct) {
@@ -401,12 +413,19 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
         open={drawerOpen}
         resource={resource}
         roleHint={capabilities.roleLabel}
-        onClose={() => {
-          setDrawerOpen(false);
-          setResource(null);
-        }}
+        onClose={closeDrawer}
         onSaved={async () => {
           await queryClient.invalidateQueries();
+          const kind = resource?.kind;
+          const isPicker =
+            kind === 'taggedProducts' ||
+            kind === 'taggedArticles' ||
+            kind === 'featuredProducts';
+          if (isPicker) {
+            // Keep the picker open; refresh the storefront mirror when the drawer closes.
+            setRefreshOnClose(true);
+            return;
+          }
           const path = typeof window !== 'undefined' ? window.location.pathname : '';
           const isStudioHome = path === '/studio' || path === '/studio/';
           if (

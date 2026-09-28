@@ -19,59 +19,24 @@ async function publicApiHeaders(): Promise<Record<string, string>> {
   };
 }
 
-/** Articles for homepage blog carousel — one per featured product, same order as featured carousel. */
+/** Articles for homepage blog section — Featured-tagged articles only (Studio curation). */
 export async function fetchFeaturedArticles(): Promise<PublicArticleCard[]> {
   try {
     const base = OpenAPI.BASE.replace(/\/+$/, '');
-    const tagRes = await fetch(`${base}/api/v1/public/articles/?tag=featured&page_size=${FEATURED_ARTICLES_PAGE_SIZE}`, {
-      credentials: 'omit',
-      headers: await publicApiHeaders(),
-      next: { revalidate: BLOG_REVALIDATE },
-    });
-    if (tagRes.ok) {
-      const tagData = (await tagRes.json()) as { results?: PublicArticleCard[] };
-      const tagged = (tagData.results ?? []).filter(isRenderableArticleCard);
-      if (tagged.length > 0) return tagged.slice(0, FEATURED_ARTICLES_PAGE_SIZE);
-    }
-  } catch {
-    /* fallback to product-based */
-  }
-  try {
-    const products = await fetchFeaturedProductsForArticles();
-    if (!products.length) return [];
-
-    const articles: PublicArticleCard[] = [];
-    await Promise.all(
-      products.map(async (product) => {
-        if (!product.slug) return;
-        const productArticles = await fetchProductArticles(product.slug);
-        const card = productArticles.find(isRenderableArticleCard);
-        if (card) articles.push(card);
-      }),
+    const tagRes = await fetch(
+      `${base}/api/v1/public/articles/?tag=featured&page_size=${FEATURED_ARTICLES_PAGE_SIZE}`,
+      {
+        credentials: 'omit',
+        headers: await publicApiHeaders(),
+        next: { revalidate: BLOG_REVALIDATE },
+      }
     );
-
-    const slugOrder = new Map(products.map((product, index) => [product.slug, index]));
-    return articles
-      .sort(
-        (left, right) =>
-          (slugOrder.get(left.product_slug!) ?? 0) - (slugOrder.get(right.product_slug!) ?? 0),
-      )
-      .slice(0, FEATURED_ARTICLES_PAGE_SIZE);
+    if (!tagRes.ok) return [];
+    const tagData = (await tagRes.json()) as { results?: PublicArticleCard[] };
+    return (tagData.results ?? []).filter(isRenderableArticleCard).slice(0, FEATURED_ARTICLES_PAGE_SIZE);
   } catch {
     return [];
   }
-}
-
-async function fetchFeaturedProductsForArticles(): Promise<PublicProduct[]> {
-  const base = OpenAPI.BASE.replace(/\/+$/, '');
-  const url = `${base}/api/v1/public/products/?featured=1&page_size=${FEATURED_ARTICLES_PAGE_SIZE}&page=1`;
-  const res = await fetch(url, {
-    credentials: 'omit',
-    headers: await publicApiHeaders(),
-  });
-  if (!res.ok) return [];
-  const data = (await res.json()) as { results?: PublicProduct[] };
-  return data.results ?? [];
 }
 
 export async function fetchProductBySlug(slug: string): Promise<PublicProduct | null> {

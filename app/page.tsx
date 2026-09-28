@@ -203,10 +203,10 @@ export default async function HomePage() {
         <HomeHeroSpotlight initialPromotionsData={initialHeroPromotionsData} />
         <HomeCbdRibbon />
         <HomeFeaturedHardware />
+        <HomeRepairPromo />
         <HomeBudgetMatcher />
         <HomeBundles />
         <HomeBnplCalculator />
-        <HomeRepairPromo />
         <HomeVideoReels />
         <Suspense fallback={<div className="min-h-[12.5rem]" aria-hidden />}>
           <HomeBuyingGuides />

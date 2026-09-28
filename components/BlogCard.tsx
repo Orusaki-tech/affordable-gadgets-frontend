@@ -33,7 +33,7 @@ export function BlogCard({
   articleSlug,
 }: BlogCardProps) {
   const studioEdit = useStudioEditOptional();
-  const canEdit = Boolean(studioEdit?.canEdit);
+  const canEdit = Boolean(studioEdit?.capabilities.canEditArticles);
   const card = (
     <Link href={studioPath(href)} className="blog-card">
       <div className="blog-card__image-wrap">
@@ -61,6 +61,7 @@ export function BlogCard({
   return (
     <StudioBlockChrome
       label={title}
+      roleHint={studioEdit?.capabilities.roleLabel}
       onEdit={() => {
         void studioEdit?.openEditArticle({ id: articleId, slug: articleSlug });
       }}

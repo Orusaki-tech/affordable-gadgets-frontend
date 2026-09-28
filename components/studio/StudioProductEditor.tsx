@@ -10,6 +10,11 @@ import {
   type StudioProduct,
 } from '@/lib/studio/api';
 import { StudioProductImages } from '@/components/studio/StudioProductImages';
+import {
+  StudioProductVideos,
+  videosFromProduct,
+  type StudioVideoRow,
+} from '@/components/studio/StudioProductVideos';
 
 const PRODUCT_TYPES = [
   { value: 'PH', label: 'Phone' },
@@ -75,6 +80,8 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
   const [activeMode, setActiveMode] = useState(mode);
   const [form, setForm] = useState<FormState>(() => toFormState(product));
   const [currentProduct, setCurrentProduct] = useState<StudioProduct | null>(product ?? null);
+  const [videos, setVideos] = useState<StudioVideoRow[]>(() => videosFromProduct(product));
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
@@ -83,15 +90,20 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
     setActiveMode(mode);
     setForm(toFormState(product));
     setCurrentProduct(product ?? null);
+    setVideos(videosFromProduct(product));
+    setVideoFile(null);
   }, [mode, product]);
 
   const canEdit = useMemo(() => {
-    if (activeMode === 'create') return capabilities.canCreate;
-    return capabilities.canFullEdit || capabilities.canContentEdit;
+    if (activeMode === 'create') return capabilities.canCreateProduct;
+    return capabilities.canFullEditProduct || capabilities.canContentEditProduct;
   }, [activeMode, capabilities]);
 
   const contentOnly =
-    activeMode === 'edit' && !capabilities.canFullEdit && capabilities.canContentEdit;
+    activeMode === 'edit' &&
+    !capabilities.canFullEditProduct &&
+    capabilities.canContentEditProduct;
+  const canMedia = capabilities.canManageProductMedia;
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -105,7 +117,19 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
     setSavedMsg(null);
     setSaving(true);
 
-    const payload: Record<string, string | boolean | null> = {
+    const videoRows = videos
+      .map((video, index) => ({
+        url: video.url.trim(),
+        title: video.title.trim(),
+        display_order: index,
+      }))
+      .filter((video) => Boolean(video.url));
+    const firstVideoUrl = videoRows[0]?.url || '';
+
+    const payload: Record<
+      string,
+      string | Blob | boolean | null | undefined | unknown[]
+    > = {
       product_name: form.product_name.trim(),
       product_type: form.product_type,
       brand: form.brand.trim(),
@@ -119,7 +143,12 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
       keywords: form.keywords.trim(),
       is_published: form.is_published,
       is_discontinued: form.is_discontinued,
+      videos: videoRows,
+      product_video_url: firstVideoUrl,
     };
+    if (videoFile) {
+      payload.product_video_file = videoFile;
+    }
 
     try {
       if (activeMode === 'create') {
@@ -129,7 +158,9 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
         const created = await createStudioProduct(payload);
         setActiveMode('edit');
         setCurrentProduct(created);
-        setSavedMsg('Created — add images below, then close when done');
+        setVideos(videosFromProduct(created));
+        setVideoFile(null);
+        setSavedMsg('Created — add images/videos below, then close when done');
         onSaved?.(created);
         return;
       }
@@ -141,15 +172,24 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
 
       let saved: StudioProduct;
       if (contentOnly) {
-        const contentPayload: Record<string, string | boolean | null> = {};
+        const contentPayload: Record<
+          string,
+          string | Blob | boolean | null | undefined | unknown[]
+        > = {
+          videos: videoRows,
+          product_video_url: firstVideoUrl,
+        };
         Object.entries(payload).forEach(([key, value]) => {
-          if (CONTENT_KEYS.has(key)) contentPayload[key] = value;
+          if (CONTENT_KEYS.has(key)) contentPayload[key] = value as string | boolean | null;
         });
+        if (videoFile) contentPayload.product_video_file = videoFile;
         saved = await updateStudioProductContent(productId, contentPayload);
       } else {
         saved = await patchStudioProduct(productId, payload);
       }
       setCurrentProduct(saved);
+      setVideos(videosFromProduct(saved));
+      setVideoFile(null);
       setSavedMsg('Saved');
       onSaved?.(saved);
     } catch (err) {
@@ -184,9 +224,10 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
         </h2>
         {contentOnly && (
           <p className="studio-editor__hint">
-            Content-creator mode: name, descriptions, SEO, images, and publish.
+            Content-creator mode: name, descriptions, SEO, images, videos, and publish.
           </p>
         )}
+        <p className="studio-editor__hint">{capabilities.editableSummary}</p>
       </div>
 
       <div className="studio-editor__grid">
@@ -336,19 +377,39 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
       </div>
 
       {currentProduct?.id ? (
-        <StudioProductImages
-          productId={currentProduct.id}
-          productName={currentProduct.product_name || form.product_name}
-          initialImages={currentProduct.images}
-          disabled={fieldDisabled}
-          onChanged={(next) => {
-            setCurrentProduct(next);
-            setSavedMsg('Images updated');
-          }}
-        />
+        <>
+          {canMedia && (
+            <StudioProductImages
+              productId={currentProduct.id}
+              productName={currentProduct.product_name || form.product_name}
+              initialImages={currentProduct.images}
+              disabled={fieldDisabled}
+              onChanged={(next) => {
+                setCurrentProduct(next);
+                setSavedMsg('Images updated');
+              }}
+            />
+          )}
+          {canMedia && (
+            <StudioProductVideos
+              videos={videos}
+              onChange={(next) => {
+                setVideos(next);
+                setSavedMsg(null);
+              }}
+              videoFile={videoFile}
+              onVideoFileChange={(file) => {
+                setVideoFile(file);
+                setSavedMsg(null);
+              }}
+              existingFileUrl={currentProduct.product_video_file_url}
+              disabled={fieldDisabled}
+            />
+          )}
+        </>
       ) : (
         activeMode === 'create' && (
-          <p className="studio-editor__hint">Save the product first, then upload images.</p>
+          <p className="studio-editor__hint">Save the product first, then upload images and videos.</p>
         )
       )}
 

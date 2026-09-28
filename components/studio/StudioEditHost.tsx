@@ -20,14 +20,19 @@ import {
   deleteStudioProduct,
   findStudioArticleBySlug,
   retrieveStudioArticle,
+  retrieveStudioBundle,
+  retrieveStudioDeliveryRate,
+  retrieveStudioFinancingProvider,
   retrieveStudioProduct,
   retrieveStudioPromotion,
   StudioApiError,
 } from '@/lib/studio/api';
 import { isStudioBrowserPath } from '@/lib/studio/paths';
+import type { StudioCapabilities } from '@/lib/studio/permissions';
 import type { PublicProduct } from '@/lib/api/generated';
 
 type StudioEditHostValue = {
+  capabilities: StudioCapabilities;
   canEdit: boolean;
   canDelete: boolean;
   canCreate: boolean;
@@ -38,6 +43,9 @@ type StudioEditHostValue = {
   deleteProduct: (product: Pick<PublicProduct, 'id' | 'product_name'>) => Promise<void>;
   openEditArticle: (ref: { id?: number | null; slug?: string | null }) => Promise<void>;
   openEditPromotion: (id: number) => Promise<void>;
+  openEditBundle: (id: number) => Promise<void>;
+  openEditFinancingProvider: (id: number) => Promise<void>;
+  openEditDeliveryRate: (id: number) => Promise<void>;
 };
 
 const StudioEditContext = createContext<StudioEditHostValue | undefined>(undefined);
@@ -46,10 +54,6 @@ export function useStudioEditOptional(): StudioEditHostValue | undefined {
   return useContext(StudioEditContext);
 }
 
-/**
- * Global in-place editors for the mirrored storefront under /studio.
- * Products, articles, and promotions share one drawer host.
- */
 export function StudioEditHost({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isStudio = isStudioBrowserPath(pathname);
@@ -66,17 +70,21 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
   const isAuthenticated = Boolean(studio?.isAuthenticated);
   const active = Boolean(isStudio && isAuthenticated && capabilities);
 
-  const canEdit = Boolean(capabilities?.canFullEdit || capabilities?.canContentEdit);
-  const canDelete = Boolean(capabilities?.canDelete);
-  const canCreate = Boolean(capabilities?.canCreate);
-
   const openCreateProduct = useCallback(() => {
+    if (!capabilities?.canCreateProduct) {
+      setError('Your role cannot create products.');
+      return;
+    }
     setResource({ kind: 'product', mode: 'create', product: null });
     setDrawerOpen(true);
-  }, []);
+  }, [capabilities?.canCreateProduct]);
 
   const openEditProduct = useCallback(
     async (product: Pick<PublicProduct, 'id' | 'product_name'> | number) => {
+      if (!capabilities?.canFullEditProduct && !capabilities?.canContentEditProduct) {
+        setError('Your role cannot edit products.');
+        return;
+      }
       const id = typeof product === 'number' ? product : product.id;
       if (!id) return;
       setError(null);
@@ -94,12 +102,12 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
         );
       }
     },
-    []
+    [capabilities?.canContentEditProduct, capabilities?.canFullEditProduct]
   );
 
   const deleteProduct = useCallback(
     async (product: Pick<PublicProduct, 'id' | 'product_name'>) => {
-      if (!product.id || !canDelete) return;
+      if (!product.id || !capabilities?.canDeleteProduct) return;
       const ok = window.confirm(`Delete “${product.product_name}”?`);
       if (!ok) return;
       setError(null);
@@ -117,11 +125,15 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
         );
       }
     },
-    [canDelete, queryClient]
+    [capabilities?.canDeleteProduct, queryClient]
   );
 
   const openEditArticle = useCallback(
     async (ref: { id?: number | null; slug?: string | null }) => {
+      if (!capabilities?.canEditArticles) {
+        setError('Your role cannot edit articles.');
+        return;
+      }
       setError(null);
       try {
         const full =
@@ -146,35 +158,116 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
         );
       }
     },
-    []
+    [capabilities?.canEditArticles]
   );
 
-  const openEditPromotion = useCallback(async (id: number) => {
-    if (!id) return;
-    setError(null);
-    try {
-      const full = await retrieveStudioPromotion(id);
-      setResource({ kind: 'promotion', promotion: full });
-      setDrawerOpen(true);
-    } catch (err) {
-      setError(
-        err instanceof StudioApiError
-          ? err.message
-          : err instanceof Error
+  const openEditPromotion = useCallback(
+    async (id: number) => {
+      if (!id) return;
+      if (!capabilities?.canEditPromotions) {
+        setError('Your role cannot edit promotions.');
+        return;
+      }
+      setError(null);
+      try {
+        const full = await retrieveStudioPromotion(id);
+        setResource({ kind: 'promotion', promotion: full });
+        setDrawerOpen(true);
+      } catch (err) {
+        setError(
+          err instanceof StudioApiError
             ? err.message
-            : 'Could not load promotion for editing'
-      );
-    }
-  }, []);
+            : err instanceof Error
+              ? err.message
+              : 'Could not load promotion for editing'
+        );
+      }
+    },
+    [capabilities?.canEditPromotions]
+  );
 
-  // Deep-link: /studio/products?new=1 or ?edit=<id>
+  const openEditBundle = useCallback(
+    async (id: number) => {
+      if (!id) return;
+      if (!capabilities?.canEditBundles) {
+        setError('Your role cannot edit bundles (Marketing Manager only).');
+        return;
+      }
+      setError(null);
+      try {
+        const full = await retrieveStudioBundle(id);
+        setResource({ kind: 'bundle', bundle: full });
+        setDrawerOpen(true);
+      } catch (err) {
+        setError(
+          err instanceof StudioApiError
+            ? err.message
+            : err instanceof Error
+              ? err.message
+              : 'Could not load bundle for editing'
+        );
+      }
+    },
+    [capabilities?.canEditBundles]
+  );
+
+  const openEditFinancingProvider = useCallback(
+    async (id: number) => {
+      if (!id) return;
+      if (!capabilities?.canEditFinancing) {
+        setError('Your role cannot edit financing providers (Inventory Manager only).');
+        return;
+      }
+      setError(null);
+      try {
+        const full = await retrieveStudioFinancingProvider(id);
+        setResource({ kind: 'financingProvider', provider: full });
+        setDrawerOpen(true);
+      } catch (err) {
+        setError(
+          err instanceof StudioApiError
+            ? err.message
+            : err instanceof Error
+              ? err.message
+              : 'Could not load financing provider'
+        );
+      }
+    },
+    [capabilities?.canEditFinancing]
+  );
+
+  const openEditDeliveryRate = useCallback(
+    async (id: number) => {
+      if (!id) return;
+      if (!capabilities?.canEditDeliveryRates) {
+        setError('Your role cannot edit delivery rates (Order Manager only).');
+        return;
+      }
+      setError(null);
+      try {
+        const full = await retrieveStudioDeliveryRate(id);
+        setResource({ kind: 'deliveryRate', rate: full });
+        setDrawerOpen(true);
+      } catch (err) {
+        setError(
+          err instanceof StudioApiError
+            ? err.message
+            : err instanceof Error
+              ? err.message
+              : 'Could not load delivery rate'
+        );
+      }
+    },
+    [capabilities?.canEditDeliveryRates]
+  );
+
   useEffect(() => {
     if (!active || !capabilities) return;
     const editId = searchParams.get('edit');
     const isNew = searchParams.get('new') === '1';
     if (!isNew && !editId) return;
 
-    if (isNew && capabilities.canCreate) {
+    if (isNew && capabilities.canCreateProduct) {
       openCreateProduct();
     } else if (editId) {
       const id = Number(editId);
@@ -195,30 +288,43 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     pathname,
   ]);
 
-  const value = useMemo<StudioEditHostValue>(
-    () => ({
-      canEdit,
-      canDelete,
-      canCreate,
+  const value = useMemo<StudioEditHostValue | null>(() => {
+    if (!capabilities) return null;
+    return {
+      capabilities,
+      canEdit: Boolean(
+        capabilities.canFullEditProduct ||
+          capabilities.canContentEditProduct ||
+          capabilities.canEditArticles ||
+          capabilities.canEditPromotions ||
+          capabilities.canEditBundles ||
+          capabilities.canEditFinancing ||
+          capabilities.canEditDeliveryRates
+      ),
+      canDelete: capabilities.canDeleteProduct,
+      canCreate: capabilities.canCreateProduct,
       openCreateProduct,
       openEditProduct,
       deleteProduct,
       openEditArticle,
       openEditPromotion,
-    }),
-    [
-      canEdit,
-      canDelete,
-      canCreate,
-      openCreateProduct,
-      openEditProduct,
-      deleteProduct,
-      openEditArticle,
-      openEditPromotion,
-    ]
-  );
+      openEditBundle,
+      openEditFinancingProvider,
+      openEditDeliveryRate,
+    };
+  }, [
+    capabilities,
+    openCreateProduct,
+    openEditProduct,
+    deleteProduct,
+    openEditArticle,
+    openEditPromotion,
+    openEditBundle,
+    openEditFinancingProvider,
+    openEditDeliveryRate,
+  ]);
 
-  if (!active) {
+  if (!active || !capabilities || !value) {
     return <>{children}</>;
   }
 
@@ -236,14 +342,19 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       <StudioEditDrawer
         open={drawerOpen}
         resource={resource}
+        roleHint={capabilities.editableSummary}
         onClose={() => {
           setDrawerOpen(false);
           setResource(null);
         }}
         onSaved={async () => {
-          await queryClient.invalidateQueries({ queryKey: ['products'] });
-          await queryClient.invalidateQueries({ queryKey: ['product'] });
-          if (pathname?.includes('/products/') || pathname?.includes('/blog/') || pathname?.includes('/articles')) {
+          await queryClient.invalidateQueries();
+          if (
+            pathname?.includes('/products/') ||
+            pathname?.includes('/blog/') ||
+            pathname?.includes('/articles') ||
+            pathname?.includes('/financing')
+          ) {
             window.location.reload();
           }
         }}

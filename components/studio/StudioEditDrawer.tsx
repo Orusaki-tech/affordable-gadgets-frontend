@@ -4,21 +4,62 @@ import { useEffect, useState } from 'react';
 import { StudioProductEditor } from '@/components/studio/StudioProductEditor';
 import { StudioArticleEditor } from '@/components/studio/StudioArticleEditor';
 import { StudioPromotionEditor } from '@/components/studio/StudioPromotionEditor';
-import type { StudioArticle, StudioProduct, StudioPromotion } from '@/lib/studio/api';
+import { StudioBundleEditor } from '@/components/studio/StudioBundleEditor';
+import { StudioFinancingProviderEditor } from '@/components/studio/StudioFinancingProviderEditor';
+import { StudioDeliveryRateEditor } from '@/components/studio/StudioDeliveryRateEditor';
+import type {
+  StudioArticle,
+  StudioBundle,
+  StudioDeliveryRate,
+  StudioFinancingProvider,
+  StudioProduct,
+  StudioPromotion,
+} from '@/lib/studio/api';
 
 export type StudioEditResource =
   | { kind: 'product'; mode: 'create' | 'edit'; product?: StudioProduct | null }
   | { kind: 'article'; article: StudioArticle }
-  | { kind: 'promotion'; promotion: StudioPromotion };
+  | { kind: 'promotion'; promotion: StudioPromotion }
+  | { kind: 'bundle'; bundle: StudioBundle }
+  | { kind: 'financingProvider'; provider: StudioFinancingProvider }
+  | { kind: 'deliveryRate'; rate: StudioDeliveryRate };
 
 type StudioEditDrawerProps = {
   open: boolean;
   resource: StudioEditResource | null;
+  roleHint?: string;
   onClose: () => void;
   onSaved: () => void | Promise<void>;
 };
 
-export function StudioEditDrawer({ open, resource, onClose, onSaved }: StudioEditDrawerProps) {
+function resourceLabel(resource: StudioEditResource): string {
+  switch (resource.kind) {
+    case 'product':
+      return resource.mode === 'create'
+        ? 'New product'
+        : `Product · ${resource.product?.product_name || resource.product?.id || ''}`;
+    case 'article':
+      return `Article · ${resource.article.headline || resource.article.slug || resource.article.id}`;
+    case 'promotion':
+      return `Promotion · ${resource.promotion.title || resource.promotion.id}`;
+    case 'bundle':
+      return `Bundle · ${resource.bundle.title || resource.bundle.id}`;
+    case 'financingProvider':
+      return `Financing · ${resource.provider.name || resource.provider.id}`;
+    case 'deliveryRate':
+      return `Delivery · ${resource.rate.county || resource.rate.id}`;
+    default:
+      return 'Edit';
+  }
+}
+
+export function StudioEditDrawer({
+  open,
+  resource,
+  roleHint,
+  onClose,
+  onSaved,
+}: StudioEditDrawerProps) {
   const [active, setActive] = useState<StudioEditResource | null>(resource);
 
   useEffect(() => {
@@ -40,21 +81,17 @@ export function StudioEditDrawer({ open, resource, onClose, onSaved }: StudioEdi
 
   if (!open || !active) return null;
 
-  const label =
-    active.kind === 'product'
-      ? active.mode === 'create'
-        ? 'New product'
-        : 'Edit product'
-      : active.kind === 'article'
-        ? 'Edit article'
-        : 'Edit promotion';
+  const label = resourceLabel(active);
 
   return (
     <div className="studio-drawer" role="dialog" aria-modal="true" aria-label={label}>
       <button type="button" className="studio-drawer__backdrop" aria-label="Close" onClick={onClose} />
       <div className="studio-drawer__panel">
         <div className="studio-drawer__top">
-          <p className="studio-drawer__eyebrow">In-place edit</p>
+          <div>
+            <p className="studio-drawer__eyebrow">In-place edit</p>
+            <p className="studio-drawer__context">{label}</p>
+          </div>
           <button type="button" className="studio-icon-btn" onClick={onClose} aria-label="Close editor">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="currentColor">
               <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
@@ -68,7 +105,6 @@ export function StudioEditDrawer({ open, resource, onClose, onSaved }: StudioEdi
             onSaved={async (saved) => {
               await onSaved();
               if (active.mode === 'create') {
-                // Stay open so staff can upload images right away.
                 setActive({ kind: 'product', mode: 'edit', product: saved });
                 return;
               }
@@ -88,6 +124,37 @@ export function StudioEditDrawer({ open, resource, onClose, onSaved }: StudioEdi
         {active.kind === 'promotion' && (
           <StudioPromotionEditor
             promotion={active.promotion}
+            roleHint={roleHint}
+            onSaved={async () => {
+              await onSaved();
+              onClose();
+            }}
+          />
+        )}
+        {active.kind === 'bundle' && (
+          <StudioBundleEditor
+            bundle={active.bundle}
+            roleHint={roleHint}
+            onSaved={async () => {
+              await onSaved();
+              onClose();
+            }}
+          />
+        )}
+        {active.kind === 'financingProvider' && (
+          <StudioFinancingProviderEditor
+            provider={active.provider}
+            roleHint={roleHint}
+            onSaved={async () => {
+              await onSaved();
+              onClose();
+            }}
+          />
+        )}
+        {active.kind === 'deliveryRate' && (
+          <StudioDeliveryRateEditor
+            rate={active.rate}
+            roleHint={roleHint}
             onSaved={async () => {
               await onSaved();
               onClose();

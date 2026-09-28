@@ -43,10 +43,13 @@ export function StudioShell({ children }: { children: ReactNode }) {
       <div className="studio-float-bar" role="banner">
         <div className="studio-float-bar__left">
           <span className="studio-float-bar__mark">Studio</span>
-          <span className="studio-float-bar__hint">Live storefront · edit in place</span>
+          <span className="studio-float-bar__role" title={capabilities.editableSummary}>
+            {capabilities.roleLabel}
+          </span>
+          <span className="studio-float-bar__hint">{capabilities.editableSummary}</span>
         </div>
         <div className="studio-float-bar__actions">
-          {capabilities.canCreate && (
+          {capabilities.canCreateProduct && (
             <Link href="/studio/products?new=1" className="studio-float-bar__btn studio-float-bar__btn--lime">
               Add product
             </Link>

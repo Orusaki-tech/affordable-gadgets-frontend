@@ -8,6 +8,7 @@ import { PRODUCTS_VISIBLE_PAGE_SIZE, prefetchProductDetail } from '@/lib/hooks/u
 import { useDebouncedSearchParam } from '@/lib/hooks/useDebouncedSearchParam';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, type FilterState } from './ProductFilters';
+import { StudioFinancingProvidersChrome } from '@/components/studio/StudioFinancingProvidersChrome';
 
 type PaginatedPublicProductList = {
   count?: number;
@@ -168,6 +169,11 @@ export function FinancingProductsPage() {
           <p className="text-sm text-gray-600" style={{ marginTop: 6 }}>
             Shop products with Buy Now Pay Later options. Look for the <strong>Financing available</strong> chip.
           </p>
+          <div style={{ marginTop: 12 }}>
+            <StudioFinancingProvidersChrome variant="light">
+              <span className="sr-only">Financing partners</span>
+            </StudioFinancingProvidersChrome>
+          </div>
         </div>
       </div>
 

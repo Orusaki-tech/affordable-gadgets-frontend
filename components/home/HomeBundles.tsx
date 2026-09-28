@@ -6,7 +6,10 @@ import { ApiService } from '@/lib/api/generated';
 import type { PublicBundle } from '@/lib/api/generated';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { MaterialIcon } from '@/components/MaterialIcon';
+import { StudioBlockChrome } from '@/components/studio/StudioBlockChrome';
+import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 import { getProductHref } from '@/lib/utils/productRoutes';
+import { studioPath } from '@/lib/studio/paths';
 
 function formatKes(value?: number | string | null) {
   if (value == null || value === '') return null;
@@ -16,6 +19,8 @@ function formatKes(value?: number | string | null) {
 }
 
 function BundleCard({ bundle }: { bundle: PublicBundle }) {
+  const studioEdit = useStudioEditOptional();
+  const canEdit = Boolean(studioEdit?.capabilities.canEditBundles && bundle.id);
   const items = bundle.items ?? [];
   const href = bundle.main_product_slug
     ? getProductHref({ slug: bundle.main_product_slug, id: bundle.main_product_id })
@@ -26,9 +31,9 @@ function BundleCard({ bundle }: { bundle: PublicBundle }) {
     formatKes(bundle.items_max_total);
   const thumb = items.find((item) => item.primary_image)?.primary_image;
 
-  return (
+  const card = (
     <Link
-      href={href}
+      href={studioPath(href)}
       className="flex flex-col justify-between rounded-2xl bg-surface-container-lowest p-4 shadow-sm transition hover:shadow-md"
     >
       <div>
@@ -76,6 +81,20 @@ function BundleCard({ bundle }: { bundle: PublicBundle }) {
         </div>
       </div>
     </Link>
+  );
+
+  if (!canEdit || !bundle.id) return card;
+
+  return (
+    <StudioBlockChrome
+      label={bundle.title}
+      roleHint={studioEdit?.capabilities.roleLabel}
+      onEdit={() => {
+        void studioEdit?.openEditBundle(bundle.id!);
+      }}
+    >
+      {card}
+    </StudioBlockChrome>
   );
 }
 

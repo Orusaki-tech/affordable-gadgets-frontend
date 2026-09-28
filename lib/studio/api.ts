@@ -195,8 +195,17 @@ export type StudioProduct = {
     image?: string;
     is_primary?: boolean;
   }>;
+  videos?: Array<{
+    id?: number;
+    url?: string;
+    title?: string;
+    display_order?: number;
+  }>;
+  product_video_url?: string | null;
+  product_video_file_url?: string | null;
   og_image_url?: string | null;
   primary_image?: string | null;
+  tags?: Array<{ id?: number; name?: string; slug?: string }>;
 };
 
 export type StudioPaginatedProducts = {
@@ -237,16 +246,15 @@ export async function retrieveStudioProduct(id: number): Promise<StudioProduct> 
 }
 
 export async function createStudioProduct(
-  data: Record<string, string | Blob | boolean | number | null | undefined>
+  data: Record<
+    string,
+    string | Blob | boolean | number | null | undefined | Record<string, unknown> | unknown[]
+  >
 ): Promise<StudioProduct> {
   const form = new FormData();
   Object.entries(data).forEach(([key, value]) => {
-    if (value === undefined || value === null || value === '') return;
-    if (typeof value === 'boolean') {
-      form.append(key, value ? 'true' : 'false');
-    } else {
-      form.append(key, value as string | Blob);
-    }
+    if (value === undefined || value === '') return;
+    appendFormValue(form, key, value);
   });
   return studioFetchJson<StudioProduct>('/products/', {
     method: 'POST',
@@ -257,21 +265,13 @@ export async function createStudioProduct(
 
 export async function patchStudioProduct(
   id: number,
-  data: Record<string, string | Blob | boolean | number | null | undefined>
+  data: Record<
+    string,
+    string | Blob | boolean | number | null | undefined | Record<string, unknown> | unknown[]
+  >
 ): Promise<StudioProduct> {
   const form = new FormData();
-  Object.entries(data).forEach(([key, value]) => {
-    if (value === undefined) return;
-    if (value === null) {
-      form.append(key, '');
-      return;
-    }
-    if (typeof value === 'boolean') {
-      form.append(key, value ? 'true' : 'false');
-    } else {
-      form.append(key, value as string | Blob);
-    }
-  });
+  Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
   return studioFetchJson<StudioProduct>(`/products/${id}/`, {
     method: 'PATCH',
     body: form,
@@ -281,21 +281,13 @@ export async function patchStudioProduct(
 
 export async function updateStudioProductContent(
   id: number,
-  data: Record<string, string | Blob | boolean | number | null | undefined>
+  data: Record<
+    string,
+    string | Blob | boolean | number | null | undefined | Record<string, unknown> | unknown[]
+  >
 ): Promise<StudioProduct> {
   const form = new FormData();
-  Object.entries(data).forEach(([key, value]) => {
-    if (value === undefined) return;
-    if (value === null) {
-      form.append(key, '');
-      return;
-    }
-    if (typeof value === 'boolean') {
-      form.append(key, value ? 'true' : 'false');
-    } else {
-      form.append(key, value as string | Blob);
-    }
-  });
+  Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
   return studioFetchJson<StudioProduct>(`/products/${id}/update_content/`, {
     method: 'PATCH',
     body: form,
@@ -327,7 +319,15 @@ export type StudioProductImage = {
 function appendFormValue(
   form: FormData,
   key: string,
-  value: string | Blob | boolean | number | null | undefined
+  value:
+    | string
+    | Blob
+    | boolean
+    | number
+    | null
+    | undefined
+    | Record<string, unknown>
+    | unknown[]
 ) {
   if (value === undefined) return;
   if (value === null) {
@@ -336,6 +336,10 @@ function appendFormValue(
   }
   if (typeof value === 'boolean') {
     form.append(key, value ? 'true' : 'false');
+    return;
+  }
+  if (typeof value === 'object' && !(value instanceof Blob)) {
+    form.append(key, JSON.stringify(value));
     return;
   }
   form.append(key, value as string | Blob);
@@ -455,6 +459,9 @@ export type StudioPromotion = {
   end_date?: string | null;
   banner_image?: string | null;
   banner_image_url?: string | null;
+  display_locations?: string[] | string | null;
+  carousel_position?: number | null;
+  featured_product?: number | null;
 };
 
 export async function retrieveStudioPromotion(id: number): Promise<StudioPromotion> {
@@ -463,19 +470,110 @@ export async function retrieveStudioPromotion(id: number): Promise<StudioPromoti
 
 export async function patchStudioPromotion(
   id: number,
-  data: Record<string, string | Blob | boolean | number | null | undefined>
+  data: Record<
+    string,
+    string | Blob | boolean | number | null | undefined | Record<string, unknown> | unknown[]
+  >
 ): Promise<StudioPromotion> {
-  const hasFile = Object.values(data).some((value) => typeof Blob !== 'undefined' && value instanceof Blob);
+  const form = new FormData();
+  Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
+  return studioFetchJson<StudioPromotion>(`/promotions/${id}/`, {
+    method: 'PATCH',
+    body: form,
+    multipart: true,
+  });
+}
+
+export type StudioBundle = {
+  id: number;
+  title?: string;
+  description?: string;
+  is_active?: boolean;
+  pricing_mode?: string;
+  bundle_price?: string | number | null;
+  discount_percentage?: string | number | null;
+  discount_amount?: string | number | null;
+  show_in_listings?: boolean;
+  main_product?: number | null;
+  main_product_name?: string | null;
+};
+
+export async function retrieveStudioBundle(id: number): Promise<StudioBundle> {
+  return studioFetchJson<StudioBundle>(`/bundles/${id}/`);
+}
+
+export async function patchStudioBundle(
+  id: number,
+  data: Record<string, string | boolean | number | null | undefined>
+): Promise<StudioBundle> {
+  return studioFetchJson<StudioBundle>(`/bundles/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export type StudioFinancingProvider = {
+  id: number;
+  name?: string;
+  slug?: string;
+  is_active?: boolean;
+  logo?: string | null;
+  logo_url?: string | null;
+};
+
+export async function listStudioFinancingProviders(): Promise<StudioFinancingProvider[]> {
+  const data = await studioFetchJson<{ results?: StudioFinancingProvider[] } | StudioFinancingProvider[]>(
+    '/financing-providers/'
+  );
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
+}
+
+export async function retrieveStudioFinancingProvider(
+  id: number
+): Promise<StudioFinancingProvider> {
+  return studioFetchJson<StudioFinancingProvider>(`/financing-providers/${id}/`);
+}
+
+export async function patchStudioFinancingProvider(
+  id: number,
+  data: Record<string, string | Blob | boolean | number | null | undefined>
+): Promise<StudioFinancingProvider> {
+  const hasFile = Object.values(data).some(
+    (value) => typeof Blob !== 'undefined' && value instanceof Blob
+  );
   if (hasFile) {
     const form = new FormData();
     Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
-    return studioFetchJson<StudioPromotion>(`/promotions/${id}/`, {
+    return studioFetchJson<StudioFinancingProvider>(`/financing-providers/${id}/`, {
       method: 'PATCH',
       body: form,
       multipart: true,
     });
   }
-  return studioFetchJson<StudioPromotion>(`/promotions/${id}/`, {
+  return studioFetchJson<StudioFinancingProvider>(`/financing-providers/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export type StudioDeliveryRate = {
+  id: number;
+  county?: string;
+  ward?: string | null;
+  price?: string | number;
+  is_active?: boolean;
+};
+
+export async function retrieveStudioDeliveryRate(id: number): Promise<StudioDeliveryRate> {
+  return studioFetchJson<StudioDeliveryRate>(`/delivery-rates/${id}/`);
+}
+
+export async function patchStudioDeliveryRate(
+  id: number,
+  data: Record<string, string | boolean | number | null | undefined>
+): Promise<StudioDeliveryRate> {
+  return studioFetchJson<StudioDeliveryRate>(`/delivery-rates/${id}/`, {
     method: 'PATCH',
     body: JSON.stringify(data),
   });

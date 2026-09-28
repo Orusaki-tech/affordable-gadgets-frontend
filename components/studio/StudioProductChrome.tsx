@@ -6,15 +6,20 @@ import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 /** Hover edit/delete icons overlaid on any ProductCard while in Studio. */
 export function StudioProductChrome({ product }: { product: PublicProduct }) {
   const studioEdit = useStudioEditOptional();
-  if (!studioEdit || (!studioEdit.canEdit && !studioEdit.canDelete)) return null;
+  const canEditProduct = Boolean(
+    studioEdit?.capabilities.canFullEditProduct ||
+      studioEdit?.capabilities.canContentEditProduct
+  );
+  const canDelete = Boolean(studioEdit?.capabilities.canDeleteProduct);
+  if (!studioEdit || (!canEditProduct && !canDelete)) return null;
 
   return (
-    <div className="studio-editable-card__chrome" aria-label="Studio actions">
-      {studioEdit.canEdit && (
+    <div className="studio-editable-card__chrome" aria-label="Studio product actions">
+      {canEditProduct && (
         <button
           type="button"
           className="studio-icon-btn"
-          title="Edit in place"
+          title={`Edit product · ${studioEdit.capabilities.roleLabel}`}
           aria-label={`Edit ${product.product_name}`}
           onClick={(e) => {
             e.preventDefault();
@@ -27,7 +32,7 @@ export function StudioProductChrome({ product }: { product: PublicProduct }) {
           </svg>
         </button>
       )}
-      {studioEdit.canDelete && (
+      {canDelete && (
         <button
           type="button"
           className="studio-icon-btn studio-icon-btn--danger"

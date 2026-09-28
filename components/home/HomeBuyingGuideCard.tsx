@@ -22,7 +22,9 @@ export type HomeBuyingGuideCardData = {
 
 export function HomeBuyingGuideCard({ guide }: { guide: HomeBuyingGuideCardData }) {
   const studioEdit = useStudioEditOptional();
-  const canEdit = Boolean(studioEdit?.canEdit && (guide.articleId || guide.articleSlug));
+  const canEdit = Boolean(
+    studioEdit?.capabilities.canEditArticles && (guide.articleId || guide.articleSlug)
+  );
 
   const card = (
     <Link
@@ -66,6 +68,7 @@ export function HomeBuyingGuideCard({ guide }: { guide: HomeBuyingGuideCardData 
   return (
     <StudioBlockChrome
       label={guide.title}
+      roleHint={studioEdit?.capabilities.roleLabel}
       onEdit={() => {
         void studioEdit?.openEditArticle({
           id: guide.articleId,

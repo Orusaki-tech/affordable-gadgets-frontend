@@ -58,6 +58,19 @@
   color: color-mix(in srgb, #fff 65%, transparent);
 }
 
+.studio-float-bar__role {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: color-mix(in srgb, var(--promo-lime, #9fe855) 22%, transparent);
+  color: var(--promo-lime, #9fe855);
+  border: 1px solid color-mix(in srgb, var(--promo-lime, #9fe855) 40%, transparent);
+}
+
 .studio-float-bar__actions {
   display: flex;
   flex-wrap: wrap;
@@ -550,4 +563,78 @@
   font-size: 0.75rem;
   font-weight: 700;
 }
+
+.studio-financing-chrome {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.studio-financing-chrome__panel {
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, #fff 8%, transparent);
+  border: 1px solid color-mix(in srgb, #fff 14%, transparent);
+}
+
+.studio-financing-chrome__label {
+  margin: 0 0 0.45rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: color-mix(in srgb, #fff 70%, transparent);
+}
+
+.studio-financing-chrome__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.studio-financing-chrome__chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--promo-lime, #9fe855) 45%, transparent);
+  background: color-mix(in srgb, var(--promo-lime, #9fe855) 18%, transparent);
+  color: #fff;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.studio-financing-chrome__error,
+.studio-financing-chrome__empty {
+  margin: 0;
+  font-size: 0.75rem;
+  color: color-mix(in srgb, #fff 65%, transparent);
+}
+
+.studio-financing-chrome--light .studio-financing-chrome__panel {
+  background: var(--surface-container-lowest, #fff);
+  border-color: var(--border-hairline, #e8e8ed);
+}
+
+.studio-financing-chrome--light .studio-financing-chrome__label,
+.studio-financing-chrome--light .studio-financing-chrome__error,
+.studio-financing-chrome--light .studio-financing-chrome__empty {
+  color: var(--on-surface-variant, #46464a);
+}
+
+.studio-financing-chrome--light .studio-financing-chrome__chip {
+  color: var(--primary, #030304);
+  border-color: var(--border-hairline, #e8e8ed);
+  background: var(--surface-container, #f0f0f2);
+}
+
+@media (max-width: 767px) {
+  .studio-float-bar__hint {
+    display: none;
+  }
+}
+
 

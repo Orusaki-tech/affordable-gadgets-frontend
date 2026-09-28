@@ -23,7 +23,7 @@ export function StudioPromoTile({
   children,
 }: StudioPromoTileProps) {
   const studioEdit = useStudioEditOptional();
-  const canEdit = Boolean(studioEdit?.canEdit && promotionId);
+  const canEdit = Boolean(studioEdit?.capabilities.canEditPromotions && promotionId);
 
   const link = (
     <Link href={studioPath(href)} className={className}>
@@ -38,6 +38,7 @@ export function StudioPromoTile({
   return (
     <StudioBlockChrome
       label={title}
+      roleHint={studioEdit?.capabilities.roleLabel}
       onEdit={() => {
         void studioEdit?.openEditPromotion(promotionId);
       }}

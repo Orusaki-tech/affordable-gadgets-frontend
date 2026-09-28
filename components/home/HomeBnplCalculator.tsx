@@ -1,8 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useMemo, useState } from 'react';
 import { MaterialIcon } from '@/components/MaterialIcon';
+import { StudioFinancingProvidersChrome } from '@/components/studio/StudioFinancingProvidersChrome';
+import { studioPath } from '@/lib/studio/paths';
 
 const PARTNERS = ['Lipa Later', 'Aspira KE', 'Craft Silicon'] as const;
 
@@ -38,16 +40,18 @@ export function HomeBnplCalculator() {
             <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
               Financing Partners
             </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {PARTNERS.map((partner) => (
-                <span key={partner} className="ag-tag ag-tag--on-dark">
-                  {partner}
-                </span>
-              ))}
-            </div>
+            <StudioFinancingProvidersChrome>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {PARTNERS.map((partner) => (
+                  <span key={partner} className="ag-tag ag-tag--on-dark">
+                    {partner}
+                  </span>
+                ))}
+              </div>
+            </StudioFinancingProvidersChrome>
           </div>
           <Link
-            href="/financing"
+            href={studioPath('/financing')}
             className="ag-btn ag-btn--lime mt-6"
           >
             Browse financing devices

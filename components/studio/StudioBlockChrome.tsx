@@ -7,6 +7,8 @@ type StudioBlockChromeProps = {
   onEdit: () => void;
   children: ReactNode;
   className?: string;
+  /** Shown in the edit button title so editors know their role context. */
+  roleHint?: string;
 };
 
 /** Hover edit control over any mirrored storefront block. */
@@ -15,15 +17,17 @@ export function StudioBlockChrome({
   onEdit,
   children,
   className,
+  roleHint,
 }: StudioBlockChromeProps) {
+  const title = roleHint ? `Edit ${label} · ${roleHint}` : `Edit ${label}`;
   return (
     <div className={`studio-editable-card${className ? ` ${className}` : ''}`}>
       <div className="studio-editable-card__chrome" aria-label="Studio actions">
         <button
           type="button"
           className="studio-icon-btn"
-          title={`Edit ${label}`}
-          aria-label={`Edit ${label}`}
+          title={title}
+          aria-label={title}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();

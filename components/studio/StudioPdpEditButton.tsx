@@ -26,7 +26,7 @@ export function StudioPdpEditButton({ productId }: { productId?: number | null }
   const [error, setError] = useState<string | null>(null);
 
   const canEdit = Boolean(
-    studio?.capabilities.canFullEdit || studio?.capabilities.canContentEdit
+    studio?.capabilities.canFullEditProduct || studio?.capabilities.canContentEditProduct
   );
 
   const openEditor = useCallback(async () => {
@@ -55,14 +55,16 @@ export function StudioPdpEditButton({ productId }: { productId?: number | null }
     return null;
   }
 
+  const editTitle = `Edit product · ${studio.capabilities.roleLabel}`;
+
   return (
     <>
       <div className="studio-pdp-chrome">
         <button
           type="button"
           className="studio-icon-btn"
-          title="Edit product"
-          aria-label="Edit product"
+          title={editTitle}
+          aria-label={editTitle}
           onClick={() => void openEditor()}
         >
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden fill="currentColor">
@@ -101,9 +103,7 @@ export function StudioArticleEditButton({
   const studioEdit = useStudioEditOptional();
   const [error, setError] = useState<string | null>(null);
 
-  const canEdit = Boolean(
-    studio?.capabilities.canFullEdit || studio?.capabilities.canContentEdit
-  );
+  const canEdit = Boolean(studio?.capabilities.canEditArticles);
 
   const openEditor = useCallback(async () => {
     setError(null);
@@ -129,13 +129,15 @@ export function StudioArticleEditButton({
     return null;
   }
 
+  const editTitle = `Edit article · ${studio.capabilities.roleLabel}`;
+
   return (
     <div className="studio-pdp-chrome">
       <button
         type="button"
         className="studio-icon-btn"
-        title="Edit article"
-        aria-label="Edit article"
+        title={editTitle}
+        aria-label={editTitle}
         onClick={() => void openEditor()}
       >
         <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden fill="currentColor">

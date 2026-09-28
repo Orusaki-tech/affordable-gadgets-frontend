@@ -478,20 +478,43 @@ export function studioArticleHasTag(
   });
 }
 
+/**
+ * Add or remove a named tag on an article.
+ * Removal matches by tag id OR name/slug so duplicate tag rows still clear.
+ */
 export async function setStudioArticleTagged(
   articleId: number,
   options: { tagName: string; tagSlug: string; enabled: boolean; tagId?: number }
 ): Promise<StudioArticle> {
-  const tag = options.tagId
-    ? { id: options.tagId }
+  const ensured = options.tagId
+    ? { id: options.tagId, name: options.tagName, slug: options.tagSlug }
     : await ensureStudioTag(options.tagName, options.tagSlug);
+  if (!ensured.id) {
+    throw new StudioApiError('Tag is missing an id', 400, ensured);
+  }
   const article = await retrieveStudioArticle(articleId);
-  const currentIds = (article.tags || [])
-    .map((t) => t.id)
-    .filter((id): id is number => typeof id === 'number');
+  const currentTags = article.tags || [];
+  const matchesTarget = (tag: { id?: number; name?: string; slug?: string }) => {
+    if (tag.id != null && tag.id === ensured.id) return true;
+    const name = tag.name?.toLowerCase() || '';
+    const slug = tag.slug?.toLowerCase() || '';
+    return (
+      name === options.tagName.toLowerCase() ||
+      slug === options.tagSlug.toLowerCase() ||
+      slug === options.tagName.toLowerCase()
+    );
+  };
   const next = options.enabled
-    ? Array.from(new Set([...currentIds, tag.id]))
-    : currentIds.filter((id) => id !== tag.id);
+    ? Array.from(
+        new Set([
+          ...currentTags.map((t) => t.id).filter((id): id is number => typeof id === 'number'),
+          ensured.id,
+        ])
+      )
+    : currentTags
+        .filter((t) => !matchesTarget(t))
+        .map((t) => t.id)
+        .filter((id): id is number => typeof id === 'number');
   return patchStudioArticle(articleId, { tag_ids: next });
 }
 
@@ -704,10 +727,22 @@ export async function ensureStudioTag(name: string, slug: string): Promise<Studi
       tag.slug?.toLowerCase() === slug.toLowerCase()
   );
   if (existing?.id) return existing;
-  return studioFetchJson<StudioTag>('/tags/', {
-    method: 'POST',
-    body: JSON.stringify({ name, slug }),
-  });
+  try {
+    return await studioFetchJson<StudioTag>('/tags/', {
+      method: 'POST',
+      body: JSON.stringify({ name, slug }),
+    });
+  } catch (err) {
+    // Race / duplicate slug — re-list and reuse.
+    const again = await listStudioTags();
+    const found = again.find(
+      (tag) =>
+        tag.name?.toLowerCase() === name.toLowerCase() ||
+        tag.slug?.toLowerCase() === slug.toLowerCase()
+    );
+    if (found?.id) return found;
+    throw err;
+  }
 }
 
 export async function ensureStudioFeaturedTag(): Promise<StudioTag> {
@@ -748,21 +783,53 @@ export async function setStudioProductTagIds(
   });
 }
 
+/**
+ * Add or remove a named tag on a product.
+ * Removal matches by tag id OR name/slug so duplicate "Featured" rows still clear.
+ */
 export async function setStudioProductTagged(
   productId: number,
   options: { tagName: string; tagSlug: string; enabled: boolean; tagId?: number }
 ): Promise<StudioProduct> {
-  const tag = options.tagId
-    ? { id: options.tagId }
+  const ensured = options.tagId
+    ? { id: options.tagId, name: options.tagName, slug: options.tagSlug }
     : await ensureStudioTag(options.tagName, options.tagSlug);
+  if (!ensured.id) {
+    throw new StudioApiError('Tag is missing an id', 400, ensured);
+  }
+
   const product = await retrieveStudioProduct(productId);
-  const currentIds = (product.tags || [])
-    .map((t) => t.id)
-    .filter((id): id is number => typeof id === 'number');
-  const next = options.enabled
-    ? Array.from(new Set([...currentIds, tag.id]))
-    : currentIds.filter((id) => id !== tag.id);
-  return setStudioProductTagIds(productId, next);
+  const currentTags = product.tags || [];
+  const matchesTarget = (tag: { id?: number; name?: string; slug?: string }) => {
+    if (tag.id != null && tag.id === ensured.id) return true;
+    const name = tag.name?.toLowerCase() || '';
+    const slug = tag.slug?.toLowerCase() || '';
+    return (
+      name === options.tagName.toLowerCase() ||
+      slug === options.tagSlug.toLowerCase() ||
+      slug === options.tagName.toLowerCase()
+    );
+  };
+
+  let nextIds: number[];
+  if (options.enabled) {
+    const kept = currentTags
+      .map((t) => t.id)
+      .filter((id): id is number => typeof id === 'number');
+    nextIds = Array.from(new Set([...kept, ensured.id]));
+  } else {
+    nextIds = currentTags
+      .filter((t) => !matchesTarget(t))
+      .map((t) => t.id)
+      .filter((id): id is number => typeof id === 'number');
+  }
+
+  const saved = await setStudioProductTagIds(productId, nextIds);
+  // Prefer the write response; if tags omitted, re-fetch to confirm.
+  if (saved.tags == null) {
+    return retrieveStudioProduct(productId);
+  }
+  return saved;
 }
 
 export async function setStudioProductFeatured(

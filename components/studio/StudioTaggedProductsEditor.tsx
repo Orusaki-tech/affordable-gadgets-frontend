@@ -183,17 +183,31 @@ export function StudioTaggedProductsEditor({
     setBusyId(productId);
     setError(null);
     setMsg(null);
+    // Optimistic UI so Remove feels instant even before public list refreshes.
+    if (!enabled) {
+      setSelected((prev) => prev.filter((p) => p.id !== productId));
+    }
     try {
-      await setStudioProductTagged(productId, {
+      const saved = await setStudioProductTagged(productId, {
         tagName: config.tagName,
         tagSlug: config.tagSlug,
         enabled,
         tagId: tag?.id,
       });
+      const stillTagged = studioProductHasTag(saved, config.tagName, tag?.id);
+      if (enabled && !stillTagged) {
+        throw new Error(`Could not add the ${config.tagName} tag. Try again.`);
+      }
+      if (!enabled && stillTagged) {
+        throw new Error(
+          `Could not remove the ${config.tagName} tag. The product may still be tagged in admin.`
+        );
+      }
       await refreshSelected();
       setMsg(enabled ? `Added (${config.tagName} tag)` : `Removed (${config.tagName} tag)`);
       await onSaved?.();
     } catch (err) {
+      await refreshSelected().catch(() => undefined);
       setError(
         err instanceof StudioApiError
           ? err.message

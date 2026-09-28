@@ -95,6 +95,7 @@ export const UTILITY_NAV: NavLink[] = [
   { href: '/', label: 'Home' },
   { href: '/articles', label: 'Blog' },
   { href: '/financing', label: 'Financing' },
+  { href: '/repair', label: 'Repair' },
 ];
 
 export function brandCategoryHref(

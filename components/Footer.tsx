@@ -170,6 +170,9 @@ export function Footer() {
 
           <div className="flex flex-col gap-3">
             <span className="text-sm font-bold text-primary">Support</span>
+            <Link href="/repair" className="text-sm text-secondary transition hover:text-primary">
+              Book a Repair
+            </Link>
             <Link href="/contact" className="text-sm text-secondary transition hover:text-primary">
               Contact Us
             </Link>

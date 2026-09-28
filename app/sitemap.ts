@@ -78,6 +78,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const path of mainNav) push(path, 0.95);
   push("/articles", 0.95);
   push("/financing", 0.95);
+  push("/repair", 0.95);
 
   // 2. Shop by brand / type
   push("/products", 0.9);

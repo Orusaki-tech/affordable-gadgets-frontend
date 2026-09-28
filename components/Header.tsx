@@ -428,6 +428,13 @@ function HeaderContent() {
               Financing
             </Link>
             <Link
+              href="/repair"
+              className={`site-header__nav-link${pathname === '/repair' ? ' site-header__nav-link--active' : ''}`}
+              onMouseEnter={closeMegaMenu}
+            >
+              Repair
+            </Link>
+            <Link
               href="/articles"
               className="site-header__nav-link"
               onMouseEnter={closeMegaMenu}
@@ -519,6 +526,9 @@ function HeaderContent() {
               ))}
               <Link href="/financing" className="rounded-lg px-2 py-2.5 text-sm font-medium" onClick={closeMobileMenu}>
                 Financing
+              </Link>
+              <Link href="/repair" className="rounded-lg px-2 py-2.5 text-sm font-medium" onClick={closeMobileMenu}>
+                Repair
               </Link>
               <Link href="/articles" className="rounded-lg px-2 py-2.5 text-sm font-medium" onClick={closeMobileMenu}>
                 Blog

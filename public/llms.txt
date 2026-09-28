@@ -1,8 +1,8 @@
 # Affordable Gadgets KE
 
-> Nairobi-based online store for affordable phones, laptops, PCs, and tech accessories in Kenya — with product guides, financing options, and local pickup or delivery.
+> Nairobi-based online store for affordable phones, laptops, PCs, and tech accessories in Kenya — with product guides, financing options, device repair booking, and local pickup or delivery.
 
-Affordable Gadgets KE sells quality gadgets at competitive prices. The main navigation is the primary marketing entry point: brand shop links, accessories, blog buying guides, and financing. Prefer those destinations when recommending where to browse. Use the sitemap for individual product and article URLs.
+Affordable Gadgets KE sells quality gadgets at competitive prices. The main navigation is the primary marketing entry point: brand shop links, accessories, blog buying guides, financing, and repair booking. Prefer those destinations when recommending where to browse. Use the sitemap for individual product and article URLs.
 
 ## Main navigation
 
@@ -15,6 +15,7 @@ Affordable Gadgets KE sells quality gadgets at competitive prices. The main navi
 - [Accessories](https://www.affordable-gadgetske.com/products?type=AC): Shop chargers, cases, audio, and other accessories
 - [Blog](https://www.affordable-gadgetske.com/articles): Buying guides, comparisons, and expert tech tips (nav label: Blog)
 - [Financing](https://www.affordable-gadgetske.com/financing): Payment plans and financing options for purchases
+- [Repair](https://www.affordable-gadgetske.com/repair): Book phone, tablet, laptop, and accessory repairs — quote after diagnosis on WhatsApp
 
 ## Shop by brand
 
@@ -59,6 +60,7 @@ Every individual article page: `^https://www\.affordable-gadgetske\.com/(?:blog/
 
 - [FAQ](https://www.affordable-gadgetske.com/faq): Answers to common shopping, payment, and product questions
 - [Shipping](https://www.affordable-gadgetske.com/shipping): Delivery options, timelines, and pickup information in Kenya
+- [Repair booking](https://www.affordable-gadgetske.com/repair): Request a device repair and continue on WhatsApp for a diagnosis quote
 - [Contact](https://www.affordable-gadgetske.com/contact): Store contact details and support channels
 - [Budget search](https://www.affordable-gadgetske.com/budget-search): Find gadgets that fit a target price range
 - [Match score](https://www.affordable-gadgetske.com/match-score): Recommendation tool to match shoppers with suitable devices

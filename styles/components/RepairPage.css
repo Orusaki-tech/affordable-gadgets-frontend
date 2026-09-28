@@ -1,0 +1,193 @@
+.repair-page__hero {
+  background: var(--obsidian-dark);
+  color: #fff;
+  padding: 2.5rem var(--section-x) 2.75rem;
+}
+
+@media (min-width: 768px) {
+  .repair-page__hero {
+    padding: 3.25rem var(--section-x-lg) 3.5rem;
+  }
+}
+
+.repair-page__hero-inner {
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+.repair-page__eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--promo-lime);
+}
+
+.repair-page__title {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #fff;
+}
+
+.repair-page__lead {
+  margin: 0 0 1.25rem;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: color-mix(in srgb, #fff 78%, transparent);
+}
+
+.repair-page__meta {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  color: color-mix(in srgb, #fff 65%, transparent);
+}
+
+.repair-page__content {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.75rem var(--section-x) 3rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .repair-page__content {
+    padding: 2rem var(--section-x-lg) 4rem;
+    gap: 2rem;
+  }
+}
+
+.repair-page__steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .repair-page__steps {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+}
+
+.repair-page__step {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 1rem;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-hairline);
+  border-radius: 12px;
+}
+
+.repair-page__step-num {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--promo-lime);
+  color: var(--primary);
+  font-size: 0.8125rem;
+  font-weight: 800;
+}
+
+.repair-page__step-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.repair-page__step-body {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--on-surface-variant);
+}
+
+.repair-page__panel {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 1.5rem 1.25rem 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .repair-page__panel {
+    padding: 1.75rem 1.75rem 2rem;
+  }
+}
+
+.repair-page__panel-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--on-surface);
+}
+
+.repair-page__panel-sub {
+  margin: 0 0 1.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+}
+
+.repair-page__form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.repair-page__form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .repair-page__form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .repair-page__field--full {
+    grid-column: 1 / -1;
+  }
+}
+
+.repair-page__optional {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.repair-page__quote-note {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--on-surface-variant);
+}
+
+.repair-page__submit {
+  margin-top: 0.25rem;
+}
+
+.repair-page .checkout-modal__textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+}
+
+.repair-page .checkout-modal__input,
+.repair-page .checkout-modal__textarea {
+  background: var(--surface-container-lowest);
+}

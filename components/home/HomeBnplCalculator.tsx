@@ -2,16 +2,54 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { OpenAPI } from '@/lib/api/generated';
 import { MaterialIcon } from '@/components/MaterialIcon';
-import { StudioFinancingProvidersChrome } from '@/components/studio/StudioFinancingProvidersChrome';
+import { StudioBlockChrome } from '@/components/studio/StudioBlockChrome';
+import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 import { studioPath } from '@/lib/studio/paths';
 
-const PARTNERS = ['Lipa Later', 'Aspira KE', 'Craft Silicon'] as const;
+const FALLBACK_PARTNERS = ['Lipa Later', 'Aspira KE', 'Craft Silicon'] as const;
+
+type PublicFinancingProvider = {
+  id: number;
+  name: string;
+  slug?: string;
+  logo_url?: string | null;
+};
+
+async function fetchPublicFinancingProviders(): Promise<PublicFinancingProvider[]> {
+  const base = OpenAPI.BASE.replace(/\/+$/, '');
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    ...(typeof OpenAPI.HEADERS === 'function'
+      ? await OpenAPI.HEADERS({} as never)
+      : (OpenAPI.HEADERS ?? {})),
+  };
+  const res = await fetch(`${base}/api/v1/public/financing/providers/`, {
+    credentials: 'omit',
+    headers,
+  });
+  if (!res.ok) {
+    throw new Error(`Financing providers request failed: ${res.status}`);
+  }
+  const data = await res.json();
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
+}
 
 export function HomeBnplCalculator() {
+  const studioEdit = useStudioEditOptional();
+  const canEdit = Boolean(studioEdit?.capabilities.canEditFinancing);
   const [devicePrice, setDevicePrice] = useState(80000);
   const [depositPercent, setDepositPercent] = useState(20);
   const [weeks, setWeeks] = useState(12);
+
+  const { data: providers = [] } = useQuery({
+    queryKey: ['financing-providers', 'public'],
+    queryFn: fetchPublicFinancingProviders,
+    staleTime: 5 * 60_000,
+  });
 
   const { deposit, financed, weekly } = useMemo(() => {
     const price = Math.max(0, devicePrice);
@@ -40,15 +78,37 @@ export function HomeBnplCalculator() {
             <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
               Financing Partners
             </p>
-            <StudioFinancingProvidersChrome>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {PARTNERS.map((partner) => (
-                  <span key={partner} className="ag-tag ag-tag--on-dark">
-                    {partner}
-                  </span>
-                ))}
-              </div>
-            </StudioFinancingProvidersChrome>
+            {canEdit && (
+              <p className="mt-1 text-[0.6875rem] text-white/55">
+                {studioEdit?.capabilities.editableSummary}
+              </p>
+            )}
+            <div className="mt-2 flex flex-wrap gap-2">
+              {providers.length > 0
+                ? providers.map((provider) => {
+                    const tag = (
+                      <span className="ag-tag ag-tag--on-dark">{provider.name}</span>
+                    );
+                    if (!canEdit || !provider.id) return <span key={provider.id}>{tag}</span>;
+                    return (
+                      <StudioBlockChrome
+                        key={provider.id}
+                        label={provider.name}
+                        roleHint={studioEdit?.capabilities.roleLabel}
+                        onEdit={() => {
+                          void studioEdit?.openEditFinancingProvider(provider.id);
+                        }}
+                      >
+                        {tag}
+                      </StudioBlockChrome>
+                    );
+                  })
+                : FALLBACK_PARTNERS.map((partner) => (
+                    <span key={partner} className="ag-tag ag-tag--on-dark">
+                      {partner}
+                    </span>
+                  ))}
+            </div>
           </div>
           <Link
             href={studioPath('/financing')}

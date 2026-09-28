@@ -515,7 +515,12 @@ export async function setStudioArticleTagged(
         .filter((t) => !matchesTarget(t))
         .map((t) => t.id)
         .filter((id): id is number => typeof id === 'number');
-  return patchStudioArticle(articleId, { tag_ids: next });
+  const saved = await patchStudioArticle(articleId, { tag_ids: next });
+  // Prefer the write response; if tags omitted, re-fetch to confirm.
+  if (saved.tags == null) {
+    return retrieveStudioArticle(articleId);
+  }
+  return saved;
 }
 
 export type StudioPromotion = {

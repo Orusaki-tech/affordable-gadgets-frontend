@@ -160,7 +160,9 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
   const deleteProduct = useCallback(
     async (product: Pick<PublicProduct, 'id' | 'product_name'>) => {
       if (!product.id || !capabilities?.canDeleteProduct) return;
-      const ok = window.confirm(`Delete “${product.product_name}”?`);
+      const ok = window.confirm(
+        `Permanently delete “${product.product_name}”? This cannot be undone. To remove it from Featured/Videos, use Choose products instead.`
+      );
       if (!ok) return;
       setError(null);
       try {

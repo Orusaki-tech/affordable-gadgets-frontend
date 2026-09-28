@@ -48,6 +48,11 @@ interface ProductCardProps {
   showRatings?: boolean;
   showSwatches?: boolean;
   showShippingBadges?: boolean;
+  /**
+   * When false, Studio hides the trash control (e.g. curated homepage rows where
+   * Delete looked like “remove from section” but permanently deleted the product).
+   */
+  studioAllowDelete?: boolean;
 }
 
 function RatingStars({ rating, count }: { rating: number | null; count: number }) {
@@ -88,9 +93,12 @@ export function ProductCard({
   showRatings = true,
   showSwatches = true,
   showShippingBadges = true,
+  studioAllowDelete = true,
 }: ProductCardProps) {
   const studioEdit = useStudioEditOptional();
-  const studioChrome = studioEdit ? <StudioProductChrome product={product} /> : null;
+  const studioChrome = studioEdit ? (
+    <StudioProductChrome product={product} allowDelete={studioAllowDelete} />
+  ) : null;
   const normalizedVariant: 'featured' | 'minimal' =
     variant === 'minimal' ? 'minimal' : 'featured';
   const isMinimal = normalizedVariant === 'minimal';

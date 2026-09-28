@@ -71,7 +71,7 @@ export function HomeFeaturedHardware() {
             featuredOnly
             pageSize={5}
             showPagination={false}
-            cardOptions={{ variant: 'featured' }}
+            cardOptions={{ variant: 'featured', studioAllowDelete: false }}
           />
         ) : (
           <p className="ag-type-body text-secondary">

@@ -178,17 +178,31 @@ export function StudioTaggedArticlesEditor({
     setBusyId(articleId);
     setError(null);
     setMsg(null);
+    // Optimistic UI so Remove feels instant even before public list refreshes.
+    if (!enabled) {
+      setSelected((prev) => prev.filter((a) => a.id !== articleId));
+    }
     try {
-      await setStudioArticleTagged(articleId, {
+      const saved = await setStudioArticleTagged(articleId, {
         tagName: 'Featured',
         tagSlug: 'featured',
         enabled,
         tagId: tag?.id,
       });
+      const stillTagged = studioArticleHasTag(saved, 'Featured', tag?.id);
+      if (enabled && !stillTagged) {
+        throw new Error('Could not add the Featured tag. Try again.');
+      }
+      if (!enabled && stillTagged) {
+        throw new Error(
+          'Could not remove the Featured tag. The article may still be tagged in admin.'
+        );
+      }
       await refreshFeatured();
       setMsg(enabled ? 'Featured on homepage' : 'Removed from homepage');
       await onSaved?.();
     } catch (err) {
+      await refreshFeatured().catch(() => undefined);
       setError(
         err instanceof StudioApiError
           ? err.message

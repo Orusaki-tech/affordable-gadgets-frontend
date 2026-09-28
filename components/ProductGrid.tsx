@@ -14,6 +14,7 @@ type ProductCardOptions = {
   showRatings?: boolean;
   showSwatches?: boolean;
   showShippingBadges?: boolean;
+  studioAllowDelete?: boolean;
 };
 
 interface ProductGridProps {

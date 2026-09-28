@@ -3,14 +3,28 @@
 import type { PublicProduct } from '@/lib/api/generated';
 import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 
+type StudioProductChromeProps = {
+  product: PublicProduct;
+  /**
+   * On curated homepage sections, hide Delete — trash looked like "remove from section"
+   * but destroyed the product. Use Choose products to untag instead.
+   */
+  allowDelete?: boolean;
+};
+
 /** Always-visible edit/delete controls overlaid on ProductCard while in Studio. */
-export function StudioProductChrome({ product }: { product: PublicProduct }) {
+export function StudioProductChrome({
+  product,
+  allowDelete = true,
+}: StudioProductChromeProps) {
   const studioEdit = useStudioEditOptional();
   const canEditProduct = Boolean(
     studioEdit?.capabilities.canFullEditProduct ||
       studioEdit?.capabilities.canContentEditProduct
   );
-  const canDelete = Boolean(studioEdit?.capabilities.canDeleteProduct);
+  const canDelete = Boolean(
+    allowDelete && studioEdit?.capabilities.canDeleteProduct
+  );
   if (!studioEdit || (!canEditProduct && !canDelete)) return null;
 
   return (
@@ -37,7 +51,7 @@ export function StudioProductChrome({ product }: { product: PublicProduct }) {
         <button
           type="button"
           className="studio-icon-btn studio-icon-btn--danger"
-          title="Delete product"
+          title="Permanently delete this product"
           aria-label={`Delete ${product.product_name}`}
           onClick={(e) => {
             e.preventDefault();

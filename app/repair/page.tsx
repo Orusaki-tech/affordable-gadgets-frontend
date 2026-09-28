@@ -81,7 +81,9 @@ export default function RepairPage() {
             <p className="repair-page__panel-sub">
               Fill this in and continue on WhatsApp — we&apos;ll take it from there.
             </p>
-            <RepairBookingForm />
+            <Suspense fallback={<div className="repair-page__form-skeleton" aria-hidden />}>
+              <RepairBookingForm />
+            </Suspense>
           </div>
         </section>
       </main>

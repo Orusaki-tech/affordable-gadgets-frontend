@@ -6,6 +6,7 @@ import { HomeFeaturedHardware } from '@/components/home/HomeFeaturedHardware';
 import { HomeBudgetMatcher } from '@/components/home/HomeBudgetMatcher';
 import { HomeBundles } from '@/components/home/HomeBundles';
 import { HomeBnplCalculator } from '@/components/home/HomeBnplCalculator';
+import { HomeRepairPromo } from '@/components/home/HomeRepairPromo';
 import { HomeVideoReels } from '@/components/home/HomeVideoReels';
 import { HomeBuyingGuides } from '@/components/home/HomeBuyingGuides';
 import { HomeReviews } from '@/components/home/HomeReviews';
@@ -205,6 +206,7 @@ export default async function HomePage() {
         <HomeBudgetMatcher />
         <HomeBundles />
         <HomeBnplCalculator />
+        <HomeRepairPromo />
         <HomeVideoReels />
         <Suspense fallback={<div className="min-h-[12.5rem]" aria-hidden />}>
           <HomeBuyingGuides />

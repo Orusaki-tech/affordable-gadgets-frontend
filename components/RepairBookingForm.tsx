@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { allBrandNavItems } from '@/lib/config/nav-links';
 
@@ -21,6 +22,17 @@ const ISSUE_OPTIONS = [
   "Software / won't turn on",
   'Other',
 ] as const;
+
+type DeviceTypeValue = (typeof DEVICE_TYPES)[number]['value'];
+type IssueValue = (typeof ISSUE_OPTIONS)[number];
+
+function isDeviceType(value: string | null): value is DeviceTypeValue {
+  return DEVICE_TYPES.some((opt) => opt.value === value);
+}
+
+function isIssue(value: string | null): value is IssueValue {
+  return ISSUE_OPTIONS.some((opt) => opt === value);
+}
 
 function validatePhone(value: string): string | null {
   const digits = value.replace(/\D/g, '');
@@ -54,6 +66,10 @@ function buildRepairWhatsAppMessage(fields: {
 }
 
 export function RepairBookingForm() {
+  const searchParams = useSearchParams();
+  const initialDeviceType = searchParams.get('deviceType');
+  const initialIssue = searchParams.get('issue');
+
   const brands = useMemo(
     () => [...allBrandNavItems().map((b) => b.navLabel), 'Other'],
     []
@@ -61,10 +77,12 @@ export function RepairBookingForm() {
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [deviceType, setDeviceType] = useState('');
+  const [deviceType, setDeviceType] = useState(
+    isDeviceType(initialDeviceType) ? initialDeviceType : ''
+  );
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
-  const [issue, setIssue] = useState('');
+  const [issue, setIssue] = useState(isIssue(initialIssue) ? initialIssue : '');
   const [details, setDetails] = useState('');
   const [touched, setTouched] = useState(false);
   const [error, setError] = useState<string | null>(null);

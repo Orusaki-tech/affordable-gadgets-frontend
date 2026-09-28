@@ -1,4 +1,5 @@
 import type { PublicProduct } from '@/lib/api/generated';
+import { studioPath } from '@/lib/studio/paths';
 
 type ProductLike = Pick<PublicProduct, 'id' | 'slug'> | null | undefined;
 
@@ -34,7 +35,7 @@ export function getProductHref(product?: ProductLike, options: ProductRouteOptio
   }
   const query = params.toString();
 
-  return query ? `${base}?${query}` : base;
+  return studioPath(query ? `${base}?${query}` : base);
 }
 
 export function buildProductQuerySuffix(

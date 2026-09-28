@@ -28,6 +28,7 @@ import { trackProductView, trackWhatsAppClick } from '@/lib/tracking';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import Link from 'next/link';
+import { StudioPdpEditButton } from '@/components/studio/StudioPdpEditButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getPlaceholderProductImage, getPlaceholderUnitImage } from '@/lib/utils/placeholders';
 import { getAndClearProductDetailPlaceholder } from '@/lib/utils/productDetailPlaceholder';
@@ -1200,6 +1201,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   return (
     <div className="product-detail">
+      <StudioPdpEditButton productId={product.id} />
       <div className="product-detail__topbar">
         <nav className="product-detail__breadcrumb" aria-label="Breadcrumb">
           <ol className="product-detail__breadcrumb-list">

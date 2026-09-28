@@ -403,6 +403,18 @@
   }
 }
 
-.studio-editor__actions {
-  margin-top: 1.25rem;
+.studio-pdp-chrome {
+  position: sticky;
+  top: 3.25rem;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding: 0.5rem var(--section-x, 1rem) 0;
+}
+
+.studio-pdp-chrome__error {
+  font-size: 0.75rem;
+  color: #991b1b;
 }

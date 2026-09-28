@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { Suspense, useEffect, type ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, type ReactNode } from 'react';
 import { useStudioAuth } from '@/components/studio/StudioAuthContext';
+import { StudioEditHost } from '@/components/studio/StudioEditHost';
 
 export function StudioShell({ children }: { children: ReactNode }) {
   const { loading, isAuthenticated, user, profile, logout, capabilities } =
@@ -69,7 +70,11 @@ export function StudioShell({ children }: { children: ReactNode }) {
           {capabilities.readOnlyReason}
         </div>
       )}
-      <div className="studio-mirror-pad">{children}</div>
+      <Suspense fallback={<div className="studio-mirror-pad">{children}</div>}>
+        <StudioEditHost>
+          <div className="studio-mirror-pad">{children}</div>
+        </StudioEditHost>
+      </Suspense>
     </div>
   );
 }

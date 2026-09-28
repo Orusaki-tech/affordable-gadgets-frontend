@@ -34,7 +34,10 @@ interface ProductsPageProps {
   renderProductCard?: (product: PublicProduct) => ReactNode;
 }
 
-export function ProductsPage({ cardOptions, renderProductCard }: ProductsPageProps) {
+function ProductsPageInner({
+  cardOptions,
+  renderProductCard,
+}: ProductsPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const searchParamsRef = useRef<string>('');
@@ -508,5 +511,9 @@ export function ProductsPage({ cardOptions, renderProductCard }: ProductsPagePro
       </div>
     </div>
   );
+}
+
+export function ProductsPage({ cardOptions, renderProductCard }: ProductsPageProps) {
+  return <ProductsPageInner cardOptions={cardOptions} renderProductCard={renderProductCard} />;
 }
 

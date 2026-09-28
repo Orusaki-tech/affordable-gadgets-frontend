@@ -25,6 +25,8 @@ import { useWishlist } from '@/lib/hooks/useWishlist';
 import { WhatsAppLeadModal } from '@/components/WhatsAppLeadModal';
 import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
 import { AuthChoiceModal } from '@/components/AuthChoiceModal';
+import { StudioProductChrome } from '@/components/studio/StudioProductChrome';
+import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 
 function hasAuthToken(): boolean {
   if (typeof window === 'undefined') return false;
@@ -87,6 +89,8 @@ export function ProductCard({
   showSwatches = true,
   showShippingBadges = true,
 }: ProductCardProps) {
+  const studioEdit = useStudioEditOptional();
+  const studioChrome = studioEdit ? <StudioProductChrome product={product} /> : null;
   const normalizedVariant: 'featured' | 'minimal' =
     variant === 'minimal' ? 'minimal' : 'featured';
   const isMinimal = normalizedVariant === 'minimal';
@@ -608,7 +612,7 @@ export function ProductCard({
         description="Create an account or sign in to save items to your cart."
       />
     ) : null;
-    return (
+    const featuredCard = (
       <>
       {authModal}
       <Link
@@ -806,9 +810,18 @@ export function ProductCard({
       {addToCartModal}
       </>
     );
+    if (studioChrome) {
+      return (
+        <div className="studio-editable-card">
+          {studioChrome}
+          {featuredCard}
+        </div>
+      );
+    }
+    return featuredCard;
   }
 
-  return (
+  const defaultCard = (
     <>
     <Link
       ref={cardRef}
@@ -1274,5 +1287,14 @@ export function ProductCard({
       )}
     </>
   );
+  if (studioChrome) {
+    return (
+      <div className="studio-editable-card">
+        {studioChrome}
+        {defaultCard}
+      </div>
+    );
+  }
+  return defaultCard;
 }
 

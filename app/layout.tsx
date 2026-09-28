@@ -7,6 +7,7 @@ import { brandConfig } from "@/lib/config/brand";
 import { StructuredData } from "@/components/StructuredData";
 import { GoogleCustomerReviewsBadge } from "@/components/GoogleCustomerReviewsBadge";
 import { AuthGate } from "@/components/AuthGate";
+import { StudioRootGate } from "@/components/studio/StudioRootGate";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -101,7 +102,7 @@ export default function RootLayout({
         <StructuredData type="LocalBusiness" />
         <Providers>
           <AuthGate>
-            {children}
+            <StudioRootGate>{children}</StudioRootGate>
           </AuthGate>
         </Providers>
         <GoogleCustomerReviewsBadge merchantId={5748422735} />

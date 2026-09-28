@@ -108,8 +108,12 @@ export function StudioAuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+export function useStudioAuthOptional(): StudioAuthContextValue | undefined {
+  return useContext(StudioAuthContext);
+}
+
 export function useStudioAuth(): StudioAuthContextValue {
-  const ctx = useContext(StudioAuthContext);
+  const ctx = useStudioAuthOptional();
   if (!ctx) {
     throw new Error('useStudioAuth must be used within StudioAuthProvider');
   }

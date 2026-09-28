@@ -13,6 +13,7 @@ const LOCATION_OPTIONS = [
   { value: 'stories_carousel', label: 'Stories carousel' },
   { value: 'special_offers', label: 'Special offers' },
   { value: 'flash_sales', label: 'Flash sales' },
+  { value: 'cbd_ribbon', label: 'CBD ribbon' },
 ] as const;
 
 type StudioPromotionEditorProps = {

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 import { ProductCarousel } from './ProductCarousel';
+import { StudioPromoTile } from '@/components/studio/StudioPromoTile';
 
 interface SpecialOffersProps {
   filter?: 'special_offers' | 'flash_sales';
@@ -121,8 +122,10 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
             const href = getPromotionHref(promotion);
 
             return (
-              <Link
+              <StudioPromoTile
                 key={promotion.id ?? `${promotion.title}-${index}`}
+                promotionId={promotion.id}
+                title={promotion.title}
                 href={href}
                 className="special-offers__promo"
               >
@@ -140,7 +143,7 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
                     />
                   )}
                 </div>
-              </Link>
+              </StudioPromoTile>
             );
           })}
         </ProductCarousel>

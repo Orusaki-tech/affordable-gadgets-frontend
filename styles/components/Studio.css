@@ -187,6 +187,44 @@
   border-bottom: 1px solid var(--border-hairline, #e8e8ed);
 }
 
+.studio-hero-banner {
+  display: block;
+  height: 100%;
+}
+
+.studio-hero-banner__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 0.75rem;
+  z-index: 41;
+  display: flex;
+  gap: 0.35rem;
+  transform: translateX(-50%);
+}
+
+.studio-hero-banner__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  border: 0;
+  background: color-mix(in srgb, #fff 45%, transparent);
+  cursor: pointer;
+  padding: 0;
+}
+
+.studio-hero-banner__dot--active {
+  background: var(--promo-lime, #9fe855);
+}
+
+.studio-hero-banner__list {
+  list-style: none;
+  margin: 0.65rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
 .studio-drawer {
   position: fixed;
   inset: 0;

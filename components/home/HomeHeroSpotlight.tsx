@@ -6,9 +6,12 @@ import { useRouter } from 'next/navigation';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { MaterialIcon } from '@/components/MaterialIcon';
 import { PreOrderModal } from '@/components/PreOrderModal';
+import { StudioBlockChrome } from '@/components/studio/StudioBlockChrome';
+import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 import { brandConfig } from '@/lib/config/brand';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
+import { studioPath } from '@/lib/studio/paths';
 
 const IPHONE_18_PRO_MAX_SLUG = 'apple-iphone-18-pro-max';
 const HERO_PROMOTION_PLACEHOLDER_IMAGE =
@@ -76,6 +79,8 @@ type HomeHeroSpotlightProps = {
 
 export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightProps) {
   const router = useRouter();
+  const studioEdit = useStudioEditOptional();
+  const canEditPromos = Boolean(studioEdit?.capabilities.canEditPromotions);
   const [query, setQuery] = useState('');
   const [budget, setBudget] = useState(45000);
   const [preOrderOpen, setPreOrderOpen] = useState(false);
@@ -221,36 +226,99 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
         </div>
 
         <div className="home-redesign__hero-banner">
-          <div className="home-redesign__hero-banner-media">
-            <CloudinaryImage
-              src={displayBannerSrc}
-              alt={activePromotion?.title ?? 'Featured promotion'}
-              preset="homepageHero"
-              fit="cover"
-              sizes="(max-width: 1023px) 100vw, 66vw"
-              className="home-redesign__hero-banner-img"
-              fill
-              priority
-              onError={() => setBannerImageFailed(true)}
-            />
-          </div>
+          {(() => {
+            const banner = (
+              <>
+                <div className="home-redesign__hero-banner-media">
+                  <CloudinaryImage
+                    src={displayBannerSrc}
+                    alt={activePromotion?.title ?? 'Featured promotion'}
+                    preset="homepageHero"
+                    fit="cover"
+                    sizes="(max-width: 1023px) 100vw, 66vw"
+                    className="home-redesign__hero-banner-img"
+                    fill
+                    priority
+                    onError={() => setBannerImageFailed(true)}
+                  />
+                </div>
 
-          <div className="home-redesign__hero-banner-actions">
-            <button
-              type="button"
-              onClick={() => setPreOrderOpen(true)}
-              className="ag-btn ag-btn--primary home-redesign__hero-cta home-redesign__hero-cta--primary"
-            >
-              Pre Order Now
-              <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
-            </button>
-            <Link
-              href={`/products/${IPHONE_18_PRO_MAX_SLUG}`}
-              className="ag-btn home-redesign__hero-cta home-redesign__hero-cta--secondary"
-            >
-              View details
-            </Link>
-          </div>
+                <div className="home-redesign__hero-banner-actions">
+                  <button
+                    type="button"
+                    onClick={() => setPreOrderOpen(true)}
+                    className="ag-btn ag-btn--primary home-redesign__hero-cta home-redesign__hero-cta--primary"
+                  >
+                    Pre Order Now
+                    <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
+                  </button>
+                  <Link
+                    href={studioPath(`/products/${IPHONE_18_PRO_MAX_SLUG}`)}
+                    className="ag-btn home-redesign__hero-cta home-redesign__hero-cta--secondary"
+                  >
+                    View details
+                  </Link>
+                </div>
+
+                {canEditPromos && promotions.length > 1 ? (
+                  <div className="studio-hero-banner__dots" role="tablist" aria-label="Hero banners">
+                    {promotions.map((promo) => {
+                      const id = promo.id;
+                      if (typeof id !== 'number') return null;
+                      const active = id === activePromotion?.id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          role="tab"
+                          aria-selected={active}
+                          className={`studio-hero-banner__dot${active ? ' studio-hero-banner__dot--active' : ''}`}
+                          title={promo.title}
+                          onClick={() => setActivePromotionId(id)}
+                        />
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </>
+            );
+
+            if (!canEditPromos || !activePromotion?.id) {
+              return banner;
+            }
+
+            return (
+              <StudioBlockChrome
+                label={activePromotion.title || 'Hero banner'}
+                roleHint={studioEdit?.capabilities.roleLabel}
+                className="studio-hero-banner"
+                onEdit={() => {
+                  void studioEdit?.openEditPromotion(activePromotion.id!);
+                }}
+              >
+                {banner}
+              </StudioBlockChrome>
+            );
+          })()}
+
+          {canEditPromos && promotions.length > 0 ? (
+            <ul className="studio-hero-banner__list" aria-label="Edit homepage hero banners">
+              {promotions.map((promo) => {
+                if (!promo.id) return null;
+                return (
+                  <li key={promo.id}>
+                    <button
+                      type="button"
+                      className="studio-icon-btn studio-icon-btn--edit"
+                      onClick={() => void studioEdit?.openEditPromotion(promo.id!)}
+                    >
+                      <span>Edit · {promo.title}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : null}
         </div>
         </div>
       </div>

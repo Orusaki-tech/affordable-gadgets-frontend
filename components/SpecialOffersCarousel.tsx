@@ -1,8 +1,8 @@
 'use client';
 
 import { PublicPromotion } from '@/lib/api/generated';
-import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
+import { StudioPromoTile } from '@/components/studio/StudioPromoTile';
 import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 import { ProductCarousel } from './ProductCarousel';
 
@@ -48,8 +48,10 @@ export function SpecialOffersCarousel({
           const href = getPromotionHref(promotion);
 
           return (
-            <Link
+            <StudioPromoTile
               key={promotion.id ?? `${promotion.title}-${index}`}
+              promotionId={promotion.id}
+              title={promotion.title}
               href={href}
               className="special-offers-carousel__promo"
             >
@@ -64,7 +66,7 @@ export function SpecialOffersCarousel({
                   />
                 )}
               </div>
-            </Link>
+            </StudioPromoTile>
           );
         })}
       </ProductCarousel>

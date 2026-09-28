@@ -9,12 +9,13 @@ import { studioPath } from '@/lib/studio/paths';
 type StudioPromoTileProps = {
   promotionId?: number | null;
   title: string;
-  href: string;
+  /** When omitted, children are wrapped without a link (click handlers stay on children). */
+  href?: string | null;
   className?: string;
   children: ReactNode;
 };
 
-/** Promo tile with optional Studio edit chrome. */
+/** Promo / banner tile with optional Studio edit chrome. */
 export function StudioPromoTile({
   promotionId,
   title,
@@ -25,14 +26,19 @@ export function StudioPromoTile({
   const studioEdit = useStudioEditOptional();
   const canEdit = Boolean(studioEdit?.capabilities.canEditPromotions && promotionId);
 
-  const link = (
-    <Link href={studioPath(href)} className={className}>
-      {children}
-    </Link>
-  );
+  const content =
+    href != null && href !== '' ? (
+      <Link href={studioPath(href)} className={className}>
+        {children}
+      </Link>
+    ) : className ? (
+      <div className={className}>{children}</div>
+    ) : (
+      <>{children}</>
+    );
 
   if (!canEdit || !promotionId) {
-    return link;
+    return content;
   }
 
   return (
@@ -43,7 +49,7 @@ export function StudioPromoTile({
         void studioEdit?.openEditPromotion(promotionId);
       }}
     >
-      {link}
+      {content}
     </StudioBlockChrome>
   );
 }

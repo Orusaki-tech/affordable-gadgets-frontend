@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { getPromotionHref } from '@/lib/utils/promotionRoutes';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
+import { StudioPromoTile } from '@/components/studio/StudioPromoTile';
 import { ProductCarousel } from './ProductCarousel';
 
 interface VideoModalProps {
@@ -381,24 +382,29 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
                 {position1Items.map((promo) => {
                   const promoImageSrc = promo.banner_image_url || promo.banner_image;
                   return (
-                    <div
+                    <StudioPromoTile
                       key={promo.id ?? promo.title}
-                      className="stories-carousel__tile stories-carousel__tile--banner"
-                      onClick={() => handlePromotionClick(promo)}
+                      promotionId={promo.id}
+                      title={promo.title}
                     >
-                      <div className="stories-carousel__media-wrap" ref={bannerContainerRef}>
-                        {promoImageSrc && (
-                          <StoryImage
-                            src={promoImageSrc}
-                            alt={promo.title}
-                            sizes="(max-width: 1024px) 100vw, 50vw"
-                            fit="cover"
-                            loading="eager"
-                            priority
-                          />
-                        )}
+                      <div
+                        className="stories-carousel__tile stories-carousel__tile--banner"
+                        onClick={() => handlePromotionClick(promo)}
+                      >
+                        <div className="stories-carousel__media-wrap" ref={bannerContainerRef}>
+                          {promoImageSrc && (
+                            <StoryImage
+                              src={promoImageSrc}
+                              alt={promo.title}
+                              sizes="(max-width: 1024px) 100vw, 50vw"
+                              fit="cover"
+                              loading="eager"
+                              priority
+                            />
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    </StudioPromoTile>
                   );
                 })}
               </ProductCarousel>
@@ -406,23 +412,25 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
           ) : bannerItem ? (
             // Show single banner if one item has position 1
             <div className="stories-carousel__banner">
-              <div
-                className="stories-carousel__tile stories-carousel__tile--banner"
-                onClick={() => handlePromotionClick(bannerItem)}
-              >
-                <div className="stories-carousel__media-wrap" ref={bannerContainerRef}>
-                  {bannerImageSrc && (
-                    <StoryImage
-                      src={bannerImageSrc}
-                      alt={bannerItem.title}
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      fit="cover"
-                      loading="eager"
-                      priority
-                    />
-                  )}
+              <StudioPromoTile promotionId={bannerItem.id} title={bannerItem.title}>
+                <div
+                  className="stories-carousel__tile stories-carousel__tile--banner"
+                  onClick={() => handlePromotionClick(bannerItem)}
+                >
+                  <div className="stories-carousel__media-wrap" ref={bannerContainerRef}>
+                    {bannerImageSrc && (
+                      <StoryImage
+                        src={bannerImageSrc}
+                        alt={bannerItem.title}
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        fit="cover"
+                        loading="eager"
+                        priority
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
+              </StudioPromoTile>
             </div>
           ) : (
           <div
@@ -439,8 +447,12 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
                   const promotion = item.data as PublicPromotion;
                   const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
               return (
-                    <div
+                    <StudioPromoTile
                       key={item.uniqueKey}
+                      promotionId={promotion.id}
+                      title={promotion.title}
+                    >
+                    <div
                       className="stories-carousel__tile"
                       onClick={() => handlePromotionClick(promotion)}
                     >
@@ -455,6 +467,7 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
                       )}
                     </div>
                   </div>
+                    </StudioPromoTile>
                 );
                 } else {
                   // Product Video
@@ -538,47 +551,54 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
                 {position1Items.map((promo) => {
                   const promoImageSrc = promo.banner_image_url || promo.banner_image;
                   return (
-                    <div
+                    <StudioPromoTile
                       key={promo.id ?? promo.title}
-                      className="stories-carousel__tile stories-carousel__tile--banner stories-carousel__tile--mobile"
-                      onClick={() => handlePromotionClick(promo)}
+                      promotionId={promo.id}
+                      title={promo.title}
                     >
-                      <div className="stories-carousel__media-wrap">
-                        {promoImageSrc && (
-                          <StoryImage
-                            src={promoImageSrc}
-                            alt={promo.title}
-                            sizes="100vw"
-                            fit="cover"
-                            loading="eager"
-                            priority
-                          />
-                        )}
+                      <div
+                        className="stories-carousel__tile stories-carousel__tile--banner stories-carousel__tile--mobile"
+                        onClick={() => handlePromotionClick(promo)}
+                      >
+                        <div className="stories-carousel__media-wrap">
+                          {promoImageSrc && (
+                            <StoryImage
+                              src={promoImageSrc}
+                              alt={promo.title}
+                              sizes="100vw"
+                              fit="cover"
+                              loading="eager"
+                              priority
+                            />
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    </StudioPromoTile>
                   );
                 })}
               </ProductCarousel>
             </div>
           ) : bannerItem && (
             // Show single banner if one item has position 1
-            <div
-              className="stories-carousel__tile stories-carousel__tile--banner stories-carousel__tile--mobile"
-              onClick={() => handlePromotionClick(bannerItem)}
-            >
-              <div className="stories-carousel__media-wrap">
-                {bannerImageSrc && (
-                <StoryImage
-                  src={bannerImageSrc}
-                  alt={bannerItem.title}
-                  sizes="100vw"
-                  fit="cover"
-                  loading="eager"
-                  priority
-                />
-                )}
+            <StudioPromoTile promotionId={bannerItem.id} title={bannerItem.title}>
+              <div
+                className="stories-carousel__tile stories-carousel__tile--banner stories-carousel__tile--mobile"
+                onClick={() => handlePromotionClick(bannerItem)}
+              >
+                <div className="stories-carousel__media-wrap">
+                  {bannerImageSrc && (
+                  <StoryImage
+                    src={bannerImageSrc}
+                    alt={bannerItem.title}
+                    sizes="100vw"
+                    fit="cover"
+                    loading="eager"
+                    priority
+                  />
+                  )}
+                </div>
               </div>
-            </div>
+            </StudioPromoTile>
           )}
 
           {/* 2x2 Grid - Next 3 Promotions + 1 Product Video (Full width on mobile) */}
@@ -589,11 +609,15 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
                   const promotion = item.data as PublicPromotion;
                   const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
                   return (
-                    <div
+                    <StudioPromoTile
                       key={item.uniqueKey}
-                      className="stories-carousel__tile stories-carousel__tile--mobile"
-                      onClick={() => handlePromotionClick(promotion)}
+                      promotionId={promotion.id}
+                      title={promotion.title}
                     >
+                      <div
+                        className="stories-carousel__tile stories-carousel__tile--mobile"
+                        onClick={() => handlePromotionClick(promotion)}
+                      >
                       <div className="stories-carousel__media-wrap">
                         {promotionImageSrc && (
                         <StoryImage
@@ -604,8 +628,9 @@ export function StoriesCarousel({ autoAdvanceDuration = 6 }: StoriesCarouselProp
                         />
                         )}
                       </div>
-                </div>
-              );
+                    </div>
+                    </StudioPromoTile>
+                  );
                 } else {
                   // Product Video
                   const product = item.data as PublicProduct;

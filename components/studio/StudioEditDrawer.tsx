@@ -7,7 +7,10 @@ import { StudioPromotionEditor } from '@/components/studio/StudioPromotionEditor
 import { StudioBundleEditor } from '@/components/studio/StudioBundleEditor';
 import { StudioFinancingProviderEditor } from '@/components/studio/StudioFinancingProviderEditor';
 import { StudioDeliveryRateEditor } from '@/components/studio/StudioDeliveryRateEditor';
-import { StudioFeaturedProductsEditor } from '@/components/studio/StudioFeaturedProductsEditor';
+import {
+  StudioTaggedProductsEditor,
+  type StudioSectionTagKey,
+} from '@/components/studio/StudioTaggedProductsEditor';
 import type {
   StudioArticle,
   StudioBundle,
@@ -24,6 +27,8 @@ export type StudioEditResource =
   | { kind: 'bundle'; bundle: StudioBundle }
   | { kind: 'financingProvider'; provider: StudioFinancingProvider }
   | { kind: 'deliveryRate'; rate: StudioDeliveryRate }
+  | { kind: 'taggedProducts'; section: StudioSectionTagKey }
+  /** @deprecated prefer taggedProducts + section: 'featured' */
   | { kind: 'featuredProducts' };
 
 type StudioEditDrawerProps = {
@@ -52,9 +57,19 @@ function resourceLabel(resource: StudioEditResource): string {
       return `Delivery · ${resource.rate.county || resource.rate.id}`;
     case 'featuredProducts':
       return 'Featured Product Highlights';
+    case 'taggedProducts':
+      return resource.section === 'video'
+        ? 'Verified Tech Unboxings'
+        : 'Featured Product Highlights';
     default:
       return 'Edit';
   }
+}
+
+function taggedSection(resource: StudioEditResource): StudioSectionTagKey | null {
+  if (resource.kind === 'taggedProducts') return resource.section;
+  if (resource.kind === 'featuredProducts') return 'featured';
+  return null;
 }
 
 export function StudioEditDrawer({
@@ -86,6 +101,7 @@ export function StudioEditDrawer({
   if (!open || !active) return null;
 
   const label = resourceLabel(active);
+  const section = taggedSection(active);
 
   return (
     <div className="studio-drawer" role="dialog" aria-modal="true" aria-label={label}>
@@ -165,8 +181,9 @@ export function StudioEditDrawer({
             }}
           />
         )}
-        {active.kind === 'featuredProducts' && (
-          <StudioFeaturedProductsEditor
+        {section && (
+          <StudioTaggedProductsEditor
+            section={section}
             roleHint={roleHint}
             onSaved={async () => {
               await onSaved();

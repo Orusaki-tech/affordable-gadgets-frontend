@@ -27,8 +27,10 @@ export type StudioCapabilities = {
   canEditBundles: boolean;
   canEditFinancing: boolean;
   canEditDeliveryRates: boolean;
-  /** Toggle Featured tag for homepage highlights (CC or IM). */
+  /** Toggle Featured / Video tags for homepage curated sections (CC or IM). */
   canEditFeaturedSelection: boolean;
+  /** Alias — same capability as featured (update_content + tags). */
+  canEditVideoSelection: boolean;
 
   /** Human-readable list of what this session can edit in Studio. */
   editableSummary: string;
@@ -96,11 +98,12 @@ export function getStudioCapabilities(
   const canEditFinancing = isIM;
   const canEditDeliveryRates = isOM;
   const canEditFeaturedSelection = isCC || isIM;
+  const canEditVideoSelection = canEditFeaturedSelection;
 
   const editable: string[] = [];
   if (canFullEditProduct) editable.push('products (full)');
   else if (canContentEditProduct) editable.push('product content, images, videos');
-  if (canEditFeaturedSelection) editable.push('featured highlights');
+  if (canEditFeaturedSelection) editable.push('featured highlights', 'homepage videos');
   if (canEditArticles) editable.push('articles');
   if (canEditPromotions) editable.push('promotions');
   if (canEditBundles) editable.push('bundles');
@@ -134,6 +137,7 @@ export function getStudioCapabilities(
     canEditFinancing,
     canEditDeliveryRates,
     canEditFeaturedSelection,
+    canEditVideoSelection,
     editableSummary:
       editable.length > 0
         ? `Editing as ${roleLabel}: ${editable.join(', ')}`

@@ -47,6 +47,7 @@ type StudioEditHostValue = {
   openEditFinancingProvider: (id: number) => Promise<void>;
   openEditDeliveryRate: (id: number) => Promise<void>;
   openEditFeaturedProducts: () => void;
+  openEditVideoProducts: () => void;
 };
 
 const StudioEditContext = createContext<StudioEditHostValue | undefined>(undefined);
@@ -304,9 +305,19 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       return;
     }
     setError(null);
-    setResource({ kind: 'featuredProducts' });
+    setResource({ kind: 'taggedProducts', section: 'featured' });
     setDrawerOpen(true);
   }, [capabilities?.canEditFeaturedSelection]);
+
+  const openEditVideoProducts = useCallback(() => {
+    if (!capabilities?.canEditVideoSelection) {
+      setError('Your role cannot choose homepage video products.');
+      return;
+    }
+    setError(null);
+    setResource({ kind: 'taggedProducts', section: 'video' });
+    setDrawerOpen(true);
+  }, [capabilities?.canEditVideoSelection]);
 
   const value = useMemo<StudioEditHostValue | null>(() => {
     if (!capabilities || !isAuthenticated) return null;
@@ -316,6 +327,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
         capabilities.canFullEditProduct ||
           capabilities.canContentEditProduct ||
           capabilities.canEditFeaturedSelection ||
+          capabilities.canEditVideoSelection ||
           capabilities.canEditArticles ||
           capabilities.canEditPromotions ||
           capabilities.canEditBundles ||
@@ -333,6 +345,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       openEditFinancingProvider,
       openEditDeliveryRate,
       openEditFeaturedProducts,
+      openEditVideoProducts,
     };
   }, [
     capabilities,
@@ -346,6 +359,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     openEditFinancingProvider,
     openEditDeliveryRate,
     openEditFeaturedProducts,
+    openEditVideoProducts,
   ]);
 
   if (!value || !capabilities) {

@@ -585,37 +585,51 @@ export type StudioTag = {
   slug?: string;
 };
 
-const FEATURED_TAG_NAME = 'Featured';
-
 export async function listStudioTags(): Promise<StudioTag[]> {
   const data = await studioFetchJson<StudioTag[] | { results?: StudioTag[] }>('/tags/');
   if (Array.isArray(data)) return data;
   return data.results ?? [];
 }
 
-export async function ensureStudioFeaturedTag(): Promise<StudioTag> {
+export async function ensureStudioTag(name: string, slug: string): Promise<StudioTag> {
   const tags = await listStudioTags();
   const existing = tags.find(
     (tag) =>
-      tag.name?.toLowerCase() === FEATURED_TAG_NAME.toLowerCase() ||
-      tag.slug?.toLowerCase() === 'featured'
+      tag.name?.toLowerCase() === name.toLowerCase() ||
+      tag.slug?.toLowerCase() === slug.toLowerCase()
   );
   if (existing?.id) return existing;
   return studioFetchJson<StudioTag>('/tags/', {
     method: 'POST',
-    body: JSON.stringify({ name: FEATURED_TAG_NAME, slug: 'featured' }),
+    body: JSON.stringify({ name, slug }),
+  });
+}
+
+export async function ensureStudioFeaturedTag(): Promise<StudioTag> {
+  return ensureStudioTag('Featured', 'featured');
+}
+
+export async function ensureStudioVideoTag(): Promise<StudioTag> {
+  return ensureStudioTag('Video', 'video');
+}
+
+export function studioProductHasTag(
+  product: StudioProduct,
+  tagName: string,
+  tagId?: number
+): boolean {
+  const tags = product.tags || [];
+  return tags.some((tag) => {
+    if (tagId != null && tag.id === tagId) return true;
+    return (
+      tag.name?.toLowerCase() === tagName.toLowerCase() ||
+      tag.slug?.toLowerCase() === tagName.toLowerCase()
+    );
   });
 }
 
 export function studioProductHasFeaturedTag(product: StudioProduct, featuredTagId?: number): boolean {
-  const tags = product.tags || [];
-  return tags.some((tag) => {
-    if (featuredTagId != null && tag.id === featuredTagId) return true;
-    return (
-      tag.name?.toLowerCase() === FEATURED_TAG_NAME.toLowerCase() ||
-      tag.slug?.toLowerCase() === 'featured'
-    );
-  });
+  return studioProductHasTag(product, 'Featured', featuredTagId);
 }
 
 /** Set product tags via update_content (CC/IM). Replaces the full tag set. */
@@ -629,21 +643,33 @@ export async function setStudioProductTagIds(
   });
 }
 
+export async function setStudioProductTagged(
+  productId: number,
+  options: { tagName: string; tagSlug: string; enabled: boolean; tagId?: number }
+): Promise<StudioProduct> {
+  const tag = options.tagId
+    ? { id: options.tagId }
+    : await ensureStudioTag(options.tagName, options.tagSlug);
+  const product = await retrieveStudioProduct(productId);
+  const currentIds = (product.tags || [])
+    .map((t) => t.id)
+    .filter((id): id is number => typeof id === 'number');
+  const next = options.enabled
+    ? Array.from(new Set([...currentIds, tag.id]))
+    : currentIds.filter((id) => id !== tag.id);
+  return setStudioProductTagIds(productId, next);
+}
+
 export async function setStudioProductFeatured(
   productId: number,
   featured: boolean,
   featuredTagId?: number
 ): Promise<StudioProduct> {
-  const tag = featuredTagId
-    ? { id: featuredTagId }
-    : await ensureStudioFeaturedTag();
-  const product = await retrieveStudioProduct(productId);
-  const currentIds = (product.tags || [])
-    .map((t) => t.id)
-    .filter((id): id is number => typeof id === 'number');
-  const next = featured
-    ? Array.from(new Set([...currentIds, tag.id]))
-    : currentIds.filter((id) => id !== tag.id);
-  return setStudioProductTagIds(productId, next);
+  return setStudioProductTagged(productId, {
+    tagName: 'Featured',
+    tagSlug: 'featured',
+    enabled: featured,
+    tagId: featuredTagId,
+  });
 }
 

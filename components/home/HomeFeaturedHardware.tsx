@@ -42,7 +42,7 @@ export function HomeFeaturedHardware() {
             ) : null}
             {canSelect ? (
               <p className="mt-1 text-xs font-semibold text-primary">
-                {studioEdit?.capabilities.editableSummary}
+                Controlled by the Featured tag · {studioEdit?.capabilities.editableSummary}
               </p>
             ) : null}
           </div>

@@ -124,27 +124,13 @@
 
 .studio-editable-card__chrome {
   position: absolute;
-  top: 0.55rem;
-  right: 0.55rem;
-  z-index: 5;
+  top: 0.45rem;
+  right: 0.45rem;
+  z-index: 40;
   display: flex;
   gap: 0.35rem;
-  opacity: 0;
-  transform: translateY(-2px);
-  transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-.studio-editable-card:hover .studio-editable-card__chrome,
-.studio-editable-card:focus-within .studio-editable-card__chrome {
   opacity: 1;
-  transform: translateY(0);
-}
-
-@media (hover: none) {
-  .studio-editable-card__chrome {
-    opacity: 1;
-    transform: none;
-  }
+  pointer-events: auto;
 }
 
 .studio-icon-btn {
@@ -157,16 +143,48 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.25rem;
   cursor: pointer;
-  box-shadow: 0 4px 14px color-mix(in srgb, #000 12%, transparent);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+}
+
+.studio-icon-btn--edit {
+  width: auto;
+  min-height: 2rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  border-color: transparent;
+  background: var(--promo-lime, #9fe855);
+  color: var(--primary, #030304);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.studio-icon-btn--edit span {
+  line-height: 1;
 }
 
 .studio-icon-btn:hover {
   background: var(--surface-muted, #f2f3f7);
 }
 
+.studio-icon-btn--edit:hover {
+  filter: brightness(1.05);
+}
+
 .studio-icon-btn--danger {
   color: #991b1b;
+}
+
+.studio-shell__edit-hint {
+  margin: 0;
+  padding: 0.45rem var(--section-x, 1rem);
+  background: color-mix(in srgb, var(--promo-lime, #9fe855) 18%, #fff);
+  color: var(--primary, #030304);
+  font-size: 0.75rem;
+  border-bottom: 1px solid var(--border-hairline, #e8e8ed);
 }
 
 .studio-drawer {

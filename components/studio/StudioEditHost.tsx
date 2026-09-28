@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -9,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   StudioEditDrawer,
@@ -27,7 +28,6 @@ import {
   retrieveStudioPromotion,
   StudioApiError,
 } from '@/lib/studio/api';
-import { isStudioBrowserPath } from '@/lib/studio/paths';
 import type { StudioCapabilities } from '@/lib/studio/permissions';
 import type { PublicProduct } from '@/lib/api/generated';
 
@@ -54,12 +54,49 @@ export function useStudioEditOptional(): StudioEditHostValue | undefined {
   return useContext(StudioEditContext);
 }
 
-export function StudioEditHost({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
-  const isStudio = isStudioBrowserPath(pathname);
-  const studio = useStudioAuthOptional();
+/** Deep-link ?new=1 / ?edit=id — isolated so useSearchParams suspense never drops the provider. */
+function StudioEditQueryBridge({
+  capabilities,
+  openCreateProduct,
+  openEditProduct,
+}: {
+  capabilities: StudioCapabilities;
+  openCreateProduct: () => void;
+  openEditProduct: (id: number) => Promise<void>;
+}) {
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  useEffect(() => {
+    const editId = searchParams.get('edit');
+    const isNew = searchParams.get('new') === '1';
+    if (!isNew && !editId) return;
+
+    if (isNew && capabilities.canCreateProduct) {
+      openCreateProduct();
+    } else if (editId) {
+      const id = Number(editId);
+      if (Number.isFinite(id) && id > 0) {
+        void openEditProduct(id);
+      }
+    }
+
+    const clean =
+      typeof window !== 'undefined' && window.location.pathname.startsWith('/studio')
+        ? window.location.pathname
+        : '/studio/products';
+    router.replace(clean, { scroll: false });
+  }, [capabilities, searchParams, openCreateProduct, openEditProduct, router]);
+
+  return null;
+}
+
+/**
+ * Only mounted under StudioShell while authenticated.
+ * Always provides edit context — do not gate on usePathname (rewrites lie).
+ */
+export function StudioEditHost({ children }: { children: ReactNode }) {
+  const studio = useStudioAuthOptional();
   const queryClient = useQueryClient();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -68,7 +105,6 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
 
   const capabilities = studio?.capabilities;
   const isAuthenticated = Boolean(studio?.isAuthenticated);
-  const active = Boolean(isStudio && isAuthenticated && capabilities);
 
   const openCreateProduct = useCallback(() => {
     if (!capabilities?.canCreateProduct) {
@@ -261,35 +297,8 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     [capabilities?.canEditDeliveryRates]
   );
 
-  useEffect(() => {
-    if (!active || !capabilities) return;
-    const editId = searchParams.get('edit');
-    const isNew = searchParams.get('new') === '1';
-    if (!isNew && !editId) return;
-
-    if (isNew && capabilities.canCreateProduct) {
-      openCreateProduct();
-    } else if (editId) {
-      const id = Number(editId);
-      if (Number.isFinite(id) && id > 0) {
-        void openEditProduct(id);
-      }
-    }
-
-    const clean = pathname?.startsWith('/studio') ? pathname : '/studio/products';
-    router.replace(clean, { scroll: false });
-  }, [
-    active,
-    capabilities,
-    searchParams,
-    openCreateProduct,
-    openEditProduct,
-    router,
-    pathname,
-  ]);
-
   const value = useMemo<StudioEditHostValue | null>(() => {
-    if (!capabilities) return null;
+    if (!capabilities || !isAuthenticated) return null;
     return {
       capabilities,
       canEdit: Boolean(
@@ -314,6 +323,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     };
   }, [
     capabilities,
+    isAuthenticated,
     openCreateProduct,
     openEditProduct,
     deleteProduct,
@@ -324,12 +334,19 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     openEditDeliveryRate,
   ]);
 
-  if (!active || !capabilities || !value) {
+  if (!value || !capabilities) {
     return <>{children}</>;
   }
 
   return (
     <StudioEditContext.Provider value={value}>
+      <Suspense fallback={null}>
+        <StudioEditQueryBridge
+          capabilities={capabilities}
+          openCreateProduct={openCreateProduct}
+          openEditProduct={openEditProduct}
+        />
+      </Suspense>
       {error && (
         <div className="studio-mirror__toast" role="alert">
           {error}
@@ -349,11 +366,12 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
         }}
         onSaved={async () => {
           await queryClient.invalidateQueries();
+          const path = typeof window !== 'undefined' ? window.location.pathname : '';
           if (
-            pathname?.includes('/products/') ||
-            pathname?.includes('/blog/') ||
-            pathname?.includes('/articles') ||
-            pathname?.includes('/financing')
+            path.includes('/products/') ||
+            path.includes('/blog/') ||
+            path.includes('/articles') ||
+            path.includes('/financing')
           ) {
             window.location.reload();
           }

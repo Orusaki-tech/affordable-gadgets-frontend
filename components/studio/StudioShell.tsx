@@ -1,27 +1,34 @@
 'use client';
 
 import Link from 'next/link';
-import { Suspense, useEffect, type ReactNode } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { useStudioAuth } from '@/components/studio/StudioAuthContext';
 import { StudioEditHost } from '@/components/studio/StudioEditHost';
 
-export function StudioShell({ children }: { children: ReactNode }) {
+export function StudioShell({
+  children,
+  pathnameHint,
+}: {
+  children: ReactNode;
+  pathnameHint?: string | null;
+}) {
   const { loading, isAuthenticated, user, profile, logout, capabilities } =
     useStudioAuth();
-  const pathname = usePathname();
   const router = useRouter();
+  const pathname = pathnameHint || '';
   const isLogin = pathname === '/studio/login';
 
   useEffect(() => {
     if (loading) return;
     if (!isAuthenticated && !isLogin) {
-      router.replace(`/studio/login?next=${encodeURIComponent(pathname || '/studio')}`);
+      const next = pathnameHint || (typeof window !== 'undefined' ? window.location.pathname : '/studio');
+      router.replace(`/studio/login?next=${encodeURIComponent(next || '/studio')}`);
     }
     if (isAuthenticated && isLogin) {
       router.replace('/studio/products');
     }
-  }, [loading, isAuthenticated, isLogin, pathname, router]);
+  }, [loading, isAuthenticated, isLogin, pathnameHint, router]);
 
   if (loading) {
     return (
@@ -73,11 +80,12 @@ export function StudioShell({ children }: { children: ReactNode }) {
           {capabilities.readOnlyReason}
         </div>
       )}
-      <Suspense fallback={<div className="studio-mirror-pad">{children}</div>}>
-        <StudioEditHost>
-          <div className="studio-mirror-pad">{children}</div>
-        </StudioEditHost>
-      </Suspense>
+      <p className="studio-shell__edit-hint" role="note">
+        Green <strong>Edit</strong> buttons appear on products, promos, articles, bundles, videos, financing, and delivery rates you can change.
+      </p>
+      <StudioEditHost>
+        <div className="studio-mirror-pad">{children}</div>
+      </StudioEditHost>
     </div>
   );
 }

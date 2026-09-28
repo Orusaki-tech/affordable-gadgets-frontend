@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { StudioEditDrawer, type StudioEditResource } from '@/components/studio/StudioEditDrawer';
 import { useStudioAuthOptional } from '@/components/studio/StudioAuthContext';
@@ -12,12 +11,11 @@ import {
   retrieveStudioProduct,
   StudioApiError,
 } from '@/lib/studio/api';
-import { isStudioBrowserPath } from '@/lib/studio/paths';
+import { useStudioLocation } from '@/lib/studio/useStudioLocation';
 
 /** Floating edit control on PDP when browsing under /studio. */
 export function StudioPdpEditButton({ productId }: { productId?: number | null }) {
-  const pathname = usePathname();
-  const isStudio = isStudioBrowserPath(pathname);
+  const { inStudio } = useStudioLocation();
   const studio = useStudioAuthOptional();
   const studioEdit = useStudioEditOptional();
   const queryClient = useQueryClient();
@@ -26,8 +24,13 @@ export function StudioPdpEditButton({ productId }: { productId?: number | null }
   const [error, setError] = useState<string | null>(null);
 
   const canEdit = Boolean(
-    studio?.capabilities.canFullEditProduct || studio?.capabilities.canContentEditProduct
+    studioEdit ||
+      studio?.capabilities.canFullEditProduct ||
+      studio?.capabilities.canContentEditProduct
   );
+  const show =
+    Boolean(studioEdit) ||
+    (inStudio && Boolean(studio?.isAuthenticated) && canEdit && Boolean(productId));
 
   const openEditor = useCallback(async () => {
     if (!productId) return;
@@ -51,25 +54,26 @@ export function StudioPdpEditButton({ productId }: { productId?: number | null }
     }
   }, [productId, studioEdit]);
 
-  if (!isStudio || !studio?.isAuthenticated || !canEdit || !productId) {
+  if (!show || !productId) {
     return null;
   }
 
-  const editTitle = `Edit product · ${studio.capabilities.roleLabel}`;
+  const editTitle = `Edit product · ${studio?.capabilities.roleLabel || 'Studio'}`;
 
   return (
     <>
       <div className="studio-pdp-chrome">
         <button
           type="button"
-          className="studio-icon-btn"
+          className="studio-icon-btn studio-icon-btn--edit"
           title={editTitle}
           aria-label={editTitle}
           onClick={() => void openEditor()}
         >
-          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden fill="currentColor">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden fill="currentColor">
             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" />
           </svg>
+          <span>Edit</span>
         </button>
         {error && <span className="studio-pdp-chrome__error">{error}</span>}
       </div>
@@ -97,13 +101,15 @@ export function StudioArticleEditButton({
   articleId?: number | null;
   articleSlug?: string | null;
 }) {
-  const pathname = usePathname();
-  const isStudio = isStudioBrowserPath(pathname);
+  const { inStudio } = useStudioLocation();
   const studio = useStudioAuthOptional();
   const studioEdit = useStudioEditOptional();
   const [error, setError] = useState<string | null>(null);
 
-  const canEdit = Boolean(studio?.capabilities.canEditArticles);
+  const canEdit = Boolean(studioEdit?.capabilities.canEditArticles || studio?.capabilities.canEditArticles);
+  const show =
+    Boolean(studioEdit?.capabilities.canEditArticles) ||
+    (inStudio && Boolean(studio?.isAuthenticated) && canEdit && Boolean(articleId || articleSlug));
 
   const openEditor = useCallback(async () => {
     setError(null);
@@ -125,24 +131,25 @@ export function StudioArticleEditButton({
     }
   }, [articleId, articleSlug, studioEdit]);
 
-  if (!isStudio || !studio?.isAuthenticated || !canEdit || (!articleId && !articleSlug)) {
+  if (!show || (!articleId && !articleSlug)) {
     return null;
   }
 
-  const editTitle = `Edit article · ${studio.capabilities.roleLabel}`;
+  const editTitle = `Edit article · ${studio?.capabilities.roleLabel || 'Studio'}`;
 
   return (
     <div className="studio-pdp-chrome">
       <button
         type="button"
-        className="studio-icon-btn"
+        className="studio-icon-btn studio-icon-btn--edit"
         title={editTitle}
         aria-label={editTitle}
         onClick={() => void openEditor()}
       >
-        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden fill="currentColor">
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden fill="currentColor">
           <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" />
         </svg>
+        <span>Edit</span>
       </button>
       {error && <span className="studio-pdp-chrome__error">{error}</span>}
     </div>

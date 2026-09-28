@@ -27,6 +27,8 @@ import {
   youtubePosterCandidatesFromLink,
   type ResolvedProductVideo,
 } from '@/lib/utils/productVideo';
+import { StudioBlockChrome } from '@/components/studio/StudioBlockChrome';
+import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -163,6 +165,12 @@ function HomepageVideoSlide({
   registerVideo: (key: string, el: HTMLVideoElement | null) => void;
   deckKey: string;
 }) {
+  const studioEdit = useStudioEditOptional();
+  const canEditVideo = Boolean(
+    studioEdit?.capabilities.canFullEditProduct ||
+      studioEdit?.capabilities.canContentEditProduct ||
+      studioEdit?.capabilities.canManageProductMedia
+  );
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const youtubeIframeRef = useRef<HTMLIFrameElement | null>(null);
   const [isMuted, setIsMuted] = useState(true);
@@ -278,7 +286,7 @@ function HomepageVideoSlide({
     }
   };
 
-  return (
+  const slide = (
     <div className="home-product-videos__slide-stack w-[calc(700px/3)] shrink-0 sm:w-[calc(740px/3)]">
       <div className="home-product-videos__slide-inner">
         <div
@@ -383,6 +391,23 @@ function HomepageVideoSlide({
         <span className="home-product-videos__meta">{metaLine}</span>
       </Link>
     </div>
+  );
+
+  if (!canEditVideo || !product.id) return slide;
+
+  return (
+    <StudioBlockChrome
+      label={`${name} video`}
+      roleHint={studioEdit?.capabilities.roleLabel}
+      onEdit={() => {
+        void studioEdit?.openEditProduct({
+          id: product.id!,
+          product_name: product.product_name || name,
+        });
+      }}
+    >
+      {slide}
+    </StudioBlockChrome>
   );
 }
 

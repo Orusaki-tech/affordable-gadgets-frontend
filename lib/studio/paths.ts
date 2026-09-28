@@ -56,6 +56,19 @@ export function isStudioLoginPath(pathname: string | null | undefined): boolean 
   return pathname === '/studio/login' || pathname?.startsWith('/studio/login/') === true;
 }
 
+/**
+ * Prefer the address-bar path. Middleware rewrites /studio/* → shop routes, so
+ * Next's usePathname() often returns the rewritten shop path and would hide Studio UI.
+ */
+export function getStudioWindowPathname(): string | null {
+  if (typeof window === 'undefined') return null;
+  return window.location.pathname;
+}
+
+export function isStudioWindowPath(): boolean {
+  return isStudioBrowserPath(getStudioWindowPathname());
+}
+
 /** Paths that must never be rewritten into /studio. */
 export function shouldSkipStudioPrefix(pathname: string): boolean {
   return (

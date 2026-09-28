@@ -1,15 +1,15 @@
 'use client';
 
 import { useEffect, type ReactNode } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { StudioAuthProvider } from '@/components/studio/StudioAuthContext';
 import { StudioShell } from '@/components/studio/StudioShell';
+import { useStudioLocation } from '@/lib/studio/useStudioLocation';
 import {
   installStudioHistoryGuard,
-  isStudioBrowserPath,
-  isStudioLoginPath,
   prefixStudioPath,
   setStudioRoutingEnabled,
+  isStudioBrowserPath,
 } from '@/lib/studio/paths';
 
 /**
@@ -17,10 +17,8 @@ import {
  * with Studio auth + float bar, and keep in-app links inside /studio.
  */
 export function StudioRootGate({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
+  const { pathname, inStudio, isLogin } = useStudioLocation();
   const router = useRouter();
-  const inStudio = isStudioBrowserPath(pathname);
-  const isLogin = isStudioLoginPath(pathname);
 
   // Sync during render so studioPath()/getProductHref work on the same tick as clicks.
   setStudioRoutingEnabled(inStudio && !isLogin);
@@ -30,14 +28,11 @@ export function StudioRootGate({ children }: { children: ReactNode }) {
     return () => setStudioRoutingEnabled(false);
   }, [inStudio, isLogin]);
 
-  // Keep Next.js router.push/replace under /studio (filters, cart, search, etc.).
   useEffect(() => {
     if (!inStudio || isLogin) return;
     return installStudioHistoryGuard();
   }, [inStudio, isLogin]);
 
-  // Keep same-origin <a>/<Link> navigations under /studio while editing.
-  // Capture + stopImmediatePropagation so Next.js <Link> cannot also push the bare shop URL.
   useEffect(() => {
     if (!inStudio || isLogin) return;
 
@@ -62,7 +57,6 @@ export function StudioRootGate({ children }: { children: ReactNode }) {
       }
       if (url.origin !== window.location.origin) return;
 
-      // Already a studio URL — let Next handle it.
       if (isStudioBrowserPath(url.pathname)) return;
 
       const next = prefixStudioPath(`${url.pathname}${url.search}${url.hash}`);
@@ -86,7 +80,7 @@ export function StudioRootGate({ children }: { children: ReactNode }) {
 
   return (
     <StudioAuthProvider>
-      <StudioShell>{children}</StudioShell>
+      <StudioShell pathnameHint={pathname}>{children}</StudioShell>
     </StudioAuthProvider>
   );
 }

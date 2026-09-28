@@ -11,7 +11,7 @@ type StudioBlockChromeProps = {
   roleHint?: string;
 };
 
-/** Hover edit control over any mirrored storefront block. */
+/** Always-visible edit control over any mirrored storefront block. */
 export function StudioBlockChrome({
   label,
   onEdit,
@@ -25,7 +25,7 @@ export function StudioBlockChrome({
       <div className="studio-editable-card__chrome" aria-label="Studio actions">
         <button
           type="button"
-          className="studio-icon-btn"
+          className="studio-icon-btn studio-icon-btn--edit"
           title={title}
           aria-label={title}
           onClick={(e) => {
@@ -34,9 +34,10 @@ export function StudioBlockChrome({
             onEdit();
           }}
         >
-          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden fill="currentColor">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden fill="currentColor">
             <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" />
           </svg>
+          <span>Edit</span>
         </button>
       </div>
       {children}

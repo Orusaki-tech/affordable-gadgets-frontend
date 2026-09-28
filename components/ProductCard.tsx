@@ -813,8 +813,8 @@ export function ProductCard({
     if (studioChrome) {
       return (
         <div className="studio-editable-card">
-          {studioChrome}
           {featuredCard}
+          {studioChrome}
         </div>
       );
     }
@@ -1290,8 +1290,8 @@ export function ProductCard({
   if (studioChrome) {
     return (
       <div className="studio-editable-card">
-        {studioChrome}
         {defaultCard}
+        {studioChrome}
       </div>
     );
   }

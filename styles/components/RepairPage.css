@@ -52,7 +52,7 @@
 }
 
 .repair-page__content {
-  max-width: 44rem;
+  max-width: 52rem;
   margin: 0 auto;
   padding: 1.75rem var(--section-x) 3rem;
   display: grid;
@@ -64,6 +64,169 @@
     padding: 2rem var(--section-x-lg) 4rem;
     gap: 2rem;
   }
+}
+
+.repair-page__hero-cta {
+  margin: 1.25rem 0 0;
+}
+
+.repair-page__hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--promo-lime);
+  text-decoration: none;
+}
+
+.repair-page__hero-link:hover {
+  text-decoration: underline;
+}
+
+.repair-page__prices {
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 1.35rem 1.15rem 1.25rem;
+  scroll-margin-top: 5.5rem;
+}
+
+@media (min-width: 640px) {
+  .repair-page__prices {
+    padding: 1.5rem 1.5rem 1.35rem;
+  }
+}
+
+.repair-page__prices-header {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .repair-page__prices-header {
+    grid-template-columns: 1fr minmax(12rem, 16rem);
+    align-items: end;
+  }
+}
+
+.repair-page__prices-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--stock-green, #1b7a4e);
+}
+
+.repair-page__prices-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--on-surface);
+}
+
+.repair-page__prices-sub {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--on-surface-variant);
+}
+
+.repair-page__prices-search .checkout-modal__input {
+  width: 100%;
+}
+
+.repair-page__prices-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-hairline);
+  border-radius: 12px;
+}
+
+.repair-page__prices-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.repair-page__prices-table th,
+.repair-page__prices-table td {
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.repair-page__prices-table thead th {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  background: color-mix(in srgb, var(--surface-canvas) 70%, #fff);
+}
+
+.repair-page__prices-table tbody th {
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.repair-page__prices-table tbody td {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--on-surface);
+  white-space: nowrap;
+}
+
+.repair-page__prices-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--surface-canvas) 55%, #fff);
+}
+
+.repair-page__prices-table tbody tr:last-child th,
+.repair-page__prices-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.repair-page__prices-book {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-hairline);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+  background: #fff;
+}
+
+.repair-page__prices-book:hover {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--promo-lime) 35%, #fff);
+}
+
+.repair-page__prices-empty {
+  margin: 0;
+  padding: 1rem 0.9rem;
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+}
+
+.repair-page__listed-price {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--promo-lime) 55%, var(--border-hairline));
+  background: color-mix(in srgb, var(--promo-lime) 22%, #fff);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--on-surface);
+}
+
+.repair-page__listed-price-note {
+  font-weight: 400;
+  color: var(--on-surface-variant);
 }
 
 .repair-page__steps {
@@ -124,6 +287,7 @@
   border: 1px solid var(--border-hairline);
   border-radius: 16px;
   padding: 1.5rem 1.25rem 1.75rem;
+  scroll-margin-top: 5.5rem;
 }
 
 @media (min-width: 640px) {

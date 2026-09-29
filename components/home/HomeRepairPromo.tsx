@@ -40,8 +40,8 @@ export function HomeRepairPromo() {
           </h2>
           <p className="ag-type-body mt-3 text-white/75">
             Screens, batteries, charging ports, and more — for phones, tablets, laptops, and
-            accessories we sell. Tell us what&apos;s broken and get a quote on WhatsApp after
-            diagnosis.
+            accessories we sell. iPhone battery replacements have listed prices; other repairs get
+            a quote on WhatsApp after diagnosis.
           </p>
           <div className="mt-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
@@ -55,10 +55,15 @@ export function HomeRepairPromo() {
               ))}
             </div>
           </div>
-          <Link href="/repair" className="ag-btn ag-btn--lime mt-6">
-            Book a repair
-            <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
-          </Link>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/repair" className="ag-btn ag-btn--lime">
+              Book a repair
+              <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
+            </Link>
+            <Link href="/repair#iphone-battery-prices" className="ag-btn ag-btn--ghost">
+              iPhone battery prices
+            </Link>
+          </div>
         </div>
 
         <div className="rounded-2xl bg-white/5 p-5 backdrop-blur-sm">
@@ -124,7 +129,8 @@ export function HomeRepairPromo() {
             <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
           </Link>
           <p className="mt-3 text-[0.6875rem] text-white/50">
-            No online prices — we diagnose first, then send a quote on WhatsApp.
+            See listed iPhone battery prices on the repair page — other jobs are quoted after
+            diagnosis on WhatsApp.
           </p>
         </div>
       </div>

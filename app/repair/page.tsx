@@ -1,16 +1,18 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { RepairBookingForm } from '@/components/RepairBookingForm';
+import { IphoneBatteryPriceList } from '@/components/IphoneBatteryPriceList';
 import { brandConfig } from '@/lib/config/brand';
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Device Repair Booking',
+  title: 'Device Repair Booking · iPhone Battery Prices',
   description:
-    'Book phone, tablet, laptop, and accessory repairs at Affordable Gadgets KE in Nairobi. Describe your issue and get a quote on WhatsApp after diagnosis.',
+    'Book phone, tablet, laptop, and accessory repairs at Affordable Gadgets KE in Nairobi. See listed iPhone battery replacement prices and get a quote on WhatsApp.',
   alternates: {
     canonical: '/repair',
   },
@@ -22,12 +24,12 @@ const STEPS = [
     body: 'Share the device and issue — we repair the brands and categories we sell.',
   },
   {
-    title: 'Continue on WhatsApp',
-    body: 'Your details open a chat with our team so we can confirm next steps.',
+    title: 'Check listed prices',
+    body: 'iPhone battery replacements have published rates below. Other repairs are quoted after diagnosis.',
   },
   {
-    title: 'Get a diagnosis quote',
-    body: 'Pricing is confirmed after we assess the device — no online price list.',
+    title: 'Continue on WhatsApp',
+    body: 'Your details open a chat with our team so we can confirm drop-off and next steps.',
   },
 ] as const;
 
@@ -51,13 +53,19 @@ export default function RepairPage() {
             <h1 className="repair-page__title">Book a device repair</h1>
             <p className="repair-page__lead">
               Screens, batteries, charging ports, and more — for phones, tablets, laptops, and
-              accessories we sell. Drop your details below and we&apos;ll quote you on WhatsApp after
-              diagnosis.
+              accessories we sell. Browse listed iPhone battery prices, or request a quote on
+              WhatsApp after diagnosis.
             </p>
             <ul className="repair-page__meta" aria-label="Shop details">
               <li>{brandConfig.business.address.streetAddress}, Nairobi</li>
-              <li>Quote after diagnosis · Via WhatsApp</li>
+              <li>iPhone batteries · Listed prices</li>
+              <li>Other repairs · Quote after diagnosis</li>
             </ul>
+            <p className="repair-page__hero-cta">
+              <Link href="#iphone-battery-prices" className="repair-page__hero-link">
+                View iPhone battery prices
+              </Link>
+            </p>
           </div>
         </section>
 
@@ -75,6 +83,8 @@ export default function RepairPage() {
               </li>
             ))}
           </ol>
+
+          <IphoneBatteryPriceList />
 
           <div className="repair-page__panel">
             <h2 className="repair-page__panel-title">Request a repair</h2>

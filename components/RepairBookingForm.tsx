@@ -1,9 +1,14 @@
 'use client';
 
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { allBrandNavItems } from '@/lib/config/nav-links';
+import {
+  findIphoneBatteryPrice,
+  formatRepairKes,
+  IPHONE_BATTERY_REPLACEMENT_PRICES,
+} from '@/lib/repair/iphoneBatteryPrices';
 
 const DEVICE_TYPES = [
   { value: 'Phone', label: 'Phone' },
@@ -48,6 +53,7 @@ function buildRepairWhatsAppMessage(fields: {
   model: string;
   issue: string;
   details: string;
+  listedPriceKes?: number | null;
 }): string {
   const lines = [
     "Hi! I'd like to book a repair.",
@@ -57,11 +63,19 @@ function buildRepairWhatsAppMessage(fields: {
     `Device: ${fields.brand} ${fields.model.trim()} (${fields.deviceType})`,
     `Issue: ${fields.issue}`,
   ];
+  if (fields.listedPriceKes != null) {
+    lines.push(`Listed battery price: ${formatRepairKes(fields.listedPriceKes)}`);
+  }
   const details = fields.details.trim();
   if (details) {
     lines.push(`Details: ${details}`);
   }
-  lines.push('', 'Please share a quote after diagnosis.');
+  lines.push(
+    '',
+    fields.listedPriceKes != null
+      ? 'Please confirm this listed battery price after inspection.'
+      : 'Please share a quote after diagnosis.'
+  );
   return lines.join('\n');
 }
 
@@ -69,23 +83,42 @@ export function RepairBookingForm() {
   const searchParams = useSearchParams();
   const initialDeviceType = searchParams.get('deviceType');
   const initialIssue = searchParams.get('issue');
+  const initialBrand = searchParams.get('brand');
+  const initialModel = searchParams.get('model');
 
   const brands = useMemo(
     () => [...allBrandNavItems().map((b) => b.navLabel), 'Other'],
     []
   );
 
+  const resolveBrand = (value: string | null) => {
+    if (!value) return '';
+    const match = brands.find((b) => b.toLowerCase() === value.toLowerCase());
+    return match || value;
+  };
+
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [deviceType, setDeviceType] = useState(
     isDeviceType(initialDeviceType) ? initialDeviceType : ''
   );
-  const [brand, setBrand] = useState('');
-  const [model, setModel] = useState('');
+  const [brand, setBrand] = useState(() => resolveBrand(initialBrand));
+  const [model, setModel] = useState(initialModel?.trim() || '');
   const [issue, setIssue] = useState(isIssue(initialIssue) ? initialIssue : '');
   const [details, setDetails] = useState('');
   const [touched, setTouched] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.location.hash !== '#repair-request') return;
+    document.getElementById('repair-request')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  const listedBattery =
+    issue === 'Battery replacement' && brand.toLowerCase() === 'apple'
+      ? findIphoneBatteryPrice(model)
+      : null;
 
   const phoneError = validatePhone(phone);
   const nameError = name.trim().length < 2 ? 'Please enter your name' : null;
@@ -113,6 +146,7 @@ export function RepairBookingForm() {
       model,
       issue,
       details,
+      listedPriceKes: listedBattery?.priceKes ?? null,
     });
     window.open(getBusinessWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
   };
@@ -120,7 +154,7 @@ export function RepairBookingForm() {
   const show = (err: string | null) => touched && err;
 
   return (
-    <form className="repair-page__form" onSubmit={handleSubmit} noValidate>
+    <form id="repair-request" className="repair-page__form" onSubmit={handleSubmit} noValidate>
       <div className="repair-page__form-grid">
         <div className="checkout-modal__field">
           <label htmlFor="repair-name" className="checkout-modal__label">
@@ -241,8 +275,14 @@ export function RepairBookingForm() {
               setModel(e.target.value);
               setError(null);
             }}
+            list="repair-iphone-battery-models"
             aria-invalid={show(modelError) ? true : undefined}
           />
+          <datalist id="repair-iphone-battery-models">
+            {IPHONE_BATTERY_REPLACEMENT_PRICES.map((row) => (
+              <option key={row.model} value={row.model} />
+            ))}
+          </datalist>
           {show(modelError) && (
             <span className="checkout-modal__error" role="alert">
               {modelError}
@@ -293,6 +333,17 @@ export function RepairBookingForm() {
         </div>
       </div>
 
+      {listedBattery ? (
+        <p className="repair-page__listed-price" role="status">
+          Listed iPhone battery replacement for <strong>{listedBattery.model}</strong>:{' '}
+          <strong>{formatRepairKes(listedBattery.priceKes)}</strong>
+          <span className="repair-page__listed-price-note">
+            {' '}
+            — confirmed after inspection at drop-off.
+          </span>
+        </p>
+      ) : null}
+
       {error && !show(firstError) && (
         <div className="checkout-modal__alert" role="alert">
           {error}
@@ -300,7 +351,9 @@ export function RepairBookingForm() {
       )}
 
       <p className="repair-page__quote-note">
-        We&apos;ll diagnose your device and send a quote on WhatsApp — no fixed prices online.
+        {listedBattery
+          ? 'Continue on WhatsApp with this listed battery price — we confirm after inspecting your iPhone.'
+          : 'Most repairs are quoted after diagnosis on WhatsApp. iPhone battery replacements have a listed price guide above.'}
       </p>
 
       <button type="submit" className="whatsapp-lead-modal__primary repair-page__submit">

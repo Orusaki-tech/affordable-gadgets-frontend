@@ -2,9 +2,14 @@
 
 export type IphoneRepairService = 'battery' | 'screen';
 
+/** Screen part grade from the shop price sheet. */
+export type IphoneScreenGrade = 'HX' | 'DD' | 'GX';
+
 export type IphoneRepairPrice = {
   model: string;
   priceKes: number;
+  /** Present for screen replacements (HX / DD / GX original). */
+  screenGrade?: IphoneScreenGrade;
 };
 
 export const IPHONE_BATTERY_REPLACEMENT_PRICES: readonly IphoneRepairPrice[] = [
@@ -37,8 +42,43 @@ export const IPHONE_BATTERY_REPLACEMENT_PRICES: readonly IphoneRepairPrice[] = [
   { model: 'iPhone 16 Pro Max', priceKes: 20000 },
 ] as const;
 
-/** Screen replacement prices — populate when the price list is provided. */
-export const IPHONE_SCREEN_REPLACEMENT_PRICES: readonly IphoneRepairPrice[] = [] as const;
+/**
+ * Original iPhone screen replacement prices.
+ * Grades: HX (16/17), DD (12–15), GX (X–11 Pro Max).
+ */
+export const IPHONE_SCREEN_REPLACEMENT_PRICES: readonly IphoneRepairPrice[] = [
+  // HX screen original
+  { model: 'iPhone 17 Pro Max', priceKes: 65000, screenGrade: 'HX' },
+  { model: 'iPhone 17 Pro', priceKes: 50000, screenGrade: 'HX' },
+  { model: 'iPhone 17', priceKes: 40000, screenGrade: 'HX' },
+  { model: 'iPhone 16 Pro Max', priceKes: 45000, screenGrade: 'HX' },
+  { model: 'iPhone 16 Pro', priceKes: 43000, screenGrade: 'HX' },
+  { model: 'iPhone 16', priceKes: 38000, screenGrade: 'HX' },
+  // DD screen original
+  { model: 'iPhone 12', priceKes: 13000, screenGrade: 'DD' },
+  { model: 'iPhone 12 Pro', priceKes: 14000, screenGrade: 'DD' },
+  { model: 'iPhone 12 Pro Max', priceKes: 18000, screenGrade: 'DD' },
+  { model: 'iPhone 13', priceKes: 16000, screenGrade: 'DD' },
+  { model: 'iPhone 13 Pro', priceKes: 18000, screenGrade: 'DD' },
+  { model: 'iPhone 13 Pro Max', priceKes: 25000, screenGrade: 'DD' },
+  { model: 'iPhone 14', priceKes: 20000, screenGrade: 'DD' },
+  { model: 'iPhone 14 Pro', priceKes: 25000, screenGrade: 'DD' },
+  { model: 'iPhone 14 Pro Max', priceKes: 30000, screenGrade: 'DD' },
+  { model: 'iPhone 15', priceKes: 25000, screenGrade: 'DD' },
+  { model: 'iPhone 15 Pro', priceKes: 35000, screenGrade: 'DD' },
+  { model: 'iPhone 15 Pro Max', priceKes: 38000, screenGrade: 'DD' },
+  // GX screen original
+  { model: 'iPhone X', priceKes: 5500, screenGrade: 'GX' },
+  { model: 'iPhone 11', priceKes: 7500, screenGrade: 'GX' },
+  { model: 'iPhone 11 Pro', priceKes: 9500, screenGrade: 'GX' },
+  { model: 'iPhone 11 Pro Max', priceKes: 12500, screenGrade: 'GX' },
+] as const;
+
+export const IPHONE_SCREEN_GRADE_LABELS: Record<IphoneScreenGrade, string> = {
+  HX: 'HX original',
+  DD: 'DD original',
+  GX: 'GX original',
+};
 
 export function formatRepairKes(amount: number): string {
   return `KSh ${Math.round(amount).toLocaleString('en-KE')}`;
@@ -130,7 +170,8 @@ export const findCatalogImageForBatteryModel = findCatalogImageForRepairModel;
 
 export function repairBookingHref(
   model: string,
-  service: IphoneRepairService = 'battery'
+  service: IphoneRepairService = 'battery',
+  screenGrade?: IphoneScreenGrade
 ): string {
   const issue = service === 'screen' ? 'Cracked / damaged screen' : 'Battery replacement';
   const params = new URLSearchParams({
@@ -139,6 +180,9 @@ export function repairBookingHref(
     issue,
     model,
   });
+  if (service === 'screen' && screenGrade) {
+    params.set('screenGrade', screenGrade);
+  }
   return `/repair?${params.toString()}#repair-request`;
 }
 

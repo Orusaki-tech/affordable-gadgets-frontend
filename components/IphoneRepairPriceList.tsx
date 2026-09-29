@@ -9,6 +9,7 @@ import { apiBaseUrl } from '@/lib/api/openapi';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 import {
   IPHONE_BATTERY_REPLACEMENT_PRICES,
+  IPHONE_SCREEN_GRADE_LABELS,
   IPHONE_SCREEN_REPLACEMENT_PRICES,
   findCatalogImageForRepairModel,
   formatRepairKes,
@@ -16,6 +17,7 @@ import {
   type CatalogImageSource,
   type IphoneRepairPrice,
   type IphoneRepairService,
+  type IphoneScreenGrade,
 } from '@/lib/repair/iphoneRepairPrices';
 
 async function fetchIphoneCatalogImages(): Promise<CatalogImageSource[]> {
@@ -39,7 +41,13 @@ async function fetchIphoneCatalogImages(): Promise<CatalogImageSource[]> {
 
 const SERVICE_META: Record<
   IphoneRepairService,
-  { label: string; eyebrow: string; title: string; badge: string; prices: readonly IphoneRepairPrice[] }
+  {
+    label: string;
+    eyebrow: string;
+    title: string;
+    badge: string;
+    prices: readonly IphoneRepairPrice[];
+  }
 > = {
   battery: {
     label: 'Battery',
@@ -57,8 +65,16 @@ const SERVICE_META: Record<
   },
 };
 
+const SCREEN_GRADE_FILTERS: Array<{ key: 'all' | IphoneScreenGrade; label: string }> = [
+  { key: 'all', label: 'All grades' },
+  { key: 'HX', label: 'HX original' },
+  { key: 'DD', label: 'DD original' },
+  { key: 'GX', label: 'GX original' },
+];
+
 export function IphoneRepairPriceList() {
   const [service, setService] = useState<IphoneRepairService>('battery');
+  const [screenGrade, setScreenGrade] = useState<'all' | IphoneScreenGrade>('all');
   const [query, setQuery] = useState('');
   const catalogQuery = useQuery({
     queryKey: ['repair', 'iphone-catalog-images'],
@@ -70,9 +86,17 @@ export function IphoneRepairPriceList() {
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const base = !q
-      ? meta.prices
-      : meta.prices.filter((row) => row.model.toLowerCase().includes(q));
+    let base = meta.prices;
+    if (service === 'screen' && screenGrade !== 'all') {
+      base = base.filter((row) => row.screenGrade === screenGrade);
+    }
+    if (q) {
+      base = base.filter(
+        (row) =>
+          row.model.toLowerCase().includes(q) ||
+          (row.screenGrade && row.screenGrade.toLowerCase().includes(q))
+      );
+    }
     const products = catalogQuery.data ?? [];
     return base.map((row) => ({
       ...row,
@@ -80,7 +104,7 @@ export function IphoneRepairPriceList() {
         findCatalogImageForRepairModel(row.model, products) ||
         getPlaceholderProductImage(row.model),
     }));
-  }, [query, meta.prices, catalogQuery.data]);
+  }, [query, meta.prices, catalogQuery.data, service, screenGrade]);
 
   return (
     <section
@@ -95,8 +119,9 @@ export function IphoneRepairPriceList() {
             {meta.title}
           </h2>
           <p className="repair-page__prices-sub">
-            Listed rates for drop-off at our Nairobi CBD shop. Confirm on WhatsApp before we start
-            work — parts and labour may vary after inspection.
+            {service === 'screen'
+              ? 'Original HX, DD, and GX screens. Diagnosable units may show as used after install. Confirm on WhatsApp before we start work.'
+              : 'Listed rates for drop-off at our Nairobi CBD shop. Confirm on WhatsApp before we start work — parts and labour may vary after inspection.'}
           </p>
         </div>
         <label className="repair-page__prices-search">
@@ -123,6 +148,7 @@ export function IphoneRepairPriceList() {
             onClick={() => {
               setService(key);
               setQuery('');
+              setScreenGrade('all');
             }}
           >
             {SERVICE_META[key].label}
@@ -130,42 +156,65 @@ export function IphoneRepairPriceList() {
         ))}
       </div>
 
+      {service === 'screen' ? (
+        <div className="repair-page__prices-grades" role="group" aria-label="Screen grade">
+          {SCREEN_GRADE_FILTERS.map((grade) => (
+            <button
+              key={grade.key}
+              type="button"
+              className={`repair-page__prices-grade${screenGrade === grade.key ? ' repair-page__prices-grade--active' : ''}`}
+              onClick={() => setScreenGrade(grade.key)}
+            >
+              {grade.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       {rows.length > 0 ? (
         <ul className="repair-page__prices-grid">
-          {rows.map((row) => (
-            <li key={`${service}-${row.model}`}>
-              <article className="repair-page__price-card">
-                <div className="repair-page__price-card-media">
-                  <CloudinaryImage
-                    src={row.imageUrl}
-                    alt={row.model}
-                    preset="productThumb"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 180px"
-                    className="repair-page__price-card-image"
-                    fill
-                  />
-                  <span className="repair-page__price-card-badge">{meta.badge}</span>
-                </div>
-                <div className="repair-page__price-card-body">
-                  <h3 className="repair-page__price-card-name">{row.model}</h3>
-                  <p className="repair-page__price-card-price">{formatRepairKes(row.priceKes)}</p>
-                  <Link
-                    href={repairBookingHref(row.model, service)}
-                    className="repair-page__price-card-book"
-                  >
-                    Book
-                  </Link>
-                </div>
-              </article>
-            </li>
-          ))}
+          {rows.map((row) => {
+            const gradeLabel = row.screenGrade
+              ? IPHONE_SCREEN_GRADE_LABELS[row.screenGrade]
+              : null;
+            return (
+              <li key={`${service}-${row.screenGrade || 'na'}-${row.model}`}>
+                <article className="repair-page__price-card">
+                  <div className="repair-page__price-card-media">
+                    <CloudinaryImage
+                      src={row.imageUrl}
+                      alt={row.model}
+                      preset="productThumb"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 180px"
+                      className="repair-page__price-card-image"
+                      fill
+                    />
+                    <span className="repair-page__price-card-badge">
+                      {gradeLabel || meta.badge}
+                    </span>
+                  </div>
+                  <div className="repair-page__price-card-body">
+                    <h3 className="repair-page__price-card-name">{row.model}</h3>
+                    {gradeLabel ? (
+                      <p className="repair-page__price-card-grade">{gradeLabel}</p>
+                    ) : null}
+                    <p className="repair-page__price-card-price">
+                      {formatRepairKes(row.priceKes)}
+                    </p>
+                    <Link
+                      href={repairBookingHref(row.model, service, row.screenGrade)}
+                      className="repair-page__price-card-book"
+                    >
+                      Book
+                    </Link>
+                  </div>
+                </article>
+              </li>
+            );
+          })}
         </ul>
       ) : (
-        <p className="repair-page__prices-empty">
-          {service === 'screen'
-            ? 'Screen replacement prices coming soon. Choose Battery, or request a quote in the form below.'
-            : 'No models match that search.'}
-        </p>
+        <p className="repair-page__prices-empty">No models match that search.</p>
       )}
     </section>
   );

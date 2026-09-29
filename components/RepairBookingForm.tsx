@@ -9,6 +9,8 @@ import {
   findIphoneScreenPrice,
   formatRepairKes,
   IPHONE_BATTERY_REPLACEMENT_PRICES,
+  IPHONE_SCREEN_GRADE_LABELS,
+  IPHONE_SCREEN_REPLACEMENT_PRICES,
 } from '@/lib/repair/iphoneRepairPrices';
 import { trackGoogleAdsLead } from '@/lib/googleAds';
 
@@ -56,6 +58,8 @@ function buildRepairWhatsAppMessage(fields: {
   issue: string;
   details: string;
   listedPriceKes?: number | null;
+  listedPriceLabel?: string | null;
+  screenGradeLabel?: string | null;
 }): string {
   const lines = [
     "Hi! I'd like to book a repair.",
@@ -65,8 +69,12 @@ function buildRepairWhatsAppMessage(fields: {
     `Device: ${fields.brand} ${fields.model.trim()} (${fields.deviceType})`,
     `Issue: ${fields.issue}`,
   ];
+  if (fields.screenGradeLabel) {
+    lines.push(`Screen grade: ${fields.screenGradeLabel}`);
+  }
   if (fields.listedPriceKes != null) {
-    lines.push(`Listed battery price: ${formatRepairKes(fields.listedPriceKes)}`);
+    const label = fields.listedPriceLabel || 'Listed price';
+    lines.push(`${label}: ${formatRepairKes(fields.listedPriceKes)}`);
   }
   const details = fields.details.trim();
   if (details) {
@@ -75,7 +83,7 @@ function buildRepairWhatsAppMessage(fields: {
   lines.push(
     '',
     fields.listedPriceKes != null
-      ? 'Please confirm this listed battery price after inspection.'
+      ? 'Please confirm this listed price after inspection.'
       : 'Please share a quote after diagnosis.'
   );
   return lines.join('\n');
@@ -127,10 +135,13 @@ export function RepairBookingForm() {
       : null;
   const listedRepairLabel =
     issue === 'Battery replacement'
-      ? 'battery replacement'
+      ? 'Listed battery price'
       : issue === 'Cracked / damaged screen'
-        ? 'screen replacement'
-        : 'repair';
+        ? 'Listed screen price'
+        : 'Listed price';
+  const screenGradeLabel = listedRepair?.screenGrade
+    ? IPHONE_SCREEN_GRADE_LABELS[listedRepair.screenGrade]
+    : null;
 
   const phoneError = validatePhone(phone);
   const nameError = name.trim().length < 2 ? 'Please enter your name' : null;
@@ -159,6 +170,8 @@ export function RepairBookingForm() {
       issue,
       details,
       listedPriceKes: listedRepair?.priceKes ?? null,
+      listedPriceLabel: listedRepairLabel,
+      screenGradeLabel,
     });
     trackGoogleAdsLead({
       leadKey: `repair:${phone.replace(/\D/g, '')}:${brand}:${model}`,
@@ -295,8 +308,13 @@ export function RepairBookingForm() {
             aria-invalid={show(modelError) ? true : undefined}
           />
           <datalist id="repair-iphone-battery-models">
-            {IPHONE_BATTERY_REPLACEMENT_PRICES.map((row) => (
-              <option key={row.model} value={row.model} />
+            {[
+              ...new Set([
+                ...IPHONE_BATTERY_REPLACEMENT_PRICES.map((row) => row.model),
+                ...IPHONE_SCREEN_REPLACEMENT_PRICES.map((row) => row.model),
+              ]),
+            ].map((model) => (
+              <option key={model} value={model} />
             ))}
           </datalist>
           {show(modelError) && (
@@ -351,7 +369,8 @@ export function RepairBookingForm() {
 
       {listedRepair ? (
         <p className="repair-page__listed-price" role="status">
-          Listed iPhone {listedRepairLabel} for <strong>{listedRepair.model}</strong>:{' '}
+          {listedRepairLabel} for <strong>{listedRepair.model}</strong>
+          {screenGradeLabel ? <> ({screenGradeLabel})</> : null}:{' '}
           <strong>{formatRepairKes(listedRepair.priceKes)}</strong>
           <span className="repair-page__listed-price-note">
             {' '}
@@ -368,8 +387,8 @@ export function RepairBookingForm() {
 
       <p className="repair-page__quote-note">
         {listedRepair
-          ? `Continue on WhatsApp with this listed ${listedRepairLabel} price — we confirm after inspecting your iPhone.`
-          : 'Most repairs are quoted after diagnosis on WhatsApp. iPhone battery (and screen) replacements have a listed price guide above when available.'}
+          ? 'Continue on WhatsApp with this listed price — we confirm after inspecting your iPhone.'
+          : 'Most repairs are quoted after diagnosis on WhatsApp. iPhone battery and screen replacements have a listed price guide above when available.'}
       </p>
 
       <button type="submit" className="whatsapp-lead-modal__primary repair-page__submit">

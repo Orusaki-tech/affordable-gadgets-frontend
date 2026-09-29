@@ -4,15 +4,15 @@ import Link from 'next/link';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { RepairBookingForm } from '@/components/RepairBookingForm';
-import { IphoneBatteryPriceList } from '@/components/IphoneBatteryPriceList';
+import { IphoneRepairPriceList } from '@/components/IphoneRepairPriceList';
 import { brandConfig } from '@/lib/config/brand';
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: 'Device Repair Booking · iPhone Battery Prices',
+  title: 'Device Repair Booking · iPhone Battery & Screen Prices',
   description:
-    'Book phone, tablet, laptop, and accessory repairs at Affordable Gadgets KE in Nairobi. See listed iPhone battery replacement prices and get a quote on WhatsApp.',
+    'Book phone, tablet, laptop, and accessory repairs at Affordable Gadgets KE in Nairobi. See listed iPhone battery and screen replacement prices and get a quote on WhatsApp.',
   alternates: {
     canonical: '/repair',
   },
@@ -25,7 +25,7 @@ const STEPS = [
   },
   {
     title: 'Check listed prices',
-    body: 'iPhone battery replacements have published rates below. Other repairs are quoted after diagnosis.',
+    body: 'iPhone battery and screen replacements have published rates below when available.',
   },
   {
     title: 'Continue on WhatsApp',
@@ -53,17 +53,17 @@ export default function RepairPage() {
             <h1 className="repair-page__title">Book a device repair</h1>
             <p className="repair-page__lead">
               Screens, batteries, charging ports, and more — for phones, tablets, laptops, and
-              accessories we sell. Browse listed iPhone battery prices, or request a quote on
+              accessories we sell. Browse listed iPhone repair prices, or request a quote on
               WhatsApp after diagnosis.
             </p>
             <ul className="repair-page__meta" aria-label="Shop details">
               <li>{brandConfig.business.address.streetAddress}, Nairobi</li>
-              <li>iPhone batteries · Listed prices</li>
+              <li>iPhone battery &amp; screen · Listed prices</li>
               <li>Other repairs · Quote after diagnosis</li>
             </ul>
             <p className="repair-page__hero-cta">
-              <Link href="#iphone-battery-prices" className="repair-page__hero-link">
-                View iPhone battery prices
+              <Link href="#iphone-repair-prices" className="repair-page__hero-link">
+                View iPhone repair prices
               </Link>
             </p>
           </div>
@@ -84,7 +84,7 @@ export default function RepairPage() {
             ))}
           </ol>
 
-          <IphoneBatteryPriceList />
+          <IphoneRepairPriceList />
 
           <div className="repair-page__panel">
             <h2 className="repair-page__panel-title">Request a repair</h2>

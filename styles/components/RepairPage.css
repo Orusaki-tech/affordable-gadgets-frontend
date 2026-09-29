@@ -138,36 +138,80 @@
   width: 100%;
 }
 
-.repair-page__prices-carousel {
-  width: 100%;
-  margin-top: 0.25rem;
+.repair-page__prices-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1.15rem;
 }
 
-.repair-page__prices-carousel .product-carousel__item {
-  height: 100%;
+.repair-page__prices-tab {
+  appearance: none;
+  border: 1px solid var(--border-hairline);
+  background: #fff;
+  color: var(--on-surface);
+  border-radius: 9999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.repair-page__battery-card {
-  height: 100%;
+.repair-page__prices-tab--active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--promo-lime);
 }
 
-.repair-page__battery-card .product-card__footer--featured {
+.repair-page__prices-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .repair-page__prices-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .repair-page__prices-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.repair-page__price-card {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.65rem 0.75rem 0.8rem;
+  height: 100%;
+  border: 1px solid var(--border-hairline);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
 }
 
-.repair-page__battery-card .product-card__buy-btn--featured {
-  text-decoration: none;
+.repair-page__price-card-media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: #f7f7f7;
 }
 
-.repair-page__battery-badge {
+.repair-page__price-card-image {
+  object-fit: contain;
+  object-position: center;
+}
+
+.repair-page__price-card-badge {
   position: absolute;
-  top: 0.65rem;
-  left: 0.65rem;
-  z-index: 2;
-  padding: 0.25rem 0.5rem;
+  top: 0.55rem;
+  left: 0.55rem;
+  z-index: 1;
+  padding: 0.22rem 0.45rem;
   border-radius: 6px;
   background: #030304;
   color: #fff;
@@ -177,43 +221,48 @@
   text-transform: uppercase;
 }
 
-.repair-page__battery-price {
+.repair-page__price-card-body {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0.8rem 0.9rem;
+  flex: 1;
 }
 
-.repair-page__battery-price-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--on-surface-variant);
+.repair-page__price-card-name {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--on-surface);
 }
 
-.repair-page__battery-price-value {
-  font-size: 0.9375rem;
+.repair-page__price-card-price {
+  margin: 0;
+  font-size: 1rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: var(--on-surface);
 }
 
-/* Keep name + Book + price visible — do not use shop hover overlay. */
-@media (min-width: 1024px) {
-  .repair-page__battery-card:hover .product-card__footer--featured {
-    top: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    border-radius: 0 0 16px 16px;
-    padding: 0.65rem 0.75rem 0.8rem;
-    box-shadow: none;
-  }
+.repair-page__price-card-book {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--primary-dark);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  text-decoration: none;
+  background: transparent;
+}
 
-  .repair-page__battery-card:hover .product-card__footer-bar {
-    display: flex;
-  }
+.repair-page__price-card-book:hover {
+  background: color-mix(in srgb, var(--promo-lime) 40%, #fff);
 }
 
 .repair-page__prices-empty {
@@ -221,6 +270,8 @@
   padding: 1rem 0.9rem;
   font-size: 0.875rem;
   color: var(--on-surface-variant);
+  border: 1px dashed var(--border-hairline);
+  border-radius: 12px;
 }
 
 .repair-page__listed-price {

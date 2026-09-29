@@ -6,9 +6,10 @@ import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { allBrandNavItems } from '@/lib/config/nav-links';
 import {
   findIphoneBatteryPrice,
+  findIphoneScreenPrice,
   formatRepairKes,
   IPHONE_BATTERY_REPLACEMENT_PRICES,
-} from '@/lib/repair/iphoneBatteryPrices';
+} from '@/lib/repair/iphoneRepairPrices';
 import { trackGoogleAdsLead } from '@/lib/googleAds';
 
 const DEVICE_TYPES = [
@@ -116,10 +117,20 @@ export function RepairBookingForm() {
     document.getElementById('repair-request')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
 
-  const listedBattery =
-    issue === 'Battery replacement' && brand.toLowerCase() === 'apple'
-      ? findIphoneBatteryPrice(model)
+  const listedRepair =
+    brand.toLowerCase() === 'apple'
+      ? issue === 'Battery replacement'
+        ? findIphoneBatteryPrice(model)
+        : issue === 'Cracked / damaged screen'
+          ? findIphoneScreenPrice(model)
+          : null
       : null;
+  const listedRepairLabel =
+    issue === 'Battery replacement'
+      ? 'battery replacement'
+      : issue === 'Cracked / damaged screen'
+        ? 'screen replacement'
+        : 'repair';
 
   const phoneError = validatePhone(phone);
   const nameError = name.trim().length < 2 ? 'Please enter your name' : null;
@@ -147,11 +158,11 @@ export function RepairBookingForm() {
       model,
       issue,
       details,
-      listedPriceKes: listedBattery?.priceKes ?? null,
+      listedPriceKes: listedRepair?.priceKes ?? null,
     });
     trackGoogleAdsLead({
       leadKey: `repair:${phone.replace(/\D/g, '')}:${brand}:${model}`,
-      value: listedBattery?.priceKes ?? undefined,
+      value: listedRepair?.priceKes ?? undefined,
     });
     window.open(getBusinessWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
   };
@@ -338,10 +349,10 @@ export function RepairBookingForm() {
         </div>
       </div>
 
-      {listedBattery ? (
+      {listedRepair ? (
         <p className="repair-page__listed-price" role="status">
-          Listed iPhone battery replacement for <strong>{listedBattery.model}</strong>:{' '}
-          <strong>{formatRepairKes(listedBattery.priceKes)}</strong>
+          Listed iPhone {listedRepairLabel} for <strong>{listedRepair.model}</strong>:{' '}
+          <strong>{formatRepairKes(listedRepair.priceKes)}</strong>
           <span className="repair-page__listed-price-note">
             {' '}
             — confirmed after inspection at drop-off.
@@ -356,9 +367,9 @@ export function RepairBookingForm() {
       )}
 
       <p className="repair-page__quote-note">
-        {listedBattery
-          ? 'Continue on WhatsApp with this listed battery price — we confirm after inspecting your iPhone.'
-          : 'Most repairs are quoted after diagnosis on WhatsApp. iPhone battery replacements have a listed price guide above.'}
+        {listedRepair
+          ? `Continue on WhatsApp with this listed ${listedRepairLabel} price — we confirm after inspecting your iPhone.`
+          : 'Most repairs are quoted after diagnosis on WhatsApp. iPhone battery (and screen) replacements have a listed price guide above when available.'}
       </p>
 
       <button type="submit" className="whatsapp-lead-modal__primary repair-page__submit">

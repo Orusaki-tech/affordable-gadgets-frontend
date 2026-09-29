@@ -60,8 +60,8 @@ export function HomeRepairPromo() {
               Book a repair
               <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
             </Link>
-            <Link href="/repair#iphone-battery-prices" className="ag-btn ag-btn--ghost">
-              iPhone battery prices
+            <Link href="/repair#iphone-repair-prices" className="ag-btn ag-btn--ghost">
+              iPhone repair prices
             </Link>
           </div>
         </div>

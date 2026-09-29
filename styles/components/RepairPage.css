@@ -259,6 +259,21 @@
 
 /* Product-card-like repair model tiles */
 .repair-page__model-card {
+  --repair-card-pad: clamp(0.45rem, 3.6cqi, 0.85rem);
+  --repair-card-gap: clamp(0.25rem, 2.2cqi, 0.55rem);
+  --repair-card-name: clamp(0.7rem, 5.4cqi, 0.95rem);
+  --repair-card-label: clamp(0.65rem, 4.6cqi, 0.8125rem);
+  --repair-card-price: clamp(0.6rem, 4.1cqi, 0.75rem);
+  --repair-card-meta: clamp(0.55rem, 3.4cqi, 0.6875rem);
+  --repair-card-total: clamp(0.75rem, 5.8cqi, 1rem);
+  --repair-card-btn: clamp(0.65rem, 4.2cqi, 0.8125rem);
+  --repair-card-btn-pad-y: clamp(0.2rem, 1.4cqi, 0.35rem);
+  --repair-card-btn-pad-x: clamp(0.4rem, 2.8cqi, 0.7rem);
+  --repair-card-option-pad: clamp(0.28rem, 2.2cqi, 0.45rem);
+  --repair-card-radius: clamp(6px, 2.5cqi, 10px);
+
+  container-type: inline-size;
+  container-name: repair-card;
   position: relative;
   display: grid;
   grid-template-rows: 1fr;
@@ -358,17 +373,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.625rem 0.75rem;
+  gap: clamp(0.35rem, 2.5cqi, 0.6rem);
+  padding: clamp(0.45rem, 3.2cqi, 0.7rem) clamp(0.55rem, 3.6cqi, 0.8rem);
 }
 
 .repair-page__model-card-name {
   margin: 0;
   flex: 1;
   min-width: 0;
-  font-size: 0.8125rem;
+  font-size: var(--repair-card-name);
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.25;
   color: var(--ui-gray-900, #111);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -380,13 +395,13 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  padding: 0.25rem 0.625rem;
-  font-size: 0.75rem;
+  padding: var(--repair-card-btn-pad-y) var(--repair-card-btn-pad-x);
+  font-size: var(--repair-card-btn);
   font-weight: 600;
   color: var(--primary-dark, #121212);
   background: transparent;
   border: 1px solid var(--primary-dark, #121212);
-  border-radius: 6px;
+  border-radius: calc(var(--repair-card-radius) - 2px);
   cursor: pointer;
   transition: background 200ms, color 200ms;
 }
@@ -398,11 +413,11 @@
 .repair-page__model-card-overlay {
   display: none;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: var(--repair-card-gap);
   height: 100%;
   min-height: 0;
   min-width: 0;
-  padding: 0.7rem;
+  padding: var(--repair-card-pad);
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -411,7 +426,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: clamp(0.35rem, 2.5cqi, 0.6rem);
   min-width: 0;
 }
 
@@ -419,9 +434,9 @@
   margin: 0;
   flex: 1;
   min-width: 0;
-  font-size: 0.8125rem;
+  font-size: var(--repair-card-name);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
   color: var(--ui-gray-900, #111);
   white-space: normal;
   overflow-wrap: break-word;
@@ -430,7 +445,7 @@
 
 .repair-page__model-card-overlay-title {
   margin: 0;
-  font-size: 0.625rem;
+  font-size: var(--repair-card-meta);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -439,26 +454,28 @@
 
 .repair-page__model-card-options {
   display: grid;
-  gap: 0.3rem;
+  gap: clamp(0.2rem, 1.8cqi, 0.4rem);
   min-width: 0;
 }
 
 .repair-page__model-card-option {
   display: flex;
   align-items: flex-start;
-  gap: 0.4rem;
+  gap: clamp(0.3rem, 2cqi, 0.45rem);
   margin: 0;
-  padding: 0.35rem 0.45rem;
+  padding: var(--repair-card-option-pad);
   border: 1px solid var(--border-hairline, #e5e7eb);
-  border-radius: 8px;
+  border-radius: var(--repair-card-radius);
   background: #fafafa;
   cursor: pointer;
   min-width: 0;
 }
 
 .repair-page__model-card-option input {
-  margin-top: 0.1rem;
+  margin-top: 0.05rem;
   flex-shrink: 0;
+  width: clamp(0.85rem, 5cqi, 1rem);
+  height: clamp(0.85rem, 5cqi, 1rem);
   accent-color: var(--primary-dark, #121212);
 }
 
@@ -473,14 +490,14 @@
 }
 
 .repair-page__model-card-option-label {
-  font-size: 0.75rem;
+  font-size: var(--repair-card-label);
   font-weight: 700;
   color: var(--on-surface);
   line-height: 1.2;
 }
 
 .repair-page__model-card-option-price {
-  font-size: 0.6875rem;
+  font-size: var(--repair-card-price);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--on-surface-variant);
@@ -498,10 +515,10 @@
   max-width: 100%;
   appearance: none;
   border: 1px solid var(--border-hairline, #e5e7eb);
-  border-radius: 8px;
+  border-radius: var(--repair-card-radius);
   background: #fff;
-  padding: 0.35rem 0.5rem;
-  font-size: 0.6875rem;
+  padding: clamp(0.28rem, 2cqi, 0.4rem) clamp(0.4rem, 2.6cqi, 0.55rem);
+  font-size: var(--repair-card-price);
   font-weight: 600;
   color: var(--on-surface);
 }
@@ -510,12 +527,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: clamp(0.35rem, 2.5cqi, 0.55rem);
   width: 100%;
   margin-top: auto;
-  padding: 0.5rem 0.65rem;
+  padding: clamp(0.4rem, 2.8cqi, 0.6rem) clamp(0.5rem, 3.2cqi, 0.75rem);
   border: 1px solid var(--primary-dark, #121212);
-  border-radius: 8px;
+  border-radius: var(--repair-card-radius);
   background: var(--primary-dark, #121212);
   color: #fff;
   cursor: pointer;
@@ -525,7 +542,7 @@
 }
 
 .repair-page__model-card-total span {
-  font-size: 0.6875rem;
+  font-size: var(--repair-card-meta);
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -534,7 +551,7 @@
 }
 
 .repair-page__model-card-total strong {
-  font-size: 0.875rem;
+  font-size: var(--repair-card-total);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

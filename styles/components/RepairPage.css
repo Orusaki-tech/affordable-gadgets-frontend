@@ -138,72 +138,82 @@
   width: 100%;
 }
 
-.repair-page__prices-table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--border-hairline);
-  border-radius: 12px;
-}
-
-.repair-page__prices-table {
+.repair-page__prices-carousel {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9375rem;
+  margin-top: 0.25rem;
 }
 
-.repair-page__prices-table th,
-.repair-page__prices-table td {
-  padding: 0.7rem 0.9rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border-hairline);
+.repair-page__prices-carousel .product-carousel__item {
+  height: 100%;
 }
 
-.repair-page__prices-table thead th {
-  font-size: 0.75rem;
+.repair-page__battery-card {
+  height: 100%;
+}
+
+.repair-page__battery-card .product-card__footer--featured {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.65rem 0.75rem 0.8rem;
+}
+
+.repair-page__battery-card .product-card__buy-btn--featured {
+  text-decoration: none;
+}
+
+.repair-page__battery-badge {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: #030304;
+  color: #fff;
+  font-size: 0.625rem;
   font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.repair-page__battery-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.repair-page__battery-price-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--on-surface-variant);
-  background: color-mix(in srgb, var(--surface-canvas) 70%, #fff);
 }
 
-.repair-page__prices-table tbody th {
-  font-weight: 600;
-  color: var(--on-surface);
-}
-
-.repair-page__prices-table tbody td {
+.repair-page__battery-price-value {
+  font-size: 0.9375rem;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
   color: var(--on-surface);
-  white-space: nowrap;
 }
 
-.repair-page__prices-table tbody tr:nth-child(even) {
-  background: color-mix(in srgb, var(--surface-canvas) 55%, #fff);
-}
+/* Keep name + Book + price visible — do not use shop hover overlay. */
+@media (min-width: 1024px) {
+  .repair-page__battery-card:hover .product-card__footer--featured {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0 0 16px 16px;
+    padding: 0.65rem 0.75rem 0.8rem;
+    box-shadow: none;
+  }
 
-.repair-page__prices-table tbody tr:last-child th,
-.repair-page__prices-table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.repair-page__prices-book {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.35rem 0.7rem;
-  border-radius: 9999px;
-  border: 1px solid var(--border-hairline);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--primary);
-  text-decoration: none;
-  background: #fff;
-}
-
-.repair-page__prices-book:hover {
-  border-color: var(--primary);
-  background: color-mix(in srgb, var(--promo-lime) 35%, #fff);
+  .repair-page__battery-card:hover .product-card__footer-bar {
+    display: flex;
+  }
 }
 
 .repair-page__prices-empty {

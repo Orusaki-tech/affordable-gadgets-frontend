@@ -29,7 +29,15 @@ function toImageList(images?: StudioProduct['images']): StudioProductImage[] {
       image_url: img.image_url,
       image: img.image,
       is_primary: img.is_primary,
-    }));
+      alt_text: img.alt_text,
+      display_order: img.display_order,
+    }))
+    .sort((a, b) => {
+      if (Boolean(a.is_primary) !== Boolean(b.is_primary)) {
+        return a.is_primary ? -1 : 1;
+      }
+      return (a.display_order ?? 0) - (b.display_order ?? 0) || a.id - b.id;
+    });
 }
 
 export function StudioProductImages({
@@ -123,7 +131,9 @@ export function StudioProductImages({
   return (
     <div className="studio-images">
       <div className="studio-images__head">
-        <h3 className="studio-images__title">Product images</h3>
+        <h3 className="studio-images__title">
+          Product images{images.length > 0 ? ` (${images.length})` : ''}
+        </h3>
         <label className="studio-btn studio-btn--ghost studio-images__upload">
           {busy ? 'Working…' : 'Add images'}
           <input

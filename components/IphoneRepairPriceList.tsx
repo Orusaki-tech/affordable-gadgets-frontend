@@ -1,23 +1,22 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
+import { RepairBookingForm, type RepairBookingPreset } from '@/components/RepairBookingForm';
 import { OpenAPI } from '@/lib/api/generated';
 import { apiBaseUrl } from '@/lib/api/openapi';
 import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
 import {
-  IPHONE_BATTERY_REPLACEMENT_PRICES,
   IPHONE_SCREEN_GRADE_LABELS,
-  IPHONE_SCREEN_REPLACEMENT_PRICES,
+  buildIphoneRepairModelOffers,
   findCatalogImageForRepairModel,
   formatRepairKes,
-  repairBookingHref,
   type CatalogImageSource,
-  type IphoneRepairPrice,
+  type IphoneRepairModelOffer,
   type IphoneRepairService,
   type IphoneScreenGrade,
+  type RepairLineItem,
 } from '@/lib/repair/iphoneRepairPrices';
 
 async function fetchIphoneCatalogImages(): Promise<CatalogImageSource[]> {
@@ -39,72 +38,267 @@ async function fetchIphoneCatalogImages(): Promise<CatalogImageSource[]> {
   return (data.results ?? []).filter((p) => /iphone/i.test(p.product_name || ''));
 }
 
-const SERVICE_META: Record<
-  IphoneRepairService,
-  {
-    label: string;
-    eyebrow: string;
-    title: string;
-    badge: string;
-    prices: readonly IphoneRepairPrice[];
-  }
-> = {
-  battery: {
-    label: 'Battery',
-    eyebrow: 'Apple · Battery',
-    title: 'iPhone battery replacement prices',
-    badge: 'Battery',
-    prices: IPHONE_BATTERY_REPLACEMENT_PRICES,
-  },
-  screen: {
-    label: 'Screen',
-    eyebrow: 'Apple · Screen',
-    title: 'iPhone screen replacement prices',
-    badge: 'Screen',
-    prices: IPHONE_SCREEN_REPLACEMENT_PRICES,
-  },
+type CardSelection = {
+  battery: boolean;
+  screen: boolean;
+  screenGrade: IphoneScreenGrade | null;
 };
 
-const SCREEN_GRADE_FILTERS: Array<{ key: 'all' | IphoneScreenGrade; label: string }> = [
-  { key: 'all', label: 'All grades' },
-  { key: 'HX', label: 'HX original' },
-  { key: 'DD', label: 'DD original' },
-  { key: 'GX', label: 'GX original' },
-];
+function defaultSelection(offer: IphoneRepairModelOffer): CardSelection {
+  const firstScreen = offer.screens[0] ?? null;
+  return {
+    battery: Boolean(offer.battery),
+    screen: !offer.battery && offer.screens.length > 0,
+    screenGrade: firstScreen?.screenGrade ?? null,
+  };
+}
+
+function lineItemsFor(
+  offer: IphoneRepairModelOffer,
+  selection: CardSelection
+): RepairLineItem[] {
+  const items: RepairLineItem[] = [];
+  if (selection.battery && offer.battery) {
+    items.push({
+      service: 'battery',
+      label: 'Battery',
+      priceKes: offer.battery.priceKes,
+    });
+  }
+  if (selection.screen && offer.screens.length > 0) {
+    const screen =
+      offer.screens.find((row) => row.screenGrade === selection.screenGrade) ||
+      offer.screens[0];
+    const grade = screen.screenGrade
+      ? IPHONE_SCREEN_GRADE_LABELS[screen.screenGrade]
+      : 'Screen';
+    items.push({
+      service: 'screen',
+      label: `Screen · ${grade}`,
+      priceKes: screen.priceKes,
+      screenGrade: screen.screenGrade,
+    });
+  }
+  return items;
+}
+
+function RepairModelCard({
+  offer,
+  imageUrl,
+  onRequestRepair,
+}: {
+  offer: IphoneRepairModelOffer;
+  imageUrl: string;
+  onRequestRepair: (preset: RepairBookingPreset) => void;
+}) {
+  const [selection, setSelection] = useState<CardSelection>(() => defaultSelection(offer));
+  const [expanded, setExpanded] = useState(false);
+
+  const items = useMemo(() => lineItemsFor(offer, selection), [offer, selection]);
+  const totalKes = items.reduce((sum, item) => sum + item.priceKes, 0);
+  const canBook = items.length > 0 && totalKes > 0;
+
+  const openBooking = () => {
+    if (!canBook) return;
+    const services = items.map((item) => item.service);
+    onRequestRepair({
+      model: offer.model,
+      brand: 'Apple',
+      deviceType: 'Phone',
+      services,
+      screenGrade: items.find((item) => item.service === 'screen')?.screenGrade,
+      lineItems: items,
+      totalKes,
+    });
+  };
+
+  const toggleService = (service: IphoneRepairService) => {
+    setSelection((prev) => {
+      if (service === 'battery') {
+        const nextBattery = !prev.battery;
+        // Keep at least one option selected when possible
+        if (!nextBattery && !prev.screen && offer.screens.length > 0) {
+          return {
+            ...prev,
+            battery: false,
+            screen: true,
+            screenGrade: prev.screenGrade || offer.screens[0]?.screenGrade || null,
+          };
+        }
+        if (!nextBattery && !prev.screen) return prev;
+        return { ...prev, battery: nextBattery };
+      }
+
+      const nextScreen = !prev.screen;
+      if (!nextScreen && !prev.battery && offer.battery) {
+        return { ...prev, screen: false, battery: true };
+      }
+      if (!nextScreen && !prev.battery) return prev;
+      return {
+        ...prev,
+        screen: nextScreen,
+        screenGrade: prev.screenGrade || offer.screens[0]?.screenGrade || null,
+      };
+    });
+  };
+
+  return (
+    <article
+      className={`repair-page__model-card${expanded ? ' repair-page__model-card--expanded' : ''}`}
+      onMouseEnter={() => setExpanded(true)}
+      onMouseLeave={() => setExpanded(false)}
+      onFocus={() => setExpanded(true)}
+      onClick={() => setExpanded(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+          setExpanded(false);
+        }
+      }}
+    >
+      <div className="repair-page__model-card-media">
+        <CloudinaryImage
+          src={imageUrl}
+          alt={offer.model}
+          preset="productThumb"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 220px"
+          className="repair-page__model-card-image"
+          fill
+        />
+      </div>
+
+      <div className="repair-page__model-card-footer">
+        <div className="repair-page__model-card-bar">
+          <h3 className="repair-page__model-card-name">{offer.model}</h3>
+          <button
+            type="button"
+            className="repair-page__model-card-buy"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!expanded) {
+                setExpanded(true);
+                return;
+              }
+              openBooking();
+            }}
+          >
+            Book
+          </button>
+        </div>
+
+        <div className="repair-page__model-card-overlay" aria-hidden={!expanded}>
+          <p className="repair-page__model-card-overlay-title">Repair options</p>
+
+          <div className="repair-page__model-card-options" role="group" aria-label={`${offer.model} repairs`}>
+            {offer.battery ? (
+              <label className="repair-page__model-card-option">
+                <input
+                  type="checkbox"
+                  checked={selection.battery}
+                  onChange={() => toggleService('battery')}
+                />
+                <span className="repair-page__model-card-option-copy">
+                  <span className="repair-page__model-card-option-label">Battery</span>
+                  <span className="repair-page__model-card-option-price">
+                    {formatRepairKes(offer.battery.priceKes)}
+                  </span>
+                </span>
+              </label>
+            ) : null}
+
+            {offer.screens.length > 0 ? (
+              <label className="repair-page__model-card-option">
+                <input
+                  type="checkbox"
+                  checked={selection.screen}
+                  onChange={() => toggleService('screen')}
+                />
+                <span className="repair-page__model-card-option-copy">
+                  <span className="repair-page__model-card-option-label">Screen</span>
+                  <span className="repair-page__model-card-option-price">
+                    {formatRepairKes(
+                      (
+                        offer.screens.find((row) => row.screenGrade === selection.screenGrade) ||
+                        offer.screens[0]
+                      ).priceKes
+                    )}
+                  </span>
+                </span>
+              </label>
+            ) : null}
+          </div>
+
+          {selection.screen && offer.screens.length > 1 ? (
+            <label className="repair-page__model-card-grade">
+              <span className="sr-only">Screen grade</span>
+              <select
+                className="repair-page__model-card-grade-select"
+                value={selection.screenGrade ?? offer.screens[0]?.screenGrade ?? ''}
+                onChange={(e) =>
+                  setSelection((prev) => ({
+                    ...prev,
+                    screenGrade: e.target.value as IphoneScreenGrade,
+                  }))
+                }
+              >
+                {offer.screens.map((row) => (
+                  <option key={`${row.model}-${row.screenGrade}`} value={row.screenGrade}>
+                    {row.screenGrade
+                      ? IPHONE_SCREEN_GRADE_LABELS[row.screenGrade]
+                      : 'Screen'}{' '}
+                    · {formatRepairKes(row.priceKes)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
+          <button
+            type="button"
+            className="repair-page__model-card-total"
+            disabled={!canBook}
+            onClick={openBooking}
+          >
+            <span>Total</span>
+            <strong>{canBook ? formatRepairKes(totalKes) : '—'}</strong>
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 export function IphoneRepairPriceList() {
-  const [service, setService] = useState<IphoneRepairService>('battery');
-  const [screenGrade, setScreenGrade] = useState<'all' | IphoneScreenGrade>('all');
   const [query, setQuery] = useState('');
+  const [bookingPreset, setBookingPreset] = useState<RepairBookingPreset | null>(null);
   const catalogQuery = useQuery({
     queryKey: ['repair', 'iphone-catalog-images'],
     queryFn: fetchIphoneCatalogImages,
     staleTime: 10 * 60 * 1000,
   });
 
-  const meta = SERVICE_META[service];
+  const offers = useMemo(() => buildIphoneRepairModelOffers(), []);
 
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let base = meta.prices;
-    if (service === 'screen' && screenGrade !== 'all') {
-      base = base.filter((row) => row.screenGrade === screenGrade);
-    }
-    if (q) {
-      base = base.filter(
-        (row) =>
-          row.model.toLowerCase().includes(q) ||
-          (row.screenGrade && row.screenGrade.toLowerCase().includes(q))
-      );
-    }
     const products = catalogQuery.data ?? [];
-    return base.map((row) => ({
-      ...row,
-      imageUrl:
-        findCatalogImageForRepairModel(row.model, products) ||
-        getPlaceholderProductImage(row.model),
-    }));
-  }, [query, meta.prices, catalogQuery.data, service, screenGrade]);
+    return offers
+      .filter((offer) => !q || offer.model.toLowerCase().includes(q))
+      .map((offer) => ({
+        ...offer,
+        imageUrl:
+          findCatalogImageForRepairModel(offer.model, products) ||
+          getPlaceholderProductImage(offer.model),
+      }));
+  }, [offers, query, catalogQuery.data]);
+
+  useEffect(() => {
+    if (!bookingPreset) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [bookingPreset]);
 
   return (
     <section
@@ -114,14 +308,13 @@ export function IphoneRepairPriceList() {
     >
       <div className="repair-page__prices-header">
         <div>
-          <p className="repair-page__prices-eyebrow">{meta.eyebrow}</p>
+          <p className="repair-page__prices-eyebrow">Apple · iPhone</p>
           <h2 id="iphone-repair-prices-title" className="repair-page__prices-title">
-            {meta.title}
+            iPhone repair prices
           </h2>
           <p className="repair-page__prices-sub">
-            {service === 'screen'
-              ? 'Original HX, DD, and GX screens. Diagnosable units may show as used after install. Confirm on WhatsApp before we start work.'
-              : 'Listed rates for drop-off at our Nairobi CBD shop. Confirm on WhatsApp before we start work — parts and labour may vary after inspection.'}
+            Hover a model to choose battery and/or screen, then tap the total to request a repair.
+            Listed rates are for drop-off at our Nairobi CBD shop and may vary after inspection.
           </p>
         </div>
         <label className="repair-page__prices-search">
@@ -137,85 +330,58 @@ export function IphoneRepairPriceList() {
         </label>
       </div>
 
-      <div className="repair-page__prices-tabs" role="tablist" aria-label="Repair type">
-        {(['battery', 'screen'] as const).map((key) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={service === key}
-            className={`repair-page__prices-tab${service === key ? ' repair-page__prices-tab--active' : ''}`}
-            onClick={() => {
-              setService(key);
-              setQuery('');
-              setScreenGrade('all');
-            }}
-          >
-            {SERVICE_META[key].label}
-          </button>
-        ))}
-      </div>
-
-      {service === 'screen' ? (
-        <div className="repair-page__prices-grades" role="group" aria-label="Screen grade">
-          {SCREEN_GRADE_FILTERS.map((grade) => (
-            <button
-              key={grade.key}
-              type="button"
-              className={`repair-page__prices-grade${screenGrade === grade.key ? ' repair-page__prices-grade--active' : ''}`}
-              onClick={() => setScreenGrade(grade.key)}
-            >
-              {grade.label}
-            </button>
-          ))}
-        </div>
-      ) : null}
-
       {rows.length > 0 ? (
         <ul className="repair-page__prices-grid">
-          {rows.map((row) => {
-            const gradeLabel = row.screenGrade
-              ? IPHONE_SCREEN_GRADE_LABELS[row.screenGrade]
-              : null;
-            return (
-              <li key={`${service}-${row.screenGrade || 'na'}-${row.model}`}>
-                <article className="repair-page__price-card">
-                  <div className="repair-page__price-card-media">
-                    <CloudinaryImage
-                      src={row.imageUrl}
-                      alt={row.model}
-                      preset="productThumb"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 180px"
-                      className="repair-page__price-card-image"
-                      fill
-                    />
-                    <span className="repair-page__price-card-badge">
-                      {gradeLabel || meta.badge}
-                    </span>
-                  </div>
-                  <div className="repair-page__price-card-body">
-                    <h3 className="repair-page__price-card-name">{row.model}</h3>
-                    {gradeLabel ? (
-                      <p className="repair-page__price-card-grade">{gradeLabel}</p>
-                    ) : null}
-                    <p className="repair-page__price-card-price">
-                      {formatRepairKes(row.priceKes)}
-                    </p>
-                    <Link
-                      href={repairBookingHref(row.model, service, row.screenGrade)}
-                      className="repair-page__price-card-book"
-                    >
-                      Book
-                    </Link>
-                  </div>
-                </article>
-              </li>
-            );
-          })}
+          {rows.map((row) => (
+            <li key={row.model}>
+              <RepairModelCard
+                offer={row}
+                imageUrl={row.imageUrl}
+                onRequestRepair={setBookingPreset}
+              />
+            </li>
+          ))}
         </ul>
       ) : (
         <p className="repair-page__prices-empty">No models match that search.</p>
       )}
+
+      {bookingPreset ? (
+        <div
+          className="checkout-modal repair-page__booking-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="repair-booking-modal-title"
+          onClick={() => setBookingPreset(null)}
+        >
+          <div
+            className="checkout-modal__panel repair-page__booking-modal-panel"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="checkout-modal__close"
+              aria-label="Close repair request"
+              onClick={() => setBookingPreset(null)}
+            >
+              <svg className="checkout-modal__close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h2 id="repair-booking-modal-title" className="checkout-modal__title">
+              Request a repair
+            </h2>
+            <p className="repair-page__booking-modal-sub">
+              Confirm your details and continue on WhatsApp — we&apos;ll take it from there.
+            </p>
+            <RepairBookingForm
+              key={`${bookingPreset.model}-${bookingPreset.totalKes}-${bookingPreset.services.join(',')}`}
+              preset={bookingPreset}
+              onSubmitted={() => setBookingPreset(null)}
+            />
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

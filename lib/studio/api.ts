@@ -194,6 +194,8 @@ export type StudioProduct = {
     image_url?: string;
     image?: string;
     is_primary?: boolean;
+    alt_text?: string;
+    display_order?: number;
   }>;
   videos?: Array<{
     id?: number;

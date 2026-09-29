@@ -143,6 +143,66 @@ export function findIphoneRepairPrice(
   return service === 'screen' ? findIphoneScreenPrice(model) : findIphoneBatteryPrice(model);
 }
 
+/** One storefront card per iPhone model with available battery / screen offers. */
+export type IphoneRepairModelOffer = {
+  model: string;
+  battery: IphoneRepairPrice | null;
+  screens: readonly IphoneRepairPrice[];
+};
+
+export function buildIphoneRepairModelOffers(): IphoneRepairModelOffer[] {
+  type MutableOffer = {
+    model: string;
+    battery: IphoneRepairPrice | null;
+    screens: IphoneRepairPrice[];
+  };
+
+  const byKey = new Map<string, MutableOffer>();
+
+  const ensure = (model: string): MutableOffer => {
+    const key = iphoneModelKey(model) || model.toLowerCase();
+    let row = byKey.get(key);
+    if (!row) {
+      row = { model, battery: null, screens: [] };
+      byKey.set(key, row);
+    }
+    return row;
+  };
+
+  for (const row of IPHONE_BATTERY_REPLACEMENT_PRICES) {
+    const offer = ensure(row.model);
+    offer.battery = row;
+    offer.model = row.model;
+  }
+
+  for (const row of IPHONE_SCREEN_REPLACEMENT_PRICES) {
+    const offer = ensure(row.model);
+    offer.model = row.model;
+    offer.screens.push(row);
+  }
+
+  return Array.from(byKey.values()).sort((a, b) => {
+    const ak = iphoneModelKey(a.model) || a.model;
+    const bk = iphoneModelKey(b.model) || b.model;
+    return ak.localeCompare(bk, undefined, { numeric: true });
+  });
+}
+
+export type RepairLineItem = {
+  service: IphoneRepairService;
+  label: string;
+  priceKes: number;
+  screenGrade?: IphoneScreenGrade;
+};
+
+export function repairIssueForServices(services: readonly IphoneRepairService[]): string {
+  const hasBattery = services.includes('battery');
+  const hasScreen = services.includes('screen');
+  if (hasBattery && hasScreen) return 'Battery replacement';
+  if (hasScreen) return 'Cracked / damaged screen';
+  return 'Battery replacement';
+}
+
 export type CatalogImageSource = {
   product_name?: string | null;
   primary_image?: string | null;

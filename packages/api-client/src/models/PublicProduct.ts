@@ -53,6 +53,17 @@ export type PublicProduct = {
     readonly average_rating?: number;
     readonly primary_image?: string | null;
     /**
+     * All product gallery images (detail / slug responses). Primary first.
+     */
+    readonly images?: Array<{
+        id?: number;
+        image_url?: string | null;
+        is_primary?: boolean;
+        alt_text?: string;
+        image_caption?: string;
+        display_order?: number;
+    }>;
+    /**
      * URL-friendly slug (auto-generated from product_name if not provided)
      */
     slug?: string;

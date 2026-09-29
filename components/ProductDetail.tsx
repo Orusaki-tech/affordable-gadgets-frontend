@@ -441,46 +441,57 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     });
   }, [activeBundles]);
 
-  // Product images - include product primary image and all unit images
+  // Product images — all product gallery photos, then unique unit/color images
   const productImages = useMemo(() => {
     const images: string[] = [];
-    
-    // Add product primary image first (or placeholder)
-    if (product?.primary_image) {
-      images.push(product.primary_image);
-    } else if (product) {
-      images.push(getPlaceholderProductImage(product.product_name));
+    const seen = new Set<string>();
+
+    const addUrl = (url?: string | null) => {
+      const trimmed = typeof url === 'string' ? url.trim() : '';
+      if (!trimmed || seen.has(trimmed)) return;
+      seen.add(trimmed);
+      images.push(trimmed);
+    };
+
+    const gallery = Array.isArray(product?.images) ? [...product.images] : [];
+    gallery.sort((a, b) => {
+      if (Boolean(a.is_primary) !== Boolean(b.is_primary)) {
+        return a.is_primary ? -1 : 1;
+      }
+      return (a.display_order ?? 0) - (b.display_order ?? 0);
+    });
+    gallery.forEach((img) => addUrl(img.image_url));
+
+    // Fallback when API only returned the legacy primary_image field
+    if (images.length === 0) {
+      addUrl(product?.primary_image);
     }
-    
-    // Add all unique unit images (for color selection)
+
+    // Unit images (color variants) after product gallery
     if (units && units.length > 0) {
-      const unitImageUrls = new Set<string>();
       units.forEach((unit: PublicInventoryUnitPublic) => {
         if (unit.images && unit.images.length > 0) {
           unit.images.forEach((img: InventoryUnitImage) => {
-            if (img.image_url && !unitImageUrls.has(img.image_url)) {
-              unitImageUrls.add(img.image_url);
-              images.push(img.image_url);
-            }
+            addUrl(img.image_url);
           });
         } else if (unit.color_name) {
-          // Add placeholder for units without images
-          const placeholderUrl = getPlaceholderUnitImage(unit.color_name);
-          if (!unitImageUrls.has(placeholderUrl)) {
-            unitImageUrls.add(placeholderUrl);
-            images.push(placeholderUrl);
-          }
+          addUrl(getPlaceholderUnitImage(unit.color_name));
         }
       });
     }
-    
-    // If no images at all, add at least one placeholder
+
     if (images.length === 0 && product) {
-      images.push(getPlaceholderProductImage(product.product_name));
+      addUrl(getPlaceholderProductImage(product.product_name));
     }
-    
+
     return images;
-  }, [product?.primary_image, product, units]);
+  }, [product?.images, product?.primary_image, product, units]);
+
+  useEffect(() => {
+    if (selectedImageIndex >= productImages.length) {
+      setSelectedImageIndex(0);
+    }
+  }, [productImages.length, selectedImageIndex]);
 
   // Track recently viewed products
   useEffect(() => {

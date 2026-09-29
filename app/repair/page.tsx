@@ -84,16 +84,25 @@ export default function RepairPage() {
             ))}
           </ol>
 
-          <IphoneRepairPriceList />
+          <div className="repair-page__workspace">
+            <div className="repair-page__workspace-main">
+              <Suspense fallback={<div className="repair-page__prices" aria-hidden />}>
+                <IphoneRepairPriceList />
+              </Suspense>
+            </div>
 
-          <div className="repair-page__panel">
-            <h2 className="repair-page__panel-title">Request a repair</h2>
-            <p className="repair-page__panel-sub">
-              Fill this in and continue on WhatsApp — we&apos;ll take it from there.
-            </p>
-            <Suspense fallback={<div className="repair-page__form-skeleton" aria-hidden />}>
-              <RepairBookingForm />
-            </Suspense>
+            <aside className="repair-page__workspace-aside" aria-label="Request a repair">
+              <div className="repair-page__panel repair-page__panel--sticky" id="repair-request-panel">
+                <h2 className="repair-page__panel-title">Request a repair</h2>
+                <p className="repair-page__panel-sub">
+                  For any brand or model — including phones without a listed price above. Fill this
+                  in and continue on WhatsApp.
+                </p>
+                <Suspense fallback={<div className="repair-page__form-skeleton" aria-hidden />}>
+                  <RepairBookingForm />
+                </Suspense>
+              </div>
+            </aside>
           </div>
         </section>
       </main>

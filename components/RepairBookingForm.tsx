@@ -11,6 +11,10 @@ import {
   IPHONE_BATTERY_REPLACEMENT_PRICES,
   IPHONE_SCREEN_GRADE_LABELS,
   IPHONE_SCREEN_REPLACEMENT_PRICES,
+  repairIssueForServices,
+  type IphoneRepairService,
+  type IphoneScreenGrade,
+  type RepairLineItem,
 } from '@/lib/repair/iphoneRepairPrices';
 import { trackGoogleAdsLead } from '@/lib/googleAds';
 
@@ -35,11 +39,21 @@ const ISSUE_OPTIONS = [
 type DeviceTypeValue = (typeof DEVICE_TYPES)[number]['value'];
 type IssueValue = (typeof ISSUE_OPTIONS)[number];
 
-function isDeviceType(value: string | null): value is DeviceTypeValue {
+export type RepairBookingPreset = {
+  model: string;
+  brand?: string;
+  deviceType?: DeviceTypeValue | string;
+  services: IphoneRepairService[];
+  screenGrade?: IphoneScreenGrade;
+  lineItems: RepairLineItem[];
+  totalKes: number;
+};
+
+function isDeviceType(value: string | null | undefined): value is DeviceTypeValue {
   return DEVICE_TYPES.some((opt) => opt.value === value);
 }
 
-function isIssue(value: string | null): value is IssueValue {
+function isIssue(value: string | null | undefined): value is IssueValue {
   return ISSUE_OPTIONS.some((opt) => opt === value);
 }
 
@@ -60,6 +74,7 @@ function buildRepairWhatsAppMessage(fields: {
   listedPriceKes?: number | null;
   listedPriceLabel?: string | null;
   screenGradeLabel?: string | null;
+  lineItems?: RepairLineItem[];
 }): string {
   const lines = [
     "Hi! I'd like to book a repair.",
@@ -69,13 +84,25 @@ function buildRepairWhatsAppMessage(fields: {
     `Device: ${fields.brand} ${fields.model.trim()} (${fields.deviceType})`,
     `Issue: ${fields.issue}`,
   ];
-  if (fields.screenGradeLabel) {
-    lines.push(`Screen grade: ${fields.screenGradeLabel}`);
+
+  if (fields.lineItems && fields.lineItems.length > 0) {
+    lines.push('Selected repairs:');
+    for (const item of fields.lineItems) {
+      lines.push(`- ${item.label}: ${formatRepairKes(item.priceKes)}`);
+    }
+    if (fields.listedPriceKes != null) {
+      lines.push(`Listed total: ${formatRepairKes(fields.listedPriceKes)}`);
+    }
+  } else {
+    if (fields.screenGradeLabel) {
+      lines.push(`Screen grade: ${fields.screenGradeLabel}`);
+    }
+    if (fields.listedPriceKes != null) {
+      const label = fields.listedPriceLabel || 'Listed price';
+      lines.push(`${label}: ${formatRepairKes(fields.listedPriceKes)}`);
+    }
   }
-  if (fields.listedPriceKes != null) {
-    const label = fields.listedPriceLabel || 'Listed price';
-    lines.push(`${label}: ${formatRepairKes(fields.listedPriceKes)}`);
-  }
+
   const details = fields.details.trim();
   if (details) {
     lines.push(`Details: ${details}`);
@@ -89,19 +116,41 @@ function buildRepairWhatsAppMessage(fields: {
   return lines.join('\n');
 }
 
-export function RepairBookingForm() {
+function issueFromPreset(preset: RepairBookingPreset | null | undefined): string {
+  if (!preset?.services?.length) return '';
+  const issue = repairIssueForServices(preset.services);
+  if (preset.services.includes('battery') && preset.services.includes('screen')) {
+    return 'Other';
+  }
+  return isIssue(issue) ? issue : '';
+}
+
+function detailsFromPreset(preset: RepairBookingPreset | null | undefined): string {
+  if (!preset?.services) return '';
+  if (preset.services.includes('battery') && preset.services.includes('screen')) {
+    return 'Battery replacement and cracked / damaged screen';
+  }
+  return '';
+}
+
+type RepairBookingFormProps = {
+  preset?: RepairBookingPreset | null;
+  onSubmitted?: () => void;
+};
+
+export function RepairBookingForm({ preset = null, onSubmitted }: RepairBookingFormProps) {
   const searchParams = useSearchParams();
-  const initialDeviceType = searchParams.get('deviceType');
-  const initialIssue = searchParams.get('issue');
-  const initialBrand = searchParams.get('brand');
-  const initialModel = searchParams.get('model');
+  const initialDeviceType = preset?.deviceType || searchParams.get('deviceType');
+  const initialIssue = preset ? issueFromPreset(preset) : searchParams.get('issue');
+  const initialBrand = preset?.brand || searchParams.get('brand');
+  const initialModel = preset?.model || searchParams.get('model');
 
   const brands = useMemo(
     () => [...allBrandNavItems().map((b) => b.navLabel), 'Other'],
     []
   );
 
-  const resolveBrand = (value: string | null) => {
+  const resolveBrand = (value: string | null | undefined) => {
     if (!value) return '';
     const match = brands.find((b) => b.toLowerCase() === value.toLowerCase());
     return match || value;
@@ -115,33 +164,48 @@ export function RepairBookingForm() {
   const [brand, setBrand] = useState(() => resolveBrand(initialBrand));
   const [model, setModel] = useState(initialModel?.trim() || '');
   const [issue, setIssue] = useState(isIssue(initialIssue) ? initialIssue : '');
-  const [details, setDetails] = useState('');
+  const [details, setDetails] = useState(() => detailsFromPreset(preset));
   const [touched, setTouched] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (preset) return;
     if (window.location.hash !== '#repair-request') return;
     document.getElementById('repair-request')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, []);
+  }, [preset]);
 
+  const presetLineItems = preset?.lineItems ?? [];
   const listedRepair =
-    brand.toLowerCase() === 'apple'
-      ? issue === 'Battery replacement'
-        ? findIphoneBatteryPrice(model)
-        : issue === 'Cracked / damaged screen'
-          ? findIphoneScreenPrice(model)
-          : null
-      : null;
+    presetLineItems.length > 0
+      ? null
+      : brand.toLowerCase() === 'apple'
+        ? issue === 'Battery replacement'
+          ? findIphoneBatteryPrice(model)
+          : issue === 'Cracked / damaged screen'
+            ? findIphoneScreenPrice(model)
+            : null
+        : null;
+
+  const listedTotalKes =
+    preset?.totalKes ??
+    (listedRepair?.priceKes != null ? listedRepair.priceKes : null);
+
   const listedRepairLabel =
-    issue === 'Battery replacement'
-      ? 'Listed battery price'
-      : issue === 'Cracked / damaged screen'
+    presetLineItems.length > 1
+      ? 'Listed repair total'
+      : presetLineItems[0]?.service === 'screen' || issue === 'Cracked / damaged screen'
         ? 'Listed screen price'
-        : 'Listed price';
-  const screenGradeLabel = listedRepair?.screenGrade
-    ? IPHONE_SCREEN_GRADE_LABELS[listedRepair.screenGrade]
-    : null;
+        : presetLineItems[0]?.service === 'battery' || issue === 'Battery replacement'
+          ? 'Listed battery price'
+          : 'Listed price';
+
+  const screenGradeLabel =
+    preset?.screenGrade
+      ? IPHONE_SCREEN_GRADE_LABELS[preset.screenGrade]
+      : listedRepair?.screenGrade
+        ? IPHONE_SCREEN_GRADE_LABELS[listedRepair.screenGrade]
+        : null;
 
   const phoneError = validatePhone(phone);
   const nameError = name.trim().length < 2 ? 'Please enter your name' : null;
@@ -161,23 +225,31 @@ export function RepairBookingForm() {
       return;
     }
     setError(null);
+
+    const issueForMessage =
+      presetLineItems.length > 1
+        ? presetLineItems.map((item) => item.label).join(' + ')
+        : issue;
+
     const message = buildRepairWhatsAppMessage({
       name,
       phone,
       deviceType,
       brand,
       model,
-      issue,
+      issue: issueForMessage,
       details,
-      listedPriceKes: listedRepair?.priceKes ?? null,
+      listedPriceKes: listedTotalKes,
       listedPriceLabel: listedRepairLabel,
       screenGradeLabel,
+      lineItems: presetLineItems.length > 0 ? presetLineItems : undefined,
     });
     trackGoogleAdsLead({
       leadKey: `repair:${phone.replace(/\D/g, '')}:${brand}:${model}`,
-      value: listedRepair?.priceKes ?? undefined,
+      value: listedTotalKes ?? undefined,
     });
     window.open(getBusinessWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
+    onSubmitted?.();
   };
 
   const show = (err: string | null) => touched && err;
@@ -313,8 +385,8 @@ export function RepairBookingForm() {
                 ...IPHONE_BATTERY_REPLACEMENT_PRICES.map((row) => row.model),
                 ...IPHONE_SCREEN_REPLACEMENT_PRICES.map((row) => row.model),
               ]),
-            ].map((model) => (
-              <option key={model} value={model} />
+            ].map((modelName) => (
+              <option key={modelName} value={modelName} />
             ))}
           </datalist>
           {show(modelError) && (
@@ -367,7 +439,27 @@ export function RepairBookingForm() {
         </div>
       </div>
 
-      {listedRepair ? (
+      {presetLineItems.length > 0 ? (
+        <div className="repair-page__listed-price" role="status">
+          <p className="repair-page__listed-price-heading">
+            {listedRepairLabel} for <strong>{preset?.model || model}</strong>
+          </p>
+          <ul className="repair-page__listed-price-lines">
+            {presetLineItems.map((item) => (
+              <li key={`${item.service}-${item.label}`}>
+                {item.label}: <strong>{formatRepairKes(item.priceKes)}</strong>
+              </li>
+            ))}
+          </ul>
+          <p className="repair-page__listed-price-total">
+            Total: <strong>{formatRepairKes(listedTotalKes || 0)}</strong>
+            <span className="repair-page__listed-price-note">
+              {' '}
+              — confirmed after inspection at drop-off.
+            </span>
+          </p>
+        </div>
+      ) : listedRepair ? (
         <p className="repair-page__listed-price" role="status">
           {listedRepairLabel} for <strong>{listedRepair.model}</strong>
           {screenGradeLabel ? <> ({screenGradeLabel})</> : null}:{' '}
@@ -386,7 +478,7 @@ export function RepairBookingForm() {
       )}
 
       <p className="repair-page__quote-note">
-        {listedRepair
+        {listedTotalKes != null
           ? 'Continue on WhatsApp with this listed price — we confirm after inspecting your iPhone.'
           : 'Most repairs are quoted after diagnosis on WhatsApp. iPhone battery and screen replacements have a listed price guide above when available.'}
       </p>

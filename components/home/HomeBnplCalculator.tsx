@@ -8,8 +8,21 @@ import { MaterialIcon } from '@/components/MaterialIcon';
 import { StudioBlockChrome } from '@/components/studio/StudioBlockChrome';
 import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 import { studioPath } from '@/lib/studio/paths';
+import {
+  BUYSIMU_DEPOSIT_MAX,
+  BUYSIMU_DEPOSIT_MIN,
+  type BuysimuPlanTerm,
+  depositForTerm,
+  findOffersForDeposit,
+  formatKes,
+  weeklyForTerm,
+} from '@/lib/financing/buysimuCatalog';
 
-const FALLBACK_PARTNERS = ['Lipa Later', 'Aspira KE', 'Craft Silicon'] as const;
+const FALLBACK_PARTNERS = ['BuySimu', 'MoPhones'] as const;
+/** Bulk of BuySimu 409 plans list 12-week and 24-week terms. */
+const TERM_OPTIONS: BuysimuPlanTerm[] = [12, 24];
+const DEFAULT_DEPOSIT = 20_000;
+const MATCH_LIMIT = 8;
 
 type PublicFinancingProvider = {
   id: number;
@@ -38,12 +51,16 @@ async function fetchPublicFinancingProviders(): Promise<PublicFinancingProvider[
   return data.results ?? [];
 }
 
+function clampDeposit(value: number): number {
+  if (!Number.isFinite(value)) return DEFAULT_DEPOSIT;
+  return Math.min(BUYSIMU_DEPOSIT_MAX, Math.max(BUYSIMU_DEPOSIT_MIN, Math.round(value)));
+}
+
 export function HomeBnplCalculator() {
   const studioEdit = useStudioEditOptional();
   const canEdit = Boolean(studioEdit?.capabilities.canEditFinancing);
-  const [devicePrice, setDevicePrice] = useState(80000);
-  const [depositPercent, setDepositPercent] = useState(20);
-  const [weeks, setWeeks] = useState(12);
+  const [depositBudget, setDepositBudget] = useState(DEFAULT_DEPOSIT);
+  const [term, setTerm] = useState<BuysimuPlanTerm>(12);
 
   const { data: providers = [] } = useQuery({
     queryKey: ['financing-providers', 'public'],
@@ -51,13 +68,12 @@ export function HomeBnplCalculator() {
     staleTime: 5 * 60_000,
   });
 
-  const { deposit, financed, weekly } = useMemo(() => {
-    const price = Math.max(0, devicePrice);
-    const depositValue = Math.round((price * depositPercent) / 100);
-    const financedValue = Math.max(0, price - depositValue);
-    const weeklyValue = weeks > 0 ? Math.ceil(financedValue / weeks) : financedValue;
-    return { deposit: depositValue, financed: financedValue, weekly: weeklyValue };
-  }, [devicePrice, depositPercent, weeks]);
+  const matches = useMemo(
+    () => findOffersForDeposit(depositBudget, term),
+    [depositBudget, term]
+  );
+  const visibleMatches = matches.slice(0, MATCH_LIMIT);
+  const extraCount = Math.max(0, matches.length - visibleMatches.length);
 
   return (
     <section className="ag-bleed ag-bleed--dark ag-bleed--spaced">
@@ -71,8 +87,8 @@ export function HomeBnplCalculator() {
             Buy Now, Pay Later (BNPL) Calculator
           </h2>
           <p className="ag-type-body mt-3 text-white/75">
-            Get instant device financing through certified Kenyan fintech partners. Pick your
-            smartphone price, set your upfront deposit, and estimate weekly installments.
+            Enter the deposit you can pay today. We&apos;ll show BuySimu iPhones that fit that
+            budget, with weekly installments from certified Kenyan financing partners.
           </p>
           <div className="mt-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
@@ -110,10 +126,7 @@ export function HomeBnplCalculator() {
                   ))}
             </div>
           </div>
-          <Link
-            href={studioPath('/financing')}
-            className="ag-btn ag-btn--lime mt-6"
-          >
+          <Link href={studioPath('/financing')} className="ag-btn ag-btn--lime mt-6">
             Browse financing devices
             <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
           </Link>
@@ -121,63 +134,141 @@ export function HomeBnplCalculator() {
 
         <div className="rounded-2xl bg-white/5 p-5 backdrop-blur-sm">
           <label className="block text-xs font-semibold uppercase tracking-wider text-white/60">
-            Device price (KSh)
+            Your deposit budget (KSh)
             <input
               type="number"
-              min={5000}
-              step={1000}
-              value={devicePrice}
-              onChange={(e) => setDevicePrice(Number(e.target.value) || 0)}
+              min={BUYSIMU_DEPOSIT_MIN}
+              max={BUYSIMU_DEPOSIT_MAX}
+              step={500}
+              value={depositBudget}
+              onChange={(e) => setDepositBudget(clampDeposit(Number(e.target.value) || 0))}
               className="mt-2 w-full rounded-xl border border-white/15 bg-white/10 px-3 py-2.5 text-sm text-white outline-none"
             />
           </label>
 
           <label className="mt-4 block text-xs font-semibold uppercase tracking-wider text-white/60">
-            Deposit {depositPercent}%
+            Deposit {formatKes(depositBudget)}
             <input
               type="range"
-              min={10}
-              max={50}
-              step={5}
-              value={depositPercent}
-              onChange={(e) => setDepositPercent(Number(e.target.value))}
+              min={BUYSIMU_DEPOSIT_MIN}
+              max={BUYSIMU_DEPOSIT_MAX}
+              step={500}
+              value={depositBudget}
+              onChange={(e) => setDepositBudget(clampDeposit(Number(e.target.value)))}
               className="mt-3 w-full accent-promo-lime"
             />
+            <span className="mt-1 flex justify-between text-[0.625rem] font-normal normal-case tracking-normal text-white/40">
+              <span>{formatKes(BUYSIMU_DEPOSIT_MIN)}</span>
+              <span>{formatKes(BUYSIMU_DEPOSIT_MAX)}</span>
+            </span>
           </label>
 
-          <label className="mt-4 block text-xs font-semibold uppercase tracking-wider text-white/60">
-            Term {weeks} weeks
-            <input
-              type="range"
-              min={4}
-              max={24}
-              step={1}
-              value={weeks}
-              onChange={(e) => setWeeks(Number(e.target.value))}
-              className="mt-3 w-full accent-promo-lime"
-            />
-          </label>
-
-          <div className="mt-5 grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-xl bg-black/30 p-3">
-              <p className="text-[0.625rem] uppercase tracking-wider text-white/50">Deposit</p>
-              <p className="mt-1 text-sm font-bold text-promo-lime">
-                KSh {deposit.toLocaleString('en-KE')}
-              </p>
-            </div>
-            <div className="rounded-xl bg-black/30 p-3">
-              <p className="text-[0.625rem] uppercase tracking-wider text-white/50">Financed</p>
-              <p className="mt-1 text-sm font-bold">KSh {financed.toLocaleString('en-KE')}</p>
-            </div>
-            <div className="rounded-xl bg-black/30 p-3">
-              <p className="text-[0.625rem] uppercase tracking-wider text-white/50">Est. / week</p>
-              <p className="mt-1 text-sm font-bold text-promo-lime">
-                KSh {weekly.toLocaleString('en-KE')}
-              </p>
+          <div className="mt-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
+              Payment term
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {TERM_OPTIONS.map((weeks) => {
+                const active = term === weeks;
+                return (
+                  <button
+                    key={weeks}
+                    type="button"
+                    onClick={() => setTerm(weeks)}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                      active
+                        ? 'bg-promo-lime text-black'
+                        : 'bg-white/10 text-white/75 hover:bg-white/15'
+                    }`}
+                  >
+                    {weeks} weeks
+                  </button>
+                );
+              })}
             </div>
           </div>
+
+          <div className="mt-5">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
+                Phones in your budget
+              </p>
+              <p className="text-[0.6875rem] text-white/50">
+                {matches.length === 0
+                  ? 'No matches'
+                  : `${matches.length} option${matches.length === 1 ? '' : 's'}`}
+              </p>
+            </div>
+
+            {visibleMatches.length === 0 ? (
+              <p className="mt-3 rounded-xl bg-black/30 p-4 text-sm text-white/65">
+                No BuySimu plans fit {formatKes(depositBudget)} on a {term}-week term. Try a higher
+                deposit or a different term.
+              </p>
+            ) : (
+              <ul className="mt-3 max-h-[22rem] space-y-2 overflow-y-auto pr-1">
+                {visibleMatches.map((offer) => {
+                  const requiredDeposit = depositForTerm(offer, term);
+                  const weekly = weeklyForTerm(offer, term);
+                  return (
+                    <li
+                      key={offer.id}
+                      className="rounded-xl bg-black/30 px-3 py-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-white">
+                            {offer.model}
+                          </p>
+                          <p className="mt-0.5 text-[0.6875rem] text-white/55">{offer.specs}</p>
+                        </div>
+                        <p className="shrink-0 text-[0.6875rem] text-white/50">
+                          Cash {formatKes(offer.cashPrice)}
+                        </p>
+                      </div>
+                      <div className="mt-2 grid grid-cols-2 gap-2 text-center sm:grid-cols-3">
+                        <div className="rounded-lg bg-white/5 px-2 py-1.5">
+                          <p className="text-[0.5625rem] uppercase tracking-wider text-white/45">
+                            Deposit
+                          </p>
+                          <p className="mt-0.5 text-xs font-bold text-promo-lime">
+                            {formatKes(requiredDeposit)}
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-white/5 px-2 py-1.5">
+                          <p className="text-[0.5625rem] uppercase tracking-wider text-white/45">
+                            / Week
+                          </p>
+                          <p className="mt-0.5 text-xs font-bold text-promo-lime">
+                            {weekly != null ? formatKes(weekly) : '—'}
+                          </p>
+                        </div>
+                        <div className="col-span-2 rounded-lg bg-white/5 px-2 py-1.5 sm:col-span-1">
+                          <p className="text-[0.5625rem] uppercase tracking-wider text-white/45">
+                            Term
+                          </p>
+                          <p className="mt-0.5 text-xs font-bold text-white">{term} wks</p>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+
+            {extraCount > 0 && (
+              <p className="mt-2 text-[0.6875rem] text-white/50">
+                +{extraCount} more on the{' '}
+                <Link href={studioPath('/financing')} className="text-promo-lime underline-offset-2 hover:underline">
+                  financing page
+                </Link>
+                .
+              </p>
+            )}
+          </div>
+
           <p className="mt-3 text-[0.6875rem] text-white/50">
-            Estimates only — final terms are confirmed by financing partners on the financing page.
+            BuySimu list prices — final approval and stock confirmed by financing partners.
           </p>
         </div>
       </div>

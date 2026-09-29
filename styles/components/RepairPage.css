@@ -74,8 +74,8 @@
 
 @media (min-width: 1024px) {
   .repair-page__workspace {
-    grid-template-columns: minmax(0, 1fr) minmax(20rem, 24rem);
-    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1fr) minmax(19rem, 22.5rem);
+    gap: 1.25rem;
   }
 }
 
@@ -90,10 +90,75 @@
 @media (min-width: 1024px) {
   .repair-page__panel--sticky {
     position: sticky;
-    top: 5.5rem;
-    max-height: calc(100vh - 6.5rem);
-    overflow-y: auto;
+    top: 5.25rem;
+    overflow: visible;
+    max-height: none;
+    padding: 1rem 1.05rem 1.1rem;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+  }
+
+  .repair-page__panel--sticky .repair-page__panel-title {
+    margin: 0 0 0.2rem;
+    font-size: 1.0625rem;
+  }
+
+  .repair-page__panel--sticky .repair-page__panel-sub {
+    margin: 0 0 0.75rem;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+  }
+
+  .repair-page__panel--sticky .repair-page__form {
+    gap: 0.65rem;
+  }
+
+  .repair-page__panel--sticky .repair-page__form-grid {
+    gap: 0.5rem 0.65rem;
+  }
+
+  .repair-page__panel--sticky .checkout-modal__field {
+    margin: 0;
+  }
+
+  .repair-page__panel--sticky .checkout-modal__label {
+    margin-bottom: 0.2rem;
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+
+  .repair-page__panel--sticky .checkout-modal__input,
+  .repair-page__panel--sticky .checkout-modal__textarea {
+    padding: 0.4rem 0.55rem;
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    min-height: 2.25rem;
+  }
+
+  .repair-page__panel--sticky .checkout-modal__textarea {
+    min-height: 2.75rem;
+    resize: none;
+  }
+
+  .repair-page__panel--sticky .checkout-modal__error {
+    margin-top: 0.2rem;
+    font-size: 0.6875rem;
+  }
+
+  .repair-page__panel--sticky .repair-page__quote-note {
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  .repair-page__panel--sticky .repair-page__listed-price {
+    padding: 0.55rem 0.7rem;
+    font-size: 0.8125rem;
+  }
+
+  .repair-page__panel--sticky .whatsapp-lead-modal__primary,
+  .repair-page__panel--sticky .repair-page__submit {
+    margin-top: 0;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.875rem;
   }
 }
 
@@ -185,15 +250,10 @@
   }
 }
 
-@media (min-width: 1280px) {
-  .repair-page__prices-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
+/* Keep cards larger beside the sticky form — avoid 4-up clipping */
 @media (min-width: 1440px) {
   .repair-page__prices-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -203,9 +263,9 @@
   display: grid;
   grid-template-rows: 1fr;
   aspect-ratio: 1 / 1;
-  min-height: 14.5rem;
   width: 100%;
-  height: 100%;
+  height: auto;
+  min-height: 0;
   overflow: hidden;
   border: 1px solid var(--primary-dark, #121212);
   border-radius: 16px;
@@ -338,11 +398,13 @@
 .repair-page__model-card-overlay {
   display: none;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.4rem;
   height: 100%;
   min-height: 0;
-  padding: 0.625rem;
-  overflow: auto;
+  min-width: 0;
+  padding: 0.7rem;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .repair-page__model-card-overlay-head {
@@ -350,6 +412,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .repair-page__model-card-overlay-name {
@@ -358,14 +421,16 @@
   min-width: 0;
   font-size: 0.8125rem;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.25;
   color: var(--ui-gray-900, #111);
-  overflow-wrap: anywhere;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .repair-page__model-card-overlay-title {
   margin: 0;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -374,23 +439,25 @@
 
 .repair-page__model-card-options {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.3rem;
+  min-width: 0;
 }
 
 .repair-page__model-card-option {
   display: flex;
   align-items: flex-start;
-  gap: 0.45rem;
+  gap: 0.4rem;
   margin: 0;
-  padding: 0.4rem 0.5rem;
+  padding: 0.35rem 0.45rem;
   border: 1px solid var(--border-hairline, #e5e7eb);
   border-radius: 8px;
   background: #fafafa;
   cursor: pointer;
+  min-width: 0;
 }
 
 .repair-page__model-card-option input {
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
   flex-shrink: 0;
   accent-color: var(--primary-dark, #121212);
 }
@@ -398,39 +465,43 @@
 .repair-page__model-card-option-copy {
   display: flex;
   flex: 1;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.05rem;
   min-width: 0;
 }
 
 .repair-page__model-card-option-label {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--on-surface);
+  line-height: 1.2;
 }
 
 .repair-page__model-card-option-price {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--on-surface-variant);
   white-space: nowrap;
-  flex-shrink: 0;
+  line-height: 1.2;
 }
 
 .repair-page__model-card-grade {
   display: block;
+  min-width: 0;
 }
 
 .repair-page__model-card-grade-select {
   width: 100%;
+  max-width: 100%;
   appearance: none;
   border: 1px solid var(--border-hairline, #e5e7eb);
   border-radius: 8px;
   background: #fff;
-  padding: 0.4rem 0.55rem;
-  font-size: 0.75rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   color: var(--on-surface);
 }
@@ -442,28 +513,34 @@
   gap: 0.5rem;
   width: 100%;
   margin-top: auto;
-  padding: 0.55rem 0.7rem;
+  padding: 0.5rem 0.65rem;
   border: 1px solid var(--primary-dark, #121212);
   border-radius: 8px;
   background: var(--primary-dark, #121212);
   color: #fff;
   cursor: pointer;
   transition: opacity 160ms, transform 160ms;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .repair-page__model-card-total span {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   opacity: 0.85;
+  flex-shrink: 0;
 }
 
 .repair-page__model-card-total strong {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .repair-page__model-card-total:hover:not(:disabled) {

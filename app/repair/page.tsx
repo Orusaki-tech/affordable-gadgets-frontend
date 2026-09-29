@@ -95,8 +95,7 @@ export default function RepairPage() {
               <div className="repair-page__panel repair-page__panel--sticky" id="repair-request-panel">
                 <h2 className="repair-page__panel-title">Request a repair</h2>
                 <p className="repair-page__panel-sub">
-                  For any brand or model — including phones without a listed price above. Fill this
-                  in and continue on WhatsApp.
+                  Any brand or model — including phones without a listed price. Continue on WhatsApp.
                 </p>
                 <Suspense fallback={<div className="repair-page__form-skeleton" aria-hidden />}>
                   <RepairBookingForm />

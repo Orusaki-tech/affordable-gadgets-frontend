@@ -431,7 +431,7 @@ export function RepairBookingForm({ preset = null, onSubmitted }: RepairBookingF
           <textarea
             id="repair-details"
             className="checkout-modal__textarea"
-            rows={3}
+            rows={2}
             placeholder="When did it start? Any other symptoms?"
             value={details}
             onChange={(e) => setDetails(e.target.value)}
@@ -479,8 +479,8 @@ export function RepairBookingForm({ preset = null, onSubmitted }: RepairBookingF
 
       <p className="repair-page__quote-note">
         {listedTotalKes != null
-          ? 'Continue on WhatsApp with this listed price — we confirm after inspecting your iPhone.'
-          : 'Most repairs are quoted after diagnosis on WhatsApp. iPhone battery and screen replacements have a listed price guide above when available.'}
+          ? 'Continue on WhatsApp — we confirm the listed price after inspecting your iPhone.'
+          : 'Most repairs are quoted after diagnosis. iPhone battery and screen prices are listed when available.'}
       </p>
 
       <button type="submit" className="whatsapp-lead-modal__primary repair-page__submit">

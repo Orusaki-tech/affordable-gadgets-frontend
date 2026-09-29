@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import Script from "next/script";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -8,6 +9,7 @@ import { StructuredData } from "@/components/StructuredData";
 import { GoogleCustomerReviewsBadge } from "@/components/GoogleCustomerReviewsBadge";
 import { AuthGate } from "@/components/AuthGate";
 import { StudioRootGate } from "@/components/studio/StudioRootGate";
+import { GOOGLE_ADS_ID } from "@/lib/googleAds";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -97,6 +99,18 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${geistSans.variable} ${geistMono.variable} antialiased bg-surface text-on-surface`}
       >
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads-gtag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GOOGLE_ADS_ID}');
+          `}
+        </Script>
         <StructuredData type="Organization" />
         <StructuredData type="WebSite" />
         <StructuredData type="LocalBusiness" />

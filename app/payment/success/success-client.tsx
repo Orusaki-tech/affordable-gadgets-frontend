@@ -8,6 +8,7 @@ import { brandConfig } from '@/lib/config/brand';
 import { OpenAPI, OrdersService, type Order } from '@/lib/api/generated';
 import { inventoryBaseUrl } from '@/lib/api/openapi';
 import { GoogleCustomerReviewsOptIn } from '@/components/GoogleCustomerReviewsOptIn';
+import { trackGoogleAdsPurchase } from '@/lib/googleAds';
 
 export function PaymentSuccessClient() {
   const searchParams = useSearchParams();
@@ -129,6 +130,19 @@ export function PaymentSuccessClient() {
     window.sessionStorage.setItem(key, '1');
     setGcrAlreadyShown(true);
   }, [shouldRenderGcrOptIn, orderId]);
+
+  useEffect(() => {
+    if (!orderId) return;
+    // Wait for order fetch to settle so value is included when available.
+    if (!order && !orderFetchFailed) return;
+    const rawTotal = order?.total_amount;
+    const parsed = rawTotal != null ? Number(rawTotal) : NaN;
+    trackGoogleAdsPurchase({
+      transactionId: orderId,
+      value: Number.isFinite(parsed) ? parsed : undefined,
+      currency: 'KES',
+    });
+  }, [orderId, order, orderFetchFailed]);
 
   return (
     <main className="flex-1 flex items-center justify-center bg-gray-50 p-4">

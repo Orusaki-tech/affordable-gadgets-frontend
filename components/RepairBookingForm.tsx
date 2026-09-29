@@ -9,6 +9,7 @@ import {
   formatRepairKes,
   IPHONE_BATTERY_REPLACEMENT_PRICES,
 } from '@/lib/repair/iphoneBatteryPrices';
+import { trackGoogleAdsLead } from '@/lib/googleAds';
 
 const DEVICE_TYPES = [
   { value: 'Phone', label: 'Phone' },
@@ -147,6 +148,10 @@ export function RepairBookingForm() {
       issue,
       details,
       listedPriceKes: listedBattery?.priceKes ?? null,
+    });
+    trackGoogleAdsLead({
+      leadKey: `repair:${phone.replace(/\D/g, '')}:${brand}:${model}`,
+      value: listedBattery?.priceKes ?? undefined,
     });
     window.open(getBusinessWhatsAppUrl(message), '_blank', 'noopener,noreferrer');
   };

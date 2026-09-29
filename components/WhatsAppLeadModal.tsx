@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { brandConfig } from '@/lib/config/brand';
 import { getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { getSessionKey } from '@/lib/tracking';
+import { trackGoogleAdsLead } from '@/lib/googleAds';
 
 const API_BASE = brandConfig.apiBaseUrl.replace(/\/+$/, '');
 
@@ -84,6 +85,7 @@ export function WhatsAppLeadModal({
         throw new Error(text || 'Failed to submit');
       }
 
+      trackGoogleAdsLead({ leadKey: `whatsapp:${productId}` });
       setSubmitted(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');

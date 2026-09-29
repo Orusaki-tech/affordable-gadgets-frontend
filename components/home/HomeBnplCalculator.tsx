@@ -77,8 +77,9 @@ export function HomeBnplCalculator() {
 
   return (
     <section className="ag-bleed ag-bleed--dark ag-bleed--spaced">
-      <div className="ag-bleed__inner grid grid-cols-1 gap-6 text-white lg:grid-cols-2">
-        <div>
+      <div className="ag-bleed__inner grid grid-cols-1 gap-6 text-white lg:grid-cols-2 lg:items-stretch">
+        {/* Left: copy + deposit controls + CTA — fills the column beside results */}
+        <div className="flex flex-col">
           <p className="ag-type-eyebrow inline-flex items-center gap-1.5 text-promo-lime">
             <MaterialIcon name="payments" className="text-[0.875rem]" />
             Lipa Mdogo Mdogo Available
@@ -90,6 +91,7 @@ export function HomeBnplCalculator() {
             Enter the deposit you can pay today. We&apos;ll show BuySimu iPhones that fit that
             budget, with weekly installments from certified Kenyan financing partners.
           </p>
+
           <div className="mt-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
               Financing Partners
@@ -126,44 +128,59 @@ export function HomeBnplCalculator() {
                   ))}
             </div>
           </div>
-          <Link href={studioPath('/financing')} className="ag-btn ag-btn--lime mt-6">
+
+          <div className="mt-5 flex-1 rounded-2xl bg-white/5 p-5 backdrop-blur-sm">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-white/60">
+              Your deposit budget (KSh)
+              <input
+                type="number"
+                min={BUYSIMU_DEPOSIT_MIN}
+                max={BUYSIMU_DEPOSIT_MAX}
+                step={500}
+                value={depositBudget}
+                onChange={(e) => setDepositBudget(clampDeposit(Number(e.target.value) || 0))}
+                className="mt-2 w-full rounded-xl border border-white/15 bg-white/10 px-3 py-2.5 text-sm text-white outline-none"
+              />
+            </label>
+
+            <label className="mt-4 block text-xs font-semibold uppercase tracking-wider text-white/60">
+              Deposit {formatKes(depositBudget)}
+              <input
+                type="range"
+                min={BUYSIMU_DEPOSIT_MIN}
+                max={BUYSIMU_DEPOSIT_MAX}
+                step={500}
+                value={depositBudget}
+                onChange={(e) => setDepositBudget(clampDeposit(Number(e.target.value)))}
+                className="mt-3 w-full accent-promo-lime"
+              />
+              <span className="mt-1 flex justify-between text-[0.625rem] font-normal normal-case tracking-normal text-white/40">
+                <span>{formatKes(BUYSIMU_DEPOSIT_MIN)}</span>
+                <span>{formatKes(BUYSIMU_DEPOSIT_MAX)}</span>
+              </span>
+            </label>
+
+            <div className="mt-5 grid grid-cols-2 gap-3 text-center">
+              <div className="rounded-xl bg-black/30 p-3">
+                <p className="text-[0.625rem] uppercase tracking-wider text-white/50">Matches</p>
+                <p className="mt-1 text-sm font-bold text-promo-lime">{matches.length}</p>
+              </div>
+              <div className="rounded-xl bg-black/30 p-3">
+                <p className="text-[0.625rem] uppercase tracking-wider text-white/50">Term</p>
+                <p className="mt-1 text-sm font-bold text-white">{term} wks</p>
+              </div>
+            </div>
+          </div>
+
+          <Link href={studioPath('/financing')} className="ag-btn ag-btn--lime mt-5 self-start">
             Browse financing devices
             <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
           </Link>
         </div>
 
-        <div className="rounded-2xl bg-white/5 p-5 backdrop-blur-sm">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-white/60">
-            Your deposit budget (KSh)
-            <input
-              type="number"
-              min={BUYSIMU_DEPOSIT_MIN}
-              max={BUYSIMU_DEPOSIT_MAX}
-              step={500}
-              value={depositBudget}
-              onChange={(e) => setDepositBudget(clampDeposit(Number(e.target.value) || 0))}
-              className="mt-2 w-full rounded-xl border border-white/15 bg-white/10 px-3 py-2.5 text-sm text-white outline-none"
-            />
-          </label>
-
-          <label className="mt-4 block text-xs font-semibold uppercase tracking-wider text-white/60">
-            Deposit {formatKes(depositBudget)}
-            <input
-              type="range"
-              min={BUYSIMU_DEPOSIT_MIN}
-              max={BUYSIMU_DEPOSIT_MAX}
-              step={500}
-              value={depositBudget}
-              onChange={(e) => setDepositBudget(clampDeposit(Number(e.target.value)))}
-              className="mt-3 w-full accent-promo-lime"
-            />
-            <span className="mt-1 flex justify-between text-[0.625rem] font-normal normal-case tracking-normal text-white/40">
-              <span>{formatKes(BUYSIMU_DEPOSIT_MIN)}</span>
-              <span>{formatKes(BUYSIMU_DEPOSIT_MAX)}</span>
-            </span>
-          </label>
-
-          <div className="mt-4">
+        {/* Right: term + matching phones */}
+        <div className="flex min-h-0 flex-col rounded-2xl bg-white/5 p-5 backdrop-blur-sm">
+          <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
               Payment term
             </p>
@@ -188,7 +205,7 @@ export function HomeBnplCalculator() {
             </div>
           </div>
 
-          <div className="mt-5">
+          <div className="mt-5 flex min-h-0 flex-1 flex-col">
             <div className="flex items-baseline justify-between gap-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
                 Phones in your budget
@@ -206,15 +223,12 @@ export function HomeBnplCalculator() {
                 deposit or a different term.
               </p>
             ) : (
-              <ul className="mt-3 max-h-[22rem] space-y-2 overflow-y-auto pr-1">
+              <ul className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 lg:max-h-none">
                 {visibleMatches.map((offer) => {
                   const requiredDeposit = depositForTerm(offer, term);
                   const weekly = weeklyForTerm(offer, term);
                   return (
-                    <li
-                      key={offer.id}
-                      className="rounded-xl bg-black/30 px-3 py-3"
-                    >
+                    <li key={offer.id} className="rounded-xl bg-black/30 px-3 py-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="truncate text-sm font-semibold text-white">
@@ -259,7 +273,10 @@ export function HomeBnplCalculator() {
             {extraCount > 0 && (
               <p className="mt-2 text-[0.6875rem] text-white/50">
                 +{extraCount} more on the{' '}
-                <Link href={studioPath('/financing')} className="text-promo-lime underline-offset-2 hover:underline">
+                <Link
+                  href={studioPath('/financing')}
+                  className="text-promo-lime underline-offset-2 hover:underline"
+                >
                   financing page
                 </Link>
                 .

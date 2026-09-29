@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { RepairBookingForm, type RepairBookingPreset } from '@/components/RepairBookingForm';
@@ -82,6 +82,8 @@ function lineItemsFor(
   return items;
 }
 
+const REPAIR_CARD_PEEK_EVENT = 'repair-card-peek';
+
 function RepairModelCard({
   offer,
   imageUrl,
@@ -92,11 +94,48 @@ function RepairModelCard({
   onRequestRepair: (preset: RepairBookingPreset) => void;
 }) {
   const [selection, setSelection] = useState<CardSelection>(() => defaultSelection(offer));
-  const [expanded, setExpanded] = useState(false);
+  const [isPeekOpen, setIsPeekOpen] = useState(false);
+  const cardRef = useRef<HTMLElement | null>(null);
+  const isTouchLikeRef = useRef(false);
 
   const items = useMemo(() => lineItemsFor(offer, selection), [offer, selection]);
   const totalKes = items.reduce((sum, item) => sum + item.priceKes, 0);
   const canBook = items.length > 0 && totalKes > 0;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(hover: none)');
+    const update = () => {
+      isTouchLikeRef.current = mq.matches;
+    };
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (!isPeekOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
+        setIsPeekOpen(false);
+      }
+    };
+    const onOtherPeek = (event: Event) => {
+      const detail = (event as CustomEvent<string | undefined>).detail;
+      if (detail !== offer.model) setIsPeekOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener(REPAIR_CARD_PEEK_EVENT, onOtherPeek);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener(REPAIR_CARD_PEEK_EVENT, onOtherPeek);
+    };
+  }, [isPeekOpen, offer.model]);
+
+  const openPeek = () => {
+    setIsPeekOpen(true);
+    window.dispatchEvent(new CustomEvent(REPAIR_CARD_PEEK_EVENT, { detail: offer.model }));
+  };
 
   const openBooking = () => {
     if (!canBook) return;
@@ -116,7 +155,6 @@ function RepairModelCard({
     setSelection((prev) => {
       if (service === 'battery') {
         const nextBattery = !prev.battery;
-        // Keep at least one option selected when possible
         if (!nextBattery && !prev.screen && offer.screens.length > 0) {
           return {
             ...prev,
@@ -142,18 +180,43 @@ function RepairModelCard({
     });
   };
 
+  const isInteractiveTarget = (target: EventTarget | null) => {
+    if (!(target instanceof Element)) return false;
+    return Boolean(target.closest('button, [role="button"], input, select, textarea, label'));
+  };
+
+  const handleCardClick = (event: MouseEvent<HTMLElement>) => {
+    if (isInteractiveTarget(event.target)) return;
+    if (!isTouchLikeRef.current) return;
+    if (!isPeekOpen) openPeek();
+  };
+
+  const handlePeekToggle = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (isPeekOpen) {
+      setIsPeekOpen(false);
+      return;
+    }
+    openPeek();
+  };
+
+  const handleBookClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (isTouchLikeRef.current && !isPeekOpen) {
+      openPeek();
+      return;
+    }
+    openBooking();
+  };
+
   return (
     <article
-      className={`repair-page__model-card${expanded ? ' repair-page__model-card--expanded' : ''}`}
-      onMouseEnter={() => setExpanded(true)}
-      onMouseLeave={() => setExpanded(false)}
-      onFocus={() => setExpanded(true)}
-      onClick={() => setExpanded(true)}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
-          setExpanded(false);
-        }
-      }}
+      ref={cardRef}
+      className={`repair-page__model-card${isPeekOpen ? ' repair-page__model-card--peek' : ''}`}
+      onClick={handleCardClick}
+      aria-expanded={isPeekOpen}
     >
       <div className="repair-page__model-card-media">
         <CloudinaryImage
@@ -164,31 +227,58 @@ function RepairModelCard({
           className="repair-page__model-card-image"
           fill
         />
+        <button
+          type="button"
+          className={`repair-page__model-card-peek-toggle${
+            isPeekOpen ? ' repair-page__model-card-peek-toggle--open' : ''
+          }`}
+          onClick={handlePeekToggle}
+          aria-label={isPeekOpen ? 'Hide repair options' : 'Show repair options'}
+          aria-expanded={isPeekOpen}
+        >
+          {isPeekOpen ? (
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+            </svg>
+          )}
+        </button>
       </div>
 
       <div className="repair-page__model-card-footer">
         <div className="repair-page__model-card-bar">
           <h3 className="repair-page__model-card-name">{offer.model}</h3>
-          <button
-            type="button"
-            className="repair-page__model-card-buy"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!expanded) {
-                setExpanded(true);
-                return;
-              }
-              openBooking();
-            }}
-          >
+          <button type="button" className="repair-page__model-card-buy" onClick={handleBookClick}>
             Book
           </button>
         </div>
 
-        <div className="repair-page__model-card-overlay" aria-hidden={!expanded}>
+        <div className="repair-page__model-card-overlay" aria-hidden={!isPeekOpen}>
+          <div className="repair-page__model-card-overlay-head">
+            <h3 className="repair-page__model-card-overlay-name">{offer.model}</h3>
+            <button
+              type="button"
+              className="repair-page__model-card-buy"
+              onClick={handleBookClick}
+            >
+              Book
+            </button>
+          </div>
+
           <p className="repair-page__model-card-overlay-title">Repair options</p>
 
-          <div className="repair-page__model-card-options" role="group" aria-label={`${offer.model} repairs`}>
+          <div
+            className="repair-page__model-card-options"
+            role="group"
+            aria-label={`${offer.model} repairs`}
+          >
             {offer.battery ? (
               <label className="repair-page__model-card-option">
                 <input
@@ -256,7 +346,10 @@ function RepairModelCard({
             type="button"
             className="repair-page__model-card-total"
             disabled={!canBook}
-            onClick={openBooking}
+            onClick={(e) => {
+              e.stopPropagation();
+              openBooking();
+            }}
           >
             <span>Total</span>
             <strong>{canBook ? formatRepairKes(totalKes) : '—'}</strong>
@@ -314,7 +407,8 @@ export function IphoneRepairPriceList() {
           </h2>
           <p className="repair-page__prices-sub">
             Hover a model to choose battery and/or screen, then tap the total to request a repair.
-            Listed rates are for drop-off at our Nairobi CBD shop and may vary after inspection.
+            On phones, tap the options button on a card. Listed rates are for drop-off at our Nairobi
+            CBD shop and may vary after inspection.
           </p>
         </div>
         <label className="repair-page__prices-search">

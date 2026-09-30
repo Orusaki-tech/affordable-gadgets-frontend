@@ -27,6 +27,15 @@ function StudioFloatActions() {
           Promotions
         </button>
       )}
+      {capabilities.canEditPromotions && (
+        <button
+          type="button"
+          className="studio-float-bar__btn"
+          onClick={() => studioEdit.openEditSpecialOffers()}
+        >
+          Special offers
+        </button>
+      )}
       {capabilities.canEditArticles && (
         <button
           type="button"
@@ -148,8 +157,8 @@ export function StudioShell({
           </div>
         )}
         <p className="studio-shell__edit-hint" role="note">
-          Use the bar for Promotions, Articles, Bundles, Offers, Delivery, and Reviews. Green Edit
-          buttons still appear on in-page cards.
+          Use the bar for Promotions, Special offers, Articles, Bundles, Offers, Delivery, and
+          Reviews. Green Edit buttons still appear on in-page cards.
         </p>
         <div className="studio-mirror-pad">{children}</div>
       </div>

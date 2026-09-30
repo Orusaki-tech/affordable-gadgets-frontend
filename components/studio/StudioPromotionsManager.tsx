@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
+import { useStudioAuth } from '@/components/studio/StudioAuthContext';
 import {
   createStudioPromotionType,
   deleteStudioPromotion,
@@ -25,6 +26,8 @@ export function StudioPromotionsManager({
   onSaved,
   onEditPromotion,
 }: StudioPromotionsManagerProps) {
+  const { capabilities } = useStudioAuth();
+  const canManageTypes = capabilities.canManagePromotionTypes;
   const [promotions, setPromotions] = useState<StudioPromotion[]>([]);
   const [types, setTypes] = useState<StudioPromotionType[]>([]);
   const [creating, setCreating] = useState(false);
@@ -209,43 +212,52 @@ export function StudioPromotionsManager({
 
       <section className="studio-editor__section">
         <h3 className="studio-editor__section-title">Promotion types</h3>
-        <form className="studio-editor__grid" onSubmit={handleCreateType}>
-          <label className="studio-field">
-            <span>Name</span>
-            <input className="studio-input" value={typeName} onChange={(e) => setTypeName(e.target.value)} />
-          </label>
-          <label className="studio-field">
-            <span>Code</span>
-            <input
-              className="studio-input"
-              value={typeCode}
-              onChange={(e) => setTypeCode(e.target.value)}
-              placeholder="SO"
-              maxLength={10}
-            />
-          </label>
-          <button type="submit" className="studio-btn studio-btn--primary">
-            Add type
-          </button>
-        </form>
-        <ul className="studio-hero-placement__list" style={{ marginTop: '0.75rem' }}>
-          {types.map((type) => (
-            <li key={type.id}>
-              <div className="studio-hero-placement__item" style={{ cursor: 'default' }}>
-                <span className="studio-hero-placement__title">
-                  {type.name} ({type.code})
-                  {type.is_active === false ? ' · off' : ''}
-                </span>
-                <button type="button" className="studio-btn studio-btn--ghost" onClick={() => void toggleTypeActive(type)}>
-                  {type.is_active === false ? 'Activate' : 'Deactivate'}
-                </button>
-                <button type="button" className="studio-btn studio-btn--ghost" onClick={() => void handleDeleteType(type)}>
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        {canManageTypes ? (
+          <>
+            <form className="studio-editor__grid" onSubmit={handleCreateType}>
+              <label className="studio-field">
+                <span>Name</span>
+                <input className="studio-input" value={typeName} onChange={(e) => setTypeName(e.target.value)} />
+              </label>
+              <label className="studio-field">
+                <span>Code</span>
+                <input
+                  className="studio-input"
+                  value={typeCode}
+                  onChange={(e) => setTypeCode(e.target.value)}
+                  placeholder="SO"
+                  maxLength={10}
+                />
+              </label>
+              <button type="submit" className="studio-btn studio-btn--primary">
+                Add type
+              </button>
+            </form>
+            <ul className="studio-hero-placement__list" style={{ marginTop: '0.75rem' }}>
+              {types.map((type) => (
+                <li key={type.id}>
+                  <div className="studio-hero-placement__item" style={{ cursor: 'default' }}>
+                    <span className="studio-hero-placement__title">
+                      {type.name} ({type.code})
+                      {type.is_active === false ? ' · off' : ''}
+                    </span>
+                    <button type="button" className="studio-btn studio-btn--ghost" onClick={() => void toggleTypeActive(type)}>
+                      {type.is_active === false ? 'Activate' : 'Deactivate'}
+                    </button>
+                    <button type="button" className="studio-btn studio-btn--ghost" onClick={() => void handleDeleteType(type)}>
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p className="studio-editor__hint">
+            Promotion types are managed by Marketing Managers. Available:{' '}
+            {types.map((t) => t.name).join(', ') || 'none'}.
+          </p>
+        )}
       </section>
     </div>
   );

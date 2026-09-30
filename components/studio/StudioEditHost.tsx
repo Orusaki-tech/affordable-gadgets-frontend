@@ -607,20 +607,32 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
         onClose={closeDrawer}
         onSaved={async () => {
           const kind = resource?.kind;
-          const isPicker =
+          const keepOpen =
             kind === 'taggedProducts' ||
             kind === 'taggedArticles' ||
             kind === 'featuredProducts' ||
             kind === 'brandBanner' ||
-            kind === 'homepageHero';
-          // Refetch curated sections immediately so the mirror behind the drawer matches.
+            kind === 'homepageHero' ||
+            kind === 'promotionsManager' ||
+            kind === 'financingOffers' ||
+            kind === 'reviewsManager' ||
+            (kind === 'deliveryRate' && resource?.mode === 'manage') ||
+            // Create→edit handoff: drawer stays open; defer reload until close.
+            (kind === 'product' && resource?.mode === 'create') ||
+            (kind === 'bundle' && resource?.mode === 'create') ||
+            (kind === 'article' && resource?.mode === 'create');
+
           await queryClient.invalidateQueries({ queryKey: ['products'] });
           await queryClient.invalidateQueries({ queryKey: ['articles'] });
           await queryClient.invalidateQueries({ queryKey: ['promotions'] });
+          await queryClient.invalidateQueries({ queryKey: ['bundles'] });
+          await queryClient.invalidateQueries({ queryKey: ['delivery-rates'] });
+          await queryClient.invalidateQueries({ queryKey: ['reviews'] });
+          await queryClient.invalidateQueries({ queryKey: ['financing-providers'] });
           await queryClient.refetchQueries({ queryKey: ['products', 'featured'] });
           await queryClient.refetchQueries({ queryKey: ['articles', 'featured'] });
           await queryClient.refetchQueries({ queryKey: ['promotions'] });
-          if (isPicker) {
+          if (keepOpen) {
             setRefreshOnClose(true);
             return;
           }

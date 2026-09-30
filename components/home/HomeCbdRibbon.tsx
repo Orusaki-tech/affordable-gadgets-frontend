@@ -39,15 +39,10 @@ function normalizeLocations(value: unknown): string[] {
 }
 
 function pickCbdPromotion(promotions: PublicPromotion[]): PublicPromotion | null {
-  const tagged = promotions.find((promo) =>
-    normalizeLocations(promo.display_locations).includes('cbd_ribbon')
-  );
-  if (tagged) return tagged;
   return (
-    promotions.find((promo) => {
-      const hay = `${promo.title || ''} ${promo.description || ''}`.toLowerCase();
-      return hay.includes('cbd') || hay.includes('500 off');
-    }) ?? null
+    promotions.find((promo) =>
+      normalizeLocations(promo.display_locations).includes('cbd_ribbon')
+    ) ?? null
   );
 }
 

@@ -207,13 +207,21 @@ export function StudioHomepageHeroEditor({
     (p) => p.id && !studioPromotionHasLocation(p, 'homepage_hero')
   );
 
-  const schedule = yearAheadIsoRange();
-  const createDefaults = {
-    display_locations: ['homepage_hero'] as string[],
-    carousel_position: (heroPromotions.length || 0) + 1,
-    start_date: schedule.start,
-    end_date: schedule.end,
-  };
+  const schedule = useMemo(() => yearAheadIsoRange(), []);
+  const createDefaults = useMemo(
+    () => ({
+      display_locations: ['homepage_hero'] as string[],
+      carousel_position: (heroPromotions.length || 0) + 1,
+      start_date: schedule.start,
+      end_date: schedule.end,
+    }),
+    [heroPromotions.length, schedule.end, schedule.start]
+  );
+  const editDefaults = useMemo(
+    () => ({ display_locations: ['homepage_hero'] as string[] }),
+    []
+  );
+  const forceHeroLocations = useMemo(() => ['homepage_hero'], []);
 
   return (
     <div className="studio-editor studio-editor--flush">
@@ -313,8 +321,8 @@ export function StudioHomepageHeroEditor({
         key={`${creating ? 'create' : `edit-${selected?.id ?? 'none'}`}-${editorKey}`}
         promotion={creating ? null : selected}
         roleHint={creating ? 'Create promotion' : 'Edit promotion'}
-        defaults={creating ? createDefaults : { display_locations: ['homepage_hero'] }}
-        forceLocations={['homepage_hero']}
+        defaults={creating ? createDefaults : editDefaults}
+        forceLocations={forceHeroLocations}
         onSaved={async (saved) => {
           await reload();
           setCreating(false);

@@ -10,11 +10,27 @@ import {
   listStudioProducts,
   patchStudioBundle,
   patchStudioBundleItem,
+  resolveStudioDefaultBrandId,
   StudioApiError,
   type StudioBundle,
   type StudioBundleItem,
   type StudioProduct,
 } from '@/lib/studio/api';
+
+const PRICING_MODES = [
+  { value: 'FX', label: 'Fixed' },
+  { value: 'PC', label: 'Percentage' },
+  { value: 'AM', label: 'Amount off' },
+] as const;
+
+function normalizePricingMode(raw?: string | null): string {
+  const v = (raw || 'FX').toLowerCase();
+  if (v === 'fixed' || v === 'fx') return 'FX';
+  if (v === 'percentage' || v === 'percent' || v === 'pc') return 'PC';
+  if (v === 'amount' || v === 'am') return 'AM';
+  if (raw === 'FX' || raw === 'PC' || raw === 'AM') return raw;
+  return 'FX';
+}
 
 type StudioBundleEditorProps = {
   mode?: 'create' | 'edit';
@@ -36,7 +52,7 @@ export function StudioBundleEditor({
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [showInListings, setShowInListings] = useState(true);
-  const [pricingMode, setPricingMode] = useState('fixed');
+  const [pricingMode, setPricingMode] = useState('FX');
   const [bundlePrice, setBundlePrice] = useState('');
   const [discountPercentage, setDiscountPercentage] = useState('');
   const [discountAmount, setDiscountAmount] = useState('');
@@ -55,7 +71,7 @@ export function StudioBundleEditor({
     setDescription(bundle?.description || '');
     setIsActive(bundle?.is_active ?? true);
     setShowInListings(bundle?.show_in_listings ?? true);
-    setPricingMode(bundle?.pricing_mode || 'fixed');
+    setPricingMode(normalizePricingMode(bundle?.pricing_mode));
     setBundlePrice(bundle?.bundle_price != null ? String(bundle.bundle_price) : '');
     setDiscountPercentage(
       bundle?.discount_percentage != null ? String(bundle.discount_percentage) : ''
@@ -117,19 +133,27 @@ export function StudioBundleEditor({
       setError('Select a main product.');
       return;
     }
+    const mode = normalizePricingMode(pricingMode);
+    if (mode === 'FX' && !bundlePrice.trim()) {
+      setError('Bundle price is required for fixed pricing.');
+      return;
+    }
     setSaving(true);
     try {
-      const payload = {
+      const payload: Record<string, string | boolean | number | null | undefined> = {
         title: title.trim(),
         description: description.trim(),
         is_active: isActive,
         show_in_listings: showInListings,
-        pricing_mode: pricingMode,
+        pricing_mode: mode,
         bundle_price: bundlePrice.trim() || null,
         discount_percentage: discountPercentage.trim() || null,
         discount_amount: discountAmount.trim() || null,
         main_product: mainProductId,
       };
+      if (isCreate) {
+        payload.brand = await resolveStudioDefaultBrandId();
+      }
       const saved = isCreate
         ? await createStudioBundle(payload)
         : await patchStudioBundle(bundleId!, payload);
@@ -255,9 +279,11 @@ export function StudioBundleEditor({
       <label className="studio-field">
         <span>Pricing mode</span>
         <select value={pricingMode} onChange={(e) => setPricingMode(e.target.value)}>
-          <option value="fixed">Fixed</option>
-          <option value="percentage">Percentage</option>
-          <option value="amount">Amount</option>
+          {PRICING_MODES.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
         </select>
       </label>
       <label className="studio-field">

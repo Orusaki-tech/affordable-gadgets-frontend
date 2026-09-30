@@ -142,6 +142,17 @@ export function StudioFinancingOffersManager({
       setError('Provider and product are required.');
       return;
     }
+    const unit = form.term_unit;
+    const payment =
+      unit === 'day'
+        ? form.daily_payment.trim()
+        : unit === 'week'
+          ? form.weekly_payment.trim()
+          : form.monthly_payment.trim();
+    if (!payment) {
+      setError(`Enter the ${unit}ly payment amount.`);
+      return;
+    }
     setSaving(true);
     try {
       const payload: Record<string, string | boolean | number | null | undefined> = {
@@ -149,11 +160,11 @@ export function StudioFinancingOffersManager({
         product: Number(form.product),
         deposit_amount: form.deposit_amount.trim() || '0',
         retail_amount: form.retail_amount.trim() || '0',
-        term_unit: form.term_unit,
+        term_unit: unit,
         term_count: form.term_count.trim() ? Number(form.term_count) : null,
-        monthly_payment: form.monthly_payment.trim() || null,
-        weekly_payment: form.weekly_payment.trim() || null,
-        daily_payment: form.daily_payment.trim() || null,
+        daily_payment: unit === 'day' ? payment : null,
+        weekly_payment: unit === 'week' ? payment : null,
+        monthly_payment: unit === 'month' ? payment : null,
         is_active: form.is_active,
       };
       if (editingId) {
@@ -310,19 +321,33 @@ export function StudioFinancingOffersManager({
               />
             </label>
             <label className="studio-field">
-              <span>Monthly payment</span>
+              <span>
+                {form.term_unit === 'day'
+                  ? 'Daily payment'
+                  : form.term_unit === 'week'
+                    ? 'Weekly payment'
+                    : 'Monthly payment'}{' '}
+                (KES)
+              </span>
               <input
                 className="studio-input"
-                value={form.monthly_payment}
-                onChange={(e) => setForm((p) => ({ ...p, monthly_payment: e.target.value }))}
-              />
-            </label>
-            <label className="studio-field">
-              <span>Weekly payment</span>
-              <input
-                className="studio-input"
-                value={form.weekly_payment}
-                onChange={(e) => setForm((p) => ({ ...p, weekly_payment: e.target.value }))}
+                value={
+                  form.term_unit === 'day'
+                    ? form.daily_payment
+                    : form.term_unit === 'week'
+                      ? form.weekly_payment
+                      : form.monthly_payment
+                }
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setForm((p) => ({
+                    ...p,
+                    daily_payment: p.term_unit === 'day' ? v : '',
+                    weekly_payment: p.term_unit === 'week' ? v : '',
+                    monthly_payment: p.term_unit === 'month' ? v : '',
+                  }));
+                }}
+                required
               />
             </label>
           </div>

@@ -74,11 +74,19 @@ export function StudioDeliveryRateEditor({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+    const countyName = county.trim();
+    const wardName = ward.trim();
+    const needsWard =
+      /nairobi/i.test(countyName) || /kiambu/i.test(countyName);
+    if (wardName && !needsWard) {
+      setError('Ward is only allowed for Nairobi or Kiambu counties.');
+      return;
+    }
     setSaving(true);
     try {
       const payload = {
-        county: county.trim(),
-        ward: ward.trim() || null,
+        county: countyName,
+        ward: needsWard ? wardName || null : null,
         price: price.trim(),
         is_active: isActive,
       };
@@ -187,7 +195,14 @@ export function StudioDeliveryRateEditor({
         </label>
         <label className="studio-field">
           <span>Ward (Nairobi / Kiambu only)</span>
-          <input value={ward} onChange={(e) => setWard(e.target.value)} />
+          <input
+            value={ward}
+            onChange={(e) => setWard(e.target.value)}
+            disabled={!/nairobi|kiambu/i.test(county)}
+            placeholder={
+              /nairobi|kiambu/i.test(county) ? 'Optional ward' : 'Not used for this county'
+            }
+          />
         </label>
         <label className="studio-field">
           <span>Price (KES)</span>

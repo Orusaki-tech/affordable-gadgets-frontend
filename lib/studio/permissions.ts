@@ -31,6 +31,8 @@ export type StudioCapabilities = {
   canEditReviews: boolean;
   /** Create admin reviews (Content Creator / superuser — matches CanCreateReviews). */
   canCreateReviews: boolean;
+  /** Create/edit/delete promotion types (MM / admin only). */
+  canManagePromotionTypes: boolean;
   /** Toggle Featured / Video tags for homepage curated sections (CC or IM). */
   canEditFeaturedSelection: boolean;
   /** Alias — same capability as featured (update_content + tags). */
@@ -103,6 +105,7 @@ export function getStudioCapabilities(
   const canEditDeliveryRates = isOM;
   const canEditReviews = isCC || isIM;
   const canCreateReviews = isCC;
+  const canManagePromotionTypes = isMM;
   const canEditFeaturedSelection = isCC || isIM;
   const canEditVideoSelection = canEditFeaturedSelection;
 
@@ -145,6 +148,7 @@ export function getStudioCapabilities(
     canEditDeliveryRates,
     canEditReviews,
     canCreateReviews,
+    canManagePromotionTypes,
     canEditFeaturedSelection,
     canEditVideoSelection,
     editableSummary:

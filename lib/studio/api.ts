@@ -1154,6 +1154,35 @@ export async function bulkStudioReviewAction(
   });
 }
 
+export type StudioBrand = {
+  id: number;
+  code?: string;
+  name?: string;
+  is_active?: boolean;
+};
+
+export async function listStudioBrands(): Promise<StudioBrand[]> {
+  const data = await studioFetchJson<StudioBrand[] | { results?: StudioBrand[] }>(
+    '/brands/?page_size=100'
+  );
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
+}
+
+/** Resolve the storefront brand id for create payloads (promotions / bundles). */
+export async function resolveStudioDefaultBrandId(): Promise<number> {
+  const brands = await listStudioBrands();
+  const code = brandConfig.code;
+  const match =
+    brands.find((b) => (b.code || '').toUpperCase() === code.toUpperCase() && b.is_active !== false) ||
+    brands.find((b) => b.is_active !== false) ||
+    brands[0];
+  if (!match?.id) {
+    throw new StudioApiError('No brand is available for Studio creates', 400, null);
+  }
+  return match.id;
+}
+
 export type StudioTag = {
   id: number;
   name?: string;

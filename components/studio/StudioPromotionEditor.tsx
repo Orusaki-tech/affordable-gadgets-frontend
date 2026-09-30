@@ -6,6 +6,7 @@ import {
   listStudioProducts,
   listStudioPromotionTypes,
   patchStudioPromotion,
+  resolveStudioDefaultBrandId,
   resolveStudioImageUrl,
   retrieveStudioProduct,
   StudioApiError,
@@ -350,6 +351,11 @@ export function StudioPromotionEditor({
       return;
     }
 
+    if (showListingBrand && !listingBrand.trim()) {
+      setError('Listing brand is required for brand banners.');
+      return;
+    }
+
     setSaving(true);
     try {
       const payload: Record<
@@ -375,10 +381,13 @@ export function StudioPromotionEditor({
       if (promotionTypeId.trim()) {
         payload.promotion_type = Number(promotionTypeId);
       } else if (!isCreate) {
-        payload.promotion_type = null;
+        payload.promotion_type = '';
       }
       if (bannerFile) {
         payload.banner_image = bannerFile;
+      }
+      if (isCreate) {
+        payload.brand = await resolveStudioDefaultBrandId();
       }
 
       const saved = isCreate

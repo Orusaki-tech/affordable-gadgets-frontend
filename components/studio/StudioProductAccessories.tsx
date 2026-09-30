@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   createStudioProductAccessory,
   deleteStudioProductAccessory,
@@ -120,11 +120,7 @@ export function StudioProductAccessories({ productId }: Props) {
           </li>
         ))}
       </ul>
-      <form
-        className="studio-editor__grid"
-        onSubmit={(e: FormEvent) => e.preventDefault()}
-        style={{ marginTop: '0.75rem' }}
-      >
+      <div className="studio-editor__grid" style={{ marginTop: '0.75rem' }}>
         <label className="studio-field studio-field--full">
           <span>Search accessory product</span>
           <input className="studio-input" value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -133,7 +129,7 @@ export function StudioProductAccessories({ productId }: Props) {
           <span>Qty</span>
           <input className="studio-input" value={qty} onChange={(e) => setQty(e.target.value)} />
         </label>
-      </form>
+      </div>
       {hits.length > 0 && (
         <ul className="studio-hero-placement__list">
           {hits.map((p) => (

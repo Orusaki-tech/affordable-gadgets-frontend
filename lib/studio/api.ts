@@ -340,11 +340,9 @@ function appendFormValue(
     | Record<string, unknown>
     | unknown[]
 ) {
-  if (value === undefined) return;
-  if (value === null) {
-    form.append(key, '');
-    return;
-  }
+  // Match admin multipart behavior: omit null/undefined so DRF does not
+  // try to coerce empty strings into decimals / FKs.
+  if (value === undefined || value === null) return;
   if (typeof value === 'boolean') {
     form.append(key, value ? 'true' : 'false');
     return;
@@ -353,6 +351,7 @@ function appendFormValue(
     form.append(key, JSON.stringify(value));
     return;
   }
+  if (value === '') return;
   form.append(key, value as string | Blob);
 }
 
@@ -456,7 +455,13 @@ export async function createStudioArticle(
   );
   if (hasFile) {
     const form = new FormData();
-    Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === 'product_ids' && Array.isArray(value)) {
+        value.forEach((id) => form.append('product_ids', String(id)));
+        return;
+      }
+      appendFormValue(form, key, value);
+    });
     return studioFetchJson<StudioArticle>('/articles/', {
       method: 'POST',
       body: form,
@@ -489,7 +494,13 @@ export async function patchStudioArticle(
   const hasFile = Object.values(data).some((value) => typeof Blob !== 'undefined' && value instanceof Blob);
   if (hasFile) {
     const form = new FormData();
-    Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === 'product_ids' && Array.isArray(value)) {
+        value.forEach((pid) => form.append('product_ids', String(pid)));
+        return;
+      }
+      appendFormValue(form, key, value);
+    });
     return studioFetchJson<StudioArticle>(`/articles/${id}/`, {
       method: 'PATCH',
       body: form,

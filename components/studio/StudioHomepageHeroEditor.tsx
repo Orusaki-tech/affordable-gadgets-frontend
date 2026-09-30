@@ -58,9 +58,9 @@ function storefrontDatePayload(promotion?: StudioPromotion | null): {
   end_date?: string;
 } {
   const range = yearAheadIsoRange();
-  if (!promotion) return range;
+  if (!promotion) return { start_date: range.start, end_date: range.end };
   if (isPromotionWindowActive(promotion)) return {};
-  return range;
+  return { start_date: range.start, end_date: range.end };
 }
 
 export function StudioHomepageHeroEditor({

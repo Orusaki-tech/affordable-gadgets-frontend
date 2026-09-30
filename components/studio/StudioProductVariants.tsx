@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   createStudioProductVariant,
   deleteStudioProductVariant,
@@ -48,8 +48,7 @@ export function StudioProductVariants({ productId }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
-  const handleAdd = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleAdd = async () => {
     setError(null);
     if (!sellingPrice.trim()) {
       setError('Selling price is required.');
@@ -163,7 +162,7 @@ export function StudioProductVariants({ productId }: Props) {
           </li>
         ))}
       </ul>
-      <form className="studio-editor__grid" onSubmit={handleAdd} style={{ marginTop: '0.75rem' }}>
+      <div className="studio-editor__grid" style={{ marginTop: '0.75rem' }}>
         <label className="studio-field">
           <span>Storage GB</span>
           <input className="studio-input" value={storageGb} onChange={(e) => setStorageGb(e.target.value)} />
@@ -174,16 +173,16 @@ export function StudioProductVariants({ productId }: Props) {
         </label>
         <label className="studio-field">
           <span>Selling price</span>
-          <input className="studio-input" value={sellingPrice} onChange={(e) => setSellingPrice(e.target.value)} required />
+          <input className="studio-input" value={sellingPrice} onChange={(e) => setSellingPrice(e.target.value)} />
         </label>
         <label className="studio-field">
           <span>Cost of unit</span>
           <input className="studio-input" value={cost} onChange={(e) => setCost(e.target.value)} />
         </label>
-        <button type="submit" className="studio-btn studio-btn--primary">
+        <button type="button" className="studio-btn studio-btn--primary" onClick={() => void handleAdd()}>
           Add variant
         </button>
-      </form>
+      </div>
     </section>
   );
 }

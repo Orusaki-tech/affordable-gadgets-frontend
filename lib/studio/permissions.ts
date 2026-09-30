@@ -27,8 +27,10 @@ export type StudioCapabilities = {
   canEditBundles: boolean;
   canEditFinancing: boolean;
   canEditDeliveryRates: boolean;
-  /** Moderate / create / delete product reviews (CC or IM). */
+  /** Moderate / delete product reviews (CC or IM). Create is CC-aligned with API. */
   canEditReviews: boolean;
+  /** Create admin reviews (Content Creator / superuser — matches CanCreateReviews). */
+  canCreateReviews: boolean;
   /** Toggle Featured / Video tags for homepage curated sections (CC or IM). */
   canEditFeaturedSelection: boolean;
   /** Alias — same capability as featured (update_content + tags). */
@@ -100,6 +102,7 @@ export function getStudioCapabilities(
   const canEditFinancing = isIM;
   const canEditDeliveryRates = isOM;
   const canEditReviews = isCC || isIM;
+  const canCreateReviews = isCC;
   const canEditFeaturedSelection = isCC || isIM;
   const canEditVideoSelection = canEditFeaturedSelection;
 
@@ -141,6 +144,7 @@ export function getStudioCapabilities(
     canEditFinancing,
     canEditDeliveryRates,
     canEditReviews,
+    canCreateReviews,
     canEditFeaturedSelection,
     canEditVideoSelection,
     editableSummary:

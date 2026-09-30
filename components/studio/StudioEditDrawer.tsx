@@ -187,8 +187,12 @@ export function StudioEditDrawer({
           <StudioArticleEditor
             mode={active.mode === 'create' || !active.article?.id ? 'create' : 'edit'}
             article={active.article}
-            onSaved={async () => {
+            onSaved={async (saved) => {
               await onSaved();
+              if (active.mode === 'create' || !active.article?.id) {
+                setActive({ kind: 'article', mode: 'edit', article: saved });
+                return;
+              }
               onClose();
             }}
             onDeleted={async () => {
@@ -223,8 +227,12 @@ export function StudioEditDrawer({
             mode={active.mode === 'create' || !active.bundle?.id ? 'create' : 'edit'}
             bundle={active.bundle}
             roleHint={roleHint}
-            onSaved={async () => {
+            onSaved={async (saved) => {
               await onSaved();
+              if (active.mode === 'create' || !active.bundle?.id) {
+                setActive({ kind: 'bundle', mode: 'edit', bundle: saved });
+                return;
+              }
               onClose();
             }}
             onDeleted={async () => {

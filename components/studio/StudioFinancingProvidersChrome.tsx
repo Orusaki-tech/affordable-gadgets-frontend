@@ -50,6 +50,14 @@ export function StudioFinancingProvidersChrome({
         <p className="studio-financing-chrome__label">
           {studioEdit?.capabilities.editableSummary || 'Financing partners'}
         </p>
+        <button
+          type="button"
+          className="studio-btn studio-btn--primary"
+          style={{ marginBottom: '0.5rem' }}
+          onClick={() => studioEdit?.openFinancingOffers()}
+        >
+          Manage offers
+        </button>
         {error && <p className="studio-financing-chrome__error">{error}</p>}
         <ul className="studio-financing-chrome__list">
           {providers.map((provider) => (

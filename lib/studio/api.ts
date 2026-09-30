@@ -303,7 +303,11 @@ export async function updateStudioProductContent(
 }
 
 export async function deleteStudioProduct(id: number): Promise<void> {
-  const res = await studioFetch(`/products/${id}/`, { method: 'DELETE' });
+  await studioDelete(`/products/${id}/`);
+}
+
+async function studioDelete(path: string): Promise<void> {
+  const res = await studioFetch(path, { method: 'DELETE' });
   if (!res.ok && res.status !== 204) {
     const body = await parseBody(res);
     throw new StudioApiError(
@@ -412,6 +416,7 @@ export type StudioArticle = {
   product?: number | null;
   product_name?: string | null;
   product_slug?: string | null;
+  products?: Array<{ id?: number; product_name?: string; slug?: string } | number>;
   thumbnail_image?: string | null;
   tags?: Array<{ id?: number; name?: string; slug?: string }>;
 };
@@ -441,6 +446,31 @@ export async function listStudioArticles(params: {
 
 export async function retrieveStudioArticle(id: number): Promise<StudioArticle> {
   return studioFetchJson<StudioArticle>(`/articles/${id}/`);
+}
+
+export async function createStudioArticle(
+  data: Record<string, string | Blob | boolean | number | null | undefined | number[]>
+): Promise<StudioArticle> {
+  const hasFile = Object.values(data).some(
+    (value) => typeof Blob !== 'undefined' && value instanceof Blob
+  );
+  if (hasFile) {
+    const form = new FormData();
+    Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
+    return studioFetchJson<StudioArticle>('/articles/', {
+      method: 'POST',
+      body: form,
+      multipart: true,
+    });
+  }
+  return studioFetchJson<StudioArticle>('/articles/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStudioArticle(id: number): Promise<void> {
+  await studioDelete(`/articles/${id}/`);
 }
 
 export async function findStudioArticleBySlug(slug: string): Promise<StudioArticle | null> {
@@ -547,8 +577,68 @@ export type StudioPromotion = {
   listing_brand?: string | null;
   carousel_position?: number | null;
   featured_product?: number | null;
+  featured_sale_price?: string | number | null;
+  product_types?: string | null;
+  products?: number[];
   promotion_code?: string | null;
+  promotion_type?: number | null;
+  promotion_type_name?: string | null;
+  brand?: number | null;
+  brand_name?: string | null;
 };
+
+export type StudioPromotionType = {
+  id: number;
+  name: string;
+  code?: string;
+  is_active?: boolean;
+  display_order?: number;
+};
+
+export async function listStudioPromotionTypes(): Promise<StudioPromotionType[]> {
+  const data = await studioFetchJson<
+    StudioPromotionType[] | { results?: StudioPromotionType[] }
+  >('/promotion-types/?page_size=100');
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
+}
+
+export async function createStudioPromotionType(data: {
+  name: string;
+  code: string;
+  description?: string;
+  is_active?: boolean;
+  display_order?: number;
+}): Promise<StudioPromotionType> {
+  return studioFetchJson<StudioPromotionType>('/promotion-types/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function patchStudioPromotionType(
+  id: number,
+  data: Partial<{
+    name: string;
+    code: string;
+    description: string;
+    is_active: boolean;
+    display_order: number;
+  }>
+): Promise<StudioPromotionType> {
+  return studioFetchJson<StudioPromotionType>(`/promotion-types/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStudioPromotionType(id: number): Promise<void> {
+  await studioDelete(`/promotion-types/${id}/`);
+}
+
+export async function deleteStudioPromotion(id: number): Promise<void> {
+  await studioDelete(`/promotions/${id}/`);
+}
 
 export async function listStudioPromotions(params?: {
   page?: number;
@@ -566,10 +656,19 @@ export async function retrieveStudioPromotion(id: number): Promise<StudioPromoti
 }
 
 export async function createStudioPromotion(
-  data: Record<string, string | Blob | boolean | number | null | undefined | string[]>
+  data: Record<
+    string,
+    string | Blob | boolean | number | null | undefined | string[] | number[]
+  >
 ): Promise<StudioPromotion> {
   const form = new FormData();
-  Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
+  Object.entries(data).forEach(([key, value]) => {
+    if (key === 'products' && Array.isArray(value)) {
+      value.forEach((id) => form.append('products', String(id)));
+      return;
+    }
+    appendFormValue(form, key, value);
+  });
   return studioFetchJson<StudioPromotion>('/promotions/', {
     method: 'POST',
     body: form,
@@ -581,11 +680,25 @@ export async function patchStudioPromotion(
   id: number,
   data: Record<
     string,
-    string | Blob | boolean | number | null | undefined | Record<string, unknown> | unknown[]
+    | string
+    | Blob
+    | boolean
+    | number
+    | null
+    | undefined
+    | Record<string, unknown>
+    | unknown[]
+    | number[]
   >
 ): Promise<StudioPromotion> {
   const form = new FormData();
-  Object.entries(data).forEach(([key, value]) => appendFormValue(form, key, value));
+  Object.entries(data).forEach(([key, value]) => {
+    if (key === 'products' && Array.isArray(value)) {
+      value.forEach((id) => form.append('products', String(id)));
+      return;
+    }
+    appendFormValue(form, key, value);
+  });
   return studioFetchJson<StudioPromotion>(`/promotions/${id}/`, {
     method: 'PATCH',
     body: form,
@@ -626,6 +739,17 @@ export async function findStudioBrandBannerPromotion(
   );
 }
 
+export type StudioBundleItem = {
+  id: number;
+  bundle?: number;
+  product: number;
+  product_name?: string;
+  product_slug?: string;
+  quantity?: number;
+  override_price?: string | number | null;
+  display_order?: number;
+};
+
 export type StudioBundle = {
   id: number;
   title?: string;
@@ -638,10 +762,30 @@ export type StudioBundle = {
   show_in_listings?: boolean;
   main_product?: number | null;
   main_product_name?: string | null;
+  items?: StudioBundleItem[];
+  brand?: number | null;
 };
+
+export async function listStudioBundles(params?: {
+  page?: number;
+}): Promise<{ count: number; results: StudioBundle[]; next: string | null }> {
+  const query = new URLSearchParams();
+  query.set('page_size', '100');
+  if (params?.page) query.set('page', String(params.page));
+  return studioFetchJson(`/bundles/?${query.toString()}`);
+}
 
 export async function retrieveStudioBundle(id: number): Promise<StudioBundle> {
   return studioFetchJson<StudioBundle>(`/bundles/${id}/`);
+}
+
+export async function createStudioBundle(
+  data: Record<string, string | boolean | number | null | undefined>
+): Promise<StudioBundle> {
+  return studioFetchJson<StudioBundle>('/bundles/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
 }
 
 export async function patchStudioBundle(
@@ -652,6 +796,50 @@ export async function patchStudioBundle(
     method: 'PATCH',
     body: JSON.stringify(data),
   });
+}
+
+export async function deleteStudioBundle(id: number): Promise<void> {
+  await studioDelete(`/bundles/${id}/`);
+}
+
+export async function listStudioBundleItems(bundleId: number): Promise<StudioBundleItem[]> {
+  const data = await studioFetchJson<StudioBundleItem[] | { results?: StudioBundleItem[] }>(
+    `/bundle-items/?bundle=${bundleId}&page_size=100`
+  );
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
+}
+
+export async function createStudioBundleItem(data: {
+  bundle: number;
+  product: number;
+  quantity?: number;
+  override_price?: string | number | null;
+  display_order?: number;
+}): Promise<StudioBundleItem> {
+  return studioFetchJson<StudioBundleItem>('/bundle-items/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function patchStudioBundleItem(
+  id: number,
+  data: Partial<{
+    product: number;
+    quantity: number;
+    override_price: string | number | null;
+    display_order: number;
+  }>
+): Promise<StudioBundleItem> {
+  return studioFetchJson<StudioBundleItem>(`/bundle-items/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStudioBundleItem(id: number): Promise<void> {
+  await studioDelete(`/bundle-items/${id}/`);
 }
 
 export type StudioFinancingProvider = {
@@ -699,6 +887,64 @@ export async function patchStudioFinancingProvider(
   });
 }
 
+export type StudioFinancingOffer = {
+  id: number;
+  provider: number;
+  provider_name?: string;
+  product: number;
+  product_name?: string;
+  deposit_amount?: string | number;
+  retail_amount?: string | number;
+  term_unit?: 'day' | 'week' | 'month' | null;
+  term_count?: number | null;
+  daily_payment?: string | number | null;
+  weekly_payment?: string | number | null;
+  monthly_payment?: string | number | null;
+  ram_gb?: number | null;
+  rom_gb?: number | null;
+  is_active?: boolean;
+};
+
+export async function listStudioFinancingOffers(params?: {
+  provider?: number;
+  product?: number;
+  page?: number;
+}): Promise<StudioFinancingOffer[]> {
+  const query = new URLSearchParams();
+  query.set('page_size', '100');
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.provider) query.set('provider', String(params.provider));
+  if (params?.product) query.set('product', String(params.product));
+  const data = await studioFetchJson<
+    StudioFinancingOffer[] | { results?: StudioFinancingOffer[] }
+  >(`/financing-offers/?${query.toString()}`);
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
+}
+
+export async function createStudioFinancingOffer(
+  data: Record<string, string | boolean | number | null | undefined>
+): Promise<StudioFinancingOffer> {
+  return studioFetchJson<StudioFinancingOffer>('/financing-offers/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function patchStudioFinancingOffer(
+  id: number,
+  data: Record<string, string | boolean | number | null | undefined>
+): Promise<StudioFinancingOffer> {
+  return studioFetchJson<StudioFinancingOffer>(`/financing-offers/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStudioFinancingOffer(id: number): Promise<void> {
+  await studioDelete(`/financing-offers/${id}/`);
+}
+
 export type StudioDeliveryRate = {
   id: number;
   county?: string;
@@ -711,6 +957,24 @@ export async function retrieveStudioDeliveryRate(id: number): Promise<StudioDeli
   return studioFetchJson<StudioDeliveryRate>(`/delivery-rates/${id}/`);
 }
 
+export async function listStudioDeliveryRates(params?: {
+  page?: number;
+}): Promise<{ count: number; results: StudioDeliveryRate[]; next: string | null }> {
+  const query = new URLSearchParams();
+  query.set('page_size', '100');
+  if (params?.page) query.set('page', String(params.page));
+  return studioFetchJson(`/delivery-rates/?${query.toString()}`);
+}
+
+export async function createStudioDeliveryRate(
+  data: Record<string, string | boolean | number | null | undefined>
+): Promise<StudioDeliveryRate> {
+  return studioFetchJson<StudioDeliveryRate>('/delivery-rates/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
 export async function patchStudioDeliveryRate(
   id: number,
   data: Record<string, string | boolean | number | null | undefined>
@@ -718,6 +982,164 @@ export async function patchStudioDeliveryRate(
   return studioFetchJson<StudioDeliveryRate>(`/delivery-rates/${id}/`, {
     method: 'PATCH',
     body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStudioDeliveryRate(id: number): Promise<void> {
+  await studioDelete(`/delivery-rates/${id}/`);
+}
+
+export type StudioProductVariant = {
+  id: number;
+  product?: number;
+  product_id?: number;
+  storage_gb?: number | null;
+  ram_gb?: number | null;
+  default_selling_price?: string | number;
+  default_cost_of_unit?: string | number;
+  is_active?: boolean;
+};
+
+export async function listStudioProductVariants(productId: number): Promise<StudioProductVariant[]> {
+  const data = await studioFetchJson<
+    StudioProductVariant[] | { results?: StudioProductVariant[] }
+  >(`/variants/?product=${productId}&page_size=100`);
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
+}
+
+export async function createStudioProductVariant(data: {
+  product_id: number;
+  storage_gb?: number | null;
+  ram_gb?: number | null;
+  default_selling_price: string | number;
+  default_cost_of_unit?: string | number;
+  is_active?: boolean;
+}): Promise<StudioProductVariant> {
+  return studioFetchJson<StudioProductVariant>('/variants/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function patchStudioProductVariant(
+  id: number,
+  data: Partial<{
+    storage_gb: number | null;
+    ram_gb: number | null;
+    default_selling_price: string | number;
+    default_cost_of_unit: string | number;
+    is_active: boolean;
+  }>
+): Promise<StudioProductVariant> {
+  return studioFetchJson<StudioProductVariant>(`/variants/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStudioProductVariant(id: number): Promise<void> {
+  await studioDelete(`/variants/${id}/`);
+}
+
+export type StudioProductAccessoryLink = {
+  id: number;
+  main_product: number;
+  accessory: number;
+  accessory_name?: string;
+  required_quantity?: number;
+};
+
+export async function listStudioProductAccessories(
+  mainProductId: number
+): Promise<StudioProductAccessoryLink[]> {
+  const data = await studioFetchJson<
+    StudioProductAccessoryLink[] | { results?: StudioProductAccessoryLink[] }
+  >(`/accessories-link/?main_product=${mainProductId}&page_size=100`);
+  if (Array.isArray(data)) return data;
+  return data.results ?? [];
+}
+
+export async function createStudioProductAccessory(data: {
+  main_product: number;
+  accessory: number;
+  required_quantity?: number;
+}): Promise<StudioProductAccessoryLink> {
+  return studioFetchJson<StudioProductAccessoryLink>('/accessories-link/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStudioProductAccessory(id: number): Promise<void> {
+  await studioDelete(`/accessories-link/${id}/`);
+}
+
+export type StudioReview = {
+  id: number;
+  product: number;
+  product_name?: string;
+  rating: number;
+  comment?: string;
+  product_condition?: string | null;
+  purchase_date?: string | null;
+  customer_username?: string | null;
+  is_admin_review?: boolean;
+  date_posted?: string;
+};
+
+export async function listStudioReviews(params?: {
+  product?: number;
+  search?: string;
+  page?: number;
+}): Promise<{ count: number; results: StudioReview[]; next: string | null }> {
+  const query = new URLSearchParams();
+  query.set('page_size', '50');
+  if (params?.page) query.set('page', String(params.page));
+  if (params?.product) query.set('product', String(params.product));
+  if (params?.search?.trim()) query.set('search', params.search.trim());
+  return studioFetchJson(`/reviews/?${query.toString()}`);
+}
+
+export async function createStudioReview(data: {
+  product: number;
+  rating: number;
+  comment?: string;
+  product_condition?: string | null;
+  purchase_date?: string | null;
+}): Promise<StudioReview> {
+  return studioFetchJson<StudioReview>('/reviews/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function patchStudioReview(
+  id: number,
+  data: Partial<{
+    rating: number;
+    comment: string;
+    product_condition: string | null;
+    purchase_date: string | null;
+  }>
+): Promise<StudioReview> {
+  return studioFetchJson<StudioReview>(`/reviews/${id}/`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteStudioReview(id: number): Promise<void> {
+  await studioDelete(`/reviews/${id}/`);
+}
+
+export async function bulkStudioReviewAction(
+  action: 'delete' | 'hide' | 'approve' | 'reject',
+  reviewIds: number[]
+): Promise<{ message?: string }> {
+  return studioFetchJson('/reviews/bulk_action/', {
+    method: 'POST',
+    body: JSON.stringify({ action, review_ids: reviewIds }),
   });
 }
 

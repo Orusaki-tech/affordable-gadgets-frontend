@@ -42,11 +42,25 @@ type StudioEditHostValue = {
   ) => Promise<void>;
   deleteProduct: (product: Pick<PublicProduct, 'id' | 'product_name'>) => Promise<void>;
   openEditArticle: (ref: { id?: number | null; slug?: string | null }) => Promise<void>;
+  openCreateArticle: () => void;
   openEditPromotion: (id: number) => Promise<void>;
+  openCreatePromotion: (opts?: {
+    title?: string;
+    description?: string;
+    display_locations?: string[];
+    forceLocations?: string[];
+    lockLocations?: boolean;
+  }) => void;
+  openPromotionsManager: () => void;
   openEditHomepageHero: (preferPromotionId?: number | null) => void;
   openEditBundle: (id: number) => Promise<void>;
+  openCreateBundle: () => void;
   openEditFinancingProvider: (id: number) => Promise<void>;
+  openFinancingOffers: (preferProviderId?: number | null) => void;
   openEditDeliveryRate: (id: number) => Promise<void>;
+  openDeliveryRatesManager: () => void;
+  openCreateDeliveryRate: () => void;
+  openReviewsManager: (preferProductId?: number | null) => void;
   openEditFeaturedProducts: () => void;
   openEditVideoProducts: () => void;
   openEditFeaturedArticles: () => void;
@@ -201,7 +215,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
           setError('Could not find article for editing');
           return;
         }
-        setResource({ kind: 'article', article: full });
+        setResource({ kind: 'article', mode: 'edit', article: full });
         setDrawerOpen(true);
       } catch (err) {
         setError(
@@ -216,6 +230,16 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     [capabilities?.canEditArticles]
   );
 
+  const openCreateArticle = useCallback(() => {
+    if (!capabilities?.canEditArticles) {
+      setError('Your role cannot edit articles.');
+      return;
+    }
+    setError(null);
+    setResource({ kind: 'article', mode: 'create', article: null });
+    setDrawerOpen(true);
+  }, [capabilities?.canEditArticles]);
+
   const openEditPromotion = useCallback(
     async (id: number) => {
       if (!id) return;
@@ -226,7 +250,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       setError(null);
       try {
         const full = await retrieveStudioPromotion(id);
-        setResource({ kind: 'promotion', promotion: full });
+        setResource({ kind: 'promotion', mode: 'edit', promotion: full });
         setDrawerOpen(true);
       } catch (err) {
         setError(
@@ -240,6 +264,51 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     },
     [capabilities?.canEditPromotions]
   );
+
+  const openCreatePromotion = useCallback(
+    (opts?: {
+      title?: string;
+      description?: string;
+      display_locations?: string[];
+      forceLocations?: string[];
+      lockLocations?: boolean;
+    }) => {
+      if (!capabilities?.canEditPromotions) {
+        setError('Your role cannot edit promotions.');
+        return;
+      }
+      setError(null);
+      const start = new Date();
+      const end = new Date();
+      end.setFullYear(end.getFullYear() + 2);
+      setResource({
+        kind: 'promotion',
+        mode: 'create',
+        promotion: null,
+        defaults: {
+          title: opts?.title,
+          description: opts?.description,
+          display_locations: opts?.display_locations ?? opts?.forceLocations,
+          start_date: start.toISOString(),
+          end_date: end.toISOString(),
+        },
+        forceLocations: opts?.forceLocations,
+        lockLocations: opts?.lockLocations,
+      });
+      setDrawerOpen(true);
+    },
+    [capabilities?.canEditPromotions]
+  );
+
+  const openPromotionsManager = useCallback(() => {
+    if (!capabilities?.canEditPromotions) {
+      setError('Your role cannot edit promotions.');
+      return;
+    }
+    setError(null);
+    setResource({ kind: 'promotionsManager' });
+    setDrawerOpen(true);
+  }, [capabilities?.canEditPromotions]);
 
   const openEditHomepageHero = useCallback(
     (preferPromotionId?: number | null) => {
@@ -268,7 +337,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       setError(null);
       try {
         const full = await retrieveStudioBundle(id);
-        setResource({ kind: 'bundle', bundle: full });
+        setResource({ kind: 'bundle', mode: 'edit', bundle: full });
         setDrawerOpen(true);
       } catch (err) {
         setError(
@@ -282,6 +351,16 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     },
     [capabilities?.canEditBundles]
   );
+
+  const openCreateBundle = useCallback(() => {
+    if (!capabilities?.canEditBundles) {
+      setError('Your role cannot edit bundles (Marketing Manager only).');
+      return;
+    }
+    setError(null);
+    setResource({ kind: 'bundle', mode: 'create', bundle: null });
+    setDrawerOpen(true);
+  }, [capabilities?.canEditBundles]);
 
   const openEditFinancingProvider = useCallback(
     async (id: number) => {
@@ -308,6 +387,22 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     [capabilities?.canEditFinancing]
   );
 
+  const openFinancingOffers = useCallback(
+    (preferProviderId?: number | null) => {
+      if (!capabilities?.canEditFinancing) {
+        setError('Your role cannot edit financing offers.');
+        return;
+      }
+      setError(null);
+      setResource({
+        kind: 'financingOffers',
+        preferProviderId: typeof preferProviderId === 'number' ? preferProviderId : null,
+      });
+      setDrawerOpen(true);
+    },
+    [capabilities?.canEditFinancing]
+  );
+
   const openEditDeliveryRate = useCallback(
     async (id: number) => {
       if (!id) return;
@@ -318,7 +413,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       setError(null);
       try {
         const full = await retrieveStudioDeliveryRate(id);
-        setResource({ kind: 'deliveryRate', rate: full });
+        setResource({ kind: 'deliveryRate', mode: 'edit', rate: full });
         setDrawerOpen(true);
       } catch (err) {
         setError(
@@ -331,6 +426,42 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       }
     },
     [capabilities?.canEditDeliveryRates]
+  );
+
+  const openDeliveryRatesManager = useCallback(() => {
+    if (!capabilities?.canEditDeliveryRates) {
+      setError('Your role cannot edit delivery rates (Order Manager only).');
+      return;
+    }
+    setError(null);
+    setResource({ kind: 'deliveryRate', mode: 'manage', rate: null });
+    setDrawerOpen(true);
+  }, [capabilities?.canEditDeliveryRates]);
+
+  const openCreateDeliveryRate = useCallback(() => {
+    if (!capabilities?.canEditDeliveryRates) {
+      setError('Your role cannot edit delivery rates (Order Manager only).');
+      return;
+    }
+    setError(null);
+    setResource({ kind: 'deliveryRate', mode: 'create', rate: null });
+    setDrawerOpen(true);
+  }, [capabilities?.canEditDeliveryRates]);
+
+  const openReviewsManager = useCallback(
+    (preferProductId?: number | null) => {
+      if (!capabilities?.canEditReviews) {
+        setError('Your role cannot moderate reviews.');
+        return;
+      }
+      setError(null);
+      setResource({
+        kind: 'reviewsManager',
+        preferProductId: typeof preferProductId === 'number' ? preferProductId : null,
+      });
+      setDrawerOpen(true);
+    },
+    [capabilities?.canEditReviews]
   );
 
   const openEditFeaturedProducts = useCallback(() => {
@@ -394,7 +525,8 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
           capabilities.canEditPromotions ||
           capabilities.canEditBundles ||
           capabilities.canEditFinancing ||
-          capabilities.canEditDeliveryRates
+          capabilities.canEditDeliveryRates ||
+          capabilities.canEditReviews
       ),
       canDelete: capabilities.canDeleteProduct,
       canCreate: capabilities.canCreateProduct,
@@ -402,11 +534,19 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       openEditProduct,
       deleteProduct,
       openEditArticle,
+      openCreateArticle,
       openEditPromotion,
+      openCreatePromotion,
+      openPromotionsManager,
       openEditHomepageHero,
       openEditBundle,
+      openCreateBundle,
       openEditFinancingProvider,
+      openFinancingOffers,
       openEditDeliveryRate,
+      openDeliveryRatesManager,
+      openCreateDeliveryRate,
+      openReviewsManager,
       openEditFeaturedProducts,
       openEditVideoProducts,
       openEditFeaturedArticles,
@@ -419,11 +559,19 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     openEditProduct,
     deleteProduct,
     openEditArticle,
+    openCreateArticle,
     openEditPromotion,
+    openCreatePromotion,
+    openPromotionsManager,
     openEditHomepageHero,
     openEditBundle,
+    openCreateBundle,
     openEditFinancingProvider,
+    openFinancingOffers,
     openEditDeliveryRate,
+    openDeliveryRatesManager,
+    openCreateDeliveryRate,
+    openReviewsManager,
     openEditFeaturedProducts,
     openEditVideoProducts,
     openEditFeaturedArticles,

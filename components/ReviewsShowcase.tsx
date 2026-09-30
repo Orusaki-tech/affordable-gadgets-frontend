@@ -14,6 +14,8 @@ import { CommunityVerifiedHub } from '@/components/home/CommunityVerifiedHub';
 import { apiBaseUrl } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
 
+import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
+
 function formatDate(dateString?: string | null): string {
   if (!dateString) return '—';
   const date = new Date(dateString);
@@ -60,6 +62,8 @@ interface ReviewsShowcaseProps {
 }
 
 export function ReviewsShowcase({ productId, variant = 'default' }: ReviewsShowcaseProps) {
+  const studioEdit = useStudioEditOptional();
+  const canModerate = Boolean(studioEdit?.capabilities.canEditReviews);
   const queryClient = useQueryClient();
   const isHub = variant === 'hub' && !productId;
   const productReviewsQuery = useProductReviews(productId ?? 0, {
@@ -321,6 +325,15 @@ export function ReviewsShowcase({ productId, variant = 'default' }: ReviewsShowc
         </p>
       </div>
       <div className="reviews-showcase__actions">
+        {canModerate && (
+          <button
+            type="button"
+            className="studio-btn studio-btn--primary"
+            onClick={() => studioEdit?.openReviewsManager(productId ?? null)}
+          >
+            Moderate reviews
+          </button>
+        )}
         <button
           type="button"
           onClick={openReviewModal}

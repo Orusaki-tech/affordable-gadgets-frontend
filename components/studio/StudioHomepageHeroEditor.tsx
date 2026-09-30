@@ -1,15 +1,14 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  createStudioPromotion,
   listStudioPromotions,
   patchStudioPromotion,
-  resolveStudioImageUrl,
   StudioApiError,
   studioPromotionHasLocation,
   type StudioPromotion,
 } from '@/lib/studio/api';
+import { StudioPromotionEditor } from '@/components/studio/StudioPromotionEditor';
 
 type StudioHomepageHeroEditorProps = {
   roleHint?: string;
@@ -72,16 +71,11 @@ export function StudioHomepageHeroEditor({
   const [allPromotions, setAllPromotions] = useState<StudioPromotion[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(preferPromotionId ?? null);
   const [creating, setCreating] = useState(false);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [carouselPosition, setCarouselPosition] = useState('1');
-  const [isActive, setIsActive] = useState(true);
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [editorKey, setEditorKey] = useState(0);
 
   const heroPromotions = useMemo(
     () => allPromotions.filter((p) => studioPromotionHasLocation(p, 'homepage_hero')),
@@ -131,7 +125,6 @@ export function StudioHomepageHeroEditor({
           setSelectedId(liveHero.id);
           setCreating(false);
         } else if (heroes[0]?.id) {
-          // Expired heroes still editable so editors can revive them.
           setSelectedId(heroes[0].id);
           setCreating(false);
         } else {
@@ -158,48 +151,12 @@ export function StudioHomepageHeroEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferPromotionId]);
 
-  useEffect(() => {
-    if (!selected) {
-      if (creating) {
-        setTitle('');
-        setDescription('');
-        setCarouselPosition(String((heroPromotions.length || 0) + 1));
-        setIsActive(true);
-      }
-      return;
-    }
-    setTitle(selected.title || '');
-    setDescription(selected.description || '');
-    setCarouselPosition(
-      selected.carousel_position != null ? String(selected.carousel_position) : '1'
-    );
-    setIsActive(selected.is_active ?? true);
-    setBannerFile(null);
-    setBannerPreview(null);
-  }, [selected, creating, heroPromotions.length]);
-
-  useEffect(() => {
-    return () => {
-      if (bannerPreview) URL.revokeObjectURL(bannerPreview);
-    };
-  }, [bannerPreview]);
-
-  const currentBanner =
-    bannerPreview ||
-    resolveStudioImageUrl(selected?.banner_image_url, [selected?.banner_image]) ||
-    null;
-
   const startCreate = () => {
     setCreating(true);
     setSelectedId(null);
     setError(null);
     setMsg(null);
-    setTitle('');
-    setDescription('');
-    setCarouselPosition(String((heroPromotions.length || 0) + 1));
-    setIsActive(true);
-    setBannerFile(null);
-    setBannerPreview(null);
+    setEditorKey((k) => k + 1);
   };
 
   const placeOnHero = async (promotion: StudioPromotion) => {
@@ -222,6 +179,7 @@ export function StudioHomepageHeroEditor({
       await reload();
       setCreating(false);
       setSelectedId(saved.id);
+      setEditorKey((k) => k + 1);
       setMsg(
         datePayload.start_date
           ? `“${saved.title || 'Promotion'}” placed on the hero and date window revived for the storefront.`
@@ -241,79 +199,6 @@ export function StudioHomepageHeroEditor({
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setMsg(null);
-    if (!title.trim()) {
-      setError('Add a title for this hero banner.');
-      return;
-    }
-    if (!selected && !bannerFile) {
-      setError('Upload a banner image to create the homepage hero.');
-      return;
-    }
-    if (selected && !currentBanner && !bannerFile) {
-      setError('Upload a banner image — homepage hero requires a banner.');
-      return;
-    }
-    setSaving(true);
-    try {
-      const pos = Number(carouselPosition);
-      const datePayload = storefrontDatePayload(selected);
-      const payload: Record<string, string | Blob | boolean | number | null | undefined | string[]> =
-        {
-          title: title.trim(),
-          description: description.trim(),
-          display_locations: withHomepageHero(
-            selected ? normalizeLocations(selected.display_locations) : []
-          ),
-          is_active: isActive,
-          carousel_position: Number.isFinite(pos) && pos > 0 ? pos : 1,
-          ...datePayload,
-        };
-      if (bannerFile) payload.banner_image = bannerFile;
-
-      let saved: StudioPromotion;
-      if (selected?.id) {
-        saved = await patchStudioPromotion(selected.id, payload);
-      } else {
-        // Create always needs an explicit active window for the public API.
-        const range = yearAheadIsoRange();
-        payload.start_date = range.start;
-        payload.end_date = range.end;
-        payload.is_active = true;
-        saved = await createStudioPromotion(payload);
-      }
-      await reload();
-      setCreating(false);
-      setSelectedId(saved.id);
-      setBannerFile(null);
-      if (bannerPreview) {
-        URL.revokeObjectURL(bannerPreview);
-        setBannerPreview(null);
-      }
-      setMsg(
-        selected
-          ? datePayload.start_date
-            ? 'Homepage hero saved and date window revived — it will show on the storefront.'
-            : 'Homepage hero saved — it will show on the storefront banner.'
-          : 'Homepage hero created — it will show on the storefront banner.'
-      );
-      onSaved?.(saved);
-    } catch (err) {
-      setError(
-        err instanceof StudioApiError
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : 'Save failed'
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-
   if (loading) {
     return <p className="studio-editor__hint">Loading homepage hero…</p>;
   }
@@ -322,27 +207,30 @@ export function StudioHomepageHeroEditor({
     (p) => p.id && !studioPromotionHasLocation(p, 'homepage_hero')
   );
 
+  const schedule = yearAheadIsoRange();
+  const createDefaults = {
+    display_locations: ['homepage_hero'] as string[],
+    carousel_position: (heroPromotions.length || 0) + 1,
+    start_date: schedule.start,
+    end_date: schedule.end,
+  };
+
   return (
-    <form className="studio-editor studio-editor--flush" onSubmit={handleSubmit}>
+    <div className="studio-editor studio-editor--flush">
       <div className="studio-editor__toolbar">
         <div>
           <p className="studio-editor__kicker">{roleHint || 'Homepage hero'}</p>
           <h2 className="studio-editor__title studio-editor__title--compact">
-            {creating ? 'New homepage hero' : selected?.title || 'Homepage hero banner'}
+            {creating
+              ? 'Create promotion (homepage hero)'
+              : selected?.title || 'Homepage hero banner'}
           </h2>
           <p className="studio-editor__hint studio-editor__hint--tight">
-            Create or edit the storefront hero. Saving always applies the Homepage hero location and
-            keeps an active date window so the banner appears publicly.
+            {creating
+              ? 'Fill in the form below to create a new promotion. Homepage hero placement and an active date window are applied automatically.'
+              : 'Edit this hero slide, or create a new promotion with the button above the slide list.'}
           </p>
         </div>
-        <label className={`studio-switch${isActive ? ' is-on' : ''}`}>
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={(e) => setIsActive(e.target.checked)}
-          />
-          <span>{isActive ? 'Active' : 'Off'}</span>
-        </label>
       </div>
 
       {error && (
@@ -359,7 +247,7 @@ export function StudioHomepageHeroEditor({
       {liveHeroCount === 0 && heroPromotions.length > 0 && !creating && (
         <div className="studio-alert" role="status">
           Hero promotions exist but their date window expired, so the storefront shows the
-          placeholder. Save below to revive dates, or create a new hero.
+          placeholder. Update Starts/Ends below (or save with a fresh window) to revive them.
         </div>
       )}
 
@@ -368,8 +256,13 @@ export function StudioHomepageHeroEditor({
           <p className="studio-field__label" style={{ margin: 0 }}>
             Hero slides ({heroPromotions.length}) · live {liveHeroCount}
           </p>
-          <button type="button" className="studio-icon-btn studio-icon-btn--edit" onClick={startCreate}>
-            <span>New hero</span>
+          <button
+            type="button"
+            className="studio-btn studio-btn--primary"
+            onClick={startCreate}
+            disabled={creating}
+          >
+            Create promotion
           </button>
         </div>
         {heroPromotions.length > 0 ? (
@@ -390,6 +283,7 @@ export function StudioHomepageHeroEditor({
                       setSelectedId(promo.id);
                       setMsg(null);
                       setError(null);
+                      setEditorKey((k) => k + 1);
                     }}
                   >
                     <span className="studio-hero-placement__pos">
@@ -409,66 +303,32 @@ export function StudioHomepageHeroEditor({
         )}
       </section>
 
-      <section className="studio-editor__section">
-        <label className="studio-field">
-          <span className="studio-field__label">Title</span>
-          <input
-            className="studio-field__input"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            placeholder="e.g. Google Pixel 8 — zoom in"
-          />
-        </label>
-        <label className="studio-field">
-          <span className="studio-field__label">Description</span>
-          <textarea
-            className="studio-field__input"
-            rows={3}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Short supporting line shown with the offer"
-          />
-        </label>
-        <label className="studio-field">
-          <span className="studio-field__label">Carousel position</span>
-          <input
-            className="studio-field__input"
-            type="number"
-            min={1}
-            value={carouselPosition}
-            onChange={(e) => setCarouselPosition(e.target.value)}
-          />
-          <span className="studio-field__help">1 = first slide on the homepage hero</span>
-        </label>
-      </section>
+      {creating && (
+        <div className="studio-alert studio-alert--ok" role="status">
+          Creating a new promotion — upload a banner, set Starts/Ends, then hit Create promotion.
+        </div>
+      )}
 
-      <section className="studio-editor__section">
-        <p className="studio-field__label">Banner image {creating ? '(required)' : ''}</p>
-        {currentBanner ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={currentBanner}
-            alt=""
-            className="studio-editor__banner-preview"
-            style={{ width: '100%', borderRadius: '0.75rem', marginBottom: '0.75rem' }}
-          />
-        ) : (
-          <div className="studio-dropzone">Upload a hero banner image</div>
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0] ?? null;
-            setBannerFile(file);
-            if (bannerPreview) URL.revokeObjectURL(bannerPreview);
-            setBannerPreview(file ? URL.createObjectURL(file) : null);
-          }}
-        />
-      </section>
+      <StudioPromotionEditor
+        key={`${creating ? 'create' : `edit-${selected?.id ?? 'none'}`}-${editorKey}`}
+        promotion={creating ? null : selected}
+        roleHint={creating ? 'Create promotion' : 'Edit promotion'}
+        defaults={creating ? createDefaults : { display_locations: ['homepage_hero'] }}
+        forceLocations={['homepage_hero']}
+        onSaved={async (saved) => {
+          await reload();
+          setCreating(false);
+          setSelectedId(saved.id);
+          setMsg(
+            creating
+              ? 'Promotion created and placed on the homepage hero.'
+              : 'Homepage hero saved.'
+          );
+          onSaved?.(saved);
+        }}
+      />
 
-      {candidates.length > 0 && (
+      {!creating && candidates.length > 0 && (
         <section className="studio-editor__section">
           <p className="studio-field__label">Or place an existing promotion on the hero</p>
           <ul className="studio-hero-placement__list">
@@ -493,18 +353,6 @@ export function StudioHomepageHeroEditor({
           </ul>
         </section>
       )}
-
-      <div className="studio-editor__actions">
-        <button type="submit" className="studio-btn studio-btn--primary" disabled={saving}>
-          {saving
-            ? 'Saving…'
-            : creating
-              ? 'Create homepage hero'
-              : selected && !isPromotionWindowActive(selected)
-                ? 'Revive & save homepage hero'
-                : 'Save homepage hero'}
-        </button>
-      </div>
-    </form>
+    </div>
   );
 }

@@ -50,7 +50,15 @@ export function HomeDeliveryChecker() {
           </p>
           {canEdit && (
             <p className="mt-2 text-xs font-semibold text-primary">
-              {studioEdit?.capabilities.editableSummary}
+              {studioEdit?.capabilities.editableSummary}{' '}
+              <button
+                type="button"
+                className="studio-btn studio-btn--primary"
+                style={{ marginLeft: 8 }}
+                onClick={() => studioEdit?.openDeliveryRatesManager()}
+              >
+                Manage rates
+              </button>
             </p>
           )}
         </div>

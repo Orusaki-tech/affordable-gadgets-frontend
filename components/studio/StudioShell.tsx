@@ -4,7 +4,77 @@ import Link from 'next/link';
 import { useEffect, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStudioAuth } from '@/components/studio/StudioAuthContext';
-import { StudioEditHost } from '@/components/studio/StudioEditHost';
+import { StudioEditHost, useStudioEditOptional } from '@/components/studio/StudioEditHost';
+
+function StudioFloatActions() {
+  const studioEdit = useStudioEditOptional();
+  const capabilities = studioEdit?.capabilities;
+  if (!capabilities) return null;
+
+  return (
+    <>
+      {capabilities.canCreateProduct && (
+        <Link href="/studio/products?new=1" className="studio-float-bar__btn studio-float-bar__btn--lime">
+          Add product
+        </Link>
+      )}
+      {capabilities.canEditPromotions && (
+        <button
+          type="button"
+          className="studio-float-bar__btn"
+          onClick={() => studioEdit.openPromotionsManager()}
+        >
+          Promotions
+        </button>
+      )}
+      {capabilities.canEditArticles && (
+        <button
+          type="button"
+          className="studio-float-bar__btn"
+          onClick={() => studioEdit.openCreateArticle()}
+        >
+          New article
+        </button>
+      )}
+      {capabilities.canEditBundles && (
+        <button
+          type="button"
+          className="studio-float-bar__btn"
+          onClick={() => studioEdit.openCreateBundle()}
+        >
+          New bundle
+        </button>
+      )}
+      {capabilities.canEditFinancing && (
+        <button
+          type="button"
+          className="studio-float-bar__btn"
+          onClick={() => studioEdit.openFinancingOffers()}
+        >
+          Offers
+        </button>
+      )}
+      {capabilities.canEditDeliveryRates && (
+        <button
+          type="button"
+          className="studio-float-bar__btn"
+          onClick={() => studioEdit.openDeliveryRatesManager()}
+        >
+          Delivery
+        </button>
+      )}
+      {capabilities.canEditReviews && (
+        <button
+          type="button"
+          className="studio-float-bar__btn"
+          onClick={() => studioEdit.openReviewsManager()}
+        >
+          Reviews
+        </button>
+      )}
+    </>
+  );
+}
 
 export function StudioShell({
   children,
@@ -46,46 +116,43 @@ export function StudioShell({
     user?.username || profile?.username || user?.email || profile?.email || 'Staff';
 
   return (
-    <div className="studio-mirror-root">
-      <div className="studio-float-bar" role="banner">
-        <div className="studio-float-bar__left">
-          <span className="studio-float-bar__mark">Studio</span>
-          <span className="studio-float-bar__role" title={capabilities.editableSummary}>
-            {capabilities.roleLabel}
-          </span>
-          <span className="studio-float-bar__hint">{capabilities.editableSummary}</span>
+    <StudioEditHost>
+      <div className="studio-mirror-root">
+        <div className="studio-float-bar" role="banner">
+          <div className="studio-float-bar__left">
+            <span className="studio-float-bar__mark">Studio</span>
+            <span className="studio-float-bar__role" title={capabilities.editableSummary}>
+              {capabilities.roleLabel}
+            </span>
+            <span className="studio-float-bar__hint">{capabilities.editableSummary}</span>
+          </div>
+          <div className="studio-float-bar__actions">
+            <StudioFloatActions />
+            <a
+              href="/products"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="studio-float-bar__btn"
+            >
+              Shop view
+            </a>
+            <span className="studio-float-bar__user">{displayName}</span>
+            <button type="button" className="studio-float-bar__btn" onClick={logout}>
+              Log out
+            </button>
+          </div>
         </div>
-        <div className="studio-float-bar__actions">
-          {capabilities.canCreateProduct && (
-            <Link href="/studio/products?new=1" className="studio-float-bar__btn studio-float-bar__btn--lime">
-              Add product
-            </Link>
-          )}
-          <a
-            href="/products"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="studio-float-bar__btn"
-          >
-            Shop view
-          </a>
-          <span className="studio-float-bar__user">{displayName}</span>
-          <button type="button" className="studio-float-bar__btn" onClick={logout}>
-            Log out
-          </button>
-        </div>
-      </div>
-      {capabilities.readOnlyReason && (
-        <div className="studio-shell__banner studio-shell__banner--float" role="status">
-          {capabilities.readOnlyReason}
-        </div>
-      )}
-      <p className="studio-shell__edit-hint" role="note">
-        Green <strong>Edit</strong> buttons appear on products, promos, articles, bundles, videos, financing, and delivery rates you can change.
-      </p>
-      <StudioEditHost>
+        {capabilities.readOnlyReason && (
+          <div className="studio-shell__banner studio-shell__banner--float" role="status">
+            {capabilities.readOnlyReason}
+          </div>
+        )}
+        <p className="studio-shell__edit-hint" role="note">
+          Use the bar for Promotions, Articles, Bundles, Offers, Delivery, and Reviews. Green Edit
+          buttons still appear on in-page cards.
+        </p>
         <div className="studio-mirror-pad">{children}</div>
-      </StudioEditHost>
-    </div>
+      </div>
+    </StudioEditHost>
   );
 }

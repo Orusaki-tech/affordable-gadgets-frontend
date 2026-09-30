@@ -99,6 +99,8 @@ function BundleCard({ bundle }: { bundle: PublicBundle }) {
 }
 
 export function HomeBundles() {
+  const studioEdit = useStudioEditOptional();
+  const canEdit = Boolean(studioEdit?.capabilities.canEditBundles);
   const { data, isLoading, isError } = useQuery({
     queryKey: ['bundles', 'homepage'],
     queryFn: () => ApiService.apiV1PublicBundlesList(1),
@@ -109,7 +111,7 @@ export function HomeBundles() {
     (b) => b.is_currently_active !== false
   ) as PublicBundle[];
 
-  if (!isLoading && (isError || bundles.length === 0)) {
+  if (!isLoading && (isError || bundles.length === 0) && !canEdit) {
     return null;
   }
 
@@ -129,6 +131,15 @@ export function HomeBundles() {
               Includes free Nairobi delivery on eligible packages
             </p>
           </div>
+          {canEdit && (
+            <button
+              type="button"
+              className="studio-btn studio-btn--primary"
+              onClick={() => studioEdit?.openCreateBundle()}
+            >
+              Create bundle
+            </button>
+          )}
         </div>
 
         {isLoading ? (

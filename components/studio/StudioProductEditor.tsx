@@ -4,10 +4,14 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useStudioAuth } from '@/components/studio/StudioAuthContext';
 import {
   createStudioProduct,
+  listStudioTags,
   patchStudioProduct,
+  resolveStudioImageUrl,
+  setStudioProductTagIds,
   updateStudioProductContent,
   StudioApiError,
   type StudioProduct,
+  type StudioTag,
 } from '@/lib/studio/api';
 import { StudioProductImages } from '@/components/studio/StudioProductImages';
 import {
@@ -15,6 +19,8 @@ import {
   videosFromProduct,
   type StudioVideoRow,
 } from '@/components/studio/StudioProductVideos';
+import { StudioProductVariants } from '@/components/studio/StudioProductVariants';
+import { StudioProductAccessories } from '@/components/studio/StudioProductAccessories';
 
 const PRODUCT_TYPES = [
   { value: 'PH', label: 'Phone' },
@@ -82,6 +88,10 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
   const [currentProduct, setCurrentProduct] = useState<StudioProduct | null>(product ?? null);
   const [videos, setVideos] = useState<StudioVideoRow[]>(() => videosFromProduct(product));
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [ogFile, setOgFile] = useState<File | null>(null);
+  const [ogPreview, setOgPreview] = useState<string | null>(null);
+  const [allTags, setAllTags] = useState<StudioTag[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
@@ -92,7 +102,35 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
     setCurrentProduct(product ?? null);
     setVideos(videosFromProduct(product));
     setVideoFile(null);
+    setOgFile(null);
+    setOgPreview(null);
+    setSelectedTagIds(
+      (product?.tags || [])
+        .map((t) => t.id)
+        .filter((id): id is number => typeof id === 'number')
+    );
   }, [mode, product]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const tags = await listStudioTags();
+        if (!cancelled) setAllTags(tags);
+      } catch {
+        if (!cancelled) setAllTags([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (ogPreview) URL.revokeObjectURL(ogPreview);
+    };
+  }, [ogPreview]);
 
   const canEdit = useMemo(() => {
     if (activeMode === 'create') return capabilities.canCreateProduct;
@@ -104,6 +142,13 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
     !capabilities.canFullEditProduct &&
     capabilities.canContentEditProduct;
   const canMedia = capabilities.canManageProductMedia;
+  const canFull = capabilities.canFullEditProduct;
+  const canTags = capabilities.canContentEditProduct || capabilities.canFullEditProduct;
+
+  const currentOg =
+    ogPreview ||
+    resolveStudioImageUrl(currentProduct?.og_image_url) ||
+    null;
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -149,6 +194,9 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
     if (videoFile) {
       payload.product_video_file = videoFile;
     }
+    if (ogFile) {
+      payload.og_image = ogFile;
+    }
 
     try {
       if (activeMode === 'create') {
@@ -156,10 +204,18 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
           throw new StudioApiError('Product name is required', 400, null);
         }
         const created = await createStudioProduct(payload);
+        if (canTags && selectedTagIds.length) {
+          try {
+            await setStudioProductTagIds(created.id, selectedTagIds);
+          } catch {
+            /* tag attach optional on create */
+          }
+        }
         setActiveMode('edit');
         setCurrentProduct(created);
         setVideos(videosFromProduct(created));
         setVideoFile(null);
+        setOgFile(null);
         setSavedMsg('Created — add images/videos below, then close when done');
         onSaved?.(created);
         return;
@@ -183,13 +239,23 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
           if (CONTENT_KEYS.has(key)) contentPayload[key] = value as string | boolean | null;
         });
         if (videoFile) contentPayload.product_video_file = videoFile;
+        if (ogFile) contentPayload.og_image = ogFile;
         saved = await updateStudioProductContent(productId, contentPayload);
       } else {
         saved = await patchStudioProduct(productId, payload);
       }
+      if (canTags) {
+        saved = await setStudioProductTagIds(productId, selectedTagIds);
+      }
       setCurrentProduct(saved);
       setVideos(videosFromProduct(saved));
       setVideoFile(null);
+      setOgFile(null);
+      setSelectedTagIds(
+        (saved.tags || [])
+          .map((t) => t.id)
+          .filter((id): id is number => typeof id === 'number')
+      );
       setSavedMsg('Saved');
       onSaved?.(saved);
     } catch (err) {
@@ -406,6 +472,66 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
               disabled={fieldDisabled}
             />
           )}
+          {canTags && (
+            <section className="studio-editor__section">
+              <h3 className="studio-editor__section-title">Tags</h3>
+              <div className="studio-chip-grid" role="group" aria-label="Product tags">
+                {allTags.map((tag) => {
+                  if (!tag.id) return null;
+                  const on = selectedTagIds.includes(tag.id);
+                  return (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      className={`studio-chip${on ? ' is-on' : ''}`}
+                      aria-pressed={on}
+                      disabled={fieldDisabled}
+                      onClick={() => {
+                        const id = tag.id!;
+                        setSelectedTagIds((prev) =>
+                          prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
+                        );
+                        setSavedMsg(null);
+                      }}
+                    >
+                      <span className="studio-chip__label">{tag.name || tag.slug}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+          {(canMedia || canTags) && (
+            <section className="studio-editor__section">
+              <div className="studio-editor__section-head">
+                <h3>OG image</h3>
+                <label className="studio-btn studio-btn--ghost studio-images__upload">
+                  {ogFile ? 'Replace' : currentOg ? 'Change' : 'Upload'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={fieldDisabled}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      if (ogPreview) URL.revokeObjectURL(ogPreview);
+                      setOgFile(file);
+                      setOgPreview(file ? URL.createObjectURL(file) : null);
+                      e.target.value = '';
+                      setSavedMsg(null);
+                    }}
+                  />
+                </label>
+              </div>
+              {currentOg ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={currentOg} alt="" className="studio-images__preview" />
+              ) : (
+                <div className="studio-dropzone">Upload Open Graph / social share image</div>
+              )}
+            </section>
+          )}
+          {canFull && <StudioProductVariants productId={currentProduct.id} />}
+          {canFull && <StudioProductAccessories productId={currentProduct.id} />}
         </>
       ) : (
         activeMode === 'create' && (

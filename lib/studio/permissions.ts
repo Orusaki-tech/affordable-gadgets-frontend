@@ -27,6 +27,8 @@ export type StudioCapabilities = {
   canEditBundles: boolean;
   canEditFinancing: boolean;
   canEditDeliveryRates: boolean;
+  /** Moderate / create / delete product reviews (CC or IM). */
+  canEditReviews: boolean;
   /** Toggle Featured / Video tags for homepage curated sections (CC or IM). */
   canEditFeaturedSelection: boolean;
   /** Alias — same capability as featured (update_content + tags). */
@@ -97,6 +99,7 @@ export function getStudioCapabilities(
   const canEditBundles = isMM;
   const canEditFinancing = isIM;
   const canEditDeliveryRates = isOM;
+  const canEditReviews = isCC || isIM;
   const canEditFeaturedSelection = isCC || isIM;
   const canEditVideoSelection = canEditFeaturedSelection;
 
@@ -109,6 +112,7 @@ export function getStudioCapabilities(
   if (canEditBundles) editable.push('bundles');
   if (canEditFinancing) editable.push('financing');
   if (canEditDeliveryRates) editable.push('delivery rates');
+  if (canEditReviews) editable.push('reviews');
 
   let readOnlyReason: string | null = null;
   if (editable.length === 0) {
@@ -136,6 +140,7 @@ export function getStudioCapabilities(
     canEditBundles,
     canEditFinancing,
     canEditDeliveryRates,
+    canEditReviews,
     canEditFeaturedSelection,
     canEditVideoSelection,
     editableSummary:

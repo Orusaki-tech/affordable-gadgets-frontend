@@ -146,13 +146,20 @@ export function HomeCbdRibbon() {
   }
 
   return (
-    <div className="studio-editable-card">
-      <div className="studio-editable-card__chrome">
-        <span className="studio-financing-chrome__empty" style={{ color: '#111', maxWidth: 280 }}>
-          No CBD ribbon promotion yet — create one in admin with location “CBD ribbon”.
-        </span>
-      </div>
+    <StudioBlockChrome
+      label="CBD ribbon"
+      roleHint={studioEdit?.capabilities.roleLabel}
+      onEdit={() => {
+        studioEdit?.openCreatePromotion({
+          title: FALLBACK.title,
+          description: FALLBACK.description,
+          display_locations: ['cbd_ribbon'],
+          forceLocations: ['cbd_ribbon'],
+          lockLocations: true,
+        });
+      }}
+    >
       {ribbon}
-    </div>
+    </StudioBlockChrome>
   );
 }

@@ -543,6 +543,12 @@ export function offerHasTerm(
 }
 
 /** Phones whose required deposit fits within the budget. */
+export function offerGenerationRank(model: string): number {
+  const match = model.match(/iPhone\s+(\d+)/i);
+  if (!match) return 0;
+  return Number(match[1]) || 0;
+}
+
 export function findOffersForDeposit(
   budget: number,
   term: BuysimuPlanTerm = 12
@@ -552,6 +558,9 @@ export function findOffersForDeposit(
     if (!offerHasTerm(offer, term)) return false;
     return depositForTerm(offer, term) <= b;
   }).sort((a, bOffer) => {
+    // Prefer newer generations first, then closest deposit to budget, then higher cash.
+    const genDiff = offerGenerationRank(bOffer.model) - offerGenerationRank(a.model);
+    if (genDiff !== 0) return genDiff;
     const da = Math.abs(depositForTerm(a, term) - b);
     const db = Math.abs(depositForTerm(bOffer, term) - b);
     if (da !== db) return da - db;

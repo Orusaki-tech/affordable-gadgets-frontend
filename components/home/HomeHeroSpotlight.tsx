@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { MaterialIcon } from '@/components/MaterialIcon';
-import { PreOrderModal } from '@/components/PreOrderModal';
 import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
-import { brandConfig } from '@/lib/config/brand';
+import { brandConfig, getBusinessWhatsAppUrl } from '@/lib/config/brand';
 import { usePromotions } from '@/lib/hooks/usePromotions';
 import type { PaginatedPublicPromotionList, PublicPromotion } from '@/lib/api/generated';
 import { studioPath } from '@/lib/studio/paths';
 import { getPromotionHref } from '@/lib/utils/promotionRoutes';
+import { trackWhatsAppClick } from '@/lib/tracking';
 
 const HERO_PROMOTION_PLACEHOLDER_IMAGE =
   'https://res.cloudinary.com/dhgaqa2gb/image/upload/v1773069898/pixel8_cd7p2f.png';
@@ -72,11 +72,12 @@ function getHeroBannerSrc(promotion: PublicPromotion | null): string | null {
   );
 }
 
-function primaryCtaLabel(promotion: PublicPromotion | null): string {
-  const title = promotion?.title?.trim() || '';
-  if (/pre[-\s]?order/i.test(title)) return 'Pre Order Now';
-  if (/early bird|campaign|launch/i.test(title)) return 'Learn more';
-  return 'Shop offer';
+function heroWhatsAppMessage(promotion: PublicPromotion | null): string {
+  const title = promotion?.title?.trim();
+  if (title) {
+    return `Hi — I'm interested in “${title}” from the homepage. Please share details and availability.`;
+  }
+  return `Hi — I'm interested in an offer I saw on the ${brandConfig.name} homepage. Please share details.`;
 }
 
 type HomeHeroSpotlightProps = {
@@ -89,7 +90,6 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
   const canEditPromos = Boolean(studioEdit?.capabilities.canEditPromotions);
   const [query, setQuery] = useState('');
   const [budget, setBudget] = useState(45000);
-  const [preOrderOpen, setPreOrderOpen] = useState(false);
   const [bannerImageFailed, setBannerImageFailed] = useState(false);
 
   const { data: promotionsData } = usePromotions({
@@ -155,6 +155,11 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
 
   const detailsHref = useMemo(
     () => (activePromotion ? getPromotionHref(activePromotion) : studioPath('/products')),
+    [activePromotion]
+  );
+
+  const whatsappHref = useMemo(
+    () => getBusinessWhatsAppUrl(heroWhatsAppMessage(activePromotion)),
     [activePromotion]
   );
 
@@ -308,14 +313,24 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
               ) : null}
 
               <div className="home-redesign__hero-banner-actions">
-                <button
-                  type="button"
-                  onClick={() => setPreOrderOpen(true)}
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="ag-btn ag-btn--primary home-redesign__hero-cta home-redesign__hero-cta--primary"
+                  onClick={() => {
+                    const productId =
+                      activePromotion?.featured_product ??
+                      activePromotion?.promo_card?.product_id ??
+                      activePromotion?.id;
+                    if (productId != null) {
+                      trackWhatsAppClick(productId);
+                    }
+                  }}
                 >
-                  {primaryCtaLabel(activePromotion)}
-                  <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
-                </button>
+                  Learn more
+                  <MaterialIcon name="chat" className="text-[1.125rem]" />
+                </a>
                 <Link
                   href={detailsHref}
                   className="ag-btn home-redesign__hero-cta home-redesign__hero-cta--secondary"
@@ -398,17 +413,6 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
           </div>
         </div>
       </div>
-
-      <PreOrderModal
-        open={preOrderOpen}
-        title={
-          activePromotion?.title
-            ? `${activePromotion.title}`
-            : 'Request this offer'
-        }
-        subtitle="We will confirm deposit, pickup, or delivery options."
-        onClose={() => setPreOrderOpen(false)}
-      />
     </section>
   );
 }

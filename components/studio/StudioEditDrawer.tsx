@@ -13,6 +13,7 @@ import {
 } from '@/components/studio/StudioTaggedProductsEditor';
 import { StudioTaggedArticlesEditor } from '@/components/studio/StudioTaggedArticlesEditor';
 import { StudioBrandBannerEditor } from '@/components/studio/StudioBrandBannerEditor';
+import { StudioHomepageHeroEditor } from '@/components/studio/StudioHomepageHeroEditor';
 import type {
   StudioArticle,
   StudioBundle,
@@ -32,6 +33,7 @@ export type StudioEditResource =
   | { kind: 'taggedProducts'; section: StudioSectionTagKey }
   | { kind: 'taggedArticles' }
   | { kind: 'brandBanner'; brandFilter: string }
+  | { kind: 'homepageHero'; preferPromotionId?: number | null }
   /** @deprecated prefer taggedProducts + section: 'featured' */
   | { kind: 'featuredProducts' };
 
@@ -69,6 +71,8 @@ function resourceLabel(resource: StudioEditResource): string {
       return 'Tech Buying Guides & Insights';
     case 'brandBanner':
       return `${resource.brandFilter} brand banner`;
+    case 'homepageHero':
+      return 'Homepage hero banner';
     default:
       return 'Edit';
   }
@@ -122,6 +126,8 @@ export function StudioEditDrawer({
                 ? 'Edit promotion'
                 : active.kind === 'brandBanner'
                   ? 'Edit brand banner'
+                  : active.kind === 'homepageHero'
+                    ? 'Edit homepage hero'
                 : active.kind === 'taggedProducts' || active.kind === 'taggedArticles' || active.kind === 'featuredProducts'
                   ? 'Choose content'
                   : 'In-place edit'}
@@ -218,6 +224,15 @@ export function StudioEditDrawer({
           <StudioBrandBannerEditor
             brandFilter={active.brandFilter}
             roleHint={roleHint}
+            onSaved={async () => {
+              await onSaved();
+            }}
+          />
+        )}
+        {active.kind === 'homepageHero' && (
+          <StudioHomepageHeroEditor
+            roleHint={roleHint}
+            preferPromotionId={active.preferPromotionId}
             onSaved={async () => {
               await onSaved();
             }}

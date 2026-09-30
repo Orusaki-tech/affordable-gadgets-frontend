@@ -43,6 +43,7 @@ type StudioEditHostValue = {
   deleteProduct: (product: Pick<PublicProduct, 'id' | 'product_name'>) => Promise<void>;
   openEditArticle: (ref: { id?: number | null; slug?: string | null }) => Promise<void>;
   openEditPromotion: (id: number) => Promise<void>;
+  openEditHomepageHero: (preferPromotionId?: number | null) => void;
   openEditBundle: (id: number) => Promise<void>;
   openEditFinancingProvider: (id: number) => Promise<void>;
   openEditDeliveryRate: (id: number) => Promise<void>;
@@ -240,6 +241,23 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     [capabilities?.canEditPromotions]
   );
 
+  const openEditHomepageHero = useCallback(
+    (preferPromotionId?: number | null) => {
+      if (!capabilities?.canEditPromotions) {
+        setError('Your role cannot edit promotions.');
+        return;
+      }
+      setError(null);
+      setResource({
+        kind: 'homepageHero',
+        preferPromotionId:
+          typeof preferPromotionId === 'number' ? preferPromotionId : null,
+      });
+      setDrawerOpen(true);
+    },
+    [capabilities?.canEditPromotions]
+  );
+
   const openEditBundle = useCallback(
     async (id: number) => {
       if (!id) return;
@@ -385,6 +403,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       deleteProduct,
       openEditArticle,
       openEditPromotion,
+      openEditHomepageHero,
       openEditBundle,
       openEditFinancingProvider,
       openEditDeliveryRate,
@@ -401,6 +420,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     deleteProduct,
     openEditArticle,
     openEditPromotion,
+    openEditHomepageHero,
     openEditBundle,
     openEditFinancingProvider,
     openEditDeliveryRate,
@@ -443,12 +463,15 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
             kind === 'taggedProducts' ||
             kind === 'taggedArticles' ||
             kind === 'featuredProducts' ||
-            kind === 'brandBanner';
+            kind === 'brandBanner' ||
+            kind === 'homepageHero';
           // Refetch curated sections immediately so the mirror behind the drawer matches.
           await queryClient.invalidateQueries({ queryKey: ['products'] });
           await queryClient.invalidateQueries({ queryKey: ['articles'] });
+          await queryClient.invalidateQueries({ queryKey: ['promotions'] });
           await queryClient.refetchQueries({ queryKey: ['products', 'featured'] });
           await queryClient.refetchQueries({ queryKey: ['articles', 'featured'] });
+          await queryClient.refetchQueries({ queryKey: ['promotions'] });
           if (isPicker) {
             setRefreshOnClose(true);
             return;

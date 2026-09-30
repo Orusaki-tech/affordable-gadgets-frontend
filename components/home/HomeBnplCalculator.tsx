@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { OpenAPI } from '@/lib/api/generated';
 import { MaterialIcon } from '@/components/MaterialIcon';
 import { StudioBlockChrome } from '@/components/studio/StudioBlockChrome';
+import { StudioFinancingProvidersChrome } from '@/components/studio/StudioFinancingProvidersChrome';
 import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 import { studioPath } from '@/lib/studio/paths';
 import {
@@ -74,7 +75,7 @@ export function HomeBnplCalculator() {
   const visibleMatches = matches.slice(0, MATCH_LIMIT);
   const extraCount = Math.max(0, matches.length - visibleMatches.length);
 
-  return (
+  const section = (
     <section className="ag-bleed ag-bleed--dark ag-bleed--spaced">
       <div className="ag-bleed__inner text-white">
         <div className="max-w-3xl">
@@ -127,7 +128,6 @@ export function HomeBnplCalculator() {
           </div>
         </div>
 
-        {/* Top controls row: deposit left, matches + term right */}
         <div className="mt-6 rounded-2xl bg-white/5 p-5 backdrop-blur-sm">
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.4fr)_auto_auto] lg:items-end">
             <div className="min-w-0">
@@ -192,7 +192,6 @@ export function HomeBnplCalculator() {
           </div>
         </div>
 
-        {/* Full-width results */}
         <div className="mt-5">
           <div className="flex flex-wrap items-baseline justify-between gap-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-white/60">
@@ -274,5 +273,11 @@ export function HomeBnplCalculator() {
         </div>
       </div>
     </section>
+  );
+
+  if (!canEdit) return section;
+
+  return (
+    <StudioFinancingProvidersChrome variant="dark">{section}</StudioFinancingProvidersChrome>
   );
 }

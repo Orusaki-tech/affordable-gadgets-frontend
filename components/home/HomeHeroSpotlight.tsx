@@ -241,19 +241,29 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
 
           <div className="home-redesign__hero-banner-stack">
             <div className="home-redesign__hero-banner">
-              {canEditPromos && activePromotion?.id ? (
+              {canEditPromos ? (
                 <div className="studio-editable-card__chrome studio-hero-banner__chrome">
                   <button
                     type="button"
                     className="studio-icon-btn studio-icon-btn--edit"
-                    title={`Edit ${activePromotion.title} · ${studioEdit?.capabilities.roleLabel || 'Studio'}`}
-                    aria-label={`Edit hero banner ${activePromotion.title}`}
-                    onClick={() => void studioEdit?.openEditPromotion(activePromotion.id!)}
+                    title={`Edit homepage hero · ${studioEdit?.capabilities.roleLabel || 'Studio'}`}
+                    aria-label={
+                      activePromotion?.title
+                        ? `Edit hero banner ${activePromotion.title}`
+                        : 'Create or edit homepage hero banner'
+                    }
+                    onClick={() => {
+                      if (activePromotion?.id) {
+                        studioEdit?.openEditHomepageHero(activePromotion.id);
+                      } else {
+                        studioEdit?.openEditHomepageHero();
+                      }
+                    }}
                   >
                     <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden fill="currentColor">
                       <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" />
                     </svg>
-                    <span>Edit banner</span>
+                    <span>{activePromotion?.id ? 'Edit banner' : 'Add banner'}</span>
                   </button>
                 </div>
               ) : null}
@@ -315,13 +325,23 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
               <div className="studio-hero-placement" role="region" aria-label="Homepage hero placement">
                 <p className="studio-hero-placement__label">
                   Homepage hero carousel — order uses each promotion’s carousel position (1 = first).
-                  Tick <strong>Homepage hero</strong> in the editor to place a promo here.
+                  Use <strong>Edit banner</strong> / <strong>Add banner</strong> to change creatives
+                  in place.
                 </p>
                 {promotions.length === 0 ? (
-                  <p className="studio-hero-placement__empty">
-                    No promotions with location “Homepage hero” yet. Create or edit a promotion and
-                    enable that location.
-                  </p>
+                  <div className="studio-hero-placement__empty-row">
+                    <p className="studio-hero-placement__empty">
+                      No promotions with location “Homepage hero” yet. The Pixel placeholder is not
+                      editable until you create or place a hero promotion.
+                    </p>
+                    <button
+                      type="button"
+                      className="studio-icon-btn studio-icon-btn--edit"
+                      onClick={() => studioEdit?.openEditHomepageHero()}
+                    >
+                      <span>Create homepage hero</span>
+                    </button>
+                  </div>
                 ) : (
                   <ul className="studio-hero-placement__list">
                     {promotions.map((promo, index) => {
@@ -334,7 +354,7 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
                             className={`studio-hero-placement__item${isActive ? ' studio-hero-placement__item--active' : ''}`}
                             onClick={() => {
                               setActivePromotionId(promo.id!);
-                              void studioEdit?.openEditPromotion(promo.id!);
+                              studioEdit?.openEditHomepageHero(promo.id!);
                             }}
                           >
                             <span className="studio-hero-placement__pos">

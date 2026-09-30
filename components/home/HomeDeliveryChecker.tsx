@@ -13,6 +13,8 @@ function formatKes(value?: number | string | null) {
   return `KSh ${Math.round(num).toLocaleString('en-KE')}`;
 }
 
+const LIST_LIMIT = 5;
+
 export function HomeDeliveryChecker() {
   const studioEdit = useStudioEditOptional();
   const canEdit = Boolean(studioEdit?.capabilities.canEditDeliveryRates);
@@ -26,13 +28,13 @@ export function HomeDeliveryChecker() {
   const rates = data?.results ?? [];
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return rates.slice(0, 8);
+    if (!q) return rates.slice(0, LIST_LIMIT);
     return rates
       .filter((rate) => {
         const hay = `${rate.county ?? ''} ${rate.ward ?? ''}`.toLowerCase();
         return hay.includes(q);
       })
-      .slice(0, 8);
+      .slice(0, LIST_LIMIT);
   }, [query, rates]);
 
   return (

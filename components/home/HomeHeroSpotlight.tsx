@@ -112,29 +112,32 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
     const firstId = selectHomeHeroPromotions(initialPromotionsData?.results ?? [])[0]?.id;
     return typeof firstId === 'number' ? firstId : null;
   });
-
-  useEffect(() => {
-    if (activePromotionId !== null) return;
-    const firstId = promoIds[0];
-    if (typeof firstId === 'number') setActivePromotionId(firstId);
-  }, [activePromotionId, promoIds]);
-
   const rotationIndexRef = useRef(0);
+
+  // Keep the active slide valid whenever the live hero list changes (add/remove).
+  useEffect(() => {
+    if (promoIds.length === 0) {
+      setActivePromotionId(null);
+      rotationIndexRef.current = 0;
+      return;
+    }
+    if (activePromotionId == null || !promoIds.includes(activePromotionId)) {
+      setActivePromotionId(promoIds[0]);
+      rotationIndexRef.current = 0;
+      return;
+    }
+    rotationIndexRef.current = Math.max(0, promoIds.indexOf(activePromotionId));
+  }, [promoIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     // Pause autoplay in Studio so editors control what they see.
     if (canEditPromos || promoIds.length <= 1) return;
-    if (activePromotionId === null || !promoIds.includes(activePromotionId)) {
-      setActivePromotionId(promoIds[0] ?? null);
-      rotationIndexRef.current = 0;
-    } else {
-      rotationIndexRef.current = Math.max(0, promoIds.indexOf(activePromotionId));
-    }
     const interval = window.setInterval(() => {
       rotationIndexRef.current = (rotationIndexRef.current + 1) % promoIds.length;
       setActivePromotionId(promoIds[rotationIndexRef.current] ?? null);
     }, HERO_AUTOPLAY_INTERVAL_MS);
     return () => window.clearInterval(interval);
-  }, [promoIdsKey, canEditPromos]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [promoIdsKey, canEditPromos, promoIds.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activePromotion = useMemo(() => {
     if (!promotions.length) return null;
@@ -282,6 +285,28 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
                 />
               </div>
 
+              {promotions.length > 1 ? (
+                <div className="studio-hero-banner__dots" role="tablist" aria-label="Hero banners">
+                  {promotions.map((promo, index) => {
+                    const id = promo.id;
+                    if (typeof id !== 'number') return null;
+                    const active = id === activePromotion?.id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        role="tab"
+                        aria-selected={active}
+                        aria-label={`Slide ${index + 1}: ${promo.title || 'Promotion'}`}
+                        className={`studio-hero-banner__dot${active ? ' studio-hero-banner__dot--active' : ''}`}
+                        title={promo.title}
+                        onClick={() => setActivePromotionId(id)}
+                      />
+                    );
+                  })}
+                </div>
+              ) : null}
+
               <div className="home-redesign__hero-banner-actions">
                 <button
                   type="button"
@@ -298,27 +323,6 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
                   View details
                 </Link>
               </div>
-
-              {promotions.length > 1 ? (
-                <div className="studio-hero-banner__dots" role="tablist" aria-label="Hero banners">
-                  {promotions.map((promo) => {
-                    const id = promo.id;
-                    if (typeof id !== 'number') return null;
-                    const active = id === activePromotion?.id;
-                    return (
-                      <button
-                        key={id}
-                        type="button"
-                        role="tab"
-                        aria-selected={active}
-                        className={`studio-hero-banner__dot${active ? ' studio-hero-banner__dot--active' : ''}`}
-                        title={promo.title}
-                        onClick={() => setActivePromotionId(id)}
-                      />
-                    );
-                  })}
-                </div>
-              ) : null}
             </div>
 
             {canEditPromos ? (

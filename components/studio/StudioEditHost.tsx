@@ -364,7 +364,6 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
         await patchStudioPromotion(id, { display_locations: locations });
         await queryClient.invalidateQueries({ queryKey: ['promotions'] });
         await queryClient.refetchQueries({ queryKey: ['promotions'] });
-        window.location.reload();
       } catch (err) {
         setError(
           err instanceof StudioApiError

@@ -97,6 +97,23 @@ export function StudioHomepageHeroEditor({
     );
   }, [allPromotions, creating, heroPromotions, selectedId]);
 
+  // Must stay above any early return — React #310 if hooks run only after loading.
+  const schedule = useMemo(() => yearAheadIsoRange(), []);
+  const createDefaults = useMemo(
+    () => ({
+      display_locations: ['homepage_hero'] as string[],
+      carousel_position: (heroPromotions.length || 0) + 1,
+      start_date: schedule.start,
+      end_date: schedule.end,
+    }),
+    [heroPromotions.length, schedule.end, schedule.start]
+  );
+  const editDefaults = useMemo(
+    () => ({ display_locations: ['homepage_hero'] as string[] }),
+    []
+  );
+  const forceHeroLocations = useMemo(() => ['homepage_hero'], []);
+
   const reload = async () => {
     const data = await listStudioPromotions({ page: 1 });
     const rows = (data.results ?? []).filter((p) => p.id);
@@ -206,22 +223,6 @@ export function StudioHomepageHeroEditor({
   const candidates = allPromotions.filter(
     (p) => p.id && !studioPromotionHasLocation(p, 'homepage_hero')
   );
-
-  const schedule = useMemo(() => yearAheadIsoRange(), []);
-  const createDefaults = useMemo(
-    () => ({
-      display_locations: ['homepage_hero'] as string[],
-      carousel_position: (heroPromotions.length || 0) + 1,
-      start_date: schedule.start,
-      end_date: schedule.end,
-    }),
-    [heroPromotions.length, schedule.end, schedule.start]
-  );
-  const editDefaults = useMemo(
-    () => ({ display_locations: ['homepage_hero'] as string[] }),
-    []
-  );
-  const forceHeroLocations = useMemo(() => ['homepage_hero'], []);
 
   return (
     <div className="studio-editor studio-editor--flush">

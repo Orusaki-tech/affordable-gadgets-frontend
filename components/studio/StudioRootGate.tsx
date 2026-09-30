@@ -17,16 +17,18 @@ import {
  * with Studio auth + float bar, and keep in-app links inside /studio.
  */
 export function StudioRootGate({ children }: { children: ReactNode }) {
-  const { pathname, inStudio, isLogin } = useStudioLocation();
+  const { pathname, inStudio, isLogin, ready } = useStudioLocation();
   const router = useRouter();
 
-  // Sync during render so studioPath()/getProductHref work on the same tick as clicks.
-  setStudioRoutingEnabled(inStudio && !isLogin);
+  // After mount, window path is authoritative — sync the module flag in-render so
+  // studioPath() matches on the same paint. Before ready, keep it off so SSR and
+  // the first client paint both emit shop hrefs (avoids React #418).
+  setStudioRoutingEnabled(ready && inStudio && !isLogin);
 
   useEffect(() => {
-    setStudioRoutingEnabled(inStudio && !isLogin);
+    setStudioRoutingEnabled(ready && inStudio && !isLogin);
     return () => setStudioRoutingEnabled(false);
-  }, [inStudio, isLogin]);
+  }, [ready, inStudio, isLogin]);
 
   useEffect(() => {
     if (!inStudio || isLogin) return;

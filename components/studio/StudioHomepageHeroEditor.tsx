@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   listStudioPromotions,
   patchStudioPromotion,
+  resolveStudioImageUrl,
   StudioApiError,
   studioPromotionHasLocation,
   type StudioPromotion,
@@ -16,6 +17,8 @@ type StudioHomepageHeroEditorProps = {
   preferPromotionId?: number | null;
   onSaved?: (promotion: StudioPromotion) => void;
 };
+
+type DetailMode = 'pick' | 'edit' | 'create';
 
 function yearAheadIsoRange(): { start: string; end: string } {
   const start = new Date();
@@ -43,6 +46,10 @@ function withHomepageHero(locations: string[]): string[] {
     : [...locations, 'homepage_hero'];
 }
 
+function withoutHomepageHero(locations: string[]): string[] {
+  return locations.filter((loc) => loc !== 'homepage_hero');
+}
+
 function isPromotionWindowActive(promotion: StudioPromotion | null | undefined): boolean {
   if (!promotion?.is_active) return false;
   const now = Date.now();
@@ -63,6 +70,115 @@ function storefrontDatePayload(promotion?: StudioPromotion | null): {
   return { start_date: range.start, end_date: range.end };
 }
 
+function sortByCarousel(a: StudioPromotion, b: StudioPromotion): number {
+  const ap = a.carousel_position ?? Number.MAX_SAFE_INTEGER;
+  const bp = b.carousel_position ?? Number.MAX_SAFE_INTEGER;
+  if (ap !== bp) return ap - bp;
+  return (a.id ?? 0) - (b.id ?? 0);
+}
+
+function promoMeta(promo: StudioPromotion): string {
+  const bits: string[] = [`#${promo.id}`];
+  if (promo.promotion_code) bits.push(promo.promotion_code);
+  if (promo.carousel_position != null) bits.push(`order ${promo.carousel_position}`);
+  return bits.join(' · ');
+}
+
+function promoThumb(promo: StudioPromotion): string | null {
+  return resolveStudioImageUrl(promo.banner_image_url || promo.banner_image) || null;
+}
+
+function HeroPromoRow({
+  promo,
+  index,
+  selected,
+  status,
+  busy,
+  primaryLabel,
+  onPrimary,
+  onEdit,
+  onRemove,
+}: {
+  promo: StudioPromotion;
+  index: number;
+  selected?: boolean;
+  status: 'live' | 'expired' | 'off';
+  busy?: boolean;
+  primaryLabel: string;
+  onPrimary: () => void;
+  onEdit?: () => void;
+  onRemove?: () => void;
+}) {
+  const thumb = promoThumb(promo);
+  return (
+    <li>
+      <div
+        className={`studio-featured-picker__row studio-hero-picker__row${
+          selected ? ' studio-hero-picker__row--selected' : ''
+        }`}
+      >
+        {thumb ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={thumb} alt="" className="studio-featured-picker__thumb" />
+        ) : (
+          <span className="studio-featured-picker__thumb studio-featured-picker__thumb--empty" />
+        )}
+        <div className="studio-hero-picker__copy">
+          <p className="studio-featured-picker__name">
+            {status !== 'off' ? (
+              <span className="studio-hero-placement__pos">
+                #{promo.carousel_position ?? index + 1}
+              </span>
+            ) : null}{' '}
+            {promo.title || `Promotion #${promo.id}`}
+          </p>
+          <p className="studio-hero-picker__meta">
+            {promoMeta(promo)}
+            {status === 'live' ? (
+              <span className="studio-hero-picker__badge studio-hero-picker__badge--live">Live</span>
+            ) : null}
+            {status === 'expired' ? (
+              <span className="studio-hero-picker__badge studio-hero-picker__badge--expired">
+                Expired
+              </span>
+            ) : null}
+          </p>
+        </div>
+        <div className="studio-hero-picker__actions">
+          <button
+            type="button"
+            className="studio-btn studio-btn--primary studio-btn--compact"
+            disabled={busy}
+            onClick={onPrimary}
+          >
+            {primaryLabel}
+          </button>
+          {onEdit ? (
+            <button
+              type="button"
+              className="studio-btn studio-btn--ghost studio-btn--compact"
+              disabled={busy}
+              onClick={onEdit}
+            >
+              Edit
+            </button>
+          ) : null}
+          {onRemove ? (
+            <button
+              type="button"
+              className="studio-btn studio-btn--ghost studio-btn--compact"
+              disabled={busy}
+              onClick={onRemove}
+            >
+              Remove
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </li>
+  );
+}
+
 export function StudioHomepageHeroEditor({
   roleHint,
   preferPromotionId,
@@ -70,43 +186,66 @@ export function StudioHomepageHeroEditor({
 }: StudioHomepageHeroEditorProps) {
   const [allPromotions, setAllPromotions] = useState<StudioPromotion[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(preferPromotionId ?? null);
-  const [creating, setCreating] = useState(false);
+  const [detailMode, setDetailMode] = useState<DetailMode>(
+    preferPromotionId != null ? 'edit' : 'pick'
+  );
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [busyId, setBusyId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [editorKey, setEditorKey] = useState(0);
+  const [catalogFilter, setCatalogFilter] = useState('');
+  const [showExpired, setShowExpired] = useState(false);
 
   const heroPromotions = useMemo(
-    () => allPromotions.filter((p) => studioPromotionHasLocation(p, 'homepage_hero')),
+    () =>
+      allPromotions
+        .filter((p) => studioPromotionHasLocation(p, 'homepage_hero'))
+        .slice()
+        .sort(sortByCarousel),
     [allPromotions]
   );
 
-  const liveHeroCount = useMemo(
-    () => heroPromotions.filter((p) => isPromotionWindowActive(p)).length,
+  const liveHeroes = useMemo(
+    () => heroPromotions.filter((p) => isPromotionWindowActive(p)),
     [heroPromotions]
   );
 
+  const expiredHeroes = useMemo(
+    () => heroPromotions.filter((p) => !isPromotionWindowActive(p)),
+    [heroPromotions]
+  );
+
+  const catalog = useMemo(() => {
+    const q = catalogFilter.trim().toLowerCase();
+    return allPromotions
+      .filter((p) => p.id && !studioPromotionHasLocation(p, 'homepage_hero'))
+      .filter((p) => {
+        if (!q) return true;
+        const hay = `${p.title || ''} ${p.promotion_code || ''} ${p.id}`.toLowerCase();
+        return hay.includes(q);
+      })
+      .sort((a, b) => (a.title || '').localeCompare(b.title || '') || (a.id ?? 0) - (b.id ?? 0));
+  }, [allPromotions, catalogFilter]);
+
   const selected = useMemo(() => {
-    if (creating) return null;
+    if (detailMode === 'create') return null;
     if (selectedId != null) {
       return allPromotions.find((p) => p.id === selectedId) ?? null;
     }
-    return (
-      heroPromotions.find((p) => isPromotionWindowActive(p)) ?? heroPromotions[0] ?? null
-    );
-  }, [allPromotions, creating, heroPromotions, selectedId]);
+    return null;
+  }, [allPromotions, detailMode, selectedId]);
 
   // Must stay above any early return — React #310 if hooks run only after loading.
   const schedule = useMemo(() => yearAheadIsoRange(), []);
   const createDefaults = useMemo(
     () => ({
       display_locations: ['homepage_hero'] as string[],
-      carousel_position: (heroPromotions.length || 0) + 1,
+      carousel_position: (liveHeroes.length || heroPromotions.length || 0) + 1,
       start_date: schedule.start,
       end_date: schedule.end,
     }),
-    [heroPromotions.length, schedule.end, schedule.start]
+    [heroPromotions.length, liveHeroes.length, schedule.end, schedule.start]
   );
   const editDefaults = useMemo(
     () => ({ display_locations: ['homepage_hero'] as string[] }),
@@ -133,19 +272,11 @@ export function StudioHomepageHeroEditor({
           preferPromotionId != null
             ? rows.find((p) => p.id === preferPromotionId) ?? null
             : null;
-        const heroes = rows.filter((p) => studioPromotionHasLocation(p, 'homepage_hero'));
-        const liveHero = heroes.find((p) => isPromotionWindowActive(p));
-        if (preferred) {
+        if (preferred?.id) {
           setSelectedId(preferred.id);
-          setCreating(false);
-        } else if (liveHero?.id) {
-          setSelectedId(liveHero.id);
-          setCreating(false);
-        } else if (heroes[0]?.id) {
-          setSelectedId(heroes[0].id);
-          setCreating(false);
+          setDetailMode('edit');
         } else {
-          setCreating(true);
+          setDetailMode('pick');
           setSelectedId(null);
         }
       } catch (err) {
@@ -168,40 +299,55 @@ export function StudioHomepageHeroEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferPromotionId]);
 
+  const openEdit = (promo: StudioPromotion) => {
+    if (!promo.id) return;
+    setDetailMode('edit');
+    setSelectedId(promo.id);
+    setMsg(null);
+    setError(null);
+    setEditorKey((k) => k + 1);
+  };
+
   const startCreate = () => {
-    setCreating(true);
+    setDetailMode('create');
     setSelectedId(null);
     setError(null);
     setMsg(null);
     setEditorKey((k) => k + 1);
   };
 
-  const placeOnHero = async (promotion: StudioPromotion) => {
+  const backToPicker = () => {
+    setDetailMode('pick');
+    setSelectedId(null);
+    setMsg(null);
+    setError(null);
+  };
+
+  const placeOnHero = async (promotion: StudioPromotion, opts?: { revive?: boolean }) => {
     if (!promotion.id) return;
-    setSaving(true);
+    setBusyId(promotion.id);
     setError(null);
     setMsg(null);
     try {
       const locations = withHomepageHero(normalizeLocations(promotion.display_locations));
-      const datePayload = storefrontDatePayload(promotion);
+      const datePayload =
+        opts?.revive || !isPromotionWindowActive(promotion)
+          ? storefrontDatePayload(null)
+          : storefrontDatePayload(promotion);
+      const nextOrder =
+        promotion.carousel_position != null
+          ? promotion.carousel_position
+          : (liveHeroes.length || heroPromotions.length || 0) + 1;
       const saved = await patchStudioPromotion(promotion.id, {
         display_locations: locations,
-        carousel_position:
-          promotion.carousel_position != null
-            ? promotion.carousel_position
-            : heroPromotions.length + 1,
+        carousel_position: nextOrder,
         is_active: true,
         ...datePayload,
       });
       await reload();
-      setCreating(false);
-      setSelectedId(saved.id);
-      setEditorKey((k) => k + 1);
-      setMsg(
-        datePayload.start_date
-          ? `“${saved.title || 'Promotion'}” placed on the hero and date window revived for the storefront.`
-          : `“${saved.title || 'Promotion'}” is now on the homepage hero.`
-      );
+      setDetailMode('pick');
+      setSelectedId(null);
+      setMsg(`“${saved.title || 'Promotion'}” is now on the homepage banner.`);
       onSaved?.(saved);
     } catch (err) {
       setError(
@@ -212,7 +358,44 @@ export function StudioHomepageHeroEditor({
             : 'Could not place promotion on hero'
       );
     } finally {
-      setSaving(false);
+      setBusyId(null);
+    }
+  };
+
+  const removeFromHero = async (promotion: StudioPromotion) => {
+    if (!promotion.id) return;
+    if (
+      !window.confirm(
+        `Remove “${promotion.title || promotion.id}” from the homepage banner? The promotion itself is kept.`
+      )
+    ) {
+      return;
+    }
+    setBusyId(promotion.id);
+    setError(null);
+    setMsg(null);
+    try {
+      const locations = withoutHomepageHero(normalizeLocations(promotion.display_locations));
+      const saved = await patchStudioPromotion(promotion.id, {
+        display_locations: locations,
+      });
+      await reload();
+      if (selectedId === promotion.id) {
+        setDetailMode('pick');
+        setSelectedId(null);
+      }
+      setMsg(`“${saved.title || 'Promotion'}” removed from the homepage banner.`);
+      onSaved?.(saved);
+    } catch (err) {
+      setError(
+        err instanceof StudioApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : 'Could not remove promotion from hero'
+      );
+    } finally {
+      setBusyId(null);
     }
   };
 
@@ -220,9 +403,7 @@ export function StudioHomepageHeroEditor({
     return <p className="studio-editor__hint">Loading homepage hero…</p>;
   }
 
-  const candidates = allPromotions.filter(
-    (p) => p.id && !studioPromotionHasLocation(p, 'homepage_hero')
-  );
+  const showEditor = detailMode === 'create' || detailMode === 'edit';
 
   return (
     <div className="studio-editor studio-editor--flush">
@@ -230,14 +411,11 @@ export function StudioHomepageHeroEditor({
         <div>
           <p className="studio-editor__kicker">{roleHint || 'Homepage hero'}</p>
           <h2 className="studio-editor__title studio-editor__title--compact">
-            {creating
-              ? 'Create promotion (homepage hero)'
-              : selected?.title || 'Homepage hero banner'}
+            Choose banner slides
           </h2>
           <p className="studio-editor__hint studio-editor__hint--tight">
-            {creating
-              ? 'Fill in the form below to create a new promotion. Homepage hero placement and an active date window are applied automatically.'
-              : 'Edit this hero slide, or create a new promotion with the button above the slide list.'}
+            Only <strong>Live</strong> slides appear in the storefront carousel. Add from your
+            catalog, revive expired ones, or create a new banner.
           </p>
         </div>
       </div>
@@ -253,113 +431,160 @@ export function StudioHomepageHeroEditor({
         </div>
       )}
 
-      {liveHeroCount === 0 && heroPromotions.length > 0 && !creating && (
+      {liveHeroes.length === 0 && (
         <div className="studio-alert" role="status">
-          Hero promotions exist but their date window expired, so the storefront shows the
-          placeholder. Update Starts/Ends below (or save with a fresh window) to revive them.
+          Nothing live on the banner right now — the storefront shows the placeholder image. Add or
+          revive a slide below.
         </div>
       )}
 
       <section className="studio-editor__section">
         <div className="studio-editor__row" style={{ justifyContent: 'space-between', gap: '0.75rem' }}>
-          <p className="studio-field__label" style={{ margin: 0 }}>
-            Hero slides ({heroPromotions.length}) · live {liveHeroCount}
-          </p>
-          <button
-            type="button"
-            className="studio-btn studio-btn--primary"
-            onClick={startCreate}
-            disabled={creating}
-          >
-            Create promotion
+          <h3 className="studio-editor__section-title" style={{ margin: 0 }}>
+            Live on banner ({liveHeroes.length})
+          </h3>
+          <button type="button" className="studio-btn studio-btn--primary" onClick={startCreate}>
+            Create new
           </button>
         </div>
-        {heroPromotions.length > 0 ? (
-          <ul className="studio-hero-placement__list" style={{ marginTop: '0.55rem' }}>
-            {heroPromotions.map((promo, index) => {
-              const live = isPromotionWindowActive(promo);
-              return (
-                <li key={promo.id}>
-                  <button
-                    type="button"
-                    className={`studio-hero-placement__item${
-                      !creating && selected?.id === promo.id
-                        ? ' studio-hero-placement__item--active'
-                        : ''
-                    }`}
-                    onClick={() => {
-                      setCreating(false);
-                      setSelectedId(promo.id);
-                      setMsg(null);
-                      setError(null);
-                      setEditorKey((k) => k + 1);
-                    }}
-                  >
-                    <span className="studio-hero-placement__pos">
-                      #{promo.carousel_position ?? index + 1}
-                    </span>
-                    <span className="studio-hero-placement__title">
-                      {promo.title}
-                      {!live ? ' (expired)' : ''}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+        {liveHeroes.length === 0 ? (
+          <p className="studio-images__empty">No live slides yet.</p>
         ) : (
-          <p className="studio-editor__hint">No homepage hero promotions yet — create one below.</p>
+          <ul className="studio-featured-picker__list">
+            {liveHeroes.map((promo, index) => (
+              <HeroPromoRow
+                key={promo.id}
+                promo={promo}
+                index={index}
+                selected={detailMode === 'edit' && selectedId === promo.id}
+                status="live"
+                busy={busyId === promo.id}
+                primaryLabel="Edit"
+                onPrimary={() => openEdit(promo)}
+                onRemove={() => void removeFromHero(promo)}
+              />
+            ))}
+          </ul>
         )}
       </section>
 
-      {creating && (
-        <div className="studio-alert studio-alert--ok" role="status">
-          Creating a new promotion — upload a banner, set Starts/Ends, then hit Create promotion.
-        </div>
+      {expiredHeroes.length > 0 && (
+        <section className="studio-editor__section">
+          <button
+            type="button"
+            className="studio-hero-picker__toggle"
+            onClick={() => setShowExpired((v) => !v)}
+            aria-expanded={showExpired}
+          >
+            <h3 className="studio-editor__section-title" style={{ margin: 0 }}>
+              On hero but expired ({expiredHeroes.length})
+            </h3>
+            <span>{showExpired ? 'Hide' : 'Show'}</span>
+          </button>
+          {showExpired ? (
+            <ul className="studio-featured-picker__list">
+              {expiredHeroes.map((promo, index) => (
+                <HeroPromoRow
+                  key={promo.id}
+                  promo={promo}
+                  index={index}
+                  selected={detailMode === 'edit' && selectedId === promo.id}
+                  status="expired"
+                  busy={busyId === promo.id}
+                  primaryLabel="Revive"
+                  onPrimary={() => void placeOnHero(promo, { revive: true })}
+                  onEdit={() => openEdit(promo)}
+                  onRemove={() => void removeFromHero(promo)}
+                />
+              ))}
+            </ul>
+          ) : (
+            <p className="studio-editor__hint studio-editor__hint--tight">
+              Hidden from shoppers until revived. They keep the Homepage hero placement.
+            </p>
+          )}
+        </section>
       )}
 
-      <StudioPromotionEditor
-        key={`${creating ? 'create' : `edit-${selected?.id ?? 'none'}`}-${editorKey}`}
-        promotion={creating ? null : selected}
-        roleHint={creating ? 'Create promotion' : 'Edit promotion'}
-        defaults={creating ? createDefaults : editDefaults}
-        forceLocations={forceHeroLocations}
-        onSaved={async (saved) => {
-          await reload();
-          setCreating(false);
-          setSelectedId(saved.id);
-          setMsg(
-            creating
-              ? 'Promotion created and placed on the homepage hero.'
-              : 'Homepage hero saved.'
-          );
-          onSaved?.(saved);
-        }}
-      />
-
-      {!creating && candidates.length > 0 && (
-        <section className="studio-editor__section">
-          <p className="studio-field__label">Or place an existing promotion on the hero</p>
-          <ul className="studio-hero-placement__list">
-            {candidates.slice(0, 12).map((promo) => (
-              <li key={promo.id}>
-                <button
-                  type="button"
-                  className="studio-hero-placement__item"
-                  disabled={saving}
-                  onClick={() => void placeOnHero(promo)}
-                >
-                  <span className="studio-hero-placement__title">
-                    {promo.title}
-                    {!isPromotionWindowActive(promo) ? ' (will revive dates)' : ''}
-                  </span>
-                  <span className="studio-icon-btn studio-icon-btn--edit">
-                    <span>Place</span>
-                  </span>
-                </button>
-              </li>
+      <section className="studio-editor__section">
+        <h3 className="studio-editor__section-title">Add from catalog</h3>
+        <p className="studio-editor__hint studio-editor__hint--tight">
+          Promotions not on the banner yet. Add places them live (date window refreshed if needed).
+        </p>
+        <label className="studio-field studio-field--full">
+          <span className="sr-only">Filter promotions</span>
+          <input
+            className="studio-input"
+            value={catalogFilter}
+            onChange={(e) => setCatalogFilter(e.target.value)}
+            placeholder="Filter by title, code, or id…"
+          />
+        </label>
+        {catalog.length === 0 ? (
+          <p className="studio-images__empty">
+            {catalogFilter.trim()
+              ? 'No promotions match that filter.'
+              : 'Every promotion is already on the hero list (live or expired).'}
+          </p>
+        ) : (
+          <ul className="studio-featured-picker__list">
+            {catalog.slice(0, 20).map((promo, index) => (
+              <HeroPromoRow
+                key={promo.id}
+                promo={promo}
+                index={index}
+                status="off"
+                busy={busyId === promo.id}
+                primaryLabel="Add"
+                onPrimary={() => void placeOnHero(promo)}
+                onEdit={() => openEdit(promo)}
+              />
             ))}
           </ul>
+        )}
+        {catalog.length > 20 ? (
+          <p className="studio-editor__hint studio-editor__hint--tight">
+            Showing 20 of {catalog.length}. Refine the filter to find others.
+          </p>
+        ) : null}
+      </section>
+
+      {showEditor && (
+        <section className="studio-editor__section studio-hero-picker__detail">
+          <div className="studio-editor__row" style={{ justifyContent: 'space-between', gap: '0.75rem' }}>
+            <h3 className="studio-editor__section-title" style={{ margin: 0 }}>
+              {detailMode === 'create'
+                ? 'New banner promotion'
+                : `Edit · ${selected?.title || `#${selectedId}`}`}
+            </h3>
+            <button type="button" className="studio-btn studio-btn--ghost" onClick={backToPicker}>
+              Back to list
+            </button>
+          </div>
+          {detailMode === 'create' && (
+            <div className="studio-alert studio-alert--ok" role="status">
+              Upload a banner, set Starts/Ends, then create. Homepage hero placement is applied
+              automatically.
+            </div>
+          )}
+          <StudioPromotionEditor
+            key={`${detailMode === 'create' ? 'create' : `edit-${selected?.id ?? 'none'}`}-${editorKey}`}
+            promotion={detailMode === 'create' ? null : selected}
+            roleHint={detailMode === 'create' ? 'Create promotion' : 'Edit promotion'}
+            defaults={detailMode === 'create' ? createDefaults : editDefaults}
+            forceLocations={forceHeroLocations}
+            onSaved={async (saved) => {
+              await reload();
+              setDetailMode('pick');
+              setSelectedId(null);
+              setMsg(
+                detailMode === 'create'
+                  ? 'Promotion created and placed on the homepage banner.'
+                  : 'Homepage hero saved.'
+              );
+              onSaved?.(saved);
+            }}
+          />
         </section>
       )}
     </div>

@@ -22,7 +22,7 @@ import {
 const FALLBACK_PARTNERS = ['BuySimu', 'MoPhones'] as const;
 const TERM_OPTIONS: BuysimuPlanTerm[] = [12, 24];
 const DEFAULT_DEPOSIT = 20_000;
-const MATCH_LIMIT = 6;
+const MATCH_LIMIT = 3;
 
 type PublicFinancingProvider = {
   id: number;

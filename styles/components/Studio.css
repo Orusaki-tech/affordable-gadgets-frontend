@@ -281,6 +281,36 @@
   text-align: left;
 }
 
+.studio-hero-placement__item--row {
+  cursor: default;
+}
+
+.studio-hero-placement__select {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.studio-hero-placement__actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.studio-icon-btn--danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 .studio-hero-placement__item--active {
   border-color: var(--promo-lime, #9fe855);
   background: color-mix(in srgb, var(--promo-lime, #9fe855) 14%, #fff);

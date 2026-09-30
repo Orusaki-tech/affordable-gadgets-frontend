@@ -166,7 +166,7 @@ function HeroPromoRow({
           {onRemove ? (
             <button
               type="button"
-              className="studio-btn studio-btn--ghost studio-btn--compact"
+              className="studio-btn studio-btn--danger studio-btn--compact"
               disabled={busy}
               onClick={onRemove}
             >

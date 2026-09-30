@@ -26,7 +26,9 @@ import {
   retrieveStudioFinancingProvider,
   retrieveStudioProduct,
   retrieveStudioPromotion,
+  patchStudioPromotion,
   StudioApiError,
+  studioPromotionHasLocation,
 } from '@/lib/studio/api';
 import type { StudioCapabilities } from '@/lib/studio/permissions';
 import type { PublicProduct } from '@/lib/api/generated';
@@ -53,6 +55,8 @@ type StudioEditHostValue = {
   }) => void;
   openPromotionsManager: () => void;
   openEditHomepageHero: (preferPromotionId?: number | null) => void;
+  /** Strip homepage_hero placement (keeps the promotion). */
+  removeHomepageHeroPromotion: (id: number) => Promise<void>;
   openEditBundle: (id: number) => Promise<void>;
   openCreateBundle: () => void;
   openEditFinancingProvider: (id: number) => Promise<void>;
@@ -327,6 +331,53 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     [capabilities?.canEditPromotions]
   );
 
+  const removeHomepageHeroPromotion = useCallback(
+    async (id: number) => {
+      if (!id) return;
+      if (!capabilities?.canEditPromotions) {
+        setError('Your role cannot edit promotions.');
+        return;
+      }
+      setError(null);
+      try {
+        const full = await retrieveStudioPromotion(id);
+        if (!studioPromotionHasLocation(full, 'homepage_hero')) {
+          setError('That promotion is not on the homepage banner.');
+          return;
+        }
+        const title = full.title || `#${id}`;
+        if (
+          !window.confirm(
+            `Remove “${title}” from the homepage banner? The promotion itself is kept.`
+          )
+        ) {
+          return;
+        }
+        const raw = full.display_locations;
+        const locations = (
+          Array.isArray(raw)
+            ? raw.map(String)
+            : typeof raw === 'string'
+              ? raw.split(',').map((s) => s.trim()).filter(Boolean)
+              : []
+        ).filter((loc) => loc !== 'homepage_hero');
+        await patchStudioPromotion(id, { display_locations: locations });
+        await queryClient.invalidateQueries({ queryKey: ['promotions'] });
+        await queryClient.refetchQueries({ queryKey: ['promotions'] });
+        window.location.reload();
+      } catch (err) {
+        setError(
+          err instanceof StudioApiError
+            ? err.message
+            : err instanceof Error
+              ? err.message
+              : 'Could not remove promotion from the banner'
+        );
+      }
+    },
+    [capabilities?.canEditPromotions, queryClient]
+  );
+
   const openEditBundle = useCallback(
     async (id: number) => {
       if (!id) return;
@@ -539,6 +590,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       openCreatePromotion,
       openPromotionsManager,
       openEditHomepageHero,
+      removeHomepageHeroPromotion,
       openEditBundle,
       openCreateBundle,
       openEditFinancingProvider,
@@ -564,6 +616,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     openCreatePromotion,
     openPromotionsManager,
     openEditHomepageHero,
+    removeHomepageHeroPromotion,
     openEditBundle,
     openCreateBundle,
     openEditFinancingProvider,

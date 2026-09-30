@@ -324,9 +324,9 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
             {canEditPromos ? (
               <div className="studio-hero-placement" role="region" aria-label="Homepage hero placement">
                 <p className="studio-hero-placement__label">
-                  Live homepage banner slides ({promotions.length}). Order follows each promotion’s
-                  carousel position (1 = first). Open a slide to edit, or use{' '}
-                  <strong>Edit banner</strong> to add/remove from the full list.
+                  Live homepage banner slides ({promotions.length}). Use <strong>Remove</strong> to
+                  take a slide off the carousel (promotion is kept). <strong>Edit</strong> opens the
+                  full banner picker.
                 </p>
                 {promotions.length === 0 ? (
                   <div className="studio-hero-placement__empty-row">
@@ -350,22 +350,40 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
                       const isActive = promo.id === activePromotion?.id;
                       return (
                         <li key={promo.id}>
-                          <button
-                            type="button"
-                            className={`studio-hero-placement__item${isActive ? ' studio-hero-placement__item--active' : ''}`}
-                            onClick={() => {
-                              setActivePromotionId(promo.id!);
-                              studioEdit?.openEditHomepageHero(promo.id!);
-                            }}
+                          <div
+                            className={`studio-hero-placement__item studio-hero-placement__item--row${
+                              isActive ? ' studio-hero-placement__item--active' : ''
+                            }`}
                           >
-                            <span className="studio-hero-placement__pos">
-                              #{promo.carousel_position ?? index + 1}
+                            <button
+                              type="button"
+                              className="studio-hero-placement__select"
+                              onClick={() => setActivePromotionId(promo.id!)}
+                            >
+                              <span className="studio-hero-placement__pos">
+                                #{promo.carousel_position ?? index + 1}
+                              </span>
+                              <span className="studio-hero-placement__title">{promo.title}</span>
+                            </button>
+                            <span className="studio-hero-placement__actions">
+                              <button
+                                type="button"
+                                className="studio-icon-btn studio-icon-btn--edit"
+                                title={`Edit ${promo.title || 'slide'}`}
+                                onClick={() => studioEdit?.openEditHomepageHero(promo.id!)}
+                              >
+                                <span>Edit</span>
+                              </button>
+                              <button
+                                type="button"
+                                className="studio-icon-btn studio-icon-btn--danger"
+                                title={`Remove ${promo.title || 'slide'} from banner`}
+                                onClick={() => void studioEdit?.removeHomepageHeroPromotion(promo.id!)}
+                              >
+                                <span>Remove</span>
+                              </button>
                             </span>
-                            <span className="studio-hero-placement__title">{promo.title}</span>
-                            <span className="studio-icon-btn studio-icon-btn--edit">
-                              <span>Edit</span>
-                            </span>
-                          </button>
+                          </div>
                         </li>
                       );
                     })}

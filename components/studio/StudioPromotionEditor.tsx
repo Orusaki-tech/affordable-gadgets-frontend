@@ -284,7 +284,32 @@ export function StudioPromotionEditor({
   const needsBanner =
     locations.includes('homepage_hero') ||
     locations.includes('stories_carousel') ||
-    locations.includes('brand_banner');
+    locations.includes('brand_banner') ||
+    locations.includes('special_offers') ||
+    locations.includes('flash_sales') ||
+    locations.includes('cbd_ribbon');
+
+  const bannerResolutionHint = (() => {
+    const hints: string[] = [];
+    if (locations.includes('homepage_hero')) {
+      hints.push('Homepage hero: 16:9 landscape, ideally 1920×1080 px (min 1280×720).');
+    }
+    if (locations.includes('brand_banner')) {
+      hints.push('Brand banner: wide landscape (e.g. 1280×288+).');
+    }
+    if (locations.includes('special_offers') || locations.includes('flash_sales')) {
+      hints.push('Special offers / flash sales: square 1:1, ideally 1080×1080 px (min 720×720).');
+    }
+    if (locations.includes('stories_carousel')) {
+      hints.push('Stories: square tile, ideally 1080×1080 px.');
+    }
+    if (locations.includes('cbd_ribbon')) {
+      hints.push('CBD ribbon: landscape, ideally 1600×400 px.');
+    }
+    return hints.length > 0
+      ? hints.join(' ')
+      : 'Upload a clear banner image for this placement.';
+  })();
 
   const toggleLocation = (value: string) => {
     if (forceLocations?.includes(value) && locations.includes(value)) return;
@@ -453,6 +478,7 @@ export function StudioPromotionEditor({
             />
           </label>
         </div>
+        <p className="studio-editor__hint studio-editor__hint--tight">{bannerResolutionHint}</p>
         {currentBanner ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={currentBanner} alt="" className="studio-images__preview studio-images__preview--banner" />

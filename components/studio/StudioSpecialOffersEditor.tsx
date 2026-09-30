@@ -409,7 +409,8 @@ export function StudioSpecialOffersEditor({
           </h2>
           <p className="studio-editor__hint studio-editor__hint--tight">
             Only <strong>Live</strong> promotions appear in the Special Offers section. Add from
-            catalog, revive expired ones, or create a new offer.
+            catalog, revive expired ones, or create a new offer. Banner images should be{' '}
+            <strong>square 1:1</strong>, ideally <strong>1080×1080 px</strong> (min 720×720).
           </p>
         </div>
       </div>
@@ -557,8 +558,8 @@ export function StudioSpecialOffersEditor({
           </div>
           {detailMode === 'create' && (
             <div className="studio-alert studio-alert--ok" role="status">
-              Upload a banner, set Starts/Ends, then create. Special Offers placement is applied
-              automatically.
+              Upload a square banner (ideally 1080×1080 px), set Starts/Ends, then create. Special
+              Offers placement is applied automatically.
             </div>
           )}
           <StudioPromotionEditor

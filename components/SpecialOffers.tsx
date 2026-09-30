@@ -92,28 +92,10 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
       );
     }
 
-    if (!data || data.results.length === 0) {
+    if (!data || data.results.length === 0 || specialOffersPromotions.length === 0) {
       return (
         <div className="special-offers">
-          <h2 className="special-offers__heading">{sectionTitle}</h2>
-          <div className="special-offers__grid">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="special-offers__card" />
-            ))}
-          </div>
-          {canManage ? (
-            <p className="special-offers__empty-text" style={{ marginTop: '0.75rem' }}>
-              No offers yet — use Edit to add promotions to this section.
-            </p>
-          ) : null}
-        </div>
-      );
-    }
-
-    return (
-      <div className="special-offers">
-        <h2 className="special-offers__title section-label">{sectionTitle}</h2>
-        {specialOffersPromotions.length === 0 ? (
+          <h2 className="special-offers__title section-label">{sectionTitle}</h2>
           <div className="special-offers__empty">
             <p className="special-offers__empty-text">No special offers available at the moment.</p>
             {canManage ? (
@@ -130,52 +112,57 @@ export function SpecialOffers({ filter, pageSize }: SpecialOffersProps = {}) {
               </Link>
             )}
           </div>
-        ) : (
-          <ProductCarousel
-            itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
-            showNavigation={true}
-            showPagination={false}
-            autoPlay
-          >
-            {specialOffersPromotions.map((promotion: PublicPromotion, index) => {
-              const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
-              const href = getPromotionHref(promotion);
-              const isSpecialOffer = normalizeLocations(promotion.display_locations).includes(
-                'special_offers'
-              );
+        </div>
+      );
+    }
 
-              return (
-                <StudioPromoTile
-                  key={promotion.id ?? `${promotion.title}-${index}`}
-                  promotionId={promotion.id}
-                  title={promotion.title}
-                  href={href}
-                  className="special-offers__promo"
-                  onRemove={
-                    canManage && isSpecialOffer && promotion.id
-                      ? () => void studioEdit?.removeSpecialOfferPromotion(promotion.id!)
-                      : undefined
-                  }
-                >
-                  <div className="special-offers__promo-media">
-                    {promotionImageSrc && (
-                      <CloudinaryImage
-                        src={promotionImageSrc}
-                        alt={promotion.title}
-                        preset="card"
-                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                        priority={false}
-                        loading={index < 2 ? 'eager' : 'lazy'}
-                        className="special-offers__promo-image"
-                        fill
-                      />
-                    )}
-                  </div>
-                </StudioPromoTile>
-              );
-            })}
-          </ProductCarousel>
-        )}
+    return (
+      <div className="special-offers">
+        <h2 className="special-offers__title section-label">{sectionTitle}</h2>
+        <ProductCarousel
+          itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
+          showNavigation={true}
+          showPagination={false}
+          autoPlay
+        >
+          {specialOffersPromotions.map((promotion: PublicPromotion, index) => {
+            const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
+            const href = getPromotionHref(promotion);
+            const isSpecialOffer = normalizeLocations(promotion.display_locations).includes(
+              'special_offers'
+            );
+
+            return (
+              <StudioPromoTile
+                key={promotion.id ?? `${promotion.title}-${index}`}
+                promotionId={promotion.id}
+                title={promotion.title}
+                href={href}
+                className="special-offers__promo"
+                onRemove={
+                  canManage && isSpecialOffer && promotion.id
+                    ? () => void studioEdit?.removeSpecialOfferPromotion(promotion.id!)
+                    : undefined
+                }
+              >
+                <div className="special-offers__promo-media">
+                  {promotionImageSrc && (
+                    <CloudinaryImage
+                      src={promotionImageSrc}
+                      alt={promotion.title}
+                      preset="promoTile"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      priority={false}
+                      loading={index < 2 ? 'eager' : 'lazy'}
+                      className="special-offers__promo-image"
+                      fill
+                    />
+                  )}
+                </div>
+              </StudioPromoTile>
+            );
+          })}
+        </ProductCarousel>
       </div>
     );
   })();

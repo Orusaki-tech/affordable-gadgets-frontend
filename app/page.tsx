@@ -2,6 +2,7 @@ import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import { HomeHeroSpotlight } from '@/components/home/HomeHeroSpotlight';
 import { HomeCbdRibbon } from '@/components/home/HomeCbdRibbon';
+import { HomeSpecialOffers } from '@/components/home/HomeSpecialOffers';
 import { HomeFeaturedHardware } from '@/components/home/HomeFeaturedHardware';
 import { HomeBudgetMatcher } from '@/components/home/HomeBudgetMatcher';
 import { HomeBundles } from '@/components/home/HomeBundles';
@@ -202,6 +203,7 @@ export default async function HomePage() {
 
         <HomeHeroSpotlight initialPromotionsData={initialHeroPromotionsData} />
         <HomeCbdRibbon />
+        <HomeSpecialOffers />
         <HomeFeaturedHardware />
         <HomeRepairPromo />
         <HomeBudgetMatcher />

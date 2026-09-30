@@ -44,6 +44,26 @@ function withHomepageHero(locations: string[]): string[] {
     : [...locations, 'homepage_hero'];
 }
 
+function isPromotionWindowActive(promotion: StudioPromotion | null | undefined): boolean {
+  if (!promotion?.is_active) return false;
+  const now = Date.now();
+  const start = promotion.start_date ? new Date(promotion.start_date).getTime() : NaN;
+  const end = promotion.end_date ? new Date(promotion.end_date).getTime() : NaN;
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
+  return start <= now && end >= now;
+}
+
+/** Public storefront only shows promos in an active date window — revive if expired. */
+function storefrontDatePayload(promotion?: StudioPromotion | null): {
+  start_date?: string;
+  end_date?: string;
+} {
+  const range = yearAheadIsoRange();
+  if (!promotion) return range;
+  if (isPromotionWindowActive(promotion)) return {};
+  return range;
+}
+
 export function StudioHomepageHeroEditor({
   roleHint,
   preferPromotionId,
@@ -68,12 +88,19 @@ export function StudioHomepageHeroEditor({
     [allPromotions]
   );
 
+  const liveHeroCount = useMemo(
+    () => heroPromotions.filter((p) => isPromotionWindowActive(p)).length,
+    [heroPromotions]
+  );
+
   const selected = useMemo(() => {
     if (creating) return null;
     if (selectedId != null) {
       return allPromotions.find((p) => p.id === selectedId) ?? null;
     }
-    return heroPromotions[0] ?? null;
+    return (
+      heroPromotions.find((p) => isPromotionWindowActive(p)) ?? heroPromotions[0] ?? null
+    );
   }, [allPromotions, creating, heroPromotions, selectedId]);
 
   const reload = async () => {
@@ -95,12 +122,17 @@ export function StudioHomepageHeroEditor({
           preferPromotionId != null
             ? rows.find((p) => p.id === preferPromotionId) ?? null
             : null;
-        const firstHero = rows.find((p) => studioPromotionHasLocation(p, 'homepage_hero'));
+        const heroes = rows.filter((p) => studioPromotionHasLocation(p, 'homepage_hero'));
+        const liveHero = heroes.find((p) => isPromotionWindowActive(p));
         if (preferred) {
           setSelectedId(preferred.id);
           setCreating(false);
-        } else if (firstHero?.id) {
-          setSelectedId(firstHero.id);
+        } else if (liveHero?.id) {
+          setSelectedId(liveHero.id);
+          setCreating(false);
+        } else if (heroes[0]?.id) {
+          // Expired heroes still editable so editors can revive them.
+          setSelectedId(heroes[0].id);
           setCreating(false);
         } else {
           setCreating(true);
@@ -177,6 +209,7 @@ export function StudioHomepageHeroEditor({
     setMsg(null);
     try {
       const locations = withHomepageHero(normalizeLocations(promotion.display_locations));
+      const datePayload = storefrontDatePayload(promotion);
       const saved = await patchStudioPromotion(promotion.id, {
         display_locations: locations,
         carousel_position:
@@ -184,11 +217,16 @@ export function StudioHomepageHeroEditor({
             ? promotion.carousel_position
             : heroPromotions.length + 1,
         is_active: true,
+        ...datePayload,
       });
       await reload();
       setCreating(false);
       setSelectedId(saved.id);
-      setMsg(`“${saved.title || 'Promotion'}” is now on the homepage hero.`);
+      setMsg(
+        datePayload.start_date
+          ? `“${saved.title || 'Promotion'}” placed on the hero and date window revived for the storefront.`
+          : `“${saved.title || 'Promotion'}” is now on the homepage hero.`
+      );
       onSaved?.(saved);
     } catch (err) {
       setError(
@@ -215,9 +253,14 @@ export function StudioHomepageHeroEditor({
       setError('Upload a banner image to create the homepage hero.');
       return;
     }
+    if (selected && !currentBanner && !bannerFile) {
+      setError('Upload a banner image — homepage hero requires a banner.');
+      return;
+    }
     setSaving(true);
     try {
       const pos = Number(carouselPosition);
+      const datePayload = storefrontDatePayload(selected);
       const payload: Record<string, string | Blob | boolean | number | null | undefined | string[]> =
         {
           title: title.trim(),
@@ -227,6 +270,7 @@ export function StudioHomepageHeroEditor({
           ),
           is_active: isActive,
           carousel_position: Number.isFinite(pos) && pos > 0 ? pos : 1,
+          ...datePayload,
         };
       if (bannerFile) payload.banner_image = bannerFile;
 
@@ -234,9 +278,11 @@ export function StudioHomepageHeroEditor({
       if (selected?.id) {
         saved = await patchStudioPromotion(selected.id, payload);
       } else {
+        // Create always needs an explicit active window for the public API.
         const range = yearAheadIsoRange();
         payload.start_date = range.start;
         payload.end_date = range.end;
+        payload.is_active = true;
         saved = await createStudioPromotion(payload);
       }
       await reload();
@@ -247,7 +293,13 @@ export function StudioHomepageHeroEditor({
         URL.revokeObjectURL(bannerPreview);
         setBannerPreview(null);
       }
-      setMsg('Homepage hero saved — it will show on the storefront banner.');
+      setMsg(
+        selected
+          ? datePayload.start_date
+            ? 'Homepage hero saved and date window revived — it will show on the storefront.'
+            : 'Homepage hero saved — it will show on the storefront banner.'
+          : 'Homepage hero created — it will show on the storefront banner.'
+      );
       onSaved?.(saved);
     } catch (err) {
       setError(
@@ -279,8 +331,8 @@ export function StudioHomepageHeroEditor({
             {creating ? 'New homepage hero' : selected?.title || 'Homepage hero banner'}
           </h2>
           <p className="studio-editor__hint studio-editor__hint--tight">
-            Edit the storefront hero in place. Tick Homepage hero is applied automatically when you
-            save here.
+            Create or edit the storefront hero. Saving always applies the Homepage hero location and
+            keeps an active date window so the banner appears publicly.
           </p>
         </div>
         <label className={`studio-switch${isActive ? ' is-on' : ''}`}>
@@ -304,10 +356,17 @@ export function StudioHomepageHeroEditor({
         </div>
       )}
 
+      {liveHeroCount === 0 && heroPromotions.length > 0 && !creating && (
+        <div className="studio-alert" role="status">
+          Hero promotions exist but their date window expired, so the storefront shows the
+          placeholder. Save below to revive dates, or create a new hero.
+        </div>
+      )}
+
       <section className="studio-editor__section">
         <div className="studio-editor__row" style={{ justifyContent: 'space-between', gap: '0.75rem' }}>
           <p className="studio-field__label" style={{ margin: 0 }}>
-            Hero slides ({heroPromotions.length})
+            Hero slides ({heroPromotions.length}) · live {liveHeroCount}
           </p>
           <button type="button" className="studio-icon-btn studio-icon-btn--edit" onClick={startCreate}>
             <span>New hero</span>
@@ -315,29 +374,35 @@ export function StudioHomepageHeroEditor({
         </div>
         {heroPromotions.length > 0 ? (
           <ul className="studio-hero-placement__list" style={{ marginTop: '0.55rem' }}>
-            {heroPromotions.map((promo, index) => (
-              <li key={promo.id}>
-                <button
-                  type="button"
-                  className={`studio-hero-placement__item${
-                    !creating && selected?.id === promo.id
-                      ? ' studio-hero-placement__item--active'
-                      : ''
-                  }`}
-                  onClick={() => {
-                    setCreating(false);
-                    setSelectedId(promo.id);
-                    setMsg(null);
-                    setError(null);
-                  }}
-                >
-                  <span className="studio-hero-placement__pos">
-                    #{promo.carousel_position ?? index + 1}
-                  </span>
-                  <span className="studio-hero-placement__title">{promo.title}</span>
-                </button>
-              </li>
-            ))}
+            {heroPromotions.map((promo, index) => {
+              const live = isPromotionWindowActive(promo);
+              return (
+                <li key={promo.id}>
+                  <button
+                    type="button"
+                    className={`studio-hero-placement__item${
+                      !creating && selected?.id === promo.id
+                        ? ' studio-hero-placement__item--active'
+                        : ''
+                    }`}
+                    onClick={() => {
+                      setCreating(false);
+                      setSelectedId(promo.id);
+                      setMsg(null);
+                      setError(null);
+                    }}
+                  >
+                    <span className="studio-hero-placement__pos">
+                      #{promo.carousel_position ?? index + 1}
+                    </span>
+                    <span className="studio-hero-placement__title">
+                      {promo.title}
+                      {!live ? ' (expired)' : ''}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className="studio-editor__hint">No homepage hero promotions yet — create one below.</p>
@@ -352,6 +417,7 @@ export function StudioHomepageHeroEditor({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            placeholder="e.g. Google Pixel 8 — zoom in"
           />
         </label>
         <label className="studio-field">
@@ -361,6 +427,7 @@ export function StudioHomepageHeroEditor({
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            placeholder="Short supporting line shown with the offer"
           />
         </label>
         <label className="studio-field">
@@ -377,7 +444,7 @@ export function StudioHomepageHeroEditor({
       </section>
 
       <section className="studio-editor__section">
-        <p className="studio-field__label">Banner image</p>
+        <p className="studio-field__label">Banner image {creating ? '(required)' : ''}</p>
         {currentBanner ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -387,7 +454,7 @@ export function StudioHomepageHeroEditor({
             style={{ width: '100%', borderRadius: '0.75rem', marginBottom: '0.75rem' }}
           />
         ) : (
-          <div className="studio-dropzone">Drop or upload a hero banner</div>
+          <div className="studio-dropzone">Upload a hero banner image</div>
         )}
         <input
           type="file"
@@ -413,7 +480,10 @@ export function StudioHomepageHeroEditor({
                   disabled={saving}
                   onClick={() => void placeOnHero(promo)}
                 >
-                  <span className="studio-hero-placement__title">{promo.title}</span>
+                  <span className="studio-hero-placement__title">
+                    {promo.title}
+                    {!isPromotionWindowActive(promo) ? ' (will revive dates)' : ''}
+                  </span>
                   <span className="studio-icon-btn studio-icon-btn--edit">
                     <span>Place</span>
                   </span>
@@ -426,7 +496,13 @@ export function StudioHomepageHeroEditor({
 
       <div className="studio-editor__actions">
         <button type="submit" className="studio-btn studio-btn--primary" disabled={saving}>
-          {saving ? 'Saving…' : creating ? 'Create homepage hero' : 'Save homepage hero'}
+          {saving
+            ? 'Saving…'
+            : creating
+              ? 'Create homepage hero'
+              : selected && !isPromotionWindowActive(selected)
+                ? 'Revive & save homepage hero'
+                : 'Save homepage hero'}
         </button>
       </div>
     </form>

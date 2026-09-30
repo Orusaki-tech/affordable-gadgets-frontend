@@ -331,8 +331,9 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
                 {promotions.length === 0 ? (
                   <div className="studio-hero-placement__empty-row">
                     <p className="studio-hero-placement__empty">
-                      No promotions with location “Homepage hero” yet. The Pixel placeholder is not
-                      editable until you create or place a hero promotion.
+                      No live Homepage hero promotions. The Pixel image is only a placeholder.
+                      Create a new hero, or open Edit banner to revive an expired promotion (date
+                      window must be active for it to appear on the storefront).
                     </p>
                     <button
                       type="button"

@@ -40,9 +40,31 @@ function messageFromBody(body: unknown, fallback: string): string {
     if (typeof obj.detail === 'string') return obj.detail;
     if (Array.isArray(obj.detail) && obj.detail[0]) return String(obj.detail[0]);
     if (typeof obj.message === 'string') return obj.message;
-    for (const value of Object.values(obj)) {
-      if (Array.isArray(value) && value[0]) return String(value[0]);
-      if (typeof value === 'string') return value;
+    const fieldLabels: Record<string, string> = {
+      meta_title: 'Meta title',
+      meta_description: 'Meta description',
+      seo_title: 'SEO title',
+      seo_description: 'SEO description',
+      product_name: 'Product name',
+      brand: 'Brand',
+      model_series: 'Model series',
+      slug: 'Slug',
+      keywords: 'Keywords',
+      headline: 'Headline',
+      title: 'Title',
+      name: 'Name',
+      code: 'Code',
+      promotion_code: 'Promotion code',
+      listing_brand: 'Listing brand',
+      county: 'County',
+      ward: 'Ward',
+      description: 'Description',
+    };
+    for (const [key, value] of Object.entries(obj)) {
+      const msg = Array.isArray(value) && value[0] ? String(value[0]) : typeof value === 'string' ? value : null;
+      if (!msg) continue;
+      const label = fieldLabels[key] || key.replace(/_/g, ' ');
+      return `${label}: ${msg}`;
     }
   }
   return fallback;

@@ -20,6 +20,7 @@ import { useStudioAuthOptional } from '@/components/studio/StudioAuthContext';
 import {
   deleteStudioProduct,
   findStudioArticleBySlug,
+  patchStudioProduct,
   retrieveStudioArticle,
   retrieveStudioBundle,
   retrieveStudioDeliveryRate,
@@ -183,14 +184,27 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     async (product: Pick<PublicProduct, 'id' | 'product_name'>) => {
       if (!product.id || !capabilities?.canDeleteProduct) return;
       const ok = window.confirm(
-        `Permanently delete “${product.product_name}”? This cannot be undone. To remove it from Featured/Videos, use Choose products instead.`
+        `Remove “${product.product_name}” from the storefront? It will be deleted if possible, or unpublished if it still has inventory.`
       );
       if (!ok) return;
       setError(null);
       try {
-        await deleteStudioProduct(product.id);
-        await queryClient.invalidateQueries({ queryKey: ['products'] });
-        await queryClient.invalidateQueries({ queryKey: ['product'] });
+        try {
+          await deleteStudioProduct(product.id);
+        } catch (err) {
+          const message =
+            err instanceof StudioApiError
+              ? err.message
+              : err instanceof Error
+                ? err.message
+                : '';
+          const blockedByInventory = /available inventory|inventory unit/i.test(message);
+          if (!blockedByInventory) throw err;
+          // Hard delete blocked (stock still attached) — unpublish so it leaves the shop.
+          await patchStudioProduct(product.id, { is_published: false });
+        }
+        await queryClient.invalidateQueries();
+        window.location.reload();
       } catch (err) {
         setError(
           err instanceof StudioApiError

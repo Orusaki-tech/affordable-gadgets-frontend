@@ -11,6 +11,7 @@ import {
   type StudioArticle,
   type StudioProduct,
 } from '@/lib/studio/api';
+import { StudioCharCount } from '@/components/studio/StudioCharCount';
 
 const ARTICLE_CATEGORIES = [
   { value: 'buying_guide', label: 'Buying guide' },
@@ -173,12 +174,26 @@ export function StudioArticleEditor({
         <h2 className="studio-editor__title">{isCreate ? 'Create article' : 'Edit article'}</h2>
       </div>
       <label className="studio-field">
-        <span>Headline</span>
-        <input value={headline} onChange={(e) => setHeadline(e.target.value)} required />
+        <span>
+          Headline <StudioCharCount length={headline.length} max={255} />
+        </span>
+        <input
+          value={headline}
+          onChange={(e) => setHeadline(e.target.value)}
+          maxLength={255}
+          required
+        />
       </label>
       <label className="studio-field">
-        <span>Slug</span>
-        <input value={slug} onChange={(e) => setSlug(e.target.value)} required />
+        <span>
+          Slug <StudioCharCount length={slug.length} max={255} />
+        </span>
+        <input
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          maxLength={255}
+          required
+        />
       </label>
       <label className="studio-field">
         <span>Category</span>
@@ -191,12 +206,27 @@ export function StudioArticleEditor({
         </select>
       </label>
       <label className="studio-field">
-        <span>SEO title</span>
-        <input value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} />
+        <span>
+          SEO title <StudioCharCount length={seoTitle.length} max={60} />
+        </span>
+        <input
+          value={seoTitle}
+          onChange={(e) => setSeoTitle(e.target.value)}
+          maxLength={60}
+          placeholder="Max 60 characters"
+        />
       </label>
       <label className="studio-field">
-        <span>SEO description</span>
-        <textarea value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} rows={3} />
+        <span>
+          SEO description <StudioCharCount length={seoDescription.length} max={160} />
+        </span>
+        <textarea
+          value={seoDescription}
+          onChange={(e) => setSeoDescription(e.target.value)}
+          rows={3}
+          maxLength={160}
+          placeholder="Max 160 characters"
+        />
       </label>
       <label className="studio-field">
         <span>Body (markdown)</span>

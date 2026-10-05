@@ -7,6 +7,7 @@ import {
   StudioApiError,
   type StudioFinancingProvider,
 } from '@/lib/studio/api';
+import { StudioCharCount } from '@/components/studio/StudioCharCount';
 
 type StudioFinancingProviderEditorProps = {
   provider: StudioFinancingProvider;
@@ -82,12 +83,26 @@ export function StudioFinancingProviderEditor({
         </p>
       </div>
       <label className="studio-field">
-        <span>Name</span>
-        <input value={name} onChange={(e) => setName(e.target.value)} required />
+        <span>
+          Name <StudioCharCount length={name.length} max={100} />
+        </span>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={100}
+          required
+        />
       </label>
       <label className="studio-field">
-        <span>Slug</span>
-        <input value={slug} onChange={(e) => setSlug(e.target.value)} required />
+        <span>
+          Slug <StudioCharCount length={slug.length} max={120} />
+        </span>
+        <input
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          maxLength={120}
+          required
+        />
       </label>
       <div className="studio-images studio-images--single">
         <div className="studio-images__head">

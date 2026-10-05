@@ -14,6 +14,7 @@ import {
   type StudioPromotionType,
 } from '@/lib/studio/api';
 import { StudioPromotionEditor } from '@/components/studio/StudioPromotionEditor';
+import { StudioCharCount } from '@/components/studio/StudioCharCount';
 
 type StudioPromotionsManagerProps = {
   roleHint?: string;
@@ -216,11 +217,20 @@ export function StudioPromotionsManager({
           <>
             <form className="studio-editor__grid" onSubmit={handleCreateType}>
               <label className="studio-field">
-                <span>Name</span>
-                <input className="studio-input" value={typeName} onChange={(e) => setTypeName(e.target.value)} />
+                <span>
+                  Name <StudioCharCount length={typeName.length} max={50} />
+                </span>
+                <input
+                  className="studio-input"
+                  value={typeName}
+                  onChange={(e) => setTypeName(e.target.value)}
+                  maxLength={50}
+                />
               </label>
               <label className="studio-field">
-                <span>Code</span>
+                <span>
+                  Code <StudioCharCount length={typeCode.length} max={10} />
+                </span>
                 <input
                   className="studio-input"
                   value={typeCode}

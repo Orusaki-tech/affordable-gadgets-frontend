@@ -94,6 +94,18 @@
   background: #0b0b0c;
 }
 
+.home-redesign__hero-banner-media--link {
+  display: block;
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+.home-redesign__hero-banner-media--link:focus-visible {
+  outline: 2px solid var(--color-primary, #16a34a);
+  outline-offset: 2px;
+}
+
 .home-redesign__hero-banner-media .cloudinary-image__fill {
   position: absolute;
   inset: 0;

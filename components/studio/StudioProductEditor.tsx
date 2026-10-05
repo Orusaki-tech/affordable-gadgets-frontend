@@ -21,6 +21,7 @@ import {
 } from '@/components/studio/StudioProductVideos';
 import { StudioProductVariants } from '@/components/studio/StudioProductVariants';
 import { StudioProductAccessories } from '@/components/studio/StudioProductAccessories';
+import { StudioCharCount } from '@/components/studio/StudioCharCount';
 
 const PRODUCT_TYPES = [
   { value: 'PH', label: 'Phone' },
@@ -298,12 +299,15 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
 
       <div className="studio-editor__grid">
         <label className="studio-field studio-field--full">
-          <span>Product name *</span>
+          <span>
+            Product name * <StudioCharCount length={form.product_name.length} max={255} />
+          </span>
           <input
             className="studio-input"
             value={form.product_name}
             onChange={(e) => setField('product_name', e.target.value)}
             disabled={fieldDisabled}
+            maxLength={255}
             required
           />
         </label>
@@ -325,23 +329,29 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
         </label>
 
         <label className="studio-field">
-          <span>Brand</span>
+          <span>
+            Brand <StudioCharCount length={form.brand.length} max={50} />
+          </span>
           <input
             className="studio-input"
             value={form.brand}
             onChange={(e) => setField('brand', e.target.value)}
             disabled={inventoryDisabled}
+            maxLength={50}
             placeholder="Apple, Samsung…"
           />
         </label>
 
         <label className="studio-field">
-          <span>Model series</span>
+          <span>
+            Model series <StudioCharCount length={form.model_series.length} max={100} />
+          </span>
           <input
             className="studio-input"
             value={form.model_series}
             onChange={(e) => setField('model_series', e.target.value)}
             disabled={inventoryDisabled}
+            maxLength={100}
           />
         </label>
 
@@ -381,43 +391,57 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
         </label>
 
         <label className="studio-field">
-          <span>Slug</span>
+          <span>
+            Slug <StudioCharCount length={form.slug.length} max={255} />
+          </span>
           <input
             className="studio-input"
             value={form.slug}
             onChange={(e) => setField('slug', e.target.value)}
             disabled={fieldDisabled}
+            maxLength={255}
           />
         </label>
 
         <label className="studio-field">
-          <span>Keywords</span>
+          <span>
+            Keywords <StudioCharCount length={form.keywords.length} max={255} />
+          </span>
           <input
             className="studio-input"
             value={form.keywords}
             onChange={(e) => setField('keywords', e.target.value)}
             disabled={fieldDisabled}
+            maxLength={255}
           />
         </label>
 
         <label className="studio-field studio-field--full">
-          <span>Meta title</span>
+          <span>
+            Meta title <StudioCharCount length={form.meta_title.length} max={60} />
+          </span>
           <input
             className="studio-input"
             value={form.meta_title}
             onChange={(e) => setField('meta_title', e.target.value)}
             disabled={fieldDisabled}
+            maxLength={60}
+            placeholder="SEO title — max 60 characters"
           />
         </label>
 
         <label className="studio-field studio-field--full">
-          <span>Meta description</span>
+          <span>
+            Meta description <StudioCharCount length={form.meta_description.length} max={160} />
+          </span>
           <textarea
             className="studio-input studio-textarea"
             rows={2}
             value={form.meta_description}
             onChange={(e) => setField('meta_description', e.target.value)}
             disabled={fieldDisabled}
+            maxLength={160}
+            placeholder="SEO description — max 160 characters"
           />
         </label>
 

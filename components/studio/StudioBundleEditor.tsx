@@ -16,6 +16,7 @@ import {
   type StudioBundleItem,
   type StudioProduct,
 } from '@/lib/studio/api';
+import { StudioCharCount } from '@/components/studio/StudioCharCount';
 
 const PRICING_MODES = [
   { value: 'FX', label: 'Fixed' },
@@ -232,8 +233,15 @@ export function StudioBundleEditor({
       </div>
 
       <label className="studio-field">
-        <span>Title</span>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} required />
+        <span>
+          Title <StudioCharCount length={title.length} max={255} />
+        </span>
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={255}
+          required
+        />
       </label>
       <label className="studio-field">
         <span>Description</span>

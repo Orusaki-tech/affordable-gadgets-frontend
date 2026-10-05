@@ -9,6 +9,7 @@ import {
   StudioApiError,
   type StudioDeliveryRate,
 } from '@/lib/studio/api';
+import { StudioCharCount } from '@/components/studio/StudioCharCount';
 
 type StudioDeliveryRateEditorProps = {
   mode?: 'create' | 'edit' | 'manage';
@@ -190,14 +191,24 @@ export function StudioDeliveryRateEditor({
 
       <form onSubmit={handleSubmit}>
         <label className="studio-field">
-          <span>County</span>
-          <input value={county} onChange={(e) => setCounty(e.target.value)} required />
+          <span>
+            County <StudioCharCount length={county.length} max={100} />
+          </span>
+          <input
+            value={county}
+            onChange={(e) => setCounty(e.target.value)}
+            maxLength={100}
+            required
+          />
         </label>
         <label className="studio-field">
-          <span>Ward (Nairobi / Kiambu only)</span>
+          <span>
+            Ward (Nairobi / Kiambu only) <StudioCharCount length={ward.length} max={100} />
+          </span>
           <input
             value={ward}
             onChange={(e) => setWard(e.target.value)}
+            maxLength={100}
             disabled={!/nairobi|kiambu/i.test(county)}
             placeholder={
               /nairobi|kiambu/i.test(county) ? 'Optional ward' : 'Not used for this county'

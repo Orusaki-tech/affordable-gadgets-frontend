@@ -14,6 +14,7 @@ import {
   type StudioPromotion,
   type StudioPromotionType,
 } from '@/lib/studio/api';
+import { StudioCharCount } from '@/components/studio/StudioCharCount';
 
 const LOCATION_OPTIONS = [
   { value: 'homepage_hero', label: 'Homepage hero', hint: 'Main carousel' },
@@ -491,11 +492,14 @@ export function StudioPromotionEditor({
         <h3 className="studio-editor__section-title">Basics</h3>
         <div className="studio-editor__stack">
           <label className="studio-field">
-            <span>Title</span>
+            <span>
+              Title <StudioCharCount length={title.length} max={255} />
+            </span>
             <input
               className="studio-input"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              maxLength={255}
               required
             />
           </label>
@@ -526,22 +530,28 @@ export function StudioPromotionEditor({
               </select>
             </label>
             <label className="studio-field">
-              <span>Promotion code</span>
+              <span>
+                Promotion code <StudioCharCount length={promotionCode.length} max={50} />
+              </span>
               <input
                 className="studio-input"
                 value={promotionCode}
                 onChange={(e) => setPromotionCode(e.target.value)}
+                maxLength={50}
                 placeholder="Auto if empty"
               />
             </label>
           </div>
           {showListingBrand && (
             <label className="studio-field">
-              <span>Listing brand filter</span>
+              <span>
+                Listing brand filter <StudioCharCount length={listingBrand.length} max={64} />
+              </span>
               <input
                 className="studio-input"
                 value={listingBrand}
                 onChange={(e) => setListingBrand(e.target.value)}
+                maxLength={64}
                 placeholder="e.g. Apple"
               />
               <span className="studio-field__help">

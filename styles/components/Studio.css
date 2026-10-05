@@ -788,6 +788,19 @@
   color: var(--on-surface-variant, #46464a);
 }
 
+.studio-char-count {
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted, #86868b);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.studio-char-count--over {
+  color: #b42318;
+}
+
 .studio-editor__hint--tight {
   margin: 0 0 0.65rem;
 }

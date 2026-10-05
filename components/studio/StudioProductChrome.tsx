@@ -51,7 +51,7 @@ export function StudioProductChrome({
         <button
           type="button"
           className="studio-icon-btn studio-icon-btn--danger"
-          title="Permanently delete this product"
+          title="Remove this product from the storefront"
           aria-label={`Delete ${product.product_name}`}
           onClick={(e) => {
             e.preventDefault();

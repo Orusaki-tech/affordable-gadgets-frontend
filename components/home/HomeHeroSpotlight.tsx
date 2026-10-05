@@ -276,7 +276,15 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
                 </div>
               ) : null}
 
-              <div className="home-redesign__hero-banner-media">
+              <Link
+                href={detailsHref}
+                className="home-redesign__hero-banner-media home-redesign__hero-banner-media--link"
+                aria-label={
+                  activePromotion?.title
+                    ? `View details: ${activePromotion.title}`
+                    : 'View promotion details'
+                }
+              >
                 <CloudinaryImage
                   src={displayBannerSrc}
                   alt={activePromotion?.title ?? 'Featured promotion'}
@@ -288,7 +296,7 @@ export function HomeHeroSpotlight({ initialPromotionsData }: HomeHeroSpotlightPr
                   priority
                   onError={() => setBannerImageFailed(true)}
                 />
-              </div>
+              </Link>
 
               {promotions.length > 1 ? (
                 <div className="studio-hero-banner__dots" role="tablist" aria-label="Hero banners">

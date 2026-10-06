@@ -239,6 +239,18 @@ export function CartPage() {
       const saved = localStorage.getItem(deliveryStorageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
+        // Browsers often autofill unlabeled date inputs as date-of-birth (e.g. 1999).
+        // Drop past "delivery" dates so we never treat DOB as a delivery day.
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (parsed.delivery_date) {
+          const chosen = new Date(`${parsed.delivery_date}T00:00:00`);
+          if (Number.isNaN(chosen.getTime()) || chosen < today) {
+            parsed.delivery_date = '';
+            parsed.delivery_time_start = '';
+            parsed.delivery_time_end = '';
+          }
+        }
         setFormData((prev) => ({ ...prev, ...parsed }));
         setDeliveryDetailsSaved(isDeliveryDetailsComplete(parsed));
       }
@@ -584,8 +596,23 @@ export function CartPage() {
     : 'Not selected';
 
   const openDeliveryModal = () => {
+    setError(null);
     setIsDeliveryModalOpen(true);
   };
+
+  const closeDeliveryModal = () => {
+    setIsDeliveryModalOpen(false);
+    setShouldStartPayment(false);
+    setError(null);
+  };
+
+  const deliveryDateMin = useMemo(() => {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }, []);
 
   if (isLoading) {
     return <div className="cart-page__loading">Loading cart...</div>;
@@ -1150,108 +1177,182 @@ export function CartPage() {
       </div>
 
       {isDeliveryModalOpen && (
-        <div className="cart-page__modal">
-          <div className="cart-page__modal-card">
+        <div
+          className="cart-page__modal"
+          role="presentation"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeDeliveryModal();
+          }}
+        >
+          <div
+            className="cart-page__modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cart-delivery-modal-title"
+          >
             <div className="cart-page__modal-header">
               <div>
-                <h2 className="cart-page__modal-title">Delivery Details</h2>
+                <h2 id="cart-delivery-modal-title" className="cart-page__modal-title">
+                  Delivery Details
+                </h2>
                 <p className="cart-page__modal-copy">
-                  Please provide delivery details to continue.
+                  Name, phone, and location are required. Delivery window is optional.
                 </p>
               </div>
-              {deliveryDetailsSaved && (
-                <button
-                  onClick={() => {
-                    setIsDeliveryModalOpen(false);
-                    setShouldStartPayment(false);
-                  }}
-                  className="cart-page__modal-close"
-                >
-                  Close
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={closeDeliveryModal}
+                className="cart-page__modal-close"
+                aria-label="Close delivery details"
+              >
+                ✕
+              </button>
             </div>
 
             <div className="cart-page__modal-form">
-              <input
-                type="text"
-                placeholder="Full name"
-                value={formData.customer_name}
-                onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
-                className="cart-page__input"
-              />
-              <input
-                type="tel"
-                placeholder="Phone number"
-                value={formData.customer_phone}
-                onChange={(e) => setFormData({ ...formData, customer_phone: e.target.value })}
-                className="cart-page__input"
-              />
-              <input
-                type="email"
-                placeholder="Email (optional)"
-                value={formData.customer_email}
-                onChange={(e) => setFormData({ ...formData, customer_email: e.target.value })}
-                className="cart-page__input"
-              />
-              <select
-                value={formData.delivery_county}
-                onChange={(e) => setFormData({ ...formData, delivery_county: e.target.value, delivery_ward: '' })}
-                className="cart-page__input"
-              >
-                <option value="">Select county</option>
-                {counties.map((county) => (
-                  <option key={county} value={county}>
-                    {county}
-                  </option>
-                ))}
-              </select>
-              {isWardRequired && (
+              <label className="cart-page__field">
+                <span className="cart-page__field-label">Full name *</span>
+                <input
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Full name"
+                  value={formData.customer_name}
+                  onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
+                  className="cart-page__input"
+                />
+              </label>
+              <label className="cart-page__field">
+                <span className="cart-page__field-label">Phone number *</span>
+                <input
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="07…"
+                  value={formData.customer_phone}
+                  onChange={(e) => setFormData({ ...formData, customer_phone: e.target.value })}
+                  className="cart-page__input"
+                />
+              </label>
+              <label className="cart-page__field">
+                <span className="cart-page__field-label">Email (optional)</span>
+                <input
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Email"
+                  value={formData.customer_email}
+                  onChange={(e) => setFormData({ ...formData, customer_email: e.target.value })}
+                  className="cart-page__input"
+                />
+              </label>
+              <label className="cart-page__field">
+                <span className="cart-page__field-label">County *</span>
                 <select
-                  value={formData.delivery_ward}
-                  onChange={(e) => setFormData({ ...formData, delivery_ward: e.target.value })}
+                  value={formData.delivery_county}
+                  onChange={(e) =>
+                    setFormData({ ...formData, delivery_county: e.target.value, delivery_ward: '' })
+                  }
                   className="cart-page__input"
                 >
-                  <option value="">Select ward</option>
-                  {wards.map((ward) => (
-                    <option key={ward} value={ward}>
-                      {ward}
+                  <option value="">Select county</option>
+                  {counties.map((county) => (
+                    <option key={county} value={county}>
+                      {county}
                     </option>
                   ))}
                 </select>
+              </label>
+              {isWardRequired && (
+                <label className="cart-page__field">
+                  <span className="cart-page__field-label">Ward *</span>
+                  <select
+                    value={formData.delivery_ward}
+                    onChange={(e) => setFormData({ ...formData, delivery_ward: e.target.value })}
+                    className="cart-page__input"
+                  >
+                    <option value="">Select ward</option>
+                    {wards.map((ward) => (
+                      <option key={ward} value={ward}>
+                        {ward}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               )}
-              <div className="cart-page__modal-grid">
-                <input
-                  type="date"
-                  value={formData.delivery_date}
-                  onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })}
-                  className="cart-page__input"
+              <fieldset className="cart-page__fieldset">
+                <legend className="cart-page__field-label">
+                  Preferred delivery window (optional)
+                </legend>
+                <p className="cart-page__field-hint">
+                  Leave blank if you’re flexible; we’ll arrange delivery after payment.
+                </p>
+                <label className="cart-page__field">
+                  <span className="cart-page__field-label">Delivery date</span>
+                  <input
+                    type="date"
+                    name="preferred_delivery_date"
+                    autoComplete="off"
+                    min={deliveryDateMin}
+                    value={formData.delivery_date}
+                    onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })}
+                    className="cart-page__input"
+                  />
+                </label>
+                <div className="cart-page__modal-grid">
+                  <label className="cart-page__field">
+                    <span className="cart-page__field-label">From</span>
+                    <input
+                      type="time"
+                      name="preferred_delivery_time_start"
+                      autoComplete="off"
+                      value={formData.delivery_time_start}
+                      onChange={(e) =>
+                        setFormData({ ...formData, delivery_time_start: e.target.value })
+                      }
+                      className="cart-page__input"
+                    />
+                  </label>
+                  <label className="cart-page__field">
+                    <span className="cart-page__field-label">To</span>
+                    <input
+                      type="time"
+                      name="preferred_delivery_time_end"
+                      autoComplete="off"
+                      value={formData.delivery_time_end}
+                      onChange={(e) =>
+                        setFormData({ ...formData, delivery_time_end: e.target.value })
+                      }
+                      className="cart-page__input"
+                    />
+                  </label>
+                </div>
+              </fieldset>
+              <label className="cart-page__field">
+                <span className="cart-page__field-label">Delivery notes (optional)</span>
+                <textarea
+                  placeholder="Gate code, landmark…"
+                  value={formData.delivery_notes}
+                  onChange={(e) => setFormData({ ...formData, delivery_notes: e.target.value })}
+                  className="cart-page__input cart-page__input--textarea"
+                  rows={2}
                 />
-                <input
-                  type="time"
-                  value={formData.delivery_time_start}
-                  onChange={(e) => setFormData({ ...formData, delivery_time_start: e.target.value })}
-                  className="cart-page__input"
-                />
-              </div>
-              <input
-                type="time"
-                value={formData.delivery_time_end}
-                onChange={(e) => setFormData({ ...formData, delivery_time_end: e.target.value })}
-                className="cart-page__input"
-                placeholder="Delivery end time"
-              />
-              <textarea
-                placeholder="Delivery notes (optional)"
-                value={formData.delivery_notes}
-                onChange={(e) => setFormData({ ...formData, delivery_notes: e.target.value })}
-                className="cart-page__input cart-page__input--textarea"
-                rows={2}
-              />
+              </label>
             </div>
+
+            {error && (
+              <div className="cart-page__alert cart-page__alert--error" style={{ marginTop: '0.75rem' }}>
+                {error}
+              </div>
+            )}
 
             <div className="cart-page__modal-actions">
               <button
+                type="button"
+                onClick={closeDeliveryModal}
+                className="cart-page__btn cart-page__btn--ghost"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
                 onClick={handleSaveDeliveryDetails}
                 className="cart-page__btn cart-page__btn--primary"
               >

@@ -14,7 +14,7 @@ import {
 import { apiBaseUrl, withInventoryApiBase, withInventoryApiHeaders } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
 import { formatApiErrorMessage } from '@/lib/utils/apiError';
-import { getIdempotencyKey } from '@/lib/utils/idempotency';
+import { clearIdempotencyKey, getIdempotencyKey } from '@/lib/utils/idempotency';
 import { savePendingCartClear } from '@/lib/pendingCartClear';
 import { AuthChoiceModal } from './AuthChoiceModal';
 
@@ -555,10 +555,24 @@ export function CartPage() {
       // Reuse the last unpaid order if payment failed after create (avoids duplicates + empty cart).
       let orderId = pendingPaymentOrderId;
       if (!orderId) {
-        const order = await withInventoryApiHeaders(
-          { 'Idempotency-Key': getIdempotencyKey(orderPayload) },
-          () => OrdersService.ordersCreate(orderPayload)
-        );
+        const createOrder = () =>
+          withInventoryApiHeaders(
+            { 'Idempotency-Key': getIdempotencyKey(orderPayload) },
+            () => OrdersService.ordersCreate(orderPayload)
+          );
+        let order;
+        try {
+          order = await createOrder();
+        } catch (createErr: any) {
+          // Backend 409 = same key, different payload. Drop the stale key and retry once.
+          const statusCode = createErr?.status ?? createErr?.response?.status;
+          if (statusCode === 409) {
+            clearIdempotencyKey(orderPayload);
+            order = await createOrder();
+          } else {
+            throw createErr;
+          }
+        }
         orderId = order.order_id ?? null;
         if (!orderId) throw new Error('Order created without an ID');
         setPendingPaymentOrderId(orderId);

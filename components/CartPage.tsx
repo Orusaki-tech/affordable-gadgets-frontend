@@ -744,7 +744,8 @@ export function CartPage() {
 
   const isPaidOrderStatus = (status?: string) => {
     const normalized = (status || '').trim().toUpperCase();
-    return ['PAID', 'DELIVERED', 'COMPLETED', 'SUCCESS', 'SUCCEEDED'].includes(normalized);
+    // Order statuses only — do not treat Pesapal COMPLETED (partial leg) as paid.
+    return ['PAID', 'DELIVERED'].includes(normalized);
   };
 
   const getGoogleReviewUrl = (orderId?: string) => {

@@ -42,5 +42,6 @@ export function clearPendingCartClear(): void {
 
 export function isPaidOrderStatus(status?: string | null): boolean {
   const normalized = String(status || '').trim().toUpperCase();
-  return ['PAID', 'DELIVERED', 'COMPLETED', 'SUCCESS', 'SUCCEEDED'].includes(normalized);
+  // Order row statuses only — Pesapal COMPLETED can mean a partial leg.
+  return ['PAID', 'DELIVERED'].includes(normalized);
 }

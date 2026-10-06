@@ -758,6 +758,13 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   const handleAuthSuccessForCart = () => {
     setNeedsAuthForCart(false);
+    if (pendingCartAdd && hasValidSavedCustomerPhone()) {
+      const phone = getSavedCustomerPhone();
+      const pending = pendingCartAdd;
+      void completePendingCartAdd(pending, phone).catch(() => {
+        /* keep pendingCartAdd so the phone modal can finish */
+      });
+    }
   };
 
   const handleAuthCloseForCart = () => {

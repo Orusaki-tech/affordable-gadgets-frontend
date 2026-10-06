@@ -960,17 +960,39 @@ export async function listStudioFinancingOffers(params?: {
   provider?: number;
   product?: number;
   page?: number;
-}): Promise<StudioFinancingOffer[]> {
+  pageSize?: number;
+}): Promise<{ count?: number; results: StudioFinancingOffer[]; next: string | null }> {
   const query = new URLSearchParams();
-  query.set('page_size', '100');
+  query.set('page_size', String(params?.pageSize ?? 100));
   if (params?.page) query.set('page', String(params.page));
   if (params?.provider) query.set('provider', String(params.provider));
   if (params?.product) query.set('product', String(params.product));
   const data = await studioFetchJson<
-    StudioFinancingOffer[] | { results?: StudioFinancingOffer[] }
+    StudioFinancingOffer[] | { count?: number; results?: StudioFinancingOffer[]; next?: string | null }
   >(`/financing-offers/?${query.toString()}`);
-  if (Array.isArray(data)) return data;
-  return data.results ?? [];
+  if (Array.isArray(data)) {
+    return { count: data.length, results: data, next: null };
+  }
+  return { count: data.count, results: data.results ?? [], next: data.next ?? null };
+}
+
+/** Fetch every financing offer page (BuySimu import is 400+ rows). */
+export async function listAllStudioFinancingOffers(params?: {
+  provider?: number;
+  product?: number;
+}): Promise<StudioFinancingOffer[]> {
+  const pageSize = 200;
+  const first = await listStudioFinancingOffers({ ...params, page: 1, pageSize });
+  const results = [...first.results];
+  let next = first.next;
+  let page = 2;
+  while (next && page <= 50) {
+    const data = await listStudioFinancingOffers({ ...params, page, pageSize });
+    results.push(...data.results);
+    next = data.next;
+    page += 1;
+  }
+  return results;
 }
 
 export async function createStudioFinancingOffer(
@@ -1161,13 +1183,32 @@ export async function listStudioReviews(params?: {
   product?: number;
   search?: string;
   page?: number;
+  pageSize?: number;
 }): Promise<{ count: number; results: StudioReview[]; next: string | null }> {
   const query = new URLSearchParams();
-  query.set('page_size', '50');
+  query.set('page_size', String(params?.pageSize ?? 50));
   if (params?.page) query.set('page', String(params.page));
   if (params?.product) query.set('product', String(params.product));
   if (params?.search?.trim()) query.set('search', params.search.trim());
   return studioFetchJson(`/reviews/?${query.toString()}`);
+}
+
+export async function listAllStudioReviews(params?: {
+  product?: number;
+  search?: string;
+}): Promise<StudioReview[]> {
+  const pageSize = 100;
+  const first = await listStudioReviews({ ...params, page: 1, pageSize });
+  const results = [...(first.results ?? [])];
+  let next = first.next;
+  let page = 2;
+  while (next && page <= 50) {
+    const data = await listStudioReviews({ ...params, page, pageSize });
+    results.push(...(data.results ?? []));
+    next = data.next;
+    page += 1;
+  }
+  return results;
 }
 
 export async function createStudioReview(data: {

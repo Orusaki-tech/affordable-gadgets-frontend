@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import {
   createStudioFinancingOffer,
   deleteStudioFinancingOffer,
-  listStudioFinancingOffers,
+  listAllStudioFinancingOffers,
   listStudioFinancingProviders,
   listStudioProducts,
   patchStudioFinancingOffer,
@@ -52,7 +52,7 @@ export function StudioFinancingOffersManager({
 
   const reload = async () => {
     const [offerRows, providerRows] = await Promise.all([
-      listStudioFinancingOffers(
+      listAllStudioFinancingOffers(
         preferProviderId ? { provider: preferProviderId } : undefined
       ),
       listStudioFinancingProviders(),

@@ -6,7 +6,7 @@ import {
   createStudioReview,
   deleteStudioReview,
   listStudioProducts,
-  listStudioReviews,
+  listAllStudioReviews,
   patchStudioReview,
   StudioApiError,
   type StudioProduct,
@@ -40,10 +40,10 @@ export function StudioReviewsManager({
   const [msg, setMsg] = useState<string | null>(null);
 
   const reload = async () => {
-    const data = await listStudioReviews(
-      preferProductId ? { product: preferProductId } : { page: 1 }
+    const rows = await listAllStudioReviews(
+      preferProductId ? { product: preferProductId } : undefined
     );
-    setReviews(data.results ?? []);
+    setReviews(rows);
   };
 
   useEffect(() => {

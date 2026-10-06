@@ -507,6 +507,19 @@ export function ProductCard({
 
   const handleAuthSuccessForCart = () => {
     setNeedsAuthForCart(false);
+    // Resume pending add after sign-in when phone is already on file.
+    if (
+      pendingCartQty != null &&
+      selectedUnit?.id &&
+      hasValidSavedCustomerPhone()
+    ) {
+      const phone = getSavedCustomerPhone();
+      const unitId = selectedUnit.id;
+      const qty = pendingCartQty;
+      void completeCartAdd(unitId, qty, phone).catch(() => {
+        /* keep pendingCartQty so the phone modal can finish the add */
+      });
+    }
   };
 
   const handleAuthCloseForCart = () => {

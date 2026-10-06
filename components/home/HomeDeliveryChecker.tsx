@@ -2,9 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ApiService } from '@/lib/api/generated';
 import { MaterialIcon } from '@/components/MaterialIcon';
 import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
+import { fetchAllPublicDeliveryRates } from '@/lib/api/deliveryRates';
 
 function formatKes(value?: number | string | null) {
   if (value == null || value === '') return null;
@@ -19,13 +19,12 @@ export function HomeDeliveryChecker() {
   const studioEdit = useStudioEditOptional();
   const canEdit = Boolean(studioEdit?.capabilities.canEditDeliveryRates);
   const [query, setQuery] = useState('');
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ['delivery-rates', 'homepage'],
-    queryFn: () => ApiService.apiV1PublicDeliveryRatesList(1),
+  const { data: rates = [], isLoading, isError } = useQuery({
+    queryKey: ['delivery-rates', 'homepage', 'all'],
+    queryFn: fetchAllPublicDeliveryRates,
     staleTime: 5 * 60_000,
   });
 
-  const rates = data?.results ?? [];
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return rates.slice(0, LIST_LIMIT);

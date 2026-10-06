@@ -31,6 +31,12 @@ import {
   getSavedCustomerPhone,
   hasValidSavedCustomerPhone,
 } from '@/lib/utils/customerPhone';
+import {
+  clearPendingCartAdd,
+  currentPathForPendingCart,
+  loadPendingCartAdd,
+  savePendingCartAdd,
+} from '@/lib/pendingCartAdd';
 
 function hasAuthToken(): boolean {
   if (typeof window === 'undefined') return false;
@@ -500,9 +506,41 @@ export function ProductCard({
     router.push('/cart');
   };
 
+  const restoredOAuthPendingRef = useRef(false);
+
+  // Resume add-to-cart after Google OAuth full-page redirect (React state is gone).
+  useEffect(() => {
+    if (restoredOAuthPendingRef.current || unitsLoading) return;
+    if (!hasAuthToken()) return;
+    const pending = loadPendingCartAdd();
+    if (!pending || pending.source !== 'card') return;
+    if (pending.path !== currentPathForPendingCart()) return;
+    const unitOnCard =
+      selectedUnit?.id === pending.unitId ||
+      activeUnits.some((u) => u.id === pending.unitId);
+    if (!unitOnCard) return;
+
+    restoredOAuthPendingRef.current = true;
+    clearPendingCartAdd();
+    setSelectedUnitId(pending.unitId);
+    if (hasValidSavedCustomerPhone()) {
+      void completeCartAdd(pending.unitId, pending.qty, getSavedCustomerPhone()).catch(() => {
+        setPendingCartQty(pending.qty);
+      });
+    } else {
+      setPendingCartQty(pending.qty);
+    }
+  }, [unitsLoading, activeUnits, selectedUnit?.id]);
+
   const beginAddToCart = (qty: number) => {
     if (!selectedUnit?.id) return;
     if (!hasAuthToken()) {
+      savePendingCartAdd({
+        source: 'card',
+        unitId: selectedUnit.id,
+        qty,
+        path: currentPathForPendingCart(),
+      });
       setPendingCartQty(qty);
       setNeedsAuthForCart(true);
       return;
@@ -548,6 +586,7 @@ export function ProductCard({
     // AuthChoiceModal also calls onClose after success — keep pending add in that case.
     if (!hasAuthToken()) {
       setPendingCartQty(null);
+      clearPendingCartAdd();
     }
   };
 

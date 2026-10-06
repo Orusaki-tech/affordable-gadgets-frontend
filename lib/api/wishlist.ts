@@ -75,11 +75,25 @@ async function request<T>(path: string, options?: RequestInit) {
 export async function fetchWishlist(): Promise<WishlistItem[]> {
   const sessionKey = getSessionKey() || undefined;
   const customerPhone = getCustomerPhone();
-  const params = new URLSearchParams();
-  if (sessionKey) params.set('session_key', sessionKey);
-  if (customerPhone) params.set('customer_phone', customerPhone);
-  const data = await request<{ results?: WishlistItem[] }>(`/api/v1/public/wishlist/?${params.toString()}`);
-  return data?.results ?? [];
+  const collected: WishlistItem[] = [];
+  let page = 1;
+  let next: string | null = '1';
+
+  while (next && page <= 50) {
+    const params = new URLSearchParams();
+    if (sessionKey) params.set('session_key', sessionKey);
+    if (customerPhone) params.set('customer_phone', customerPhone);
+    params.set('page', String(page));
+    params.set('page_size', '100');
+    const data = await request<{ results?: WishlistItem[]; next?: string | null }>(
+      `/api/v1/public/wishlist/?${params.toString()}`
+    );
+    collected.push(...(data?.results ?? []));
+    next = data?.next ?? null;
+    page += 1;
+  }
+
+  return collected;
 }
 
 export async function addWishlistItem(productId: number): Promise<WishlistItem | undefined> {

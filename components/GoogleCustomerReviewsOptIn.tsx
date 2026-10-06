@@ -16,6 +16,8 @@ type GoogleCustomerReviewsOptInProps = {
   deliveryCountry: string; // ISO 3166-1 alpha-2 (e.g. "KE")
   estimatedDeliveryDate: string; // YYYY-MM-DD
   gtins?: string[];
+  /** Fired after Google surveyoptin.render succeeds (not merely when the script loads). */
+  onRendered?: () => void;
 };
 
 function loadOnce(src: string, id: string) {
@@ -53,6 +55,7 @@ export function GoogleCustomerReviewsOptIn(props: GoogleCustomerReviewsOptInProp
             estimated_delivery_date: props.estimatedDeliveryDate,
             ...(products ? { products } : {}),
           });
+          props.onRendered?.();
         });
       } catch {
         // If Google script isn't ready yet, platform.js will call onload again after it loads.
@@ -70,6 +73,7 @@ export function GoogleCustomerReviewsOptIn(props: GoogleCustomerReviewsOptInProp
     props.deliveryCountry,
     props.estimatedDeliveryDate,
     products,
+    props.onRendered,
   ]);
 
   return null;

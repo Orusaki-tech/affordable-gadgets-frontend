@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { OpenAPI, OrdersService, PesapalService } from '@/lib/api/generated';
-import { inventoryBaseUrl } from '@/lib/api/openapi';
+import { OrdersService, PesapalService } from '@/lib/api/generated';
+import { withInventoryApiBase } from '@/lib/api/openapi';
 import Link from 'next/link';
 import { ORDER_STATUS } from '@/lib/constants/apiEnums';
 
@@ -45,12 +45,12 @@ export function PaymentCallbackClient() {
     let attempts = 0;
 
     const checkStatus = async () => {
-      const previousBase = OpenAPI.BASE;
       try {
         attempts += 1;
         console.log('[PESAPAL] Checking payment status for order:', orderId);
-        OpenAPI.BASE = inventoryBaseUrl;
-        const paymentStatus = await OrdersService.ordersPaymentStatusRetrieve(orderId);
+        const paymentStatus = await withInventoryApiBase(() =>
+          OrdersService.ordersPaymentStatusRetrieve(orderId)
+        );
         console.log('[PESAPAL] Payment Status:', JSON.stringify(paymentStatus, null, 2));
         const normalizedStatus = String(paymentStatus.status || '').toUpperCase();
         const normalizedOrderStatus = String((paymentStatus as any).order_status || '').toUpperCase();
@@ -99,32 +99,34 @@ export function PaymentCallbackClient() {
         console.log('[PESAPAL] ========== CALLBACK PAGE: ERROR CHECKING STATUS ==========');
         console.log('[PESAPAL] Error checking payment status:', error);
         console.log('[PESAPAL] ===========================================================\n');
-        setStatus('failed');
-        setMessage('Unable to verify payment status. Please check your order status.');
-      } finally {
-        OpenAPI.BASE = previousBase;
+        // Soft-fail: keep polling through transient network/API blips (same as usePayment).
+        if (attempts >= maxAttempts) {
+          setStatus('failed');
+          setMessage('Unable to verify payment status. Please check your order status.');
+          return;
+        }
+        setMessage('Payment is being processed...');
+        timeoutId = setTimeout(checkStatus, 3000);
       }
     };
 
     const processCallback = async () => {
       // Forward Pesapal callback params to backend so order status can be reconciled.
       if (orderTrackingId || orderMerchantReference) {
-        const previousBase = OpenAPI.BASE;
         try {
-          OpenAPI.BASE = inventoryBaseUrl;
-          await PesapalService.pesapalIpnRetrieve(
-            orderMerchantReference || undefined,
-            searchParams.get('OrderNotificationType') || undefined,
-            orderTrackingId || undefined,
-            searchParams.get('PaymentAccount') || undefined,
-            searchParams.get('PaymentMethod') || undefined,
-            searchParams.get('PaymentStatusDescription') || undefined
+          await withInventoryApiBase(() =>
+            PesapalService.pesapalIpnRetrieve(
+              orderMerchantReference || undefined,
+              searchParams.get('OrderNotificationType') || undefined,
+              orderTrackingId || undefined,
+              searchParams.get('PaymentAccount') || undefined,
+              searchParams.get('PaymentMethod') || undefined,
+              searchParams.get('PaymentStatusDescription') || undefined
+            )
           );
         } catch (ipnErr) {
           // Continue to polling even if IPN forwarding fails.
           console.warn('[PESAPAL] Failed to forward callback params to backend IPN endpoint', ipnErr);
-        } finally {
-          OpenAPI.BASE = previousBase;
         }
       }
 
@@ -233,4 +235,3 @@ export function PaymentCallbackClient() {
     </main>
   );
 }
-

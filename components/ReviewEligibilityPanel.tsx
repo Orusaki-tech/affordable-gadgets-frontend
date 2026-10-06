@@ -106,9 +106,23 @@ export function ReviewEligibilityPanel() {
       setStep('form');
       setIsCheckingEligibility(true);
       try {
-        const ordersResponse = await withInventoryApiBase(() => OrdersService.ordersList());
+        const orders: Array<{
+          status?: string | null;
+          order_id?: string;
+          created_at?: string;
+          order_items?: any[];
+        }> = [];
+        let page = 1;
+        let hasNext = true;
+        while (hasNext && page <= 50) {
+          const ordersResponse = await withInventoryApiBase(() =>
+            OrdersService.ordersList(page)
+          );
+          orders.push(...(ordersResponse?.results ?? []));
+          hasNext = Boolean(ordersResponse?.next);
+          page += 1;
+        }
 
-        const orders = ordersResponse?.results ?? [];
         const directEligible: EligibleReviewItem[] = [];
         const lookupCandidates: Array<{
           order_id: string;

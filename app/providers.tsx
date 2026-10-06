@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Suspense, useState } from 'react';
 import { CartProvider } from '@/lib/hooks/useCart';
+import { WishlistProvider } from '@/lib/hooks/useWishlist';
 import { AuthSessionBootstrap } from '@/components/AuthSessionBootstrap';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -21,10 +22,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        <Suspense fallback={null}>
-          <AuthSessionBootstrap />
-        </Suspense>
-        {children}
+        <WishlistProvider>
+          <Suspense fallback={null}>
+            <AuthSessionBootstrap />
+          </Suspense>
+          {children}
+        </WishlistProvider>
       </CartProvider>
     </QueryClientProvider>
   );

@@ -50,6 +50,12 @@ import {
   getSavedCustomerPhone,
   hasValidSavedCustomerPhone,
 } from '@/lib/utils/customerPhone';
+import {
+  clearPendingCartAdd,
+  currentPathForPendingCart,
+  loadPendingCartAdd,
+  savePendingCartAdd,
+} from '@/lib/pendingCartAdd';
 
 const IPHONE_18_PRO_MAX_SLUG = 'apple-iphone-18-pro-max';
 
@@ -742,6 +748,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   const beginPendingCartAdd = (pending: PendingCartAdd) => {
     if (!hasAuthToken()) {
+      savePendingCartAdd({
+        source: 'pdp',
+        pending,
+        selectedUnitId: selectedUnit,
+        path: currentPathForPendingCart(),
+      });
       setPendingCartAdd(pending);
       setNeedsAuthForCart(true);
       return;
@@ -756,8 +768,51 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     setPendingCartAdd(pending);
   };
 
+  const restoredOAuthPendingRef = useRef(false);
+
+  // Resume add-to-cart after Google OAuth full-page redirect (React state is gone).
+  useEffect(() => {
+    if (restoredOAuthPendingRef.current) return;
+    if (!hasAuthToken()) return;
+    const stored = loadPendingCartAdd();
+    if (!stored || stored.source !== 'pdp') return;
+    if (stored.path !== currentPathForPendingCart()) return;
+
+    restoredOAuthPendingRef.current = true;
+    clearPendingCartAdd();
+    const unitId = stored.selectedUnitId ?? null;
+    if (unitId != null) {
+      setSelectedUnit(unitId);
+    }
+    setPendingCartAdd(stored.pending);
+
+    if (!hasValidSavedCustomerPhone()) return;
+    const phone = getSavedCustomerPhone();
+    const pending = stored.pending;
+    // Use stored unitId — setSelectedUnit is async and completePendingCartAdd would see a stale value.
+    void (async () => {
+      try {
+        await updateCartPhone(phone);
+        if (pending.kind === 'unit') {
+          if (unitId == null) return;
+          await addToCart(unitId, pending.quantity, pending.promotionId, pending.unitPrice);
+        } else if (pending.kind === 'bundle') {
+          if (unitId == null) return;
+          await addBundleToCart(pending.bundleId, unitId, pending.bundleItemIds);
+        } else {
+          await addToCart(pending.unitId, pending.quantity, undefined, pending.unitPrice);
+        }
+        setPendingCartAdd(null);
+        router.push('/cart');
+      } catch {
+        /* keep pendingCartAdd so the phone modal can finish */
+      }
+    })();
+  }, [product?.id, updateCartPhone, addToCart, addBundleToCart, router]);
+
   const handleAuthSuccessForCart = () => {
     setNeedsAuthForCart(false);
+    clearPendingCartAdd();
     if (pendingCartAdd && hasValidSavedCustomerPhone()) {
       const phone = getSavedCustomerPhone();
       const pending = pendingCartAdd;
@@ -772,6 +827,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     // AuthChoiceModal also calls onClose after success — keep pending add in that case.
     if (!hasAuthToken()) {
       setPendingCartAdd(null);
+      clearPendingCartAdd();
     }
   };
 

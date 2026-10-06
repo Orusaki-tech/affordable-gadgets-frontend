@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
-import { fetchWishlist, removeWishlistItem, type WishlistItem } from '@/lib/api/wishlist';
+import { fetchWishlist, type WishlistItem } from '@/lib/api/wishlist';
+import { useWishlist } from '@/lib/hooks/useWishlist';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { MaterialIcon } from '@/components/MaterialIcon';
 
@@ -13,6 +14,7 @@ function formatKes(value?: number | null) {
 }
 
 export default function WishlistClient() {
+  const { remove, reload } = useWishlist();
   const [items, setItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -107,8 +109,9 @@ export default function WishlistClient() {
                     className="mt-auto inline-flex items-center justify-center gap-1 rounded-xl border border-border-hairline px-3 py-2 text-sm font-medium text-secondary hover:bg-surface-muted"
                     onClick={async () => {
                       if (typeof productId !== 'number') return;
-                      await removeWishlistItem(productId);
+                      await remove(productId);
                       setItems((prev) => prev.filter((row) => row.id !== item.id));
+                      void reload();
                     }}
                   >
                     <MaterialIcon name="delete" className="text-[1.125rem]" />

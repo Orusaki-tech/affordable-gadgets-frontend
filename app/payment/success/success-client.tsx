@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { brandConfig } from '@/lib/config/brand';
-import { OpenAPI, OrdersService, type Order } from '@/lib/api/generated';
-import { inventoryBaseUrl } from '@/lib/api/openapi';
+import { OrdersService, type Order } from '@/lib/api/generated';
+import { inventoryBaseUrl, withInventoryApiBase } from '@/lib/api/openapi';
 import { GoogleCustomerReviewsOptIn } from '@/components/GoogleCustomerReviewsOptIn';
 import { trackGoogleAdsPurchase } from '@/lib/googleAds';
 
@@ -50,10 +50,8 @@ export function PaymentSuccessClient() {
   useEffect(() => {
     let mounted = true;
     const fetchOrder = async (id: string) => {
-      const previousBase = OpenAPI.BASE;
       try {
-        OpenAPI.BASE = inventoryBaseUrl;
-        const data = await OrdersService.ordersRetrieve(id);
+        const data = await withInventoryApiBase(() => OrdersService.ordersRetrieve(id));
         if (mounted) {
           setOrder(data);
           setOrderFetchFailed(false);
@@ -65,8 +63,6 @@ export function PaymentSuccessClient() {
           setOrder(null);
           setOrderFetchFailed(true);
         }
-      } finally {
-        OpenAPI.BASE = previousBase;
       }
     };
 
@@ -124,12 +120,12 @@ export function PaymentSuccessClient() {
 
   const shouldRenderGcrOptIn = !!gcrPayload && !gcrAlreadyShown;
 
-  useEffect(() => {
-    if (!shouldRenderGcrOptIn || !orderId || typeof window === 'undefined') return;
+  const markGcrShown = () => {
+    if (!orderId || typeof window === 'undefined') return;
     const key = `gcr-optin-shown:${orderId}`;
     window.sessionStorage.setItem(key, '1');
     setGcrAlreadyShown(true);
-  }, [shouldRenderGcrOptIn, orderId]);
+  };
 
   useEffect(() => {
     if (!orderId) return;
@@ -154,6 +150,7 @@ export function PaymentSuccessClient() {
             email={gcrPayload.email}
             deliveryCountry={gcrPayload.deliveryCountry}
             estimatedDeliveryDate={gcrPayload.estimatedDeliveryDate}
+            onRendered={markGcrShown}
           />
         ) : null}
         <div className="mb-6">

@@ -59,6 +59,26 @@ export async function withInventoryApiBase<T>(fn: () => Promise<T>): Promise<T> 
   }
 }
 
+/** Run an inventory API call with extra request headers (e.g. Idempotency-Key). */
+export async function withInventoryApiHeaders<T>(
+  extraHeaders: Record<string, string>,
+  fn: () => Promise<T>
+): Promise<T> {
+  const previousHeaders = OpenAPI.HEADERS;
+  OpenAPI.HEADERS = async () => {
+    const base =
+      typeof previousHeaders === 'function'
+        ? await previousHeaders()
+        : ((previousHeaders as Record<string, string> | undefined) ?? {});
+    return { ...base, ...extraHeaders };
+  };
+  try {
+    return await withInventoryApiBase(fn);
+  } finally {
+    OpenAPI.HEADERS = previousHeaders;
+  }
+}
+
 export const setAuthToken = (token: string) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem('auth_token', token);

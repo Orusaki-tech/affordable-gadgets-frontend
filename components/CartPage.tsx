@@ -11,9 +11,10 @@ import {
   OrdersService,
   PaymentModeEnum,
 } from '@/lib/api/generated';
-import { apiBaseUrl, withInventoryApiBase } from '@/lib/api/openapi';
+import { apiBaseUrl, withInventoryApiBase, withInventoryApiHeaders } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
 import { formatApiErrorMessage } from '@/lib/utils/apiError';
+import { getIdempotencyKey } from '@/lib/utils/idempotency';
 import { AuthChoiceModal } from './AuthChoiceModal';
 
 type PublicDeliveryRatesResponse = {
@@ -66,6 +67,24 @@ export function CartPage() {
   const [paymentMode, setPaymentMode] = useState<PaymentModeEnum>(PaymentModeEnum.BOTH);
   /** Set when order create succeeds but Pesapal redirect fails — retry payment without a new order. */
   const [pendingPaymentOrderId, setPendingPaymentOrderId] = useState<string | null>(null);
+
+  // Drop stale retry targets if the cart contents change after order create.
+  const cartFingerprint = useMemo(
+    () =>
+      JSON.stringify(
+        (cart?.items ?? [])
+          .map((item) => ({
+            unit: item.inventory_unit?.id ?? null,
+            qty: item.quantity ?? 1,
+          }))
+          .sort((a, b) => String(a.unit).localeCompare(String(b.unit)))
+      ),
+    [cart?.items]
+  );
+
+  useEffect(() => {
+    setPendingPaymentOrderId(null);
+  }, [cartFingerprint]);
 
   // Periodically check if cart still exists (in case it was cleared after payment)
   useEffect(() => {
@@ -519,7 +538,10 @@ export function CartPage() {
       // Reuse the last unpaid order if payment failed after create (avoids duplicates + empty cart).
       let orderId = pendingPaymentOrderId;
       if (!orderId) {
-        const order = await withInventoryApiBase(() => OrdersService.ordersCreate(orderPayload));
+        const order = await withInventoryApiHeaders(
+          { 'Idempotency-Key': getIdempotencyKey(orderPayload) },
+          () => OrdersService.ordersCreate(orderPayload)
+        );
         orderId = order.order_id ?? null;
         if (!orderId) throw new Error('Order created without an ID');
         setPendingPaymentOrderId(orderId);

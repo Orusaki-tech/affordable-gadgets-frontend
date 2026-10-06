@@ -54,17 +54,22 @@ export function PaymentCallbackClient() {
         console.log('[PESAPAL] Payment Status:', JSON.stringify(paymentStatus, null, 2));
         const normalizedStatus = String(paymentStatus.status || '').toUpperCase();
         const normalizedOrderStatus = String((paymentStatus as any).order_status || '').toUpperCase();
-        const isSuccess =
-          SUCCESS_PAYMENT_STATES.has(normalizedStatus) ||
+        // Full checkout success only when the order itself is paid — Pesapal COMPLETED
+        // can mean ITEMS_ONLY / DELIVERY_ONLY while the order is still PENDING.
+        const isFullOrderPaid =
           SUCCESS_PAYMENT_STATES.has(normalizedOrderStatus) ||
           paymentStatus.status === ORDER_STATUS.PAID ||
-          paymentStatus.status === ORDER_STATUS.DELIVERED;
+          paymentStatus.status === ORDER_STATUS.DELIVERED ||
+          normalizedOrderStatus === 'PAID' ||
+          normalizedOrderStatus === 'DELIVERED';
+        const isPartialPaymentComplete =
+          !isFullOrderPaid && SUCCESS_PAYMENT_STATES.has(normalizedStatus);
         const isFailure =
           FAILED_PAYMENT_STATES.has(normalizedStatus) ||
           FAILED_PAYMENT_STATES.has(normalizedOrderStatus) ||
           paymentStatus.status === ORDER_STATUS.CANCELED;
 
-        if (isSuccess) {
+        if (isFullOrderPaid) {
           if (!isMounted) return;
           console.log('[PESAPAL] Payment is COMPLETED - showing success');
           setStatus('success');
@@ -78,6 +83,12 @@ export function PaymentCallbackClient() {
             }
             router.push(`/payment/success?${params.toString()}`);
           }, 2000);
+        } else if (isPartialPaymentComplete) {
+          if (!isMounted) return;
+          setStatus('success');
+          setMessage(
+            'Partial payment received. Pay the remaining balance from Your Orders on the cart page.'
+          );
         } else if (isFailure) {
           if (!isMounted) return;
           console.log('[PESAPAL] Payment is', paymentStatus.status, '- showing failure');

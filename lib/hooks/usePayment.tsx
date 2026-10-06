@@ -92,22 +92,32 @@ export function usePayment({
       setPaymentStatus(status);
       const normalizedStatus = String(status.status || '').toUpperCase();
       const normalizedOrderStatus = String((status as any).order_status || '').toUpperCase();
-      const isSuccess =
-        SUCCESS_PAYMENT_STATES.has(normalizedStatus) ||
+      // Pesapal COMPLETED can be a partial leg — only treat full order PAID as success.
+      const isFullOrderPaid =
         SUCCESS_PAYMENT_STATES.has(normalizedOrderStatus) ||
         status.status === ORDER_STATUS.PAID ||
-        status.status === ORDER_STATUS.DELIVERED;
+        status.status === ORDER_STATUS.DELIVERED ||
+        normalizedOrderStatus === 'PAID' ||
+        normalizedOrderStatus === 'DELIVERED';
+      const isPartialPaymentComplete =
+        !isFullOrderPaid && SUCCESS_PAYMENT_STATES.has(normalizedStatus);
       const isFailure =
         FAILED_PAYMENT_STATES.has(normalizedStatus) ||
         FAILED_PAYMENT_STATES.has(normalizedOrderStatus) ||
         status.status === ORDER_STATUS.CANCELED;
 
-      // Check if payment is complete
-      if (isSuccess) {
-        console.log('[PESAPAL] Payment is COMPLETED - stopping polling');
+      if (isFullOrderPaid) {
+        console.log('[PESAPAL] Order is PAID - stopping polling');
         setIsPolling(false);
         onPaymentComplete?.();
         console.log('[PESAPAL] ========== HOOK: CHECK PAYMENT STATUS - COMPLETED ==========\n');
+        return true;
+      }
+
+      if (isPartialPaymentComplete) {
+        console.log('[PESAPAL] Partial payment COMPLETED - stopping polling (order still pending)');
+        setIsPolling(false);
+        console.log('[PESAPAL] ========== HOOK: CHECK PAYMENT STATUS - PARTIAL ==========\n');
         return true;
       }
 

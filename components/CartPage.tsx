@@ -350,7 +350,23 @@ export function CartPage() {
     return Number(totalWithDelivery || 0);
   }, [itemCount, paymentMode, totalValue, effectiveDeliveryFee, totalWithDelivery]);
 
-  const initiatePesapalRedirect = async (orderId: string) => {
+  const resolvePaymentModeForOrder = (order?: {
+    is_items_paid?: boolean;
+    is_delivery_paid?: boolean;
+  }): PaymentModeEnum => {
+    if (order?.is_items_paid && !order?.is_delivery_paid) {
+      return PaymentModeEnum.DELIVERY_ONLY;
+    }
+    if (!order?.is_items_paid && order?.is_delivery_paid) {
+      return PaymentModeEnum.ITEMS_ONLY;
+    }
+    return paymentMode;
+  };
+
+  const initiatePesapalRedirect = async (
+    orderId: string,
+    mode: PaymentModeEnum = paymentMode
+  ) => {
     // Only send contact fields we actually have. Empty phone_number overwrites
     // the order's stored customer and can make Pesapal reject the request as 400.
     const email = formData.customer_email.trim();
@@ -368,7 +384,7 @@ export function CartPage() {
       OrdersService.ordersInitiatePaymentCreate(orderId, {
         callback_url: `${window.location.origin}/payment/callback`,
         cancellation_url: `${window.location.origin}/payment/cancelled`,
-        payment_mode: paymentMode,
+        payment_mode: mode,
         ...(Object.keys(customer).length > 0 ? { customer } : {}),
       })
     );
@@ -572,11 +588,17 @@ export function CartPage() {
     }
   };
 
-  const payPendingOrder = async (orderId: string) => {
+  const payPendingOrder = async (order: {
+    order_id: string;
+    is_items_paid?: boolean;
+    is_delivery_paid?: boolean;
+  }) => {
+    const orderId = order.order_id;
     setError(null);
     setIsSubmitting(true);
     try {
-      const redirectUrl = await initiatePesapalRedirect(orderId);
+      const mode = resolvePaymentModeForOrder(order);
+      const redirectUrl = await initiatePesapalRedirect(orderId, mode);
       const cartId = cart?.id;
       const itemIds = (cart?.items || [])
         .map((item) => item.id)
@@ -1025,7 +1047,7 @@ export function CartPage() {
                             {String(order.status || '').toLowerCase() === 'pending' && (
                               <button
                                 type="button"
-                                onClick={() => payPendingOrder(order.order_id)}
+                                onClick={() => payPendingOrder(order)}
                                 disabled={isSubmitting}
                                 className="cart-page__link cart-page__order-link"
                               >
@@ -1128,7 +1150,7 @@ export function CartPage() {
                             {String(order.status || '').toLowerCase() === 'pending' && (
                               <button
                                 type="button"
-                                onClick={() => payPendingOrder(order.order_id)}
+                                onClick={() => payPendingOrder(order)}
                                 disabled={isSubmitting}
                                 className="cart-page__link cart-page__order-link"
                               >

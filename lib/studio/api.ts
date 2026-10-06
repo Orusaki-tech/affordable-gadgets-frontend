@@ -992,11 +992,29 @@ export async function retrieveStudioDeliveryRate(id: number): Promise<StudioDeli
 
 export async function listStudioDeliveryRates(params?: {
   page?: number;
+  pageSize?: number;
 }): Promise<{ count: number; results: StudioDeliveryRate[]; next: string | null }> {
   const query = new URLSearchParams();
-  query.set('page_size', '100');
+  query.set('page_size', String(params?.pageSize ?? 100));
   if (params?.page) query.set('page', String(params.page));
   return studioFetchJson(`/delivery-rates/?${query.toString()}`);
+}
+
+/** Fetch every delivery rate (API is paginated; Studio needs the full list to manage). */
+export async function listAllStudioDeliveryRates(): Promise<StudioDeliveryRate[]> {
+  const pageSize = 200;
+  const first = await listStudioDeliveryRates({ page: 1, pageSize });
+  const results = [...(first.results ?? [])];
+  let next = first.next;
+  let page = 2;
+  // Cap pages so a broken next URL cannot loop forever.
+  while (next && page <= 50) {
+    const data = await listStudioDeliveryRates({ page, pageSize });
+    results.push(...(data.results ?? []));
+    next = data.next;
+    page += 1;
+  }
+  return results;
 }
 
 export async function createStudioDeliveryRate(

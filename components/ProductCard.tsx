@@ -27,6 +27,10 @@ import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
 import { AuthChoiceModal } from '@/components/AuthChoiceModal';
 import { StudioProductChrome } from '@/components/studio/StudioProductChrome';
 import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
+import {
+  getSavedCustomerPhone,
+  hasValidSavedCustomerPhone,
+} from '@/lib/utils/customerPhone';
 
 function hasAuthToken(): boolean {
   if (typeof window === 'undefined') return false;
@@ -467,11 +471,31 @@ export function ProductCard({
     toggle(product.id);
   };
 
+  const completeCartAdd = async (unitId: number, qty: number, phone: string) => {
+    await updateCartPhone(phone);
+    await addToCart(unitId, qty);
+    setPendingCartQty(null);
+    setIsPeekOpen(false);
+    router.push('/cart');
+  };
+
   const beginAddToCart = (qty: number) => {
-    setPendingCartQty(qty);
+    if (!selectedUnit?.id) return;
     if (!hasAuthToken()) {
+      setPendingCartQty(qty);
       setNeedsAuthForCart(true);
+      return;
     }
+    // Returning shoppers: skip the phone modal when we already have a number.
+    if (hasValidSavedCustomerPhone()) {
+      const phone = getSavedCustomerPhone();
+      const unitId = selectedUnit.id;
+      void completeCartAdd(unitId, qty, phone).catch(() => {
+        setPendingCartQty(qty);
+      });
+      return;
+    }
+    setPendingCartQty(qty);
   };
 
   const handleAddToCart = (event: React.MouseEvent, qty?: number) => {
@@ -495,11 +519,7 @@ export function ProductCard({
 
   const handleConfirmCartAdd = async (phone: string) => {
     if (!selectedUnit?.id || pendingCartQty == null) return;
-    await updateCartPhone(phone);
-    await addToCart(selectedUnit.id, pendingCartQty);
-    setPendingCartQty(null);
-    setIsPeekOpen(false);
-    router.push('/cart');
+    await completeCartAdd(selectedUnit.id, pendingCartQty, phone);
   };
 
   const hasPriceRange =

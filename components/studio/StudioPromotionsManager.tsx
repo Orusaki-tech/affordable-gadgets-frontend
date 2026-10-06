@@ -6,7 +6,7 @@ import {
   createStudioPromotionType,
   deleteStudioPromotion,
   deleteStudioPromotionType,
-  listStudioPromotions,
+  listAllStudioPromotions,
   listStudioPromotionTypes,
   patchStudioPromotionType,
   StudioApiError,
@@ -41,11 +41,11 @@ export function StudioPromotionsManager({
   const [busyId, setBusyId] = useState<number | null>(null);
 
   const reload = async () => {
-    const [promoData, typeData] = await Promise.all([
-      listStudioPromotions({ page: 1 }),
+    const [promos, typeData] = await Promise.all([
+      listAllStudioPromotions(),
       listStudioPromotionTypes(),
     ]);
-    setPromotions(promoData.results ?? []);
+    setPromotions(promos);
     setTypes(typeData);
   };
 

@@ -675,13 +675,32 @@ export async function deleteStudioPromotion(id: number): Promise<void> {
 
 export async function listStudioPromotions(params?: {
   page?: number;
+  pageSize?: number;
   is_active?: boolean;
 }): Promise<{ count: number; results: StudioPromotion[]; next: string | null }> {
   const query = new URLSearchParams();
-  query.set('page_size', '100');
+  query.set('page_size', String(params?.pageSize ?? 100));
   if (params?.page) query.set('page', String(params.page));
   if (params?.is_active != null) query.set('is_active', params.is_active ? 'true' : 'false');
   return studioFetchJson(`/promotions/?${query.toString()}`);
+}
+
+/** Fetch every promotion page (Studio pickers must not stop at page 1). */
+export async function listAllStudioPromotions(params?: {
+  is_active?: boolean;
+}): Promise<StudioPromotion[]> {
+  const pageSize = 200;
+  const first = await listStudioPromotions({ page: 1, pageSize, is_active: params?.is_active });
+  const results = [...(first.results ?? [])];
+  let next = first.next;
+  let page = 2;
+  while (next && page <= 50) {
+    const data = await listStudioPromotions({ page, pageSize, is_active: params?.is_active });
+    results.push(...(data.results ?? []));
+    next = data.next;
+    page += 1;
+  }
+  return results;
 }
 
 export async function retrieveStudioPromotion(id: number): Promise<StudioPromotion> {
@@ -758,8 +777,7 @@ export async function findStudioBrandBannerPromotion(
   brandFilter: string
 ): Promise<StudioPromotion | null> {
   const code = brandBannerPromotionCode(brandFilter);
-  const data = await listStudioPromotions({ page: 1 });
-  const results = data.results ?? [];
+  const results = await listAllStudioPromotions();
   const byCode = results.find((p) => (p.promotion_code || '').toUpperCase() === code);
   if (byCode) return byCode;
   const needle = brandFilter.trim().toLowerCase();

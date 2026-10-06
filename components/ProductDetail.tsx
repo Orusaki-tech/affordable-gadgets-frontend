@@ -46,6 +46,10 @@ import { AddToCartLeadModal } from '@/components/AddToCartLeadModal';
 import { AuthChoiceModal } from '@/components/AuthChoiceModal';
 import { MaterialIcon } from '@/components/MaterialIcon';
 import { getApiErrorInfo } from '@/lib/utils/apiError';
+import {
+  getSavedCustomerPhone,
+  hasValidSavedCustomerPhone,
+} from '@/lib/utils/customerPhone';
 
 const IPHONE_18_PRO_MAX_SLUG = 'apple-iphone-18-pro-max';
 
@@ -712,11 +716,44 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     }
   }, [filteredUnits, selectedUnit, selectedStorage, selectedRAM, selectedColor, uniqueRAM.length]);
 
-  const beginPendingCartAdd = (pending: PendingCartAdd) => {
-    setPendingCartAdd(pending);
-    if (!hasAuthToken()) {
-      setNeedsAuthForCart(true);
+  const completePendingCartAdd = async (pending: PendingCartAdd, phone: string) => {
+    await updateCartPhone(phone);
+
+    if (pending.kind === 'unit') {
+      if (!selectedUnit) throw new Error('Please select a variant first');
+      await addToCart(selectedUnit, pending.quantity, pending.promotionId, pending.unitPrice);
+      setPendingCartAdd(null);
+      router.push('/cart');
+      return;
     }
+
+    if (pending.kind === 'bundle') {
+      if (!selectedUnit) throw new Error('Please select a variant first');
+      await addBundleToCart(pending.bundleId, selectedUnit, pending.bundleItemIds);
+      setPendingCartAdd(null);
+      router.push('/cart');
+      return;
+    }
+
+    await addToCart(pending.unitId, pending.quantity, undefined, pending.unitPrice);
+    setPendingCartAdd(null);
+    router.push('/cart');
+  };
+
+  const beginPendingCartAdd = (pending: PendingCartAdd) => {
+    if (!hasAuthToken()) {
+      setPendingCartAdd(pending);
+      setNeedsAuthForCart(true);
+      return;
+    }
+    if (hasValidSavedCustomerPhone()) {
+      const phone = getSavedCustomerPhone();
+      void completePendingCartAdd(pending, phone).catch(() => {
+        setPendingCartAdd(pending);
+      });
+      return;
+    }
+    setPendingCartAdd(pending);
   };
 
   const handleAuthSuccessForCart = () => {
@@ -758,37 +795,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
 
   const handleConfirmCartAdd = async (phone: string) => {
     if (!pendingCartAdd) return;
-    await updateCartPhone(phone);
-
-    if (pendingCartAdd.kind === 'unit') {
-      if (!selectedUnit) throw new Error('Please select a variant first');
-      await addToCart(
-        selectedUnit,
-        pendingCartAdd.quantity,
-        pendingCartAdd.promotionId,
-        pendingCartAdd.unitPrice,
-      );
-      setPendingCartAdd(null);
-      router.push('/cart');
-      return;
-    }
-
-    if (pendingCartAdd.kind === 'bundle') {
-      if (!selectedUnit) throw new Error('Please select a variant first');
-      await addBundleToCart(pendingCartAdd.bundleId, selectedUnit, pendingCartAdd.bundleItemIds);
-      setPendingCartAdd(null);
-      router.push('/cart');
-      return;
-    }
-
-    await addToCart(
-      pendingCartAdd.unitId,
-      pendingCartAdd.quantity,
-      undefined,
-      pendingCartAdd.unitPrice,
-    );
-    setPendingCartAdd(null);
-    router.push('/cart');
+    await completePendingCartAdd(pendingCartAdd, phone);
   };
 
   const handleAddBundleToCart = async (bundleId: number) => {

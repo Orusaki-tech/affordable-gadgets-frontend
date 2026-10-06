@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  listStudioPromotions,
+  listAllStudioPromotions,
   patchStudioPromotion,
   resolveStudioImageUrl,
   StudioApiError,
@@ -248,8 +248,7 @@ export function StudioSpecialOffersEditor({
   const forceLocations = useMemo(() => [LOCATION], []);
 
   const reload = async () => {
-    const data = await listStudioPromotions({ page: 1 });
-    const rows = (data.results ?? []).filter((p) => p.id);
+    const rows = (await listAllStudioPromotions()).filter((p) => p.id);
     setAllPromotions(rows);
     return rows;
   };

@@ -65,10 +65,10 @@ export async function withInventoryApiHeaders<T>(
   fn: () => Promise<T>
 ): Promise<T> {
   const previousHeaders = OpenAPI.HEADERS;
-  OpenAPI.HEADERS = async () => {
+  OpenAPI.HEADERS = async (options) => {
     const base =
       typeof previousHeaders === 'function'
-        ? await previousHeaders()
+        ? await previousHeaders(options as any)
         : ((previousHeaders as Record<string, string> | undefined) ?? {});
     return { ...base, ...extraHeaders };
   };

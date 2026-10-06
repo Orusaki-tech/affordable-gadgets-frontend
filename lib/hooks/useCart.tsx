@@ -3,7 +3,15 @@
  */
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  type ReactNode,
+} from 'react';
 import { ApiService, Cart, CartItemRequest, CartRequest } from '@/lib/api/generated';
 import { getApiErrorInfo } from '@/lib/utils/apiError';
 
@@ -16,8 +24,17 @@ interface CartContextType {
   cart: Cart | null;
   isLoading: boolean;
   error: string | null;
-  addToCart: (inventoryUnitId: number, quantity?: number, promotionId?: number, unitPrice?: number) => Promise<void>;
-  addBundleToCart: (bundleId: number, mainInventoryUnitId?: number, bundleItemIds?: number[]) => Promise<void>;
+  addToCart: (
+    inventoryUnitId: number,
+    quantity?: number,
+    promotionId?: number,
+    unitPrice?: number
+  ) => Promise<void>;
+  addBundleToCart: (
+    bundleId: number,
+    mainInventoryUnitId?: number,
+    bundleItemIds?: number[]
+  ) => Promise<void>;
   updateCartPhone: (phone: string) => Promise<void>;
   removeFromCart: (itemId: number) => Promise<void>;
   updateCart: () => Promise<void>;
@@ -28,16 +45,19 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
 const getCartId = (currentCart: Cart): number => {
   if (currentCart.id === undefined) {
     throw new Error('Cart ID is missing');
   }
   return currentCart.id;
 };
+
 type CartItemCreateRequest = CartItemRequest & {
   promotion_id?: number;
   unit_price?: number;
 };
+
 type BundleAddRequest = {
   bundle_id: number;
   main_inventory_unit_id?: number;
@@ -48,12 +68,44 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Always-current cart for async flows (avoids stale closure after create/add). */
+  const cartRef = useRef<Cart | null>(null);
+
+  useEffect(() => {
+    cartRef.current = cart;
+  }, [cart]);
+
+  const refreshCartById = useCallback(async (cartId: number): Promise<Cart | null> => {
+    try {
+      const updatedCart = await ApiService.apiV1PublicCartRetrieve(cartId);
+      setCart(updatedCart);
+      cartRef.current = updatedCart;
+      return updatedCart;
+    } catch (err: any) {
+      if (err?.response?.status === 404 || err?.status === 404) {
+        setCart(null);
+        cartRef.current = null;
+        return null;
+      }
+      throw err;
+    }
+  }, []);
+
+  const ensureCart = useCallback(async (): Promise<Cart> => {
+    const existing = cartRef.current;
+    if (existing?.id != null) return existing;
+    const created = await ApiService.apiV1PublicCartCreate({});
+    setCart(created);
+    cartRef.current = created;
+    return created;
+  }, []);
 
   // Load cart only for signed-in customers
   useEffect(() => {
     const initCart = async () => {
       if (!getAuthToken()) {
         setCart(null);
+        cartRef.current = null;
         setError(null);
         setIsLoading(false);
         return;
@@ -64,8 +116,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setError(null);
         const newCart = await ApiService.apiV1PublicCartCreate({});
         setCart(newCart);
+        cartRef.current = newCart;
       } catch (err: any) {
-        const { data: errorData, message: errorMessage, brandCode, status, url } = getApiErrorInfo(err);
+        const { data: errorData, message: errorMessage, brandCode, status, url } =
+          getApiErrorInfo(err);
 
         console.error('Cart initialization error:', {
           message: errorMessage,
@@ -83,15 +137,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
         if (status === 401 || status === 403) {
           setCart(null);
+          cartRef.current = null;
           setError(null);
           return;
         }
 
         if (err?.response?.status === 400 || err?.response?.status === 404) {
           if (errorMessage.includes('Brand') || errorMessage.includes('brand')) {
-            setError(`Brand not configured: ${brandCode || 'Unknown'}. Run 'python manage.py create_default_brand' to create it.`);
+            setError(
+              `Brand not configured: ${brandCode || 'Unknown'}. Run 'python manage.py create_default_brand' to create it.`
+            );
           } else {
             setCart(null);
+            cartRef.current = null;
           }
         } else {
           setError(errorMessage);
@@ -116,164 +174,136 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateCart = useCallback(async () => {
-    if (!cart) return;
+    const id = cartRef.current?.id;
+    if (id === undefined) return;
     try {
-      if (cart.id === undefined) return;
-      const updatedCart = await ApiService.apiV1PublicCartRetrieve(cart.id);
-      // If cart has no items, clear it
-      if (!updatedCart.items || updatedCart.items.length === 0) {
-        console.log('Cart is empty, clearing from state');
-        setCart(null);
-        return;
-      }
-      setCart(updatedCart);
+      await refreshCartById(id);
     } catch (err: any) {
-      // If cart is not found (404), it has been deleted (e.g., after payment confirmation)
-      // Clear the cart from state so the UI reflects that it's been cleared
-      if (err?.response?.status === 404) {
-        console.log('Cart not found (deleted) - clearing from state');
-        setCart(null);
-        return;
-      }
       setError(err.message || 'Failed to update cart');
     }
-  }, [cart]);
+  }, [refreshCartById]);
 
-  const addToCart = useCallback(async (
-    inventoryUnitId: number, 
-    quantity: number = 1,
-    promotionId?: number,
-    unitPrice?: number
-  ) => {
-    if (!getAuthToken()) {
-      throw new Error('Sign in required to add items to cart');
-    }
-    try {
-      let currentCart = cart;
-      
-      if (!currentCart) {
-        currentCart = await ApiService.apiV1PublicCartCreate({});
-        setCart(currentCart);
+  const addToCart = useCallback(
+    async (
+      inventoryUnitId: number,
+      quantity: number = 1,
+      promotionId?: number,
+      unitPrice?: number
+    ) => {
+      if (!getAuthToken()) {
+        throw new Error('Sign in required to add items to cart');
       }
-      
-      // Add item to cart with promotion info
-      const cartId = getCartId(currentCart);
-      console.log('Adding item to cart:', { 
-        cartId, 
-        inventoryUnitId, 
-        quantity,
-        promotionId,
-        unitPrice
-      });
-      const cartItemRequest: CartItemCreateRequest = {
-        inventory_unit_id: inventoryUnitId,
-        quantity,
-        promotion_id: promotionId,
-        unit_price: unitPrice,
-      };
-      await ApiService.apiV1PublicCartItemsCreate(cartId, cartItemRequest as unknown as CartRequest);
-      await updateCart();
-      console.log('Item added successfully');
-    } catch (err: any) {
-      const { data, message, status, url } = getApiErrorInfo(err);
-      console.error('Add to cart error details:', {
-        message,
-        response: data,
-        status,
-        url,
-      });
-      setError(message || 'Failed to add item to cart');
-      throw err;
-    }
-  }, [cart, updateCart]);
-
-  const addBundleToCart = useCallback(async (
-    bundleId: number,
-    mainInventoryUnitId?: number,
-    bundleItemIds?: number[]
-  ) => {
-    if (!getAuthToken()) {
-      throw new Error('Sign in required to add items to cart');
-    }
-    try {
-      let currentCart = cart;
-      if (!currentCart) {
-        currentCart = await ApiService.apiV1PublicCartCreate({});
-        setCart(currentCart);
+      try {
+        const currentCart = await ensureCart();
+        const cartId = getCartId(currentCart);
+        const cartItemRequest: CartItemCreateRequest = {
+          inventory_unit_id: inventoryUnitId,
+          quantity,
+          promotion_id: promotionId,
+          unit_price: unitPrice,
+        };
+        await ApiService.apiV1PublicCartItemsCreate(
+          cartId,
+          cartItemRequest as unknown as CartRequest
+        );
+        // Refresh by known id — do not rely on stale `cart` state from before create.
+        await refreshCartById(cartId);
+      } catch (err: any) {
+        const { data, message, status, url } = getApiErrorInfo(err);
+        console.error('Add to cart error details:', {
+          message,
+          response: data,
+          status,
+          url,
+        });
+        setError(message || 'Failed to add item to cart');
+        throw err;
       }
+    },
+    [ensureCart, refreshCartById]
+  );
+
+  const addBundleToCart = useCallback(
+    async (bundleId: number, mainInventoryUnitId?: number, bundleItemIds?: number[]) => {
+      if (!getAuthToken()) {
+        throw new Error('Sign in required to add items to cart');
+      }
+      try {
+        const currentCart = await ensureCart();
+        const cartId = getCartId(currentCart);
+        const payload: BundleAddRequest = {
+          bundle_id: bundleId,
+          main_inventory_unit_id: mainInventoryUnitId,
+          bundle_item_ids: bundleItemIds,
+        };
+        await ApiService.apiV1PublicCartBundlesCreate(cartId, payload as unknown as CartRequest);
+        await refreshCartById(cartId);
+      } catch (err: any) {
+        const { message } = getApiErrorInfo(err);
+        setError(message || 'Failed to add bundle to cart');
+        throw err;
+      }
+    },
+    [ensureCart, refreshCartById]
+  );
+
+  const updateCartPhone = useCallback(
+    async (phone: string) => {
+      if (!getAuthToken()) {
+        throw new Error('Sign in required to add items to cart');
+      }
+      const currentCart = await ensureCart();
       const cartId = getCartId(currentCart);
-      const payload: BundleAddRequest = {
-        bundle_id: bundleId,
-        main_inventory_unit_id: mainInventoryUnitId,
-        bundle_item_ids: bundleItemIds,
-      };
-      await ApiService.apiV1PublicCartBundlesCreate(cartId, payload as unknown as CartRequest);
-      await updateCart();
-    } catch (err: any) {
-      const { message } = getApiErrorInfo(err);
-      setError(message || 'Failed to add bundle to cart');
-      throw err;
-    }
-  }, [cart, updateCart]);
+      const updated = await ApiService.apiV1PublicCartPartialUpdate(cartId, {
+        customer_phone: phone,
+      });
+      setCart(updated);
+      cartRef.current = updated;
+    },
+    [ensureCart]
+  );
 
-  const updateCartPhone = useCallback(async (phone: string) => {
-    if (!getAuthToken()) {
-      throw new Error('Sign in required to add items to cart');
-    }
-    let currentCart = cart;
-    if (!currentCart) {
-      currentCart = await ApiService.apiV1PublicCartCreate({});
-      setCart(currentCart);
-    }
-    const cartId = getCartId(currentCart);
-    const updated = await ApiService.apiV1PublicCartPartialUpdate(cartId, {
-      customer_phone: phone,
-    });
-    setCart(updated);
-  }, [cart]);
+  const removeFromCart = useCallback(
+    async (itemId: number) => {
+      const current = cartRef.current;
+      if (!current?.id) {
+        console.error('Cannot remove item: No cart available');
+        return;
+      }
+      try {
+        await ApiService.apiV1PublicCartItemsDestroy(current.id, String(itemId));
+        await refreshCartById(current.id);
+      } catch (err: any) {
+        console.error('Error removing item from cart:', err);
+        const { message } = getApiErrorInfo(err);
+        setError(message || 'Failed to remove item from cart');
+        throw err;
+      }
+    },
+    [refreshCartById]
+  );
 
-  const removeFromCart = useCallback(async (itemId: number) => {
-    if (!cart) {
-      console.error('Cannot remove item: No cart available');
-      return;
-    }
-    if (cart.id === undefined) {
-      console.error('Cannot remove item: Cart ID is missing');
-      return;
-    }
-    try {
-      console.log(`Removing item ${itemId} from cart ${cart.id}`);
-      await ApiService.apiV1PublicCartItemsDestroy(cart.id, String(itemId));
-      console.log('Item removed successfully, updating cart...');
-      await updateCart();
-      console.log('Cart updated successfully');
-    } catch (err: any) {
-      console.error('Error removing item from cart:', err);
-      const { message } = getApiErrorInfo(err);
-      setError(message || 'Failed to remove item from cart');
-      throw err; // Re-throw so UI can handle it
-    }
-  }, [cart, updateCart]);
-
-  const checkout = useCallback(async (checkoutData: CartRequest): Promise<Cart> => {
-    if (!cart) throw new Error('No cart available');
-    const cartId = getCartId(cart);
-    try {
-      const response = await ApiService.apiV1PublicCartCheckoutCreate(cartId, checkoutData);
-      // Don't clear cart - keep it for reference until lead is converted to order
-      // The cart is now linked to the lead via cart.lead
-      // Just refresh the cart to show it's submitted
-      await updateCart();
-      return response;
-    } catch (err: any) {
-      const { message } = getApiErrorInfo(err);
-      setError(message || 'Failed to checkout');
-      throw err;
-    }
-  }, [cart, updateCart]);
+  const checkout = useCallback(
+    async (checkoutData: CartRequest): Promise<Cart> => {
+      const current = cartRef.current;
+      if (!current) throw new Error('No cart available');
+      const cartId = getCartId(current);
+      try {
+        const response = await ApiService.apiV1PublicCartCheckoutCreate(cartId, checkoutData);
+        await refreshCartById(cartId);
+        return response;
+      } catch (err: any) {
+        const { message } = getApiErrorInfo(err);
+        setError(message || 'Failed to checkout');
+        throw err;
+      }
+    },
+    [refreshCartById]
+  );
 
   const clearCart = useCallback(() => {
     setCart(null);
+    cartRef.current = null;
   }, []);
 
   const itemCount = (cart?.items ?? []).reduce((sum, item) => sum + (item.quantity ?? 0), 0);
@@ -294,11 +324,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     totalValue,
   };
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart() {
@@ -308,4 +334,3 @@ export function useCart() {
   }
   return context;
 }
-

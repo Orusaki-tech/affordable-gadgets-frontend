@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { brandConfig } from '@/lib/config/brand';
 import { OrdersService, type Order } from '@/lib/api/generated';
 import { inventoryBaseUrl, withInventoryApiBase } from '@/lib/api/openapi';
+import { flushPendingCartClearForOrder } from '@/lib/flushPendingCartClear';
 import { GoogleCustomerReviewsOptIn } from '@/components/GoogleCustomerReviewsOptIn';
 import { trackGoogleAdsPurchase } from '@/lib/googleAds';
 
@@ -56,6 +57,7 @@ export function PaymentSuccessClient() {
           setOrder(data);
           setOrderFetchFailed(false);
         }
+        void flushPendingCartClearForOrder(id, data?.status);
       } catch (error) {
         console.warn('[GCR] Failed to fetch order for opt-in payload', { orderId: id, error });
         // If order isn't accessible yet, we still show success UI; opt-in will simply not render.

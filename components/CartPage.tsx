@@ -15,6 +15,7 @@ import { apiBaseUrl, withInventoryApiBase, withInventoryApiHeaders } from '@/lib
 import { brandConfig } from '@/lib/config/brand';
 import { formatApiErrorMessage } from '@/lib/utils/apiError';
 import { getIdempotencyKey } from '@/lib/utils/idempotency';
+import { savePendingCartClear } from '@/lib/pendingCartClear';
 import { AuthChoiceModal } from './AuthChoiceModal';
 
 type PublicDeliveryRatesResponse = {
@@ -31,7 +32,7 @@ const resolveUrlAgainstApiBase = (nextUrl: string) => {
 };
 
 export function CartPage() {
-  const { cart, isLoading, removeFromCart, totalValue, itemCount, updateCart, clearCart } =
+  const { cart, isLoading, removeFromCart, totalValue, itemCount, updateCart, reloadCart } =
     useCart();
   const [removingBundleGroup, setRemovingBundleGroup] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -558,17 +559,9 @@ export function CartPage() {
         return;
       }
 
-      // Only clear the cart once Pesapal redirect is ready.
-      try {
-        await Promise.all(
-          cartItemIds.map((itemId) =>
-            ApiService.apiV1PublicCartItemsDestroy(cartId, String(itemId))
-          )
-        );
-      } catch (clearErr) {
-        console.warn('Failed to clear cart after order create:', clearErr);
-      }
-      clearCart();
+      // Keep cart until payment is confirmed (success/callback). If the shopper
+      // abandons Pesapal they can retry without re-adding items.
+      savePendingCartClear({ cartId, itemIds: cartItemIds, orderId });
       setPendingPaymentOrderId(null);
       window.location.href = redirectUrl;
     } catch (err: any) {
@@ -584,6 +577,13 @@ export function CartPage() {
     setIsSubmitting(true);
     try {
       const redirectUrl = await initiatePesapalRedirect(orderId);
+      const cartId = cart?.id;
+      const itemIds = (cart?.items || [])
+        .map((item) => item.id)
+        .filter((id): id is number => typeof id === 'number');
+      if (cartId != null && itemIds.length > 0) {
+        savePendingCartClear({ cartId, itemIds, orderId });
+      }
       setPendingPaymentOrderId(null);
       window.location.href = redirectUrl;
     } catch (err: any) {
@@ -617,10 +617,21 @@ export function CartPage() {
     setIsDeliveryModalOpen(true);
   };
 
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = async () => {
     setIsLoggedIn(true);
+    setError(null);
+    try {
+      const fresh = await reloadCart();
+      if (!fresh?.items?.length) {
+        setError('Cart is empty after sign-in. Please add items again.');
+        return;
+      }
+    } catch {
+      setError('Could not refresh cart after sign-in. Please try again.');
+      return;
+    }
     if (canProceedToPayment()) {
-      startPayment();
+      await startPayment();
       return;
     }
     setShouldStartPayment(true);

@@ -38,6 +38,8 @@ interface CartContextType {
   updateCartPhone: (phone: string) => Promise<void>;
   removeFromCart: (itemId: number) => Promise<void>;
   updateCart: () => Promise<void>;
+  /** Awaitable cart reload after login/register — use before checkout. */
+  reloadCart: () => Promise<Cart | null>;
   checkout: (checkoutData: CartRequest) => Promise<Cart>;
   clearCart: () => void;
   itemCount: number;
@@ -100,70 +102,72 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return created;
   }, []);
 
-  // Load cart only for signed-in customers
-  useEffect(() => {
-    const initCart = async () => {
-      if (!getAuthToken()) {
+  const reloadCart = useCallback(async (): Promise<Cart | null> => {
+    if (!getAuthToken()) {
+      setCart(null);
+      cartRef.current = null;
+      setError(null);
+      setIsLoading(false);
+      return null;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      const newCart = await ApiService.apiV1PublicCartCreate({});
+      setCart(newCart);
+      cartRef.current = newCart;
+      return newCart;
+    } catch (err: any) {
+      const { data: errorData, message: errorMessage, brandCode, status, url } =
+        getApiErrorInfo(err);
+
+      console.error('Cart initialization error:', {
+        message: errorMessage,
+        brand_code: brandCode || 'Unknown',
+        response: errorData,
+        status,
+        url,
+        fullError: err,
+      });
+
+      if (err?.code === 'ECONNREFUSED' || err?.message?.includes('Network Error')) {
+        setError('Cannot connect to backend server. Please ensure the Django backend is running.');
+        return null;
+      }
+
+      if (status === 401 || status === 403) {
         setCart(null);
         cartRef.current = null;
         setError(null);
-        setIsLoading(false);
-        return;
+        return null;
       }
 
-      try {
-        setIsLoading(true);
-        setError(null);
-        const newCart = await ApiService.apiV1PublicCartCreate({});
-        setCart(newCart);
-        cartRef.current = newCart;
-      } catch (err: any) {
-        const { data: errorData, message: errorMessage, brandCode, status, url } =
-          getApiErrorInfo(err);
-
-        console.error('Cart initialization error:', {
-          message: errorMessage,
-          brand_code: brandCode || 'Unknown',
-          response: errorData,
-          status,
-          url,
-          fullError: err,
-        });
-
-        if (err?.code === 'ECONNREFUSED' || err?.message?.includes('Network Error')) {
-          setError('Cannot connect to backend server. Please ensure the Django backend is running.');
-          return;
-        }
-
-        if (status === 401 || status === 403) {
+      if (err?.response?.status === 400 || err?.response?.status === 404) {
+        if (errorMessage.includes('Brand') || errorMessage.includes('brand')) {
+          setError(
+            `Brand not configured: ${brandCode || 'Unknown'}. Run 'python manage.py create_default_brand' to create it.`
+          );
+        } else {
           setCart(null);
           cartRef.current = null;
-          setError(null);
-          return;
         }
-
-        if (err?.response?.status === 400 || err?.response?.status === 404) {
-          if (errorMessage.includes('Brand') || errorMessage.includes('brand')) {
-            setError(
-              `Brand not configured: ${brandCode || 'Unknown'}. Run 'python manage.py create_default_brand' to create it.`
-            );
-          } else {
-            setCart(null);
-            cartRef.current = null;
-          }
-        } else {
-          setError(errorMessage);
-        }
-      } finally {
-        setIsLoading(false);
+      } else {
+        setError(errorMessage);
       }
-    };
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
+  // Load cart only for signed-in customers
+  useEffect(() => {
     const handleAuthChange = () => {
-      void initCart();
+      void reloadCart();
     };
 
-    void initCart();
+    void reloadCart();
     window.addEventListener('auth-token-changed', handleAuthChange);
     window.addEventListener('storage', (e) => {
       if (e.key === 'auth_token') handleAuthChange();
@@ -171,7 +175,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return () => {
       window.removeEventListener('auth-token-changed', handleAuthChange);
     };
-  }, []);
+  }, [reloadCart]);
 
   const updateCart = useCallback(async () => {
     const id = cartRef.current?.id;
@@ -318,6 +322,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     updateCartPhone,
     removeFromCart,
     updateCart,
+    reloadCart,
     checkout,
     clearCart,
     itemCount,

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { OrdersService, PesapalService } from '@/lib/api/generated';
 import { withInventoryApiBase } from '@/lib/api/openapi';
+import { flushPendingCartClearForOrder } from '@/lib/flushPendingCartClear';
 import Link from 'next/link';
 import { ORDER_STATUS } from '@/lib/constants/apiEnums';
 
@@ -74,6 +75,7 @@ export function PaymentCallbackClient() {
           console.log('[PESAPAL] Payment is COMPLETED - showing success');
           setStatus('success');
           setMessage('Payment completed successfully!');
+          void flushPendingCartClearForOrder(orderId, normalizedOrderStatus);
 
           setTimeout(() => {
             console.log('[PESAPAL] Redirecting to payment success page for GCR opt-in...');

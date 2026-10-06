@@ -10,6 +10,7 @@ import { setAuthToken, withInventoryApiBase } from '@/lib/api/openapi';
 import { PaymentMethodModal } from './PaymentMethodModal';
 import { brandConfig } from '@/lib/config/brand';
 import { getAuthAttributionFields } from '@/lib/auth/attribution';
+import { savePendingCartClear } from '@/lib/pendingCartClear';
 
 interface CheckoutModalProps {
   onClose: () => void;
@@ -23,7 +24,7 @@ interface CheckoutModalProps {
 }
 
 export function CheckoutModal({ onClose, totalValue, initialFormData }: CheckoutModalProps) {
-  const { checkout, cart } = useCart();
+  const { checkout, cart, reloadCart } = useCart();
   const router = useRouter();
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -386,6 +387,12 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
       setShowAuthGate(false);
       setAuthMode(null);
       setAllowGuestCheckout(false);
+      // Wait for the server cart after auth — don't checkout against stale state.
+      const fresh = await reloadCart();
+      if (!fresh?.items?.length) {
+        setAuthError('Cart is empty after sign-in. Please add items again.');
+        return;
+      }
       await performCheckout();
     } catch (err) {
       setAuthError('Login failed. Please check your credentials.');
@@ -417,6 +424,11 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
       setShowAuthGate(false);
       setAuthMode(null);
       setAllowGuestCheckout(false);
+      const fresh = await reloadCart();
+      if (!fresh?.items?.length) {
+        setAuthError('Cart is empty after sign-in. Please add items again.');
+        return;
+      }
       await performCheckout();
     } catch (err) {
       setAuthError('Registration failed. Please review details and try again.');
@@ -470,7 +482,14 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
       if ((paymentResult as any).success && (paymentResult as any).redirect_url) {
         console.log('[PESAPAL] Payment initiated successfully - redirecting to payment page');
         console.log('[PESAPAL] Redirect URL:', (paymentResult as any).redirect_url);
-        // Redirect to Pesapal payment page
+        // Keep cart until payment is confirmed — defer clear across Pesapal redirect.
+        const cartId = cart?.id;
+        const itemIds = (cart?.items || [])
+          .map((item) => item.id)
+          .filter((id): id is number => typeof id === 'number');
+        if (cartId != null && itemIds.length > 0 && createdOrderId) {
+          savePendingCartClear({ cartId, itemIds, orderId: createdOrderId });
+        }
         window.location.href = (paymentResult as any).redirect_url;
         console.log('[PESAPAL] ========== CHECKOUT: INITIATE PAYMENT SUCCESS ==========\n');
       } else {

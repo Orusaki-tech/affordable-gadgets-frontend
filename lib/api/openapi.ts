@@ -34,15 +34,28 @@ OpenAPI.HEADERS = async () => {
 
 /**
  * Run an OpenAPI client call against `/api/inventory` and always restore BASE.
- * Mutating OpenAPI.BASE without a finally leaks inventory base into public product calls.
+ * Uses a depth counter so nested/parallel withInventoryApiBase calls don't restore
+ * the root base while another inventory call is still in flight.
  */
+let inventoryBaseDepth = 0;
+let inventoryBaseRoot: string | null = null;
+
 export async function withInventoryApiBase<T>(fn: () => Promise<T>): Promise<T> {
-  const previousBase = OpenAPI.BASE;
+  if (inventoryBaseDepth === 0) {
+    inventoryBaseRoot = OpenAPI.BASE;
+  }
+  inventoryBaseDepth += 1;
   OpenAPI.BASE = inventoryBaseUrl;
   try {
     return await fn();
   } finally {
-    OpenAPI.BASE = previousBase;
+    inventoryBaseDepth -= 1;
+    if (inventoryBaseDepth === 0) {
+      OpenAPI.BASE = inventoryBaseRoot ?? apiBaseUrl;
+      inventoryBaseRoot = null;
+    } else {
+      OpenAPI.BASE = inventoryBaseUrl;
+    }
   }
 }
 

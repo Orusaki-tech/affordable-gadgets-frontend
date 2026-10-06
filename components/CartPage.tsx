@@ -13,6 +13,7 @@ import {
 } from '@/lib/api/generated';
 import { apiBaseUrl, withInventoryApiBase } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
+import { formatApiErrorMessage } from '@/lib/utils/apiError';
 import { AuthChoiceModal } from './AuthChoiceModal';
 
 type PublicDeliveryRatesResponse = {
@@ -34,6 +35,8 @@ export function CartPage() {
   const [removingBundleGroup, setRemovingBundleGroup] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Orders-list failures stay in the orders section — not the checkout alert. */
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   const [fulfillment, setFulfillment] = useState<'DELIVERY' | 'PICKUP'>('DELIVERY');
   const [deliveryRates, setDeliveryRates] = useState<Array<{ county: string; ward?: string | null; price: number }>>([]);
   const [formData, setFormData] = useState({
@@ -148,13 +151,13 @@ export function CartPage() {
     if (!isLoggedIn) return;
     const fetchOrders = async () => {
       setOrdersLoading(true);
-      setError(null);
+      setOrdersError(null);
       try {
         const response = await withInventoryApiBase(() => OrdersService.ordersList());
         setOrderHistory(response?.results ?? []);
       } catch (err: any) {
         console.error('Failed to fetch orders:', err);
-        setError(err?.message || 'Failed to load orders.');
+        setOrdersError(formatApiErrorMessage(err, 'Failed to load orders.'));
       } finally {
         setOrdersLoading(false);
       }
@@ -328,24 +331,38 @@ export function CartPage() {
   }, [itemCount, paymentMode, totalValue, effectiveDeliveryFee, totalWithDelivery]);
 
   const initiatePesapalRedirect = async (orderId: string) => {
+    // Only send contact fields we actually have. Empty phone_number overwrites
+    // the order's stored customer and can make Pesapal reject the request as 400.
+    const email = formData.customer_email.trim();
+    const phone = formData.customer_phone.trim();
+    const name = formData.customer_name.trim();
+    const customer: Record<string, string> = {};
+    if (email) customer.email = email;
+    if (phone) customer.phone_number = phone;
+    if (name) {
+      customer.first_name = name.split(' ')[0] || name;
+      customer.last_name = name.split(' ').slice(1).join(' ') || '';
+    }
+
     const paymentResult = await withInventoryApiBase(() =>
       OrdersService.ordersInitiatePaymentCreate(orderId, {
         callback_url: `${window.location.origin}/payment/callback`,
         cancellation_url: `${window.location.origin}/payment/cancelled`,
         payment_mode: paymentMode,
-        customer: {
-          email: formData.customer_email.trim() || undefined,
-          phone_number: formData.customer_phone.trim(),
-          first_name: formData.customer_name.trim().split(' ')[0] || formData.customer_name.trim(),
-          last_name: formData.customer_name.trim().split(' ').slice(1).join(' ') || '',
-        },
+        ...(Object.keys(customer).length > 0 ? { customer } : {}),
       })
     );
     const redirectUrl = (paymentResult as any)?.redirect_url;
     if (!redirectUrl) {
-      throw Object.assign(new Error('Payment initiation failed. Please try again.'), {
-        body: paymentResult,
-      });
+      throw Object.assign(
+        new Error(
+          formatApiErrorMessage(
+            { body: paymentResult },
+            'Payment initiation failed. Please try again.'
+          )
+        ),
+        { body: paymentResult }
+      );
     }
     return redirectUrl as string;
   };
@@ -512,13 +529,9 @@ export function CartPage() {
       try {
         redirectUrl = await initiatePesapalRedirect(orderId);
       } catch (payErr: any) {
-        const detail =
-          payErr?.body?.error ||
-          payErr?.body?.detail ||
-          payErr?.message ||
-          'Payment initiation failed.';
+        const detail = formatApiErrorMessage(payErr, 'Payment initiation failed.');
         setError(
-          `${typeof detail === 'string' ? detail : 'Payment initiation failed.'} Order ${orderId} is saved — tap Proceed again or pay from Your Orders.`
+          `${detail} Order ${orderId} is saved — tap Proceed again or pay from Your Orders.`
         );
         return;
       }
@@ -538,12 +551,7 @@ export function CartPage() {
       window.location.href = redirectUrl;
     } catch (err: any) {
       console.error('Checkout error:', err);
-      const detail =
-        err?.body?.error ||
-        err?.body?.detail ||
-        err?.message ||
-        'Failed to checkout. Please try again.';
-      setError(typeof detail === 'string' ? detail : 'Failed to checkout. Please try again.');
+      setError(formatApiErrorMessage(err, 'Failed to checkout. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -558,12 +566,7 @@ export function CartPage() {
       window.location.href = redirectUrl;
     } catch (err: any) {
       console.error('Pending order payment error:', err);
-      const detail =
-        err?.body?.error ||
-        err?.body?.detail ||
-        err?.message ||
-        'Payment initiation failed. Please try again.';
-      setError(typeof detail === 'string' ? detail : 'Payment initiation failed. Please try again.');
+      setError(formatApiErrorMessage(err, 'Payment initiation failed. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -959,7 +962,12 @@ export function CartPage() {
                   {ordersLoading && (
                     <p className="cart-page__orders-copy">Loading your orders...</p>
                   )}
-                  {!ordersLoading && orderHistory.length === 0 && (
+                  {ordersError && (
+                    <p className="cart-page__orders-copy" style={{ color: 'var(--color-danger, #b91c1c)' }}>
+                      {ordersError}
+                    </p>
+                  )}
+                  {!ordersLoading && !ordersError && orderHistory.length === 0 && (
                     <p className="cart-page__orders-copy">No orders found yet.</p>
                   )}
                   {orderHistory.length > 0 && (

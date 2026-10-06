@@ -483,24 +483,13 @@ export function ProductCard({
       selectedUnit?.id === unitId
         ? selectedUnit
         : activeUnits.find((u) => u.id === unitId) ?? null;
+    // Selling price is already the shop price; discount_percent is display-only
+    // (compare-at vs selling). Do not re-apply it or the cart undercharges.
     const listPrice =
       unit?.selling_price != null && unit.selling_price !== ''
         ? Number(unit.selling_price)
         : undefined;
-    // Card sale badges use product-level discount_percent; apply that to the unit list price
-    // so grid add-to-cart matches the price shoppers see (PDP already passes promo pricing).
-    const cardDiscountPercent =
-      typeof product.discount_percent === 'number' ? product.discount_percent : null;
-    let unitPrice = listPrice;
-    if (
-      listPrice != null &&
-      Number.isFinite(listPrice) &&
-      typeof cardDiscountPercent === 'number' &&
-      cardDiscountPercent > 0
-    ) {
-      unitPrice = Math.round(listPrice * (1 - cardDiscountPercent / 100) * 100) / 100;
-    }
-    await addToCart(unitId, qty, undefined, unitPrice);
+    await addToCart(unitId, qty, undefined, listPrice);
     setPendingCartQty(null);
     setIsPeekOpen(false);
     router.push('/cart');

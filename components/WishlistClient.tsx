@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
-import { fetchWishlist, type WishlistItem } from '@/lib/api/wishlist';
 import { useWishlist } from '@/lib/hooks/useWishlist';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { MaterialIcon } from '@/components/MaterialIcon';
@@ -14,33 +12,7 @@ function formatKes(value?: number | null) {
 }
 
 export default function WishlistClient() {
-  const { remove, reload } = useWishlist();
-  const [items, setItems] = useState<WishlistItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      try {
-        const results = await fetchWishlist();
-        if (!cancelled) {
-          setItems(results);
-          setError(null);
-        }
-      } catch (err: unknown) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load wishlist');
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { entries: items, isLoading: loading, error, remove } = useWishlist();
 
   return (
     <main className="mx-auto w-full max-w-[87.5rem] flex-1 px-4 py-10 lg:px-6">
@@ -110,8 +82,6 @@ export default function WishlistClient() {
                     onClick={async () => {
                       if (typeof productId !== 'number') return;
                       await remove(productId);
-                      setItems((prev) => prev.filter((row) => row.id !== item.id));
-                      void reload();
                     }}
                   >
                     <MaterialIcon name="delete" className="text-[1.125rem]" />

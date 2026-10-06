@@ -13,10 +13,16 @@ import React, {
   useState,
   type ReactNode,
 } from 'react';
-import { addWishlistItem, fetchWishlist, removeWishlistItem } from '@/lib/api/wishlist';
+import {
+  addWishlistItem,
+  fetchWishlist,
+  removeWishlistItem,
+  type WishlistItem,
+} from '@/lib/api/wishlist';
 
 interface WishlistContextType {
   items: number[];
+  entries: WishlistItem[];
   isLoading: boolean;
   error: string | null;
   isInWishlist: (productId?: number) => boolean;
@@ -28,25 +34,33 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
+function productIdsFromEntries(entries: WishlistItem[]): number[] {
+  return entries
+    .map((item) => item.product?.id ?? item.product_id)
+    .filter((id): id is number => typeof id === 'number');
+}
+
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<number[]>([]);
+  const [entries, setEntries] = useState<WishlistItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const itemsRef = useRef<number[]>([]);
+  const entriesRef = useRef<WishlistItem[]>([]);
+
+  const items = useMemo(() => productIdsFromEntries(entries), [entries]);
 
   useEffect(() => {
     itemsRef.current = items;
-  }, [items]);
+    entriesRef.current = entries;
+  }, [items, entries]);
 
   const loadWishlist = useCallback(async () => {
     setIsLoading(true);
     try {
       const results = await fetchWishlist();
-      const ids = results
-        .map((item) => item.product?.id ?? item.product_id)
-        .filter((id): id is number => typeof id === 'number');
-      setItems(ids);
-      itemsRef.current = ids;
+      setEntries(results);
+      entriesRef.current = results;
+      itemsRef.current = productIdsFromEntries(results);
       setError(null);
     } catch (err: any) {
       setError(err?.message || 'Failed to load wishlist');
@@ -68,30 +82,52 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   const add = useCallback(async (productId?: number) => {
     if (typeof productId !== 'number') return;
     if (itemsRef.current.includes(productId)) return;
-    const next = [...itemsRef.current, productId];
-    setItems(next);
-    itemsRef.current = next;
+    const nextIds = [...itemsRef.current, productId];
+    itemsRef.current = nextIds;
+    // Optimistic id presence for hearts/badge; full entry arrives after reload.
+    setEntries((prev) => {
+      if (prev.some((row) => (row.product?.id ?? row.product_id) === productId)) {
+        return prev;
+      }
+      const optimistic = [...prev, { id: -productId, product_id: productId } as WishlistItem];
+      entriesRef.current = optimistic;
+      return optimistic;
+    });
     try {
       await addWishlistItem(productId);
+      const results = await fetchWishlist();
+      setEntries(results);
+      entriesRef.current = results;
+      itemsRef.current = productIdsFromEntries(results);
     } catch (err: any) {
-      const rolled = itemsRef.current.filter((id) => id !== productId);
-      setItems(rolled);
-      itemsRef.current = rolled;
+      setEntries((prev) => {
+        const rolled = prev.filter(
+          (row) => (row.product?.id ?? row.product_id) !== productId
+        );
+        entriesRef.current = rolled;
+        return rolled;
+      });
+      itemsRef.current = itemsRef.current.filter((id) => id !== productId);
       setError(err?.message || 'Failed to add wishlist item');
     }
   }, []);
 
   const remove = useCallback(async (productId?: number) => {
     if (typeof productId !== 'number') return;
-    const previous = itemsRef.current;
-    const next = previous.filter((id) => id !== productId);
-    setItems(next);
-    itemsRef.current = next;
+    const previous = entriesRef.current;
+    const previousIds = itemsRef.current;
+    const next = previous.filter(
+      (row) => (row.product?.id ?? row.product_id) !== productId
+    );
+    setEntries(next);
+    entriesRef.current = next;
+    itemsRef.current = previousIds.filter((id) => id !== productId);
     try {
       await removeWishlistItem(productId);
     } catch (err: any) {
-      setItems(previous);
-      itemsRef.current = previous;
+      setEntries(previous);
+      entriesRef.current = previous;
+      itemsRef.current = previousIds;
       setError(err?.message || 'Failed to remove wishlist item');
     }
   }, []);
@@ -109,8 +145,18 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ items, isLoading, error, isInWishlist, add, remove, toggle, reload: loadWishlist }),
-    [items, isLoading, error, isInWishlist, add, remove, toggle, loadWishlist]
+    () => ({
+      items,
+      entries,
+      isLoading,
+      error,
+      isInWishlist,
+      add,
+      remove,
+      toggle,
+      reload: loadWishlist,
+    }),
+    [items, entries, isLoading, error, isInWishlist, add, remove, toggle, loadWishlist]
   );
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;

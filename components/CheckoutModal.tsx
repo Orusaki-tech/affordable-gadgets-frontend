@@ -54,6 +54,7 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
   const [paymentMode, setPaymentMode] = useState<'quote' | 'pay_now'>('pay_now'); // Default to pay now
   const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
+  const [orderTotal, setOrderTotal] = useState<number | null>(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   
   // Check if cart is already submitted
@@ -236,14 +237,16 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
             return row;
           });
 
+          // This modal has no county/ward picker — create as pickup so delivery
+          // fee cannot be silently zeroed while claiming a delivery address.
           const order = await withInventoryApiBase(() =>
             OrdersService.ordersCreate({
               order_items: orderItems,
               customer_name: formData.customer_name,
               customer_phone: formData.customer_phone,
               customer_email: formData.customer_email || undefined,
-              delivery_address: formData.delivery_address || undefined,
-              order_source: 'ONLINE', // Explicitly set for online orders
+              order_source: 'ONLINE',
+              fulfillment_method: 'PICKUP',
             } as OrderRequest)
           );
 
@@ -251,6 +254,11 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
 
           // Store order ID and show payment method modal
           setCreatedOrderId(order.order_id ?? null);
+          setOrderTotal(
+            order.total_amount != null && order.total_amount !== ''
+              ? Number(order.total_amount)
+              : totalValue
+          );
           setIsSubmitting(false);
           // Close checkout modal and show payment method modal
           setShowPaymentMethodModal(true);
@@ -577,7 +585,7 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
             onClose();
           }}
           onProceed={handlePaymentProceed}
-          totalAmount={totalValue}
+          totalAmount={orderTotal ?? totalValue}
           merchantName="AFFORDABLE GADGETS"
           isLoading={isProcessingPayment}
         />

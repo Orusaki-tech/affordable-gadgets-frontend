@@ -38,8 +38,12 @@ jobs:
       - name: Docker build
         run: docker build -t ag-shop:ci .
 
+  # Legacy GCP Artifact Registry + MIG path. Shop production is Vercel
+  # (affordable-gadgets-frontend). This job fails without billing on the old
+  # GCP project and only generates noise — keep as manual fallback via
+  # deploy-production.yml if MIG is ever re-enabled.
   push-and-deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: false
     needs: build
     runs-on: ubuntu-latest
     permissions:

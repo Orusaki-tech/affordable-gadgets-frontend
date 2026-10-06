@@ -473,7 +473,28 @@ export function ProductCard({
 
   const completeCartAdd = async (unitId: number, qty: number, phone: string) => {
     await updateCartPhone(phone);
-    await addToCart(unitId, qty);
+    const unit =
+      selectedUnit?.id === unitId
+        ? selectedUnit
+        : activeUnits.find((u) => u.id === unitId) ?? null;
+    const listPrice =
+      unit?.selling_price != null && unit.selling_price !== ''
+        ? Number(unit.selling_price)
+        : undefined;
+    // Card sale badges use product-level discount_percent; apply that to the unit list price
+    // so grid add-to-cart matches the price shoppers see (PDP already passes promo pricing).
+    const cardDiscountPercent =
+      typeof product.discount_percent === 'number' ? product.discount_percent : null;
+    let unitPrice = listPrice;
+    if (
+      listPrice != null &&
+      Number.isFinite(listPrice) &&
+      typeof cardDiscountPercent === 'number' &&
+      cardDiscountPercent > 0
+    ) {
+      unitPrice = Math.round(listPrice * (1 - cardDiscountPercent / 100) * 100) / 100;
+    }
+    await addToCart(unitId, qty, undefined, unitPrice);
     setPendingCartQty(null);
     setIsPeekOpen(false);
     router.push('/cart');

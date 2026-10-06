@@ -32,6 +32,20 @@ OpenAPI.HEADERS = async () => {
   return headers;
 };
 
+/**
+ * Run an OpenAPI client call against `/api/inventory` and always restore BASE.
+ * Mutating OpenAPI.BASE without a finally leaks inventory base into public product calls.
+ */
+export async function withInventoryApiBase<T>(fn: () => Promise<T>): Promise<T> {
+  const previousBase = OpenAPI.BASE;
+  OpenAPI.BASE = inventoryBaseUrl;
+  try {
+    return await fn();
+  } finally {
+    OpenAPI.BASE = previousBase;
+  }
+}
+
 export const setAuthToken = (token: string) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem('auth_token', token);

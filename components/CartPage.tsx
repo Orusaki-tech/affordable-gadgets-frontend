@@ -8,11 +8,10 @@ import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { useState, useEffect, useMemo } from 'react';
 import {
   ApiService,
-  OpenAPI,
   OrdersService,
   PaymentModeEnum,
 } from '@/lib/api/generated';
-import { apiBaseUrl, inventoryBaseUrl } from '@/lib/api/openapi';
+import { apiBaseUrl, withInventoryApiBase } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
 import { AuthChoiceModal } from './AuthChoiceModal';
 
@@ -30,7 +29,8 @@ const resolveUrlAgainstApiBase = (nextUrl: string) => {
 };
 
 export function CartPage() {
-  const { cart, isLoading, removeFromCart, totalValue, itemCount, updateCart } = useCart();
+  const { cart, isLoading, removeFromCart, totalValue, itemCount, updateCart, clearCart } =
+    useCart();
   const [removingBundleGroup, setRemovingBundleGroup] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -148,10 +148,7 @@ export function CartPage() {
       setOrdersLoading(true);
       setError(null);
       try {
-        const previousBase = OpenAPI.BASE;
-        OpenAPI.BASE = inventoryBaseUrl;
-        const response = await OrdersService.ordersList();
-        OpenAPI.BASE = previousBase;
+        const response = await withInventoryApiBase(() => OrdersService.ordersList());
         setOrderHistory(response?.results ?? []);
       } catch (err: any) {
         console.error('Failed to fetch orders:', err);
@@ -211,6 +208,8 @@ export function CartPage() {
     ['nairobi', 'kiambu'].includes(county.trim().toLowerCase());
   const isWardRequired = isWardRequiredForCounty(formData.delivery_county);
 
+  const isPickup = fulfillment === 'PICKUP';
+
   const isDeliveryDetailsComplete = (data = formData) => {
     const hasName = data.customer_name.trim().length > 0;
     const hasPhone = data.customer_phone.trim().length > 0;
@@ -218,6 +217,14 @@ export function CartPage() {
     const wardRequired = isWardRequiredForCounty(data.delivery_county);
     const hasWard = !wardRequired || data.delivery_ward.trim().length > 0;
     return hasName && hasPhone && hasCounty && hasWard;
+  };
+
+  /** Pickup only needs contact; delivery needs county/ward when required. */
+  const canProceedToPayment = (data = formData) => {
+    if (isPickup) {
+      return data.customer_name.trim().length > 0 && data.customer_phone.trim().length > 0;
+    }
+    return isDeliveryDetailsComplete(data);
   };
 
   const buildDeliveryAddress = (data = formData) => {
@@ -252,7 +259,11 @@ export function CartPage() {
           }
         }
         setFormData((prev) => ({ ...prev, ...parsed }));
-        setDeliveryDetailsSaved(isDeliveryDetailsComplete(parsed));
+        setDeliveryDetailsSaved(
+          fulfillment === 'PICKUP'
+            ? Boolean(parsed.customer_name?.trim() && parsed.customer_phone?.trim())
+            : isDeliveryDetailsComplete(parsed)
+        );
       }
     } catch (err) {
       console.warn('Failed to load delivery details:', err);
@@ -319,8 +330,12 @@ export function CartPage() {
   };
 
   const handleSaveDeliveryDetails = async () => {
-    if (!isDeliveryDetailsComplete()) {
-      setError('Name, phone, county and ward (if required) are needed.');
+    if (!canProceedToPayment()) {
+      setError(
+        isPickup
+          ? 'Name and phone number are required for pickup.'
+          : 'Name, phone, county and ward (if required) are needed.'
+      );
       return;
     }
 
@@ -412,10 +427,18 @@ export function CartPage() {
         if (!unitId) {
           throw new Error(`Missing inventory_unit.id for cart item ${item.id ?? 'unknown'}`);
         }
-        return {
+        const payload: {
+          inventory_unit_id: number;
+          quantity: number;
+          unit_price_at_purchase?: number;
+        } = {
           inventory_unit_id: unitId,
           quantity: item.quantity ?? 1,
         };
+        if (item.unit_price != null && item.unit_price !== '') {
+          payload.unit_price_at_purchase = Number(item.unit_price);
+        }
+        return payload;
       });
 
       const deliveryWindowStart = buildDeliveryDateTime(
@@ -427,8 +450,6 @@ export function CartPage() {
         formData.delivery_time_end
       );
 
-      const previousBase = OpenAPI.BASE;
-      OpenAPI.BASE = inventoryBaseUrl;
       const orderPayload: any = {
         order_items: orderItems,
         customer_name: formData.customer_name.trim(),
@@ -444,25 +465,43 @@ export function CartPage() {
         orderPayload.delivery_window_end = deliveryWindowEnd;
         orderPayload.delivery_notes = formData.delivery_notes.trim() || undefined;
       }
-      const order = await OrdersService.ordersCreate(orderPayload);
 
-      const callbackUrl = `${window.location.origin}/payment/callback`;
-      const cancellationUrl = `${window.location.origin}/payment/cancelled`;
-      const paymentResult = await OrdersService.ordersInitiatePaymentCreate(order.order_id ?? '', {
-        callback_url: callbackUrl,
-        cancellation_url: cancellationUrl,
-        payment_mode: paymentMode,
-        customer: {
-          email: formData.customer_email.trim() || undefined,
-          phone_number: formData.customer_phone.trim(),
-          first_name: formData.customer_name.trim().split(' ')[0] || formData.customer_name.trim(),
-          last_name: formData.customer_name.trim().split(' ').slice(1).join(' ') || '',
-        },
-      });
-      OpenAPI.BASE = previousBase;
+      const cartId = cart.id as number;
+      const cartItemIds = cart.items
+        .map((item) => item.id)
+        .filter((id): id is number => typeof id === 'number');
 
-      if ((paymentResult as any)?.redirect_url) {
-        window.location.href = (paymentResult as any).redirect_url;
+      const order = await withInventoryApiBase(() => OrdersService.ordersCreate(orderPayload));
+
+      // Clear immediately after order create so "Proceed" retries can't spawn duplicates.
+      try {
+        await Promise.all(
+          cartItemIds.map((itemId) =>
+            ApiService.apiV1PublicCartItemsDestroy(cartId, String(itemId))
+          )
+        );
+      } catch (clearErr) {
+        console.warn('Failed to clear cart after order create:', clearErr);
+      }
+      clearCart();
+
+      const paymentResult = await withInventoryApiBase(() =>
+        OrdersService.ordersInitiatePaymentCreate(order.order_id ?? '', {
+          callback_url: `${window.location.origin}/payment/callback`,
+          cancellation_url: `${window.location.origin}/payment/cancelled`,
+          payment_mode: paymentMode,
+          customer: {
+            email: formData.customer_email.trim() || undefined,
+            phone_number: formData.customer_phone.trim(),
+            first_name: formData.customer_name.trim().split(' ')[0] || formData.customer_name.trim(),
+            last_name: formData.customer_name.trim().split(' ').slice(1).join(' ') || '',
+          },
+        })
+      );
+
+      const redirectUrl = (paymentResult as any)?.redirect_url;
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
         return;
       }
 
@@ -482,7 +521,7 @@ export function CartPage() {
     }
     setError(null);
     if (isLoggedIn) {
-      if (deliveryDetailsSaved) {
+      if (canProceedToPayment()) {
         startPayment();
         return;
       }
@@ -500,7 +539,7 @@ export function CartPage() {
 
   const handleAuthSuccess = () => {
     setIsLoggedIn(true);
-    if (deliveryDetailsSaved) {
+    if (canProceedToPayment()) {
       startPayment();
       return;
     }
@@ -1193,10 +1232,12 @@ export function CartPage() {
             <div className="cart-page__modal-header">
               <div>
                 <h2 id="cart-delivery-modal-title" className="cart-page__modal-title">
-                  Delivery Details
+                  {isPickup ? 'Pickup contact' : 'Delivery Details'}
                 </h2>
                 <p className="cart-page__modal-copy">
-                  Name, phone, and location are required. Delivery window is optional.
+                  {isPickup
+                    ? 'Name and phone are required for pickup. Location is not needed.'
+                    : 'Name, phone, and location are required. Delivery window is optional.'}
                 </p>
               </div>
               <button
@@ -1243,6 +1284,8 @@ export function CartPage() {
                   className="cart-page__input"
                 />
               </label>
+              {!isPickup && (
+                <>
               <label className="cart-page__field">
                 <span className="cart-page__field-label">County *</span>
                 <select
@@ -1335,6 +1378,8 @@ export function CartPage() {
                   rows={2}
                 />
               </label>
+                </>
+              )}
             </div>
 
             {error && (

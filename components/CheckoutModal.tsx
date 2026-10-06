@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { useCart } from '@/lib/hooks/useCart';
 import { formatPrice } from '@/lib/utils/format';
 import { useRouter } from 'next/navigation';
-import { ApiService, OpenAPI, OrdersService, OrderRequest, Order, InitiatePaymentRequestRequest, LoginService, RegisterService } from '@/lib/api/generated';
-import { inventoryBaseUrl, setAuthToken } from '@/lib/api/openapi';
+import { ApiService, OrdersService, OrderRequest, Order, InitiatePaymentRequestRequest, LoginService, RegisterService } from '@/lib/api/generated';
+import { setAuthToken, withInventoryApiBase } from '@/lib/api/openapi';
 import { PaymentMethodModal } from './PaymentMethodModal';
 import { brandConfig } from '@/lib/config/brand';
 import { getAuthAttributionFields } from '@/lib/auth/attribution';
@@ -222,24 +222,30 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
             if (!unitId) {
               throw new Error(`Missing inventory_unit.id for cart item ${item.id ?? 'unknown'}`);
             }
-            return {
+            const row: {
+              inventory_unit_id: number;
+              quantity: number;
+              unit_price_at_purchase?: number;
+            } = {
               inventory_unit_id: unitId,
               quantity: item.quantity ?? 1,
             };
+            if (item.unit_price != null && item.unit_price !== '') {
+              row.unit_price_at_purchase = Number(item.unit_price);
+            }
+            return row;
           });
 
-          // Create order
-          const previousBase = OpenAPI.BASE;
-          OpenAPI.BASE = inventoryBaseUrl;
-          const order = await OrdersService.ordersCreate({
-            order_items: orderItems,
-            customer_name: formData.customer_name,
-            customer_phone: formData.customer_phone,
-            customer_email: formData.customer_email || undefined,
-            delivery_address: formData.delivery_address || undefined,
-            order_source: 'ONLINE', // Explicitly set for online orders
-          } as OrderRequest);
-          OpenAPI.BASE = previousBase;
+          const order = await withInventoryApiBase(() =>
+            OrdersService.ordersCreate({
+              order_items: orderItems,
+              customer_name: formData.customer_name,
+              customer_phone: formData.customer_phone,
+              customer_email: formData.customer_email || undefined,
+              delivery_address: formData.delivery_address || undefined,
+              order_source: 'ONLINE', // Explicitly set for online orders
+            } as OrderRequest)
+          );
 
           console.log('Order created:', order);
 
@@ -357,18 +363,13 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
     setIsAuthSubmitting(true);
     setAuthError(null);
     try {
-      const previousBase = OpenAPI.BASE;
-      let res: Awaited<ReturnType<typeof LoginService.loginCreate>> | null = null;
-      try {
-        OpenAPI.BASE = inventoryBaseUrl;
-        res = await LoginService.loginCreate({
+      const res = await withInventoryApiBase(() =>
+        LoginService.loginCreate({
           username_or_email: authForm.username_or_email,
           password: authForm.password,
           ...getAuthAttributionFields(),
-        });
-      } finally {
-        OpenAPI.BASE = previousBase;
-      }
+        })
+      );
       const token = res?.token;
       if (token) {
         setAuthToken(token);
@@ -390,21 +391,16 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
     setIsAuthSubmitting(true);
     setAuthError(null);
     try {
-      const previousBase = OpenAPI.BASE;
-      let res: Awaited<ReturnType<typeof RegisterService.registerCreate>> | null = null;
-      try {
-        OpenAPI.BASE = inventoryBaseUrl;
-        res = await RegisterService.registerCreate({
+      const res = await withInventoryApiBase(() =>
+        RegisterService.registerCreate({
           username: authForm.username,
           email: authForm.email,
           password: authForm.password,
           phone_number: formData.customer_phone || undefined,
           address: formData.delivery_address || undefined,
           ...getAuthAttributionFields(),
-        } as Parameters<typeof RegisterService.registerCreate>[0]);
-      } finally {
-        OpenAPI.BASE = previousBase;
-      }
+        } as Parameters<typeof RegisterService.registerCreate>[0])
+      );
       const token = (res as { token?: string } | null)?.token;
       if (token) {
         setAuthToken(token);
@@ -448,19 +444,18 @@ export function CheckoutModal({ onClose, totalValue, initialFormData }: Checkout
         name: formData.customer_name,
       });
 
-      const previousBase = OpenAPI.BASE;
-      OpenAPI.BASE = inventoryBaseUrl;
-      const paymentResult = await OrdersService.ordersInitiatePaymentCreate(createdOrderId, {
-        callback_url: callbackUrl,
-        cancellation_url: cancellationUrl,
-        customer: {
-          email: formData.customer_email,
-          phone_number: mobileNumber || formData.customer_phone,
-          first_name: formData.customer_name.split(' ')[0] || formData.customer_name,
-          last_name: formData.customer_name.split(' ').slice(1).join(' ') || '',
-        },
-      } as InitiatePaymentRequestRequest);
-      OpenAPI.BASE = previousBase;
+      const paymentResult = await withInventoryApiBase(() =>
+        OrdersService.ordersInitiatePaymentCreate(createdOrderId, {
+          callback_url: callbackUrl,
+          cancellation_url: cancellationUrl,
+          customer: {
+            email: formData.customer_email,
+            phone_number: mobileNumber || formData.customer_phone,
+            first_name: formData.customer_name.split(' ')[0] || formData.customer_name,
+            last_name: formData.customer_name.split(' ').slice(1).join(' ') || '',
+          },
+        } as InitiatePaymentRequestRequest)
+      );
 
       console.log('[PESAPAL] Payment initiation result:', JSON.stringify(paymentResult, null, 2));
 

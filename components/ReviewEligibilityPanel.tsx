@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { apiBaseUrl, inventoryBaseUrl } from '@/lib/api/openapi';
+import { apiBaseUrl, inventoryBaseUrl, withInventoryApiBase } from '@/lib/api/openapi';
 import { brandConfig } from '@/lib/config/brand';
 import { getProductHref } from '@/lib/utils/productRoutes';
-import { ApiService, OpenAPI, OrdersService } from '@/lib/api/generated';
+import { ApiService, OrdersService } from '@/lib/api/generated';
 
 interface EligibleReviewItem {
   product_id: number;
@@ -106,10 +106,7 @@ export function ReviewEligibilityPanel() {
       setStep('form');
       setIsCheckingEligibility(true);
       try {
-        const previousBase = OpenAPI.BASE;
-        OpenAPI.BASE = inventoryBaseUrl;
-        const ordersResponse = await OrdersService.ordersList();
-        OpenAPI.BASE = previousBase;
+        const ordersResponse = await withInventoryApiBase(() => OrdersService.ordersList());
 
         const orders = ordersResponse?.results ?? [];
         const directEligible: EligibleReviewItem[] = [];

@@ -2,9 +2,9 @@
  * React hook for payment operations
  */
 import { useState, useEffect, useCallback } from 'react';
-import { OpenAPI, OrdersService } from '@/lib/api/generated';
+import { OrdersService } from '@/lib/api/generated';
 import type { InitiatePaymentRequestRequest, Order } from '@/lib/api/generated';
-import { inventoryBaseUrl } from '@/lib/api/openapi';
+import { withInventoryApiBase } from '@/lib/api/openapi';
 import { ORDER_STATUS } from '@/lib/constants/apiEnums';
 
 const SUCCESS_PAYMENT_STATES = new Set(['PAID', 'DELIVERED', 'COMPLETED', 'SUCCESS', 'SUCCEEDED']);
@@ -46,15 +46,12 @@ export function usePayment({
     setError(null);
 
     try {
-      const previousBase = OpenAPI.BASE;
-      OpenAPI.BASE = inventoryBaseUrl;
-      const response = await OrdersService.ordersInitiatePaymentCreate(orderId, data);
-      OpenAPI.BASE = previousBase;
-      
+      const response = await withInventoryApiBase(() =>
+        OrdersService.ordersInitiatePaymentCreate(orderId, data)
+      );
+
       if ((response as any)?.redirect_url) {
-        // ✅ FIXED: Don't start polling immediately
-        // Only return the response - let the component handle redirect
-        // Polling should only start when user returns from Pesapal
+        // Don't start polling immediately — wait until user returns from Pesapal.
         console.log('[PESAPAL] Payment initiated successfully - redirect_url received');
         console.log('[PESAPAL] NOT starting polling - user will be redirected to Pesapal');
         return response;
@@ -88,10 +85,9 @@ export function usePayment({
 
     try {
       console.log('[PESAPAL] Calling OrdersService.ordersPaymentStatusRetrieve...');
-      const previousBase = OpenAPI.BASE;
-      OpenAPI.BASE = inventoryBaseUrl;
-      const status = await OrdersService.ordersPaymentStatusRetrieve(orderId);
-      OpenAPI.BASE = previousBase;
+      const status = await withInventoryApiBase(() =>
+        OrdersService.ordersPaymentStatusRetrieve(orderId)
+      );
       console.log('[PESAPAL] Payment Status received:', JSON.stringify(status, null, 2));
       setPaymentStatus(status);
       const normalizedStatus = String(status.status || '').toUpperCase();

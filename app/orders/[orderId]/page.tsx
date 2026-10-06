@@ -4,8 +4,8 @@ import { Suspense, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
-import { OpenAPI, OrdersService, Order } from '@/lib/api/generated';
-import { inventoryBaseUrl } from '@/lib/api/openapi';
+import { OrdersService, Order } from '@/lib/api/generated';
+import { inventoryBaseUrl, withInventoryApiBase } from '@/lib/api/openapi';
 import { formatPrice } from '@/lib/utils/format';
 import Link from 'next/link';
 
@@ -20,14 +20,14 @@ function OrderDetailContent() {
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
+    let isInitial = true;
 
     const fetchOrder = async () => {
       try {
-        setLoading(true);
-        const previousBase = OpenAPI.BASE;
-        OpenAPI.BASE = inventoryBaseUrl;
-        const orderData = await OrdersService.ordersRetrieve(orderId);
-        OpenAPI.BASE = previousBase;
+        if (isInitial) setLoading(true);
+        const orderData = await withInventoryApiBase(() =>
+          OrdersService.ordersRetrieve(orderId)
+        );
         setOrder(orderData);
         setError(null);
         const status = (orderData.status || '').toLowerCase();
@@ -38,7 +38,10 @@ function OrderDetailContent() {
         console.error('Error fetching order:', err);
         setError(err.message || 'Failed to load order details');
       } finally {
-        setLoading(false);
+        if (isInitial) {
+          setLoading(false);
+          isInitial = false;
+        }
       }
     };
 

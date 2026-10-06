@@ -456,6 +456,7 @@ export function CartPage() {
         customer_phone: formData.customer_phone.trim(),
         customer_email: formData.customer_email.trim() || undefined,
         order_source: 'ONLINE',
+        fulfillment_method: fulfillment,
       };
       if (fulfillment === 'DELIVERY') {
         orderPayload.delivery_address = formData.delivery_address.trim() || undefined;
@@ -508,7 +509,12 @@ export function CartPage() {
       setError('Payment initiation failed. Please try again.');
     } catch (err: any) {
       console.error('Checkout error:', err);
-      setError(err?.message || 'Failed to checkout. Please try again.');
+      const detail =
+        err?.body?.error ||
+        err?.body?.detail ||
+        err?.message ||
+        'Failed to checkout. Please try again.';
+      setError(typeof detail === 'string' ? detail : 'Failed to checkout. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

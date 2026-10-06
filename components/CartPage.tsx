@@ -61,6 +61,8 @@ export function CartPage() {
   const [shouldStartPayment, setShouldStartPayment] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [paymentMode, setPaymentMode] = useState<PaymentModeEnum>(PaymentModeEnum.BOTH);
+  /** Set when order create succeeds but Pesapal redirect fails — retry payment without a new order. */
+  const [pendingPaymentOrderId, setPendingPaymentOrderId] = useState<string | null>(null);
 
   // Periodically check if cart still exists (in case it was cleared after payment)
   useEffect(() => {
@@ -315,13 +317,38 @@ export function CartPage() {
     return countyRate ? Number(countyRate.price || 0) : 0;
   }, [deliveryRates, formData.delivery_county, formData.delivery_ward]);
 
-  const effectiveDeliveryFee = fulfillment === 'PICKUP' ? 0 : deliveryFee;
+  const effectiveDeliveryFee =
+    itemCount === 0 || fulfillment === 'PICKUP' ? 0 : deliveryFee;
   const totalWithDelivery = Number(totalValue || 0) + effectiveDeliveryFee;
   const payableNow = useMemo(() => {
+    if (itemCount === 0) return 0;
     if (paymentMode === PaymentModeEnum.ITEMS_ONLY) return Number(totalValue || 0);
     if (paymentMode === PaymentModeEnum.DELIVERY_ONLY) return Number(effectiveDeliveryFee || 0);
     return Number(totalWithDelivery || 0);
-  }, [paymentMode, totalValue, effectiveDeliveryFee, totalWithDelivery]);
+  }, [itemCount, paymentMode, totalValue, effectiveDeliveryFee, totalWithDelivery]);
+
+  const initiatePesapalRedirect = async (orderId: string) => {
+    const paymentResult = await withInventoryApiBase(() =>
+      OrdersService.ordersInitiatePaymentCreate(orderId, {
+        callback_url: `${window.location.origin}/payment/callback`,
+        cancellation_url: `${window.location.origin}/payment/cancelled`,
+        payment_mode: paymentMode,
+        customer: {
+          email: formData.customer_email.trim() || undefined,
+          phone_number: formData.customer_phone.trim(),
+          first_name: formData.customer_name.trim().split(' ')[0] || formData.customer_name.trim(),
+          last_name: formData.customer_name.trim().split(' ').slice(1).join(' ') || '',
+        },
+      })
+    );
+    const redirectUrl = (paymentResult as any)?.redirect_url;
+    if (!redirectUrl) {
+      throw Object.assign(new Error('Payment initiation failed. Please try again.'), {
+        body: paymentResult,
+      });
+    }
+    return redirectUrl as string;
+  };
 
   const buildDeliveryDateTime = (date: string, time: string) => {
     if (!date || !time) return undefined;
@@ -472,9 +499,31 @@ export function CartPage() {
         .map((item) => item.id)
         .filter((id): id is number => typeof id === 'number');
 
-      const order = await withInventoryApiBase(() => OrdersService.ordersCreate(orderPayload));
+      // Reuse the last unpaid order if payment failed after create (avoids duplicates + empty cart).
+      let orderId = pendingPaymentOrderId;
+      if (!orderId) {
+        const order = await withInventoryApiBase(() => OrdersService.ordersCreate(orderPayload));
+        orderId = order.order_id ?? null;
+        if (!orderId) throw new Error('Order created without an ID');
+        setPendingPaymentOrderId(orderId);
+      }
 
-      // Clear immediately after order create so "Proceed" retries can't spawn duplicates.
+      let redirectUrl: string;
+      try {
+        redirectUrl = await initiatePesapalRedirect(orderId);
+      } catch (payErr: any) {
+        const detail =
+          payErr?.body?.error ||
+          payErr?.body?.detail ||
+          payErr?.message ||
+          'Payment initiation failed.';
+        setError(
+          `${typeof detail === 'string' ? detail : 'Payment initiation failed.'} Order ${orderId} is saved — tap Proceed again or pay from Your Orders.`
+        );
+        return;
+      }
+
+      // Only clear the cart once Pesapal redirect is ready.
       try {
         await Promise.all(
           cartItemIds.map((itemId) =>
@@ -485,28 +534,8 @@ export function CartPage() {
         console.warn('Failed to clear cart after order create:', clearErr);
       }
       clearCart();
-
-      const paymentResult = await withInventoryApiBase(() =>
-        OrdersService.ordersInitiatePaymentCreate(order.order_id ?? '', {
-          callback_url: `${window.location.origin}/payment/callback`,
-          cancellation_url: `${window.location.origin}/payment/cancelled`,
-          payment_mode: paymentMode,
-          customer: {
-            email: formData.customer_email.trim() || undefined,
-            phone_number: formData.customer_phone.trim(),
-            first_name: formData.customer_name.trim().split(' ')[0] || formData.customer_name.trim(),
-            last_name: formData.customer_name.trim().split(' ').slice(1).join(' ') || '',
-          },
-        })
-      );
-
-      const redirectUrl = (paymentResult as any)?.redirect_url;
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-        return;
-      }
-
-      setError('Payment initiation failed. Please try again.');
+      setPendingPaymentOrderId(null);
+      window.location.href = redirectUrl;
     } catch (err: any) {
       console.error('Checkout error:', err);
       const detail =
@@ -515,6 +544,26 @@ export function CartPage() {
         err?.message ||
         'Failed to checkout. Please try again.';
       setError(typeof detail === 'string' ? detail : 'Failed to checkout. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const payPendingOrder = async (orderId: string) => {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      const redirectUrl = await initiatePesapalRedirect(orderId);
+      setPendingPaymentOrderId(null);
+      window.location.href = redirectUrl;
+    } catch (err: any) {
+      console.error('Pending order payment error:', err);
+      const detail =
+        err?.body?.error ||
+        err?.body?.detail ||
+        err?.message ||
+        'Payment initiation failed. Please try again.';
+      setError(typeof detail === 'string' ? detail : 'Payment initiation failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -932,6 +981,16 @@ export function CartPage() {
                             </div>
                           </div>
                           <div className="cart-page__order-actions">
+                            {String(order.status || '').toLowerCase() === 'pending' && (
+                              <button
+                                type="button"
+                                onClick={() => payPendingOrder(order.order_id)}
+                                disabled={isSubmitting}
+                                className="cart-page__link cart-page__order-link"
+                              >
+                                {isSubmitting ? 'Starting payment…' : 'Pay now'}
+                              </button>
+                            )}
                             <Link
                               href={`/orders/${order.order_id}`}
                               className="cart-page__link cart-page__order-link"
@@ -1025,6 +1084,16 @@ export function CartPage() {
                             </div>
                           </div>
                           <div className="cart-page__order-actions">
+                            {String(order.status || '').toLowerCase() === 'pending' && (
+                              <button
+                                type="button"
+                                onClick={() => payPendingOrder(order.order_id)}
+                                disabled={isSubmitting}
+                                className="cart-page__link cart-page__order-link"
+                              >
+                                {isSubmitting ? 'Starting payment…' : 'Pay now'}
+                              </button>
+                            )}
                             <Link
                               href={`/orders/${order.order_id}`}
                               className="cart-page__link cart-page__order-link"
@@ -1153,16 +1222,22 @@ export function CartPage() {
             </div>
             <button
               onClick={handleCheckout}
-              disabled={cart?.is_submitted || isSubmitting}
+              disabled={itemCount === 0 || cart?.is_submitted || isSubmitting}
               className={`cart-page__checkout-button ${
-                cart?.is_submitted || isSubmitting ? 'cart-page__checkout-button--disabled' : ''
+                itemCount === 0 || cart?.is_submitted || isSubmitting
+                  ? 'cart-page__checkout-button--disabled'
+                  : ''
               }`}
             >
               {isSubmitting
                 ? 'Processing...'
                 : cart?.is_submitted
                   ? 'Already Submitted'
-                  : 'Proceed to Payment'}
+                  : itemCount === 0
+                    ? 'Cart is empty'
+                    : pendingPaymentOrderId
+                      ? 'Retry Payment'
+                      : 'Proceed to Payment'}
             </button>
             <Link
               href="/products"

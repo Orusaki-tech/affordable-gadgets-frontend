@@ -2,29 +2,15 @@
 
 import Link from 'next/link';
 import { CloudinaryImage } from '@/components/CloudinaryImage';
-import { ProductCard } from '@/components/ProductCard';
 import { ProductCarousel } from '@/components/ProductCarousel';
 import { StudioBlockChrome } from '@/components/studio/StudioBlockChrome';
-import { StudioPromoTile } from '@/components/studio/StudioPromoTile';
 import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
 import { useProducts } from '@/lib/hooks/useProducts';
-import { usePromotions } from '@/lib/hooks/usePromotions';
-import type { PublicProductList, PublicPromotion } from '@/lib/api/generated';
-import { getPromotionHref } from '@/lib/utils/promotionRoutes';
+import type { PublicProductList } from '@/lib/api/generated';
+import { getProductHref } from '@/lib/utils/productRoutes';
+import { formatPrice } from '@/lib/utils/format';
 
-const LOCATION = 'watch_offers' as const;
 const WATCH_PAGE_SIZE = 24;
-
-function normalizeLocations(value: unknown): string[] {
-  if (Array.isArray(value)) return value.map((item) => String(item));
-  if (typeof value === 'string') {
-    return value
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-  return [];
-}
 
 function isWatchProduct(product: PublicProductList): boolean {
   const name = (product.product_name || '').toLowerCase();
@@ -71,42 +57,21 @@ function pickWatchProducts(products: PublicProductList[], limit = WATCH_PAGE_SIZ
 }
 
 /**
- * Homepage watch strip: live catalog watches by default.
- * Optional Studio `watch_offers` creatives override when curated.
+ * Homepage watch strip — live catalog watches (all brands).
+ * Studio Watch offers remains available for optional promo creatives later.
  */
 export function HomeWatchFinder() {
   const studioEdit = useStudioEditOptional();
   const canManage = Boolean(studioEdit?.capabilities.canEditPromotions);
 
-  const productsQuery = useProducts({
+  const { data, isLoading, isError } = useProducts({
     search: 'watch',
     page_size: WATCH_PAGE_SIZE,
     page: 1,
   });
-  const promotionsQuery = usePromotions({
-    page_size: WATCH_PAGE_SIZE,
-    display_location: LOCATION,
-  });
 
-  const promotions = (promotionsQuery.data?.results || []).filter((promo: PublicPromotion) => {
-    const locations = normalizeLocations(promo.display_locations);
-    if (locations.length === 0) return false;
-    return locations.includes(LOCATION);
-  });
-
-  const products = pickWatchProducts((productsQuery.data?.results ?? []).filter(isWatchProduct));
-
-  // Curated creatives win only when Studio has placed live ones; otherwise show stock.
-  const usePromos = !promotionsQuery.isLoading && promotions.length > 0;
-  const isLoading = usePromos
-    ? promotionsQuery.isLoading
-    : productsQuery.isLoading && products.length === 0;
-
+  const products = pickWatchProducts((data?.results ?? []).filter(isWatchProduct));
   const openManager = () => studioEdit?.openEditWatchOffers();
-
-  if (!isLoading && products.length === 0 && promotions.length === 0 && !canManage) {
-    return null;
-  }
 
   const body = (() => {
     if (isLoading) {
@@ -124,65 +89,7 @@ export function HomeWatchFinder() {
       );
     }
 
-    if (usePromos) {
-      return (
-        <div className="special-offers">
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-            <h2 id="home-watch-offers-title" className="special-offers__title section-label !mb-0">
-              Apple, Samsung &amp; Pixel Watches
-            </h2>
-            <Link
-              href="/products?type=AC&search=watch"
-              className="text-sm font-semibold text-primary underline-offset-2 hover:underline"
-            >
-              Browse all watches
-            </Link>
-          </div>
-          <ProductCarousel
-            itemsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
-            showNavigation
-            showPagination={false}
-            autoPlay
-          >
-            {promotions.map((promotion: PublicPromotion, index) => {
-              const promotionImageSrc = promotion.banner_image_url || promotion.banner_image;
-              const href = getPromotionHref(promotion);
-              return (
-                <StudioPromoTile
-                  key={promotion.id ?? `${promotion.title}-${index}`}
-                  promotionId={promotion.id}
-                  title={promotion.title}
-                  href={href}
-                  className="special-offers__promo"
-                  onRemove={
-                    canManage && promotion.id
-                      ? () => void studioEdit?.removeWatchOfferPromotion(promotion.id!)
-                      : undefined
-                  }
-                >
-                  <div className="special-offers__promo-media">
-                    {promotionImageSrc ? (
-                      <CloudinaryImage
-                        src={promotionImageSrc}
-                        alt={promotion.title}
-                        preset="promoTile"
-                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                        priority={false}
-                        loading={index < 2 ? 'eager' : 'lazy'}
-                        className="special-offers__promo-image"
-                        fill
-                      />
-                    ) : null}
-                  </div>
-                </StudioPromoTile>
-              );
-            })}
-          </ProductCarousel>
-        </div>
-      );
-    }
-
-    if (products.length === 0) {
+    if (isError || products.length === 0) {
       return (
         <div className="special-offers">
           <h2 id="home-watch-offers-title" className="special-offers__title section-label">
@@ -190,17 +97,21 @@ export function HomeWatchFinder() {
           </h2>
           <div className="special-offers__empty">
             <p className="special-offers__empty-text">
-              No watches in stock right now. You can still curate promo creatives in Studio.
+              {isError
+                ? 'Could not load watches right now.'
+                : 'No watches in stock right now.'}
             </p>
+            <Link href="/products?type=AC&search=watch" className="special-offers__empty-link">
+              Browse watches
+            </Link>
             {canManage ? (
-              <button type="button" className="special-offers__empty-link" onClick={openManager}>
-                Choose watch offers
-              </button>
-            ) : (
-              <Link href="/products?type=AC&search=watch" className="special-offers__empty-link">
-                Browse watches
-              </Link>
-            )}
+              <>
+                {' · '}
+                <button type="button" className="special-offers__empty-link" onClick={openManager}>
+                  Curate promo tiles
+                </button>
+              </>
+            ) : null}
           </div>
         </div>
       );
@@ -225,28 +136,41 @@ export function HomeWatchFinder() {
           showPagination={false}
           autoPlay={false}
         >
-          {products.map((product) => (
-            <ProductCard
-              key={product.id ?? product.slug}
-              product={product}
-              variant="featured"
-              studioAllowDelete={false}
-            />
-          ))}
+          {products.map((product, index) => {
+            const href = getProductHref(product);
+            const imageSrc = product.primary_image;
+            const price =
+              product.min_price != null ? formatPrice(product.min_price) : null;
+
+            return (
+              <Link
+                key={product.id ?? product.slug ?? index}
+                href={href}
+                className="special-offers__promo"
+                aria-label={product.product_name}
+              >
+                <div className="special-offers__promo-media">
+                  {imageSrc ? (
+                    <CloudinaryImage
+                      src={imageSrc}
+                      alt={product.product_name}
+                      preset="promoTile"
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                      priority={false}
+                      loading={index < 2 ? 'eager' : 'lazy'}
+                      className="special-offers__promo-image"
+                      fill
+                    />
+                  ) : null}
+                </div>
+                <span className="sr-only">
+                  {product.product_name}
+                  {price ? ` — ${price}` : ''}
+                </span>
+              </Link>
+            );
+          })}
         </ProductCarousel>
-        {canManage ? (
-          <p className="mt-4 text-xs text-secondary">
-            Showing live catalog watches. Optional:{' '}
-            <button
-              type="button"
-              className="font-semibold text-primary underline-offset-2 hover:underline"
-              onClick={openManager}
-            >
-              curate promo creatives
-            </button>{' '}
-            to replace this strip with designed tiles.
-          </p>
-        ) : null}
       </div>
     );
   })();

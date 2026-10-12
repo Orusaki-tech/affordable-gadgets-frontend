@@ -6,21 +6,29 @@ import { ArticlesGrid } from '@/components/ArticlesGrid';
 import { HeaderWithAnnouncement } from '@/components/HeaderWithAnnouncement';
 import { Footer } from '@/components/Footer';
 import {
-  applyArticleFilters,
   buildArticlesPath,
   resolveHubFromParam,
 } from '@/lib/blog/articleFilters';
-import { fetchAllPublishedArticles, fetchArticleBrandOptions } from '@/lib/blog/articlePage';
-import type { PublicArticleCard } from '@/lib/api/generated';
+import {
+  fetchArticleBrandOptions,
+  fetchPublishedArticlesPage,
+} from '@/lib/blog/articlePage';
 
 export const revalidate = 3600;
 
 const BASE_TITLE = 'Buying Guides & Articles';
 const BASE_DESCRIPTION =
   'Expert phone, laptop, tablet and accessory buying guides for renewed tech in Kenya.';
+const ARTICLES_PAGE_SIZE = 24;
 
 interface PageProps {
   searchParams: Promise<Record<string, string | undefined>>;
+}
+
+function parsePage(value?: string): number {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 1) return 1;
+  return Math.floor(n);
 }
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
@@ -79,34 +87,51 @@ export default async function ArticlesIndexPage({ searchParams }: PageProps) {
   const search = sp.search || '';
   const brand = sp.brand || '';
   const activeHub = resolveHubFromParam(sp.type);
+  const page = parsePage(sp.page);
+  const filters = {
+    search: sp.search,
+    brand: sp.brand,
+    productType: activeHub?.code,
+  };
 
-  let articles: PublicArticleCard[] = [];
+  let articles: Awaited<ReturnType<typeof fetchPublishedArticlesPage>>['results'] = [];
   let brandOptions: string[] = [];
+  let totalCount = 0;
+  let totalPages = 1;
+  let currentPage = page;
 
   try {
-    const [fetchedArticles, fetchedBrands] = await Promise.all([
-      fetchAllPublishedArticles({
-        search: sp.search,
-        brand: sp.brand,
-        productType: activeHub?.code,
-      }),
+    const [fetchedPage, fetchedBrands] = await Promise.all([
+      fetchPublishedArticlesPage(filters, page, ARTICLES_PAGE_SIZE),
       fetchArticleBrandOptions(activeHub?.code),
     ]);
-    articles = applyArticleFilters(
-      fetchedArticles,
-      { search: sp.search, brand: sp.brand, productType: activeHub?.code },
-      fetchedBrands,
-    );
+    articles = fetchedPage.results;
+    totalCount = fetchedPage.count;
+    totalPages = fetchedPage.totalPages;
+    currentPage = fetchedPage.page;
     brandOptions = fetchedBrands;
   } catch {
     articles = [];
     brandOptions = [];
+    totalCount = 0;
+    totalPages = 1;
+    currentPage = 1;
   }
 
   const resultLabel = activeHub
     ? `${activeHub.label.toLowerCase()} guides`
     : 'guides';
   const brandLabel = brand ? ` from ${brand}` : '';
+  const showingFrom = totalCount === 0 ? 0 : (currentPage - 1) * ARTICLES_PAGE_SIZE + 1;
+  const showingTo = Math.min(currentPage * ARTICLES_PAGE_SIZE, totalCount);
+  const prevHref =
+    currentPage > 1
+      ? buildArticlesPath({ ...filters, page: currentPage - 1 })
+      : null;
+  const nextHref =
+    currentPage < totalPages
+      ? buildArticlesPath({ ...filters, page: currentPage + 1 })
+      : null;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f7f7f8]">
@@ -131,11 +156,41 @@ export default async function ArticlesIndexPage({ searchParams }: PageProps) {
           ) : (
             <>
               <p className="text-sm text-gray-500 mb-4">
-                {articles.length} {resultLabel}
+                Showing {showingFrom}–{showingTo} of {totalCount} {resultLabel}
                 {brandLabel}
                 {search ? ` matching "${search}"` : ''}
               </p>
               <ArticlesGrid articles={articles} />
+              {totalPages > 1 ? (
+                <nav
+                  className="mt-8 flex flex-wrap items-center justify-between gap-3"
+                  aria-label="Articles pagination"
+                >
+                  {prevHref ? (
+                    <Link
+                      href={prevHref}
+                      className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:border-gray-400"
+                    >
+                      Previous
+                    </Link>
+                  ) : (
+                    <span />
+                  )}
+                  <p className="text-sm text-gray-500">
+                    Page {currentPage} of {totalPages}
+                  </p>
+                  {nextHref ? (
+                    <Link
+                      href={nextHref}
+                      className="rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 hover:border-gray-400"
+                    >
+                      Next
+                    </Link>
+                  ) : (
+                    <span />
+                  )}
+                </nav>
+              ) : null}
             </>
           )}
 

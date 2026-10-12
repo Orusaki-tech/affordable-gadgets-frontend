@@ -11,6 +11,7 @@ export interface ArticleListFilters {
   search?: string;
   brand?: string;
   productType?: ArticleProductTypeCode;
+  page?: number;
 }
 
 const LAPTOP_RE = /macbook|laptop|notebook|chromebook/i;
@@ -69,6 +70,7 @@ export function buildArticlesQuery(filters: ArticleListFilters): string {
   if (filters.search?.trim()) params.set('search', filters.search.trim());
   if (filters.brand?.trim()) params.set('brand', filters.brand.trim());
   if (filters.productType) params.set('type', filters.productType);
+  if (filters.page && filters.page > 1) params.set('page', String(filters.page));
   return params.toString();
 }
 

@@ -125,6 +125,43 @@ async function fetchArticlesPage(
   return (await res.json()) as ArticlesPagePayload;
 }
 
+export type PublishedArticlesPage = {
+  results: PublicArticleCard[];
+  count: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+/** Single page for /articles index — avoids loading 300+ cards on first paint. */
+export async function fetchPublishedArticlesPage(
+  filters: ArticleListFilters = {},
+  page = 1,
+  pageSize = 24,
+): Promise<PublishedArticlesPage> {
+  const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+  const safeSize =
+    Number.isFinite(pageSize) && pageSize > 0 ? Math.min(Math.floor(pageSize), 100) : 24;
+  const base = `${OpenAPI.BASE.replace(/\/+$/, '')}/api/v1/public/articles/`;
+  const headers = await publicApiHeaders();
+  const data = await fetchArticlesPage(base, safePage, safeSize, filters, headers);
+  const results = (data?.results ?? []).filter(isRenderableArticleCard);
+  const count =
+    typeof data?.count === 'number' && data.count >= 0
+      ? data.count
+      : results.length + (data?.next ? safeSize : 0);
+  const totalPages = Math.max(1, Math.ceil(count / safeSize) || 1);
+
+  return {
+    results,
+    count,
+    page: safePage,
+    pageSize: safeSize,
+    totalPages,
+  };
+}
+
+/** @deprecated Prefer fetchPublishedArticlesPage for storefront indexes. */
 export async function fetchAllPublishedArticles(
   filters: ArticleListFilters = {},
 ): Promise<PublicArticleCard[]> {
@@ -145,7 +182,6 @@ export async function fetchAllPublishedArticles(
         : 0;
 
   if (remainingPages > 0) {
-    // Parallelize remaining pages — sequential 1.7s×N was ~16s TTFB on /articles.
     const pageNumbers = Array.from({ length: remainingPages }, (_, i) => i + 2);
     const pages = await Promise.all(
       pageNumbers.map((page) => fetchArticlesPage(base, page, pageSize, filters, headers))
@@ -154,7 +190,6 @@ export async function fetchAllPublishedArticles(
       if (page?.results?.length) all.push(...page.results);
     }
   } else if (first.next) {
-    // Fallback when count is missing: keep walking next links.
     let page = 2;
     let hasNext = true;
     while (hasNext) {

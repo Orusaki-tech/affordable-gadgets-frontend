@@ -10,6 +10,7 @@ import { HomeBundles } from '@/components/home/HomeBundles';
 import { HomeBnplCalculator } from '@/components/home/HomeBnplCalculator';
 import { HomeRepairPromo } from '@/components/home/HomeRepairPromo';
 import { HomeVideoReels } from '@/components/home/HomeVideoReels';
+import { HomeAccessories } from '@/components/home/HomeAccessories';
 import { HomeBuyingGuides } from '@/components/home/HomeBuyingGuides';
 import { HomeReviews } from '@/components/home/HomeReviews';
 import { HomeDeliveryChecker } from '@/components/home/HomeDeliveryChecker';
@@ -212,6 +213,7 @@ export default async function HomePage() {
         <HomeBundles />
         <HomeBnplCalculator />
         <HomeVideoReels />
+        <HomeAccessories />
         <Suspense fallback={<div className="min-h-[12.5rem]" aria-hidden />}>
           <HomeBuyingGuides />
         </Suspense>

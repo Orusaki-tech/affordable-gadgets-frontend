@@ -5,6 +5,7 @@ import { HomeCbdRibbon } from '@/components/home/HomeCbdRibbon';
 import { HomeSpecialOffers } from '@/components/home/HomeSpecialOffers';
 import { HomeFeaturedHardware } from '@/components/home/HomeFeaturedHardware';
 import { HomeBudgetMatcher } from '@/components/home/HomeBudgetMatcher';
+import { HomeWatchFinder } from '@/components/home/HomeWatchFinder';
 import { HomeBundles } from '@/components/home/HomeBundles';
 import { HomeBnplCalculator } from '@/components/home/HomeBnplCalculator';
 import { HomeRepairPromo } from '@/components/home/HomeRepairPromo';
@@ -207,6 +208,7 @@ export default async function HomePage() {
         <HomeFeaturedHardware />
         <HomeRepairPromo />
         <HomeBudgetMatcher />
+        <HomeWatchFinder />
         <HomeBundles />
         <HomeBnplCalculator />
         <HomeVideoReels />

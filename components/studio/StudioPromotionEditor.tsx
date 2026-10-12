@@ -20,6 +20,7 @@ const LOCATION_OPTIONS = [
   { value: 'homepage_hero', label: 'Homepage hero', hint: 'Main carousel' },
   { value: 'stories_carousel', label: 'Stories', hint: 'Story strip' },
   { value: 'special_offers', label: 'Special offers', hint: 'Offers block' },
+  { value: 'watch_offers', label: 'Watch offers', hint: 'Watch strip' },
   { value: 'flash_sales', label: 'Flash sales', hint: 'Timed deals' },
   { value: 'cbd_ribbon', label: 'CBD ribbon', hint: 'Top ribbon' },
   { value: 'brand_banner', label: 'Brand banner', hint: 'Products brand page' },
@@ -287,6 +288,7 @@ export function StudioPromotionEditor({
     locations.includes('stories_carousel') ||
     locations.includes('brand_banner') ||
     locations.includes('special_offers') ||
+    locations.includes('watch_offers') ||
     locations.includes('flash_sales') ||
     locations.includes('cbd_ribbon');
 
@@ -298,8 +300,14 @@ export function StudioPromotionEditor({
     if (locations.includes('brand_banner')) {
       hints.push('Brand banner: wide landscape (e.g. 1280×288+).');
     }
-    if (locations.includes('special_offers') || locations.includes('flash_sales')) {
-      hints.push('Special offers / flash sales: square 1:1, ideally 1080×1080 px (min 720×720).');
+    if (
+      locations.includes('special_offers') ||
+      locations.includes('watch_offers') ||
+      locations.includes('flash_sales')
+    ) {
+      hints.push(
+        'Special / watch / flash offers: square 1:1, ideally 1080×1080 px (min 720×720).'
+      );
     }
     if (locations.includes('stories_carousel')) {
       hints.push('Stories: square tile, ideally 1080×1080 px.');

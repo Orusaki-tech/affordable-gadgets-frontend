@@ -61,6 +61,9 @@ type StudioEditHostValue = {
   openEditSpecialOffers: (preferPromotionId?: number | null) => void;
   /** Strip special_offers placement (keeps the promotion). */
   removeSpecialOfferPromotion: (id: number) => Promise<void>;
+  openEditWatchOffers: (preferPromotionId?: number | null) => void;
+  /** Strip watch_offers placement (keeps the promotion). */
+  removeWatchOfferPromotion: (id: number) => Promise<void>;
   openEditBundle: (id: number) => Promise<void>;
   openCreateBundle: () => void;
   openEditFinancingProvider: (id: number) => Promise<void>;
@@ -457,6 +460,69 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     [capabilities?.canEditPromotions, queryClient]
   );
 
+  const openEditWatchOffers = useCallback(
+    (preferPromotionId?: number | null) => {
+      if (!capabilities?.canEditPromotions) {
+        setError('Your role cannot edit promotions.');
+        return;
+      }
+      setError(null);
+      setResource({
+        kind: 'watchOffers',
+        preferPromotionId:
+          typeof preferPromotionId === 'number' ? preferPromotionId : null,
+      });
+      setDrawerOpen(true);
+    },
+    [capabilities?.canEditPromotions]
+  );
+
+  const removeWatchOfferPromotion = useCallback(
+    async (id: number) => {
+      if (!id) return;
+      if (!capabilities?.canEditPromotions) {
+        setError('Your role cannot edit promotions.');
+        return;
+      }
+      setError(null);
+      try {
+        const full = await retrieveStudioPromotion(id);
+        if (!studioPromotionHasLocation(full, 'watch_offers')) {
+          setError('That promotion is not in Watch offers.');
+          return;
+        }
+        const title = full.title || `#${id}`;
+        if (
+          !window.confirm(
+            `Remove “${title}” from Watch offers? The promotion itself is kept.`
+          )
+        ) {
+          return;
+        }
+        const raw = full.display_locations;
+        const locations = (
+          Array.isArray(raw)
+            ? raw.map(String)
+            : typeof raw === 'string'
+              ? raw.split(',').map((s) => s.trim()).filter(Boolean)
+              : []
+        ).filter((loc) => loc !== 'watch_offers');
+        await patchStudioPromotion(id, { display_locations: locations });
+        await queryClient.invalidateQueries({ queryKey: ['promotions'] });
+        await queryClient.refetchQueries({ queryKey: ['promotions'] });
+      } catch (err) {
+        setError(
+          err instanceof StudioApiError
+            ? err.message
+            : err instanceof Error
+              ? err.message
+              : 'Could not remove promotion from Watch offers'
+        );
+      }
+    },
+    [capabilities?.canEditPromotions, queryClient]
+  );
+
   const openEditBundle = useCallback(
     async (id: number) => {
       if (!id) return;
@@ -672,6 +738,8 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       removeHomepageHeroPromotion,
       openEditSpecialOffers,
       removeSpecialOfferPromotion,
+      openEditWatchOffers,
+      removeWatchOfferPromotion,
       openEditBundle,
       openCreateBundle,
       openEditFinancingProvider,
@@ -700,6 +768,8 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     removeHomepageHeroPromotion,
     openEditSpecialOffers,
     removeSpecialOfferPromotion,
+    openEditWatchOffers,
+    removeWatchOfferPromotion,
     openEditBundle,
     openCreateBundle,
     openEditFinancingProvider,
@@ -750,6 +820,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
             kind === 'brandBanner' ||
             kind === 'homepageHero' ||
             kind === 'specialOffers' ||
+            kind === 'watchOffers' ||
             kind === 'promotionsManager' ||
             kind === 'financingOffers' ||
             kind === 'reviewsManager' ||

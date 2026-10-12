@@ -93,34 +93,77 @@ export function isRenderableArticleCard(article: PublicArticleCard): boolean {
   return Boolean(article.slug && article.headline);
 }
 
+type ArticlesPagePayload = {
+  count?: number;
+  next?: string | null;
+  results?: PublicArticleCard[];
+};
+
+async function fetchArticlesPage(
+  base: string,
+  page: number,
+  pageSize: number,
+  filters: ArticleListFilters,
+  headers: Record<string, string>,
+): Promise<ArticlesPagePayload | null> {
+  const params = new URLSearchParams({
+    ordering: '-published_at',
+    page: String(page),
+    page_size: String(pageSize),
+  });
+  if (filters.search?.trim()) params.set('search', filters.search.trim());
+  if (filters.brand?.trim()) params.set('brand', filters.brand.trim());
+  if (filters.productType) params.set('product_type', filters.productType);
+
+  const res = await fetch(`${base}?${params.toString()}`, {
+    credentials: 'omit',
+    headers,
+    // Match app/articles revalidate so SSR does not cold-fetch every visit.
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) return null;
+  return (await res.json()) as ArticlesPagePayload;
+}
+
 export async function fetchAllPublishedArticles(
   filters: ArticleListFilters = {},
 ): Promise<PublicArticleCard[]> {
-  const all: PublicArticleCard[] = [];
-  let page = 1;
   const pageSize = 100;
   const base = `${OpenAPI.BASE.replace(/\/+$/, '')}/api/v1/public/articles/`;
+  const headers = await publicApiHeaders();
 
-  while (true) {
-    const params = new URLSearchParams({
-      ordering: '-published_at',
-      page: String(page),
-      page_size: String(pageSize),
-    });
-    if (filters.search?.trim()) params.set('search', filters.search.trim());
-    if (filters.brand?.trim()) params.set('brand', filters.brand.trim());
-    if (filters.productType) params.set('product_type', filters.productType);
+  const first = await fetchArticlesPage(base, 1, pageSize, filters, headers);
+  if (!first) return [];
 
-    const res = await fetch(`${base}?${params.toString()}`, {
-      credentials: 'omit',
-      headers: await publicApiHeaders(),
-    });
-    if (!res.ok) break;
+  const all: PublicArticleCard[] = [...(first.results ?? [])];
+  const total = typeof first.count === 'number' && first.count > 0 ? first.count : null;
+  const remainingPages =
+    total != null
+      ? Math.max(0, Math.ceil(total / pageSize) - 1)
+      : first.next
+        ? 1
+        : 0;
 
-    const data = (await res.json()) as { results?: PublicArticleCard[]; next?: string | null };
-    all.push(...(data.results ?? []));
-    if (!data.next) break;
-    page += 1;
+  if (remainingPages > 0) {
+    // Parallelize remaining pages — sequential 1.7s×N was ~16s TTFB on /articles.
+    const pageNumbers = Array.from({ length: remainingPages }, (_, i) => i + 2);
+    const pages = await Promise.all(
+      pageNumbers.map((page) => fetchArticlesPage(base, page, pageSize, filters, headers))
+    );
+    for (const page of pages) {
+      if (page?.results?.length) all.push(...page.results);
+    }
+  } else if (first.next) {
+    // Fallback when count is missing: keep walking next links.
+    let page = 2;
+    let hasNext = true;
+    while (hasNext) {
+      const data = await fetchArticlesPage(base, page, pageSize, filters, headers);
+      if (!data?.results?.length) break;
+      all.push(...data.results);
+      hasNext = Boolean(data.next);
+      page += 1;
+    }
   }
 
   return all.filter(isRenderableArticleCard);

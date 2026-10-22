@@ -13,6 +13,31 @@ import { ProductsBrandBanner } from './ProductsBrandBanner';
 import { getBrandBannerConfig } from '@/lib/config/products-brand-banners';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { studioPath } from '@/lib/studio/paths';
+
+/** True when two shop/studio hrefs name the same path and query, ignoring encoding and /studio. */
+function shopHrefsMatch(current: string, next: string): boolean {
+  const base = window.location.origin;
+  let currentUrl: URL;
+  let nextUrl: URL;
+  try {
+    currentUrl = new URL(current, base);
+    nextUrl = new URL(next, base);
+  } catch {
+    return current === next;
+  }
+  const path = (value: string) =>
+    value === '/studio' ? '/' : value.replace(/^\/studio(?=\/)/, '') || '/';
+  if (path(currentUrl.pathname) !== path(nextUrl.pathname)) return false;
+  const normalize = (params: URLSearchParams) =>
+    [...params.entries()]
+      .filter(([, value]) => value !== '')
+      .sort(([aKey, aValue], [bKey, bValue]) =>
+        aKey === bKey ? aValue.localeCompare(bValue) : aKey.localeCompare(bKey)
+      )
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&');
+  return normalize(currentUrl.searchParams) === normalize(nextUrl.searchParams);
+}
 import { CATEGORY_CARDS } from '@/lib/config/categories';
 import { trackSearch } from '@/lib/tracking';
 import Link from 'next/link';
@@ -114,7 +139,7 @@ function ProductsPageInner({
       const nextUrl = studioPath(`/products${paramString ? `?${paramString}` : ''}${hash}`);
       if (typeof window !== 'undefined') {
         const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-        if (currentUrl === nextUrl) {
+        if (shopHrefsMatch(currentUrl, nextUrl)) {
           return;
         }
       }
@@ -156,7 +181,14 @@ function ProductsPageInner({
   }, [promotionId, router, singlePromotionProductId]);
 
   useEffect(() => {
-    setFilters(initialFilters);
+    setFilters((prev) =>
+      prev.type === initialFilters.type &&
+      prev.brand === initialFilters.brand &&
+      prev.minPrice === initialFilters.minPrice &&
+      prev.maxPrice === initialFilters.maxPrice
+        ? prev
+        : initialFilters
+    );
   }, [initialFilters]);
 
   useEffect(() => {
@@ -327,7 +359,20 @@ function ProductsPageInner({
     // Prefetch detail + units for first 4 visible products so first-row clicks are instant
     const firstFew = data.results.slice(0, 4);
     firstFew.forEach((product) => prefetchProductDetail(queryClient, product));
-  }, [data?.next, data?.results, page, filters, debouncedSearch, sort, promotionId, featuredOnly, queryClient]);
+  }, [
+    data?.next,
+    data?.results,
+    page,
+    filters.type,
+    filters.brand,
+    filters.minPrice,
+    filters.maxPrice,
+    debouncedSearch,
+    sort,
+    promotionId,
+    featuredOnly,
+    queryClient,
+  ]);
 
   // Do not re-filter by type/brand here: the list API already applies `type` and `brand_filter`
   // (backend uses icontains for brand). Client-side exact brand matching hid valid rows

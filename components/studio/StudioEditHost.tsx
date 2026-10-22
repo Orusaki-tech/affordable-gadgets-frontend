@@ -7,6 +7,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -19,6 +20,7 @@ import {
 import { useStudioAuthOptional } from '@/components/studio/StudioAuthContext';
 import {
   deleteStudioProduct,
+  releaseStudioProductDeleteBlockers,
   findStudioArticleBySlug,
   patchStudioProduct,
   retrieveStudioArticle,
@@ -97,10 +99,16 @@ function StudioEditQueryBridge({
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const handledDeepLink = useRef<string | null>(null);
+
   useEffect(() => {
     const editId = searchParams.get('edit');
     const isNew = searchParams.get('new') === '1';
     if (!isNew && !editId) return;
+
+    const key = isNew ? 'new' : `edit:${editId}`;
+    if (handledDeepLink.current === key) return;
+    handledDeepLink.current = key;
 
     if (isNew && capabilities.canCreateProduct) {
       openCreateProduct();
@@ -111,11 +119,17 @@ function StudioEditQueryBridge({
       }
     }
 
-    const clean =
+    // Drop only the deep-link flags. Replacing the bare path also wiped `search`
+    // and the catalog wrote it back, so the two updates kept replacing each other.
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('edit');
+    params.delete('new');
+    const qs = params.toString();
+    const path =
       typeof window !== 'undefined' && window.location.pathname.startsWith('/studio')
         ? window.location.pathname
         : '/studio/products';
-    router.replace(clean, { scroll: false });
+    router.replace(qs ? `${path}?${qs}` : path, { scroll: false });
   }, [capabilities, searchParams, openCreateProduct, openEditProduct, router]);
 
   return null;
@@ -201,10 +215,19 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
               : err instanceof Error
                 ? err.message
                 : '';
-          const blockedByInventory = /available inventory|inventory unit/i.test(message);
-          if (!blockedByInventory) throw err;
-          // Hard delete blocked (stock still attached) — unpublish so it leaves the shop.
-          await patchStudioProduct(product.id, { is_published: false });
+          const blockedByInventory =
+            /available inventory/i.test(message) &&
+            !/ProductArticle|protected foreign key/i.test(message);
+          if (blockedByInventory) {
+            // Hard delete blocked (stock still attached) — unpublish so it leaves the shop.
+            await patchStudioProduct(product.id, { is_published: false });
+          } else {
+            // Buying guides use PROTECT, so the API refuses the delete until they are
+            // unlinked. Keep the guides as standalone articles and retry.
+            const released = await releaseStudioProductDeleteBlockers(product.id);
+            if (!released) throw err;
+            await deleteStudioProduct(product.id);
+          }
         }
         await queryClient.invalidateQueries();
         window.location.reload();

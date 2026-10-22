@@ -853,6 +853,44 @@ export async function deleteStudioBundle(id: number): Promise<void> {
   await studioDelete(`/bundles/${id}/`);
 }
 
+/**
+ * Unlink PROTECT relations that block product delete on the current API.
+ * Buying guides stay in the catalog with no primary product. Bundles whose
+ * main product is this one are removed.
+ */
+export async function releaseStudioProductDeleteBlockers(productId: number): Promise<boolean> {
+  let changed = false;
+  const articles = await studioFetchJson<StudioPaginatedArticles>(
+    `/articles/?product=${productId}&page_size=100`
+  );
+  for (const article of articles.results ?? []) {
+    if (!article.id) continue;
+    const others = (article.products ?? [])
+      .map((row) => (typeof row === 'number' ? row : row.id))
+      .filter((id): id is number => typeof id === 'number' && id !== productId);
+    const payload: Record<string, string | null | number[]> = {
+      product_id: null,
+      product_ids: others,
+    };
+    try {
+      await patchStudioArticle(article.id, payload);
+    } catch {
+      payload.slug = `${(article.slug || 'article').slice(0, 240)}-${productId}`;
+      await patchStudioArticle(article.id, payload);
+    }
+    changed = true;
+  }
+
+  const bundles = await listStudioBundles();
+  for (const bundle of bundles.results ?? []) {
+    if (bundle.id != null && bundle.main_product === productId) {
+      await deleteStudioBundle(bundle.id);
+      changed = true;
+    }
+  }
+  return changed;
+}
+
 export async function listStudioBundleItems(bundleId: number): Promise<StudioBundleItem[]> {
   const data = await studioFetchJson<StudioBundleItem[] | { results?: StudioBundleItem[] }>(
     `/bundle-items/?bundle=${bundleId}&page_size=100`

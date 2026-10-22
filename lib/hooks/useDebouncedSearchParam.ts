@@ -18,23 +18,32 @@ export function useDebouncedSearchParam({
   onTrack,
 }: UseDebouncedSearchParamOptions) {
   const searchParams = useSearchParams();
-  const [search, setSearch] = useState(() => searchParams.get('search') || '');
+  const urlSearch = searchParams.get('search') || '';
+  const [search, setSearch] = useState(urlSearch);
   const debouncedSearch = useDebouncedValue(search, debounceMs);
   const trackingReadyRef = useRef(false);
   const onSyncToUrlRef = useRef(onSyncToUrl);
   const onTrackRef = useRef(onTrack);
+  const searchRef = useRef(search);
+  const debouncedRef = useRef(debouncedSearch);
+  searchRef.current = search;
+  debouncedRef.current = debouncedSearch;
 
   useEffect(() => {
     onSyncToUrlRef.current = onSyncToUrl;
     onTrackRef.current = onTrack;
   }, [onSyncToUrl, onTrack]);
 
+  // Copy the URL into the field only for an external navigation (back/forward,
+  // a shared link). A search write updates the URL to the debounced value while
+  // the user may already have typed further — adopting that URL resets the
+  // field and starts another fetch.
   useEffect(() => {
-    setSearch(searchParams.get('search') || '');
-  }, [searchParams]);
+    if (urlSearch === searchRef.current || urlSearch === debouncedRef.current) return;
+    setSearch(urlSearch);
+  }, [urlSearch]);
 
   useEffect(() => {
-    const urlSearch = searchParams.get('search') || '';
     if (debouncedSearch === urlSearch) {
       trackingReadyRef.current = true;
       return;
@@ -44,7 +53,7 @@ export function useDebouncedSearchParam({
       onTrackRef.current?.(debouncedSearch);
     }
     trackingReadyRef.current = true;
-  }, [debouncedSearch, searchParams]);
+  }, [debouncedSearch, urlSearch]);
 
   const handleSearchChange = useCallback((value: string) => {
     setSearch(value);

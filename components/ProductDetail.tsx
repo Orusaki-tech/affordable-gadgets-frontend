@@ -832,6 +832,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   };
 
   const handleAddToCart = () => {
+    if (product?.is_out_of_stock) return;
     if (!selectedUnit) {
       triggerVariantShake();
       return;
@@ -1243,6 +1244,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   }
 
   const stockCount = Number(product.available_units_count ?? 0);
+  const isOutOfStock = Boolean(product.is_out_of_stock);
   const ratingValue =
     typeof product.average_rating === 'number' && product.average_rating > 0
       ? product.average_rating
@@ -1300,8 +1302,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
         <div className="product-detail__gallery">
           {/* Main Image */}
           <div className="product-detail__gallery-main">
+            {isOutOfStock ? <span className="product-detail__out-of-stock">Out of stock</span> : null}
             <div className="product-detail__gallery-status">
-              {stockCount > 0 ? (
+              {stockCount > 0 && !isOutOfStock ? (
                 <span className="product-detail__gallery-status-chip product-detail__gallery-status-chip--stock">
                   <span className="product-detail__trust-dot" aria-hidden />
                   Kimathi Hub: Ready for Dispatch
@@ -1665,6 +1668,23 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               const openWhatsApp = () => {
                 setIsWhatsAppModalOpen(true);
               };
+
+              if (isOutOfStock) {
+                return (
+                  <div className="product-detail__cta product-detail__cta--inline product-detail__cta--whatsapp-block">
+                    <p className="product-detail__stock-note product-detail__stock-note--out">
+                      This item is out of stock.
+                    </p>
+                    <button
+                      type="button"
+                      className="product-detail__cta-button product-detail__cta-button--whatsapp"
+                      onClick={openWhatsApp}
+                    >
+                      Message us on WhatsApp
+                    </button>
+                  </div>
+                );
+              }
 
               const whatsAppButton = showWhatsApp ? (
                 <button

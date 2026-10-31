@@ -36,6 +36,10 @@ export type PatchedProductRequest = {
      */
     is_discontinued?: boolean;
     /**
+     * Show an Out of stock label on the storefront and block online purchase.
+     */
+    is_out_of_stock?: boolean;
+    /**
      * Device launch/release date used for storefront sorting (newest first).
      */
     release_date?: string | null;

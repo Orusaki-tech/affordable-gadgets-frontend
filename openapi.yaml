@@ -11332,6 +11332,10 @@ components:
         is_discontinued:
           type: boolean
           description: Mark product as discontinued (no longer in catalog)
+        is_out_of_stock:
+          type: boolean
+          description: Show an Out of stock label on the storefront and block online
+            purchase.
         release_date:
           type: string
           format: date
@@ -11711,6 +11715,10 @@ components:
         is_discontinued:
           type: boolean
           description: Mark product as discontinued (no longer in catalog)
+        is_out_of_stock:
+          type: boolean
+          description: Show an Out of stock label on the storefront and block online
+            purchase.
         release_date:
           type: string
           format: date
@@ -12160,6 +12168,10 @@ components:
         is_discontinued:
           type: boolean
           description: Mark product as discontinued (no longer in catalog)
+        is_out_of_stock:
+          type: boolean
+          description: Show an Out of stock label on the storefront and block online
+            purchase.
         release_date:
           type: string
           format: date
@@ -12319,6 +12331,10 @@ components:
         is_discontinued:
           type: boolean
           description: Mark product as discontinued (no longer in catalog)
+        is_out_of_stock:
+          type: boolean
+          description: Show an Out of stock label on the storefront and block online
+            purchase.
         release_date:
           type: string
           format: date
@@ -13238,6 +13254,11 @@ components:
         published_article_count:
           type: integer
           readOnly: true
+        is_out_of_stock:
+          type: boolean
+          readOnly: true
+          description: Show an Out of stock label on the storefront and block online
+            purchase.
       required:
       - product_name
     PublicProductArticle:
@@ -13389,6 +13410,11 @@ components:
         published_article_count:
           type: integer
           readOnly: true
+        is_out_of_stock:
+          type: boolean
+          readOnly: true
+          description: Show an Out of stock label on the storefront and block online
+            purchase.
         updated_at:
           type: string
           format: date-time

@@ -24,6 +24,10 @@ export type PublicProductList = {
      */
     readonly available_units_count?: number;
     /**
+     * Show an Out of stock label on the storefront and block online purchase.
+     */
+    readonly is_out_of_stock?: boolean;
+    /**
      * Get min price for available units; fall back to Product.default_selling_price when none.
      */
     readonly min_price?: number;

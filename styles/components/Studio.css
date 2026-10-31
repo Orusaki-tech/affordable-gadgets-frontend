@@ -676,6 +676,14 @@
   font-weight: 500;
 }
 
+.studio-check__note {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #6b7280;
+}
+
 .studio-btn {
   display: inline-flex;
   align-items: center;

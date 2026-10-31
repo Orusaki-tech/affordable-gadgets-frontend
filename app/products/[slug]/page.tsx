@@ -197,8 +197,11 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
   }
 
   const hasAnyPrice = isFiniteNumber(lowPrice) || isFiniteNumber(highPrice);
-  const availability =
-    Number(product.available_units_count ?? 0) > 0 ? 'InStock' : 'OutOfStock';
+  const availability = product.is_out_of_stock
+    ? 'OutOfStock'
+    : Number(product.available_units_count ?? 0) > 0
+      ? 'InStock'
+      : 'OutOfStock';
   
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#ffffff' }}>

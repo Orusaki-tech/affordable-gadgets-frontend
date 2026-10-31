@@ -39,6 +39,7 @@ const CONTENT_KEYS = new Set([
   'slug',
   'keywords',
   'is_published',
+  'is_out_of_stock',
 ]);
 
 type StudioProductEditorProps = {
@@ -61,6 +62,7 @@ type FormState = {
   keywords: string;
   is_published: boolean;
   is_discontinued: boolean;
+  is_out_of_stock: boolean;
 };
 
 function toFormState(product?: StudioProduct | null): FormState {
@@ -79,6 +81,7 @@ function toFormState(product?: StudioProduct | null): FormState {
     keywords: product?.keywords || '',
     is_published: product?.is_published ?? true,
     is_discontinued: product?.is_discontinued ?? false,
+    is_out_of_stock: product?.is_out_of_stock ?? false,
   };
 }
 
@@ -189,6 +192,7 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
       keywords: form.keywords.trim(),
       is_published: form.is_published,
       is_discontinued: form.is_discontinued,
+      is_out_of_stock: form.is_out_of_stock,
       videos: videoRows,
       product_video_url: firstVideoUrl,
     };
@@ -291,7 +295,7 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
         </h2>
         {contentOnly && (
           <p className="studio-editor__hint">
-            Content-creator mode: name, descriptions, SEO, images, videos, and publish.
+            Content-creator mode: name, descriptions, SEO, images, videos, publish, and out of stock.
           </p>
         )}
         <p className="studio-editor__hint">{capabilities.editableSummary}</p>
@@ -453,6 +457,21 @@ export function StudioProductEditor({ mode, product, onSaved }: StudioProductEdi
             disabled={fieldDisabled}
           />
           <span>Published on storefront</span>
+        </label>
+
+        <label className="studio-check studio-field--full">
+          <input
+            type="checkbox"
+            checked={form.is_out_of_stock}
+            onChange={(e) => setField('is_out_of_stock', e.target.checked)}
+            disabled={fieldDisabled}
+          />
+          <span>
+            Out of stock
+            <span className="studio-check__note">
+              Shows an Out of stock label on the shop and blocks purchase.
+            </span>
+          </span>
         </label>
 
         <label className="studio-check">

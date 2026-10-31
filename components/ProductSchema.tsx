@@ -37,11 +37,13 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
   const maxPrice = prices.length > 0 ? Math.max(...prices) : undefined;
   const price = selectedUnit ? Number(selectedUnit.selling_price) : minPrice;
 
-  // Availability: InStock if units or variants exist
+  // Availability: InStock if units or variants exist, unless staff marked it out of stock
   const hasAnyOffer = units.length > 0 || (product as any).variants?.length > 0;
-  const availability = hasAnyOffer
-    ? 'https://schema.org/InStock'
-    : 'https://schema.org/OutOfStock';
+  const availability = product.is_out_of_stock
+    ? 'https://schema.org/OutOfStock'
+    : hasAnyOffer
+      ? 'https://schema.org/InStock'
+      : 'https://schema.org/OutOfStock';
 
   // Build offers array from units (fallback to variants when no units)
   const offers = units.length > 0
@@ -50,7 +52,7 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
         url: canonicalUrl || `${brandConfig.siteUrl}/products/${product.slug || product.id}`,
         priceCurrency: 'KES',
         price: Number(unit.selling_price).toFixed(2),
-        availability: 'https://schema.org/InStock',
+        availability,
         itemCondition: unit.condition === 'N'
           ? 'https://schema.org/NewCondition'
           : unit.condition === 'R'
@@ -66,7 +68,7 @@ export function ProductSchema({ product, units = [], reviews = [], selectedUnit 
         url: canonicalUrl || `${brandConfig.siteUrl}/products/${product.slug || product.id}`,
         priceCurrency: 'KES',
         price: p.toFixed(2),
-        availability: 'https://schema.org/InStock',
+        availability,
         itemCondition: 'https://schema.org/NewCondition',
         seller: {
           '@type': 'Organization' as const,

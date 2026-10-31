@@ -120,6 +120,7 @@ export function ProductCard({
   const allowInterestCount = showInterestCount && !isMinimal && !isFeaturedVariant;
   const availableCount = Number(product.available_units_count ?? 0);
   const interestCount = Number(product.interest_count ?? 0);
+  const isOutOfStock = Boolean(product.is_out_of_stock);
   const hasStock = availableCount > 0;
   const hasBundle = Boolean((product as PublicProduct & { has_active_bundle?: boolean }).has_active_bundle);
   const bundlePricePreview = (product as PublicProduct & { bundle_price_preview?: number | null }).bundle_price_preview;
@@ -478,6 +479,7 @@ export function ProductCard({
   };
 
   const completeCartAdd = async (unitId: number, qty: number, phone: string) => {
+    if (isOutOfStock) return;
     await updateCartPhone(phone);
     const unit =
       selectedUnit?.id === unitId
@@ -522,6 +524,7 @@ export function ProductCard({
   }, [unitsLoading, activeUnits, selectedUnit?.id]);
 
   const beginAddToCart = (qty: number) => {
+    if (isOutOfStock) return;
     if (!selectedUnit?.id) return;
     if (!hasAuthToken()) {
       savePendingCartAdd({
@@ -589,7 +592,7 @@ export function ProductCard({
     product.min_price !== undefined &&
     product.max_price !== null &&
     product.max_price !== undefined;
-  const hasDefaultPriceOffer = !hasStock && hasPriceRange;
+  const hasDefaultPriceOffer = !isOutOfStock && !hasStock && hasPriceRange;
   const compareAtMin = product.compare_at_min_price ?? null;
   const compareAtMax = product.compare_at_max_price ?? null;
   const compareAtDisplay = compareAtMin ?? compareAtMax;
@@ -647,7 +650,8 @@ export function ProductCard({
         : 'Price on request';
 
   /** Show add-to-cart button (icon + price) on hover when at least one variant can be added; button shows single/max price */
-  const showAddToCartSingleButton = activeUnits.length >= 1 && activeUnitsMaxPrice != null;
+  const showAddToCartSingleButton =
+    !isOutOfStock && activeUnits.length >= 1 && activeUnitsMaxPrice != null;
   const showPriceCtaButton = showAddToCartSingleButton || hasDefaultPriceOffer || variantPrice !== null;
   const addToCartButtonPriceText =
     variantPrice !== null
@@ -724,6 +728,7 @@ export function ProductCard({
             className="product-card__image product-card__image--primary product-card__image--featured"
             fill
           />
+          {isOutOfStock ? <span className="product-card__out-of-stock">Out of stock</span> : null}
           <ProductTrustStamp condition={trustStampCondition} size="card" />
         </div>
         {mobileActionButtons}
@@ -736,14 +741,16 @@ export function ProductCard({
             >
               {product.product_name}
             </p>
-            <button
-              type="button"
-              onClick={handleBuyClick}
-              className="product-card__buy-btn product-card__buy-btn--featured"
-            >
-              Buy
-            </button>
-            {hasStock && (
+            {!isOutOfStock && (
+              <button
+                type="button"
+                onClick={handleBuyClick}
+                className="product-card__buy-btn product-card__buy-btn--featured"
+              >
+                Buy
+              </button>
+            )}
+            {hasStock && !isOutOfStock && (
               <button
                 type="button"
                 onClick={(event) => {
@@ -946,6 +953,7 @@ export function ProductCard({
         {mobileActionButtons}
 
           <ProductTrustStamp condition={trustStampCondition} size="card" />
+          {isOutOfStock ? <span className="product-card__out-of-stock">Out of stock</span> : null}
 
           {/* Badges */}
           <div className="product-card__badges">
@@ -1296,8 +1304,10 @@ export function ProductCard({
         {/* Stock & Interest Info */}
         {!isMinimal ? (
           <div className="product-card__meta">
-            <span className="product-card__stock product-card__stock--in">
-              {hasStock ? (
+            <span className={`product-card__stock ${isOutOfStock ? 'product-card__stock--out' : 'product-card__stock--in'}`}>
+              {isOutOfStock ? (
+                'Out of stock'
+              ) : hasStock ? (
                 <span className="product-card__stock-info">
                   <svg className="product-card__stock-icon" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -1334,8 +1344,8 @@ export function ProductCard({
           </div>
         ) : (
           <div className="product-card__stock-note">
-            <span className="product-card__stock product-card__stock--in">
-              {hasStock ? 'In stock' : 'Available to order'}
+            <span className={`product-card__stock ${isOutOfStock ? 'product-card__stock--out' : 'product-card__stock--in'}`}>
+              {isOutOfStock ? 'Out of stock' : hasStock ? 'In stock' : 'Available to order'}
             </span>
             {lowStock && hasStock && (
               <span className="product-card__low-stock">Low stock</span>

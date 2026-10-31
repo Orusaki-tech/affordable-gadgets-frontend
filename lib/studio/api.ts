@@ -204,6 +204,7 @@ export type StudioProduct = {
   default_selling_price?: string | null;
   is_published?: boolean;
   is_discontinued?: boolean;
+  is_out_of_stock?: boolean;
   slug?: string;
   meta_title?: string;
   meta_description?: string;

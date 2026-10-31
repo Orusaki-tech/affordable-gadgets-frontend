@@ -25,6 +25,10 @@ export type PublicProduct = {
      */
     readonly available_units_count?: number;
     /**
+     * Show an Out of stock label on the storefront and block online purchase.
+     */
+    readonly is_out_of_stock?: boolean;
+    /**
      * Get total interest count for product - optimized version.
      */
     readonly interest_count?: number;

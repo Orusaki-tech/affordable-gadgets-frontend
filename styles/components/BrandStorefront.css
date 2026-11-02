@@ -115,31 +115,31 @@
   color: var(--stock-green, #16a34a);
 }
 
-.brand-storefront__rail {
-  display: flex;
-  gap: 0.75rem;
+.brand-storefront__carousel,
+.brand-storefront .product-carousel {
   min-width: 0;
   max-width: 100%;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
+}
+
+.brand-storefront .product-carousel__track {
+  margin-left: 0;
+  margin-right: 0;
   padding-bottom: 0.25rem;
 }
 
-.brand-storefront__card {
-  flex: 0 0 240px;
-  min-width: 0;
-  scroll-snap-align: start;
+.brand-storefront .samsung-progressbar {
+  margin-top: 1rem;
 }
 
-.brand-storefront__guides {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.brand-storefront .samsung-progressbar-inner {
   gap: 1rem;
-  min-width: 0;
+  justify-content: flex-start;
 }
 
-.brand-storefront__guides .home-buying-guides__card {
-  height: 100%;
+.brand-storefront .samsung-progressbar-bar {
+  width: auto;
+  flex: 1 1 auto;
+  max-width: 16rem;
 }
 
 .brand-storefront__reviews {
@@ -186,20 +186,14 @@
 }
 
 @media (max-width: 900px) {
-  .brand-storefront__trust,
-  .brand-storefront__guides {
+  .brand-storefront__trust {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
   .brand-storefront__trust,
-  .brand-storefront__guides,
   .brand-storefront__reviews {
     grid-template-columns: 1fr;
-  }
-
-  .brand-storefront__card {
-    flex-basis: 78%;
   }
 }

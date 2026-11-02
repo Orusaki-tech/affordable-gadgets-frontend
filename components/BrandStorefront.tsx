@@ -4,9 +4,11 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiService, type PublicArticleCard, type PublicProduct, type Review } from '@/lib/api/generated';
+import { BlogArticlesCarousel } from '@/components/BlogArticlesCarousel';
 import { HomeBuyingGuideCard, type HomeBuyingGuideCardData } from '@/components/home/HomeBuyingGuideCard';
 import { MaterialIcon } from '@/components/MaterialIcon';
 import { ProductCard } from '@/components/ProductCard';
+import { ProductCarousel } from '@/components/ProductCarousel';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import {
   allBrandNavItems,
@@ -164,7 +166,7 @@ export function BrandStorefront({
       seenGuides.add(key);
       return true;
     })
-    .slice(0, 3);
+    .slice(0, 6);
   const catalogNames = new Set(
     [...products, ...companionProducts].map((product) => (product.product_name || '').toLowerCase())
   );
@@ -221,13 +223,15 @@ export function BrandStorefront({
           href="#products-grid"
           linkLabel={`See all ${title}`}
         >
-          <div className="brand-storefront__rail">
+          <ProductCarousel
+            itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
+            showNavigation
+            className="brand-storefront__carousel"
+          >
             {mostWanted.map((product) => (
-              <div key={product.id} className="brand-storefront__card">
-                <ProductCard product={product} showRatings />
-              </div>
+              <ProductCard key={product.id} product={product} showRatings />
             ))}
-          </div>
+          </ProductCarousel>
         </StorefrontBlock>
       ) : null}
 
@@ -241,13 +245,15 @@ export function BrandStorefront({
           href={brandCategoryHref(brand, companionType)}
           linkLabel="See all"
         >
-          <div className="brand-storefront__rail">
+          <ProductCarousel
+            itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
+            showNavigation
+            className="brand-storefront__carousel"
+          >
             {companionProducts.map((product) => (
-              <div key={product.id} className="brand-storefront__card">
-                <ProductCard product={product} showRatings />
-              </div>
+              <ProductCard key={product.id} product={product} showRatings />
             ))}
-          </div>
+          </ProductCarousel>
         </StorefrontBlock>
       ) : null}
 
@@ -259,11 +265,13 @@ export function BrandStorefront({
           href={`/articles?brand=${encodeURIComponent(brand)}`}
           linkLabel="All guides"
         >
-          <div className="brand-storefront__guides">
+          <BlogArticlesCarousel itemsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}>
             {guideCards.map((guide) => (
-              <HomeBuyingGuideCard key={guide.key} guide={guide} />
+              <div key={guide.key} className="home-buying-guides__slide">
+                <HomeBuyingGuideCard guide={guide} />
+              </div>
             ))}
-          </div>
+          </BlogArticlesCarousel>
         </StorefrontBlock>
       ) : null}
 

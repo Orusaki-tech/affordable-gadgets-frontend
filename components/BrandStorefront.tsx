@@ -4,9 +4,10 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiService, type PublicArticleCard, type PublicProduct, type Review } from '@/lib/api/generated';
-import { BlogCard } from '@/components/BlogCard';
+import { HomeBuyingGuideCard, type HomeBuyingGuideCardData } from '@/components/home/HomeBuyingGuideCard';
 import { MaterialIcon } from '@/components/MaterialIcon';
 import { ProductCard } from '@/components/ProductCard';
+import { formatArticleCategory } from '@/lib/utils/blogCategories';
 import {
   allBrandNavItems,
   brandCategoryHref,
@@ -41,6 +42,68 @@ function articleHref(article: PublicArticleCard): string | null {
 function reviewStars(rating: number) {
   const filled = Math.max(0, Math.min(5, Math.round(rating)));
   return `${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}`;
+}
+
+function guideMeta(article: PublicArticleCard) {
+  const raw = article.updated_at || article.published_at;
+  if (!raw) return 'Buying guide';
+  const date = new Date(raw);
+  if (Number.isNaN(date.getTime())) return 'Buying guide';
+  return `Updated ${date.toLocaleDateString('en-KE', { month: 'long', year: 'numeric' })}`;
+}
+
+function toGuideCard(
+  article: PublicArticleCard,
+  href: string,
+  fallbackTitle: string
+): HomeBuyingGuideCardData {
+  const category = formatArticleCategory(article.category);
+  const name = article.product_name || fallbackTitle;
+  const opening = (article.opening_words || '').trim();
+  return {
+    key: article.slug || href,
+    href,
+    title: article.headline || name,
+    imageUrl: article.thumbnail_image || article.product_primary_image || null,
+    category,
+    meta: guideMeta(article),
+    excerpt: opening || `What to check before you buy ${name} in Kenya — and what you can skip.`,
+    cta: 'Read guide',
+    articleSlug: article.slug ?? null,
+  };
+}
+
+function StorefrontBlock({
+  eyebrow,
+  title,
+  copy,
+  href,
+  linkLabel,
+  children,
+}: {
+  eyebrow: string;
+  title: string;
+  copy: string;
+  href: string;
+  linkLabel: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="brand-storefront__block home-section-panel">
+      <div className="brand-storefront__heading">
+        <div className="brand-storefront__heading-copy">
+          <p className="ag-type-eyebrow text-stock-green">{eyebrow}</p>
+          <h3 className="ag-type-h3">{title}</h3>
+          <p className="ag-type-body">{copy}</p>
+        </div>
+        <Link href={href} className="brand-storefront__more">
+          {linkLabel}
+          <MaterialIcon name="chevron_right" className="text-[1.125rem]" />
+        </Link>
+      </div>
+      {children}
+    </section>
+  );
 }
 
 export function BrandStorefront({
@@ -90,15 +153,18 @@ export function BrandStorefront({
   const companionProducts = companion.data?.results ?? [];
   const seenGuides = new Set<string>();
   const guideCards = (guides.data?.results ?? [])
-    .map((article) => ({ article, href: articleHref(article) }))
-    .filter((item): item is { article: PublicArticleCard; href: string } => {
-      if (!item.href) return false;
-      const key = (item.article.headline || item.article.slug || item.href).trim().toLowerCase();
+    .map((article) => {
+      const href = articleHref(article);
+      return href ? toGuideCard(article, href, title) : null;
+    })
+    .filter((item): item is HomeBuyingGuideCardData => {
+      if (!item) return false;
+      const key = item.title.trim().toLowerCase();
       if (seenGuides.has(key)) return false;
       seenGuides.add(key);
       return true;
     })
-    .slice(0, 6);
+    .slice(0, 3);
   const catalogNames = new Set(
     [...products, ...companionProducts].map((product) => (product.product_name || '').toLowerCase())
   );
@@ -109,44 +175,52 @@ export function BrandStorefront({
     })
     .slice(0, 4);
 
+  const companionCopy =
+    companionType === 'AC'
+      ? `Chargers, audio, and wearables that belong with ${title}.`
+      : `${title} phones to pair with these accessories.`;
+
   return (
     <section className="brand-storefront" aria-label={`${title} shop`}>
-      <div className="brand-storefront__intro">
-        <h2 className="brand-storefront__title">{title} in Kenya</h2>
-        {subtitle ? <p className="brand-storefront__subtitle">{subtitle}</p> : null}
-      </div>
+      <div className="home-section-panel brand-storefront__lead">
+        <p className="ag-type-eyebrow text-stock-green">Shop {title}</p>
+        <h2 className="ag-type-h2">{title} in Kenya</h2>
+        {subtitle ? <p className="ag-type-body brand-storefront__subtitle">{subtitle}</p> : null}
 
-      <ul className="brand-storefront__trust">
-        {TRUST.map((item) => (
-          <li key={item.text}>
-            <MaterialIcon name={item.icon} />
-            <span>{item.text}</span>
-          </li>
-        ))}
-      </ul>
+        <ul className="brand-storefront__trust">
+          {TRUST.map((item) => (
+            <li key={item.text}>
+              <MaterialIcon name={item.icon} className="ag-icon-sm" />
+              <span>{item.text}</span>
+            </li>
+          ))}
+        </ul>
 
-      <div className="brand-storefront__chips" aria-label={`Shop ${title} by category`}>
-        {categories.map((category) => {
-          const active = (category.productType || '') === (productType || '');
-          return (
-            <Link
-              key={`${category.label}-${category.productType || 'all'}`}
-              href={brandCategoryHref(brand, category.productType)}
-              className={active ? 'brand-storefront__chip brand-storefront__chip--active' : 'brand-storefront__chip'}
-              aria-current={active ? 'page' : undefined}
-            >
-              {category.label}
-            </Link>
-          );
-        })}
+        <div className="brand-storefront__chips" aria-label={`Shop ${title} by category`}>
+          {categories.map((category) => {
+            const active = (category.productType || '') === (productType || '');
+            return (
+              <Link
+                key={`${category.label}-${category.productType || 'all'}`}
+                href={brandCategoryHref(brand, category.productType)}
+                className={active ? 'ag-chip ag-chip--lime' : 'ag-chip ag-chip--muted'}
+                aria-current={active ? 'page' : undefined}
+              >
+                {category.label}
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {mostWanted.length > 0 ? (
-        <div className="brand-storefront__block">
-          <div className="brand-storefront__heading">
-            <h3>Shop our most wanted</h3>
-            <Link href="#products-grid">See all {title}</Link>
-          </div>
+        <StorefrontBlock
+          eyebrow="Most wanted"
+          title="Shop our most wanted"
+          copy={`The ${title} devices shoppers open first, ready to order in Kenya.`}
+          href="#products-grid"
+          linkLabel={`See all ${title}`}
+        >
           <div className="brand-storefront__rail">
             {mostWanted.map((product) => (
               <div key={product.id} className="brand-storefront__card">
@@ -154,19 +228,19 @@ export function BrandStorefront({
               </div>
             ))}
           </div>
-        </div>
+        </StorefrontBlock>
       ) : null}
 
       {banner ? <div className="brand-storefront__banner">{banner}</div> : null}
 
       {showCompanion && companionProducts.length > 0 ? (
-        <div className="brand-storefront__block">
-          <div className="brand-storefront__heading">
-            <h3>
-              {companionLabel} for {title}
-            </h3>
-            <Link href={brandCategoryHref(brand, companionType)}>See all</Link>
-          </div>
+        <StorefrontBlock
+          eyebrow="Goes with it"
+          title={`${companionLabel} for ${title}`}
+          copy={companionCopy}
+          href={brandCategoryHref(brand, companionType)}
+          linkLabel="See all"
+        >
           <div className="brand-storefront__rail">
             {companionProducts.map((product) => (
               <div key={product.id} className="brand-storefront__card">
@@ -174,37 +248,33 @@ export function BrandStorefront({
               </div>
             ))}
           </div>
-        </div>
+        </StorefrontBlock>
       ) : null}
 
       {guideCards.length > 0 ? (
-        <div className="brand-storefront__block">
-          <div className="brand-storefront__heading">
-            <h3>{title} guides</h3>
-            <Link href={`/articles?brand=${encodeURIComponent(brand)}`}>All guides</Link>
-          </div>
-          <div className="brand-storefront__rail brand-storefront__rail--guides">
-            {guideCards.map(({ article, href }) => (
-              <div key={article.slug} className="brand-storefront__guide">
-                <BlogCard
-                  imageUrl={article.thumbnail_image || article.product_primary_image || ''}
-                  category={article.category || 'buying_guide'}
-                  title={article.headline || article.product_name || title}
-                  href={href}
-                  articleSlug={article.slug}
-                />
-              </div>
+        <StorefrontBlock
+          eyebrow="Before you buy"
+          title={`${title} guides`}
+          copy={`What to check before you pay for ${title} — specs, price, and what to skip.`}
+          href={`/articles?brand=${encodeURIComponent(brand)}`}
+          linkLabel="All guides"
+        >
+          <div className="brand-storefront__guides">
+            {guideCards.map((guide) => (
+              <HomeBuyingGuideCard key={guide.key} guide={guide} />
             ))}
           </div>
-        </div>
+        </StorefrontBlock>
       ) : null}
 
       {brandReviews.length > 0 ? (
-        <div className="brand-storefront__block">
-          <div className="brand-storefront__heading">
-            <h3>What buyers say</h3>
-            <Link href="/reviews">All reviews</Link>
-          </div>
+        <StorefrontBlock
+          eyebrow="From buyers"
+          title="What buyers say"
+          copy={`Notes from people who already bought ${title} from this shop.`}
+          href="/reviews"
+          linkLabel="All reviews"
+        >
           <div className="brand-storefront__reviews">
             {brandReviews.map((review) => (
               <article key={review.id} className="brand-storefront__review">
@@ -219,7 +289,7 @@ export function BrandStorefront({
               </article>
             ))}
           </div>
-        </div>
+        </StorefrontBlock>
       ) : null}
     </section>
   );

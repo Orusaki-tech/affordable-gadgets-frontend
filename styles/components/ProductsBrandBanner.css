@@ -34,15 +34,7 @@
     padding-top: 0.75rem;
   }
 
-  .brand-storefront__banner {
-    width: auto;
-    max-width: none;
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  .products-brand-banner,
-  .brand-storefront__banner .products-brand-banner {
+  .products-brand-banner {
     border-radius: 12px;
     border: 1px solid var(--ui-gray-200);
     border-bottom: 1px solid var(--ui-gray-200);

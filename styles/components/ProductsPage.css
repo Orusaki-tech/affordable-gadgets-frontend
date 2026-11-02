@@ -1,5 +1,6 @@
 .products-page {
   width: 100%;
+  min-width: 0;
 }
 
 .products-page__promo {
@@ -90,10 +91,12 @@
   margin: 0;
 }
 
-.products-page__catalog-title {
+.products-page__catalog-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   margin: 0 0 1rem;
-  font-size: 1.25rem;
-  font-weight: 700;
+  min-width: 0;
 }
 
 .products-page__layout {

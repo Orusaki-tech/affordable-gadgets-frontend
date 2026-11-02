@@ -508,7 +508,10 @@ function ProductsPageInner({
         {/* Results */}
         <div className="products-page__results">
           {!promotionData && brandBannerConfig ? (
-            <h2 className="products-page__catalog-title">All {brandBannerConfig.title}</h2>
+            <div className="products-page__catalog-heading">
+              <p className="ag-type-eyebrow text-stock-green">Full catalog</p>
+              <h2 className="ag-type-h2">All {brandBannerConfig.title}</h2>
+            </div>
           ) : null}
           {isLoading ? (
             <div className="products-page__grid products-page__grid--loading">

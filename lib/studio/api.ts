@@ -1472,6 +1472,41 @@ export async function setStudioProductTagged(
   return saved;
 }
 
+export type HomepageCampaignAnimation = 'none' | 'title_shimmer';
+
+export type StudioHomepageCampaignProduct = {
+  id: number;
+  product_name: string;
+  primary_image?: string | null;
+};
+
+export type StudioHomepageCampaign = {
+  title: string;
+  animation: HomepageCampaignAnimation;
+  is_active: boolean;
+  starts_at: string | null;
+  ends_at: string | null;
+  products: StudioHomepageCampaignProduct[];
+};
+
+export async function retrieveStudioHomepageCampaign(): Promise<StudioHomepageCampaign> {
+  return studioFetchJson<StudioHomepageCampaign>('/homepage-campaign/');
+}
+
+export async function patchStudioHomepageCampaign(data: {
+  title: string;
+  animation: HomepageCampaignAnimation;
+  is_active: boolean;
+  starts_at: string | null;
+  ends_at: string | null;
+  product_ids: number[];
+}): Promise<StudioHomepageCampaign> {
+  return studioFetchJson<StudioHomepageCampaign>('/homepage-campaign/', {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
 export async function setStudioProductFeatured(
   productId: number,
   featured: boolean,

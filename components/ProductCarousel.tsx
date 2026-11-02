@@ -17,6 +17,8 @@ interface ProductCarouselProps {
   showPagination?: boolean;
   autoPlay?: boolean;
   autoPlayInterval?: number;
+  /** Pause autoplay while this carousel is outside the viewport. */
+  pauseOffscreen?: boolean;
   className?: string;
 }
 
@@ -29,6 +31,7 @@ export function ProductCarousel({
   showPagination = false,
   autoPlay = false,
   autoPlayInterval = 3000,
+  pauseOffscreen = false,
   className = '',
 }: ProductCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -37,6 +40,11 @@ export function ProductCarousel({
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [itemsPerSlide, setItemsPerSlide] = useState(itemsPerView.desktop || 4);
   const [isHoverPaused, setIsHoverPaused] = useState(false);
+  const [offscreenObserved, setOffscreenObserved] = useState(true);
+  const isOffscreen =
+    pauseOffscreen &&
+    typeof IntersectionObserver !== 'undefined' &&
+    offscreenObserved;
 
   // Calculate items per slide based on viewport
   useEffect(() => {
@@ -75,9 +83,21 @@ export function ProductCarousel({
     return () => container.removeEventListener('scroll', updateScrollButtons);
   }, [children, itemsPerSlide]);
 
+  useEffect(() => {
+    if (!pauseOffscreen || typeof IntersectionObserver === 'undefined') return;
+    const node = scrollContainerRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setOffscreenObserved(!entry.isIntersecting),
+      { threshold: 0.25 }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [pauseOffscreen, children.length]);
+
   // Auto-play functionality
   useEffect(() => {
-    if (!autoPlay || isHoverPaused || children.length <= itemsPerSlide) return;
+    if (!autoPlay || isHoverPaused || isOffscreen || children.length <= itemsPerSlide) return;
 
     const interval = setInterval(() => {
       if (scrollContainerRef.current) {
@@ -98,7 +118,7 @@ export function ProductCarousel({
     }, autoPlayInterval);
 
     return () => clearInterval(interval);
-  }, [autoPlay, autoPlayInterval, children.length, itemsPerSlide, isHoverPaused]);
+  }, [autoPlay, autoPlayInterval, children.length, itemsPerSlide, isHoverPaused, isOffscreen]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;

@@ -36,6 +36,15 @@ function StudioFloatActions() {
           Special offers
         </button>
       )}
+      {capabilities.canEditFeaturedSelection && (
+        <button
+          type="button"
+          className="studio-float-bar__btn"
+          onClick={() => studioEdit.openEditSeasonalCampaign()}
+        >
+          Seasonal
+        </button>
+      )}
       {capabilities.canEditPromotions && (
         <button
           type="button"

@@ -19,6 +19,7 @@ import { StudioBrandBannerEditor } from '@/components/studio/StudioBrandBannerEd
 import { StudioHomepageHeroEditor } from '@/components/studio/StudioHomepageHeroEditor';
 import { StudioSpecialOffersEditor } from '@/components/studio/StudioSpecialOffersEditor';
 import { StudioWatchOffersEditor } from '@/components/studio/StudioWatchOffersEditor';
+import { StudioSeasonalCampaignEditor } from '@/components/studio/StudioSeasonalCampaignEditor';
 import type {
   StudioArticle,
   StudioBundle,
@@ -64,6 +65,7 @@ export type StudioEditResource =
   | { kind: 'homepageHero'; preferPromotionId?: number | null }
   | { kind: 'specialOffers'; preferPromotionId?: number | null }
   | { kind: 'watchOffers'; preferPromotionId?: number | null }
+  | { kind: 'seasonalCampaign' }
   /** @deprecated prefer taggedProducts + section: 'featured' */
   | { kind: 'featuredProducts' };
 
@@ -120,6 +122,8 @@ function resourceLabel(resource: StudioEditResource): string {
       return 'Special offers';
     case 'watchOffers':
       return 'Watch offers';
+    case 'seasonalCampaign':
+      return 'Seasonal campaign';
     default:
       return 'Edit';
   }
@@ -340,6 +344,14 @@ export function StudioEditDrawer({
           <StudioWatchOffersEditor
             roleHint={roleHint}
             preferPromotionId={active.preferPromotionId}
+            onSaved={async () => {
+              await onSaved();
+            }}
+          />
+        )}
+        {active.kind === 'seasonalCampaign' && (
+          <StudioSeasonalCampaignEditor
+            roleHint={roleHint}
             onSaved={async () => {
               await onSaved();
             }}

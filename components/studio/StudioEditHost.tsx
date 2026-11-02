@@ -75,6 +75,7 @@ type StudioEditHostValue = {
   openCreateDeliveryRate: () => void;
   openReviewsManager: (preferProductId?: number | null) => void;
   openEditFeaturedProducts: () => void;
+  openEditSeasonalCampaign: () => void;
   openEditVideoProducts: () => void;
   openEditFeaturedArticles: () => void;
   openEditBrandBanner: (brandFilter: string) => void;
@@ -693,6 +694,16 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     setDrawerOpen(true);
   }, [capabilities?.canEditFeaturedSelection]);
 
+  const openEditSeasonalCampaign = useCallback(() => {
+    if (!capabilities?.canEditFeaturedSelection) {
+      setError('Your role cannot edit the seasonal campaign.');
+      return;
+    }
+    setError(null);
+    setResource({ kind: 'seasonalCampaign' });
+    setDrawerOpen(true);
+  }, [capabilities?.canEditFeaturedSelection]);
+
   const openEditVideoProducts = useCallback(() => {
     if (!capabilities?.canEditVideoSelection) {
       setError('Your role cannot choose homepage video products.');
@@ -772,6 +783,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       openCreateDeliveryRate,
       openReviewsManager,
       openEditFeaturedProducts,
+      openEditSeasonalCampaign,
       openEditVideoProducts,
       openEditFeaturedArticles,
       openEditBrandBanner,
@@ -802,6 +814,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     openCreateDeliveryRate,
     openReviewsManager,
     openEditFeaturedProducts,
+    openEditSeasonalCampaign,
     openEditVideoProducts,
     openEditFeaturedArticles,
     openEditBrandBanner,
@@ -844,6 +857,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
             kind === 'homepageHero' ||
             kind === 'specialOffers' ||
             kind === 'watchOffers' ||
+            kind === 'seasonalCampaign' ||
             kind === 'promotionsManager' ||
             kind === 'financingOffers' ||
             kind === 'reviewsManager' ||
@@ -860,6 +874,8 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
           await queryClient.invalidateQueries({ queryKey: ['delivery-rates'] });
           await queryClient.invalidateQueries({ queryKey: ['reviews'] });
           await queryClient.invalidateQueries({ queryKey: ['financing-providers'] });
+          await queryClient.invalidateQueries({ queryKey: ['homepage-campaign'] });
+          await queryClient.refetchQueries({ queryKey: ['homepage-campaign'] });
           await queryClient.refetchQueries({ queryKey: ['products', 'featured'] });
           await queryClient.refetchQueries({ queryKey: ['articles', 'featured'] });
           await queryClient.refetchQueries({ queryKey: ['promotions'] });

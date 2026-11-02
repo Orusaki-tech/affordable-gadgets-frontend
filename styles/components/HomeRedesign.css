@@ -555,3 +555,38 @@
 .home-buying-guides__image {
   transition: transform 0.3s ease;
 }
+
+.home-seasonal__title--shimmer {
+  background-image: linear-gradient(
+    100deg,
+    currentColor 0%,
+    currentColor 38%,
+    #c8f56a 50%,
+    currentColor 62%,
+    currentColor 100%
+  );
+  background-size: 220% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: home-seasonal-shimmer 3.6s ease-in-out infinite;
+}
+
+@keyframes home-seasonal-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-seasonal__title--shimmer {
+    animation: none;
+    background: none;
+    color: var(--primary);
+    -webkit-text-fill-color: currentColor;
+  }
+}

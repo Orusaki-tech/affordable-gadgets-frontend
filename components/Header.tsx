@@ -371,14 +371,6 @@ function HeaderContent() {
             }`}
             aria-label="Shop categories"
           >
-            <Link
-              href="/products"
-              className={`site-header__nav-link${isAllDevicesActive ? ' site-header__nav-link--active' : ''}`}
-              onMouseEnter={closeMegaMenu}
-            >
-              All Devices
-            </Link>
-
             {PRIMARY_BRAND_NAV.map((brand) => (
               <HeaderBrandMenu
                 key={brand.brandFilter}
@@ -395,6 +387,14 @@ function HeaderContent() {
                 onNavigate={closeMegaMenu}
               />
             ))}
+
+            <Link
+              href="/products"
+              className={`site-header__nav-link${isAllDevicesActive ? ' site-header__nav-link--active' : ''}`}
+              onMouseEnter={closeMegaMenu}
+            >
+              All Devices
+            </Link>
 
             <HeaderMoreBrandsMenu
               brands={MORE_BRAND_NAV}
@@ -501,9 +501,6 @@ function HeaderContent() {
         {isMobileMenuOpen && (
           <nav className="border-t border-border-hairline pb-4 lg:hidden" aria-label="Mobile">
             <div className="flex flex-col gap-1 pt-3">
-              <Link href="/products" className="rounded-lg px-2 py-2.5 text-sm font-medium" onClick={closeMobileMenu}>
-                All Devices
-              </Link>
               {PRIMARY_BRAND_NAV.map((brand) => (
                 <HeaderBrandMenu
                   key={brand.brandFilter}
@@ -514,6 +511,9 @@ function HeaderContent() {
                   onNavigate={closeMobileMenu}
                 />
               ))}
+              <Link href="/products" className="rounded-lg px-2 py-2.5 text-sm font-medium" onClick={closeMobileMenu}>
+                All Devices
+              </Link>
               <HeaderMoreBrandsMenu brands={MORE_BRAND_NAV} variant="mobile" onNavigate={closeMobileMenu} />
               {SHOP_NAV.map((link) => (
                 <Link

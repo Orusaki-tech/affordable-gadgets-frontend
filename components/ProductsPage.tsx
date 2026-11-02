@@ -408,12 +408,6 @@ function ProductsPageInner({
 
   return (
     <div className="products-page">
-      {!promotionData && brandBannerConfig ? (
-        <div className="products-page__header products-page__header--fullbleed">
-          <ProductsBrandBanner config={brandBannerConfig} />
-        </div>
-      ) : null}
-
       <div className="products-page__body container mx-auto px-4">
       {!promotionData && brandBannerConfig ? (
         <BrandStorefront
@@ -423,6 +417,7 @@ function ProductsPageInner({
           productType={filters.type}
           products={filteredResults}
           showMostWanted={page === 1 && filteredResults.length > 0}
+          banner={<ProductsBrandBanner config={brandBannerConfig} />}
         />
       ) : null}
 

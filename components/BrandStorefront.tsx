@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiService, type PublicArticleCard, type PublicProduct, type Review } from '@/lib/api/generated';
 import { BlogCard } from '@/components/BlogCard';
@@ -28,6 +29,7 @@ type BrandStorefrontProps = {
   productType: string;
   products: PublicProduct[];
   showMostWanted: boolean;
+  banner?: ReactNode;
 };
 
 function articleHref(article: PublicArticleCard): string | null {
@@ -48,6 +50,7 @@ export function BrandStorefront({
   productType,
   products,
   showMostWanted,
+  banner,
 }: BrandStorefrontProps) {
   const navItem = allBrandNavItems().find(
     (item) => item.brandFilter.toLowerCase() === brand.toLowerCase()
@@ -153,6 +156,8 @@ export function BrandStorefront({
           </div>
         </div>
       ) : null}
+
+      {banner ? <div className="brand-storefront__banner">{banner}</div> : null}
 
       {showCompanion && companionProducts.length > 0 ? (
         <div className="brand-storefront__block">

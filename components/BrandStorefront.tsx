@@ -4,12 +4,14 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiService, type PublicArticleCard, type PublicProduct, type Review } from '@/lib/api/generated';
-import { BlogArticlesCarousel } from '@/components/BlogArticlesCarousel';
-import { HomeBuyingGuideCard, type HomeBuyingGuideCardData } from '@/components/home/HomeBuyingGuideCard';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { MaterialIcon } from '@/components/MaterialIcon';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductCarousel } from '@/components/ProductCarousel';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
+import { formatPrice } from '@/lib/utils/format';
+import { getProductHref } from '@/lib/utils/productRoutes';
+import { studioPath } from '@/lib/studio/paths';
 import {
   allBrandNavItems,
   brandCategoryHref,
@@ -17,13 +19,6 @@ import {
 } from '@/lib/config/nav-links';
 import { useProducts } from '@/lib/hooks/useProducts';
 import { articlePath, blogPath } from '@/lib/seo/urls';
-
-const TRUST = [
-  { icon: 'verified', text: '6-12 Months Warranty' },
-  { icon: 'local_shipping', text: 'Affordable Shipping Across Kenya' },
-  { icon: 'shield', text: 'Secure Payments' },
-  { icon: 'bolt', text: '1-2 Days Delivery' },
-] as const;
 
 type BrandStorefrontProps = {
   brand: string;
@@ -46,33 +41,40 @@ function reviewStars(rating: number) {
   return `${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}`;
 }
 
-function guideMeta(article: PublicArticleCard) {
-  const raw = article.updated_at || article.published_at;
-  if (!raw) return 'Buying guide';
-  const date = new Date(raw);
-  if (Number.isNaN(date.getTime())) return 'Buying guide';
-  return `Updated ${date.toLocaleDateString('en-KE', { month: 'long', year: 'numeric' })}`;
-}
+const SPOTLIGHT_LIMIT = 4;
 
-function toGuideCard(
-  article: PublicArticleCard,
-  href: string,
-  fallbackTitle: string
-): HomeBuyingGuideCardData {
-  const category = formatArticleCategory(article.category);
-  const name = article.product_name || fallbackTitle;
-  const opening = (article.opening_words || '').trim();
-  return {
-    key: article.slug || href,
-    href,
-    title: article.headline || name,
-    imageUrl: article.thumbnail_image || article.product_primary_image || null,
-    category,
-    meta: guideMeta(article),
-    excerpt: opening || `What to check before you buy ${name} in Kenya — and what you can skip.`,
-    cta: 'Read guide',
-    articleSlug: article.slug ?? null,
-  };
+type SpotlightItem = {
+  key: string;
+  href: string;
+  title: string;
+  meta: string;
+  imageUrl: string | null;
+};
+
+function MediaSpotlightCard({ item }: { item: SpotlightItem }) {
+  return (
+    <Link href={item.href} className="brand-media-card">
+      <span className="brand-media-card__copy">
+        <span className="brand-media-card__title">{item.title}</span>
+        <span className="brand-media-card__meta">{item.meta}</span>
+      </span>
+      <span className="brand-media-card__media">
+        {item.imageUrl ? (
+          <CloudinaryImage
+            src={item.imageUrl}
+            alt=""
+            preset="card"
+            fill
+            fit="cover"
+            sizes="120px"
+            className="brand-media-card__image"
+          />
+        ) : (
+          <MaterialIcon name="article" className="brand-media-card__fallback" />
+        )}
+      </span>
+    </Link>
+  );
 }
 
 function StorefrontBlock({
@@ -154,19 +156,43 @@ export function BrandStorefront({
   const mostWanted = showMostWanted ? products.slice(0, 8) : [];
   const companionProducts = companion.data?.results ?? [];
   const seenGuides = new Set<string>();
-  const guideCards = (guides.data?.results ?? [])
-    .map((article) => {
-      const href = articleHref(article);
-      return href ? toGuideCard(article, href, title) : null;
-    })
-    .filter((item): item is HomeBuyingGuideCardData => {
-      if (!item) return false;
-      const key = item.title.trim().toLowerCase();
-      if (seenGuides.has(key)) return false;
-      seenGuides.add(key);
-      return true;
-    })
-    .slice(0, 6);
+  const guideSpotlight: SpotlightItem[] = [];
+  for (const article of guides.data?.results ?? []) {
+    const href = articleHref(article);
+    const guideTitle = (article.headline || article.product_name || title).trim();
+    const key = guideTitle.toLowerCase();
+    if (!href || seenGuides.has(key)) continue;
+    seenGuides.add(key);
+    guideSpotlight.push({
+      key: article.slug || href,
+      href: studioPath(href),
+      title: guideTitle,
+      meta: formatArticleCategory(article.category),
+      imageUrl: article.thumbnail_image || article.product_primary_image || null,
+    });
+    if (guideSpotlight.length >= SPOTLIGHT_LIMIT) break;
+  }
+
+  const accessoryPool = productType === 'AC' ? products : companionProducts;
+  const accessorySpotlight: SpotlightItem[] =
+    guideSpotlight.length > 0
+      ? []
+      : accessoryPool.slice(0, SPOTLIGHT_LIMIT).map((product) => ({
+          key: String(product.id ?? product.slug),
+          href: getProductHref(product),
+          title: product.product_name || title,
+          meta: product.min_price != null ? formatPrice(product.min_price) : 'Accessory',
+          imageUrl: product.primary_image || null,
+        }));
+  const spotlightIds = new Set(
+    accessorySpotlight.map((item) => item.key).filter((key) => key && key !== 'undefined')
+  );
+  const mostWantedVisible = mostWanted.filter(
+    (product) => !spotlightIds.has(String(product.id ?? product.slug))
+  );
+  const companionVisible = companionProducts.filter(
+    (product) => !spotlightIds.has(String(product.id ?? product.slug))
+  );
   const catalogNames = new Set(
     [...products, ...companionProducts].map((product) => (product.product_name || '').toLowerCase())
   );
@@ -189,14 +215,31 @@ export function BrandStorefront({
         <h2 className="ag-type-h2">{title} in Kenya</h2>
         {subtitle ? <p className="ag-type-body brand-storefront__subtitle">{subtitle}</p> : null}
 
-        <ul className="brand-storefront__trust">
-          {TRUST.map((item) => (
-            <li key={item.text}>
-              <MaterialIcon name={item.icon} className="ag-icon-sm" />
-              <span>{item.text}</span>
-            </li>
-          ))}
-        </ul>
+        {guideSpotlight.length > 0 || accessorySpotlight.length > 0 ? (
+          <div className="brand-storefront__spotlight">
+            <div className="brand-storefront__spotlight-head">
+              <p className="ag-type-eyebrow text-stock-green">
+                {guideSpotlight.length > 0 ? 'From the guides' : `Accessories for ${title}`}
+              </p>
+              <Link
+                href={
+                  guideSpotlight.length > 0
+                    ? `/articles?brand=${encodeURIComponent(brand)}`
+                    : brandCategoryHref(brand, 'AC')
+                }
+                className="brand-storefront__more"
+              >
+                {guideSpotlight.length > 0 ? 'All guides' : 'See all'}
+                <MaterialIcon name="chevron_right" className="text-[1.125rem]" />
+              </Link>
+            </div>
+            <div className="brand-storefront__spotlight-grid">
+              {(guideSpotlight.length > 0 ? guideSpotlight : accessorySpotlight).map((item) => (
+                <MediaSpotlightCard key={item.key} item={item} />
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         <div className="brand-storefront__chips" aria-label={`Shop ${title} by category`}>
           {categories.map((category) => {
@@ -215,7 +258,7 @@ export function BrandStorefront({
         </div>
       </div>
 
-      {mostWanted.length > 0 ? (
+      {mostWantedVisible.length > 0 ? (
         <StorefrontBlock
           eyebrow="Most wanted"
           title="Shop our most wanted"
@@ -228,7 +271,7 @@ export function BrandStorefront({
             showNavigation
             className="brand-storefront__carousel"
           >
-            {mostWanted.map((product) => (
+            {mostWantedVisible.map((product) => (
               <ProductCard key={product.id} product={product} showRatings />
             ))}
           </ProductCarousel>
@@ -237,7 +280,7 @@ export function BrandStorefront({
 
       {banner ? <div className="brand-storefront__banner">{banner}</div> : null}
 
-      {showCompanion && companionProducts.length > 0 ? (
+      {showCompanion && companionVisible.length > 0 ? (
         <StorefrontBlock
           eyebrow="Goes with it"
           title={`${companionLabel} for ${title}`}
@@ -250,28 +293,10 @@ export function BrandStorefront({
             showNavigation
             className="brand-storefront__carousel"
           >
-            {companionProducts.map((product) => (
+            {companionVisible.map((product) => (
               <ProductCard key={product.id} product={product} showRatings />
             ))}
           </ProductCarousel>
-        </StorefrontBlock>
-      ) : null}
-
-      {guideCards.length > 0 ? (
-        <StorefrontBlock
-          eyebrow="Before you buy"
-          title={`${title} guides`}
-          copy={`What to check before you pay for ${title} — specs, price, and what to skip.`}
-          href={`/articles?brand=${encodeURIComponent(brand)}`}
-          linkLabel="All guides"
-        >
-          <BlogArticlesCarousel itemsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}>
-            {guideCards.map((guide) => (
-              <div key={guide.key} className="home-buying-guides__slide">
-                <HomeBuyingGuideCard guide={guide} />
-              </div>
-            ))}
-          </BlogArticlesCarousel>
         </StorefrontBlock>
       ) : null}
 

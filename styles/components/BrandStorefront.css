@@ -1,17 +1,49 @@
 .brand-storefront {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  margin: 0.25rem 0 1.75rem;
+  gap: 0.65rem;
+  margin: 0 0 1rem;
   min-width: 0;
   max-width: 100%;
+}
+
+.brand-storefront .home-section-panel {
+  padding: 0.75rem 1rem;
 }
 
 .brand-storefront__lead {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.85rem;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+
+.brand-storefront__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+@media (min-width: 960px) {
+  .brand-storefront__lead--split {
+    display: grid;
+    grid-template-columns: minmax(14rem, 22rem) minmax(0, 1fr);
+    column-gap: 1.25rem;
+    row-gap: 0.65rem;
+    align-items: start;
+  }
+
+  .brand-storefront__lead--split .brand-storefront__intro,
+  .brand-storefront__lead--split .brand-storefront__chips {
+    grid-column: 1;
+  }
+
+  .brand-storefront__lead--split .brand-storefront__spotlight {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+  }
 }
 
 .brand-storefront__subtitle {
@@ -46,7 +78,8 @@
   display: flex;
   align-items: stretch;
   min-width: 0;
-  min-height: 4.75rem;
+  min-height: 0;
+  height: 4.25rem;
   overflow: hidden;
   border-radius: 12px;
   background: var(--surface-container-lowest, #fff);
@@ -137,7 +170,7 @@
 .brand-storefront__block {
   display: flex;
   flex-direction: column;
-  gap: 1.15rem;
+  gap: 0.55rem;
   min-width: 0;
   max-width: 100%;
 }
@@ -203,6 +236,10 @@
 .brand-storefront .product-card {
   width: 100%;
   min-width: 0;
+}
+
+.brand-storefront .product-card__media--square {
+  aspect-ratio: 5 / 3.2;
 }
 
 .brand-storefront .samsung-progressbar {

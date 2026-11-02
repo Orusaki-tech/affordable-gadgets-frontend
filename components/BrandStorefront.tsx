@@ -98,7 +98,7 @@ function StorefrontBlock({
         <div className="brand-storefront__heading-copy">
           <p className="ag-type-eyebrow text-stock-green">{eyebrow}</p>
           <h3 className="ag-type-h3">{title}</h3>
-          <p className="ag-type-body">{copy}</p>
+          {copy ? <p className="ag-type-body">{copy}</p> : null}
         </div>
         <Link href={href} className="brand-storefront__more">
           {linkLabel}
@@ -210,10 +210,16 @@ export function BrandStorefront({
 
   return (
     <section className="brand-storefront" aria-label={`${title} shop`}>
-      <div className="home-section-panel brand-storefront__lead">
-        <p className="ag-type-eyebrow text-stock-green">Shop {title}</p>
-        <h2 className="ag-type-h2">{title} in Kenya</h2>
-        {subtitle ? <p className="ag-type-body brand-storefront__subtitle">{subtitle}</p> : null}
+      <div
+        className={`home-section-panel brand-storefront__lead${
+          guideSpotlight.length > 0 || accessorySpotlight.length > 0 ? ' brand-storefront__lead--split' : ''
+        }`}
+      >
+        <div className="brand-storefront__intro">
+          <p className="ag-type-eyebrow text-stock-green">Shop {title}</p>
+          <h2 className="ag-type-h2">{title} in Kenya</h2>
+          {subtitle ? <p className="ag-type-body brand-storefront__subtitle">{subtitle}</p> : null}
+        </div>
 
         {guideSpotlight.length > 0 || accessorySpotlight.length > 0 ? (
           <div className="brand-storefront__spotlight">
@@ -262,7 +268,7 @@ export function BrandStorefront({
         <StorefrontBlock
           eyebrow="Most wanted"
           title="Shop our most wanted"
-          copy={`The ${title} devices shoppers open first, ready to order in Kenya.`}
+          copy=""
           href="#products-grid"
           linkLabel={`See all ${title}`}
         >

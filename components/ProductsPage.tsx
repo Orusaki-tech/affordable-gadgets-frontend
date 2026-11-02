@@ -10,6 +10,7 @@ import { PublicPromotion } from '@/lib/api/generated';
 import { ProductCard } from './ProductCard';
 import { ProductFilters, FilterState } from './ProductFilters';
 import { ProductsBrandBanner } from './ProductsBrandBanner';
+import { BrandStorefront } from './BrandStorefront';
 import { getBrandBannerConfig } from '@/lib/config/products-brand-banners';
 import { getProductHref } from '@/lib/utils/productRoutes';
 import { studioPath } from '@/lib/studio/paths';
@@ -414,6 +415,17 @@ function ProductsPageInner({
       ) : null}
 
       <div className="products-page__body container mx-auto px-4">
+      {!promotionData && brandBannerConfig ? (
+        <BrandStorefront
+          brand={brandBannerConfig.brandFilter}
+          title={brandBannerConfig.title}
+          subtitle={brandBannerConfig.subtitle}
+          productType={filters.type}
+          products={filteredResults}
+          showMostWanted={page === 1 && filteredResults.length > 0}
+        />
+      ) : null}
+
       {promotionData ? (
         <div className="products-page__promo">
           <div className="products-page__promo-header">
@@ -500,6 +512,9 @@ function ProductsPageInner({
 
         {/* Results */}
         <div className="products-page__results">
+          {!promotionData && brandBannerConfig ? (
+            <h2 className="products-page__catalog-title">All {brandBannerConfig.title}</h2>
+          ) : null}
           {isLoading ? (
             <div className="products-page__grid products-page__grid--loading">
               {[...Array(PRODUCTS_VISIBLE_PAGE_SIZE)].map((_, i) => (

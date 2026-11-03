@@ -215,10 +215,27 @@ export function BrandStorefront({
           guideSpotlight.length > 0 || accessorySpotlight.length > 0 ? ' brand-storefront__lead--split' : ''
         }`}
       >
+        <div className="brand-storefront__lead-copy">
         <div className="brand-storefront__intro">
           <p className="ag-type-eyebrow brand-storefront__kicker">Shop {title}</p>
           <h2 className="ag-type-h2">{title} in Kenya</h2>
           {subtitle ? <p className="ag-type-body brand-storefront__subtitle">{subtitle}</p> : null}
+        </div>
+        <div className="brand-storefront__chips" aria-label={`Shop ${title} by category`}>
+          {categories.map((category) => {
+            const active = (category.productType || '') === (productType || '');
+            return (
+              <Link
+                key={`${category.label}-${category.productType || 'all'}`}
+                href={brandCategoryHref(brand, category.productType)}
+                className={active ? 'ag-chip ag-chip--lime' : 'ag-chip ag-chip--muted'}
+                aria-current={active ? 'page' : undefined}
+              >
+                {category.label}
+              </Link>
+            );
+          })}
+        </div>
         </div>
 
         {guideSpotlight.length > 0 || accessorySpotlight.length > 0 ? (
@@ -246,22 +263,6 @@ export function BrandStorefront({
             </div>
           </div>
         ) : null}
-
-        <div className="brand-storefront__chips" aria-label={`Shop ${title} by category`}>
-          {categories.map((category) => {
-            const active = (category.productType || '') === (productType || '');
-            return (
-              <Link
-                key={`${category.label}-${category.productType || 'all'}`}
-                href={brandCategoryHref(brand, category.productType)}
-                className={active ? 'ag-chip ag-chip--lime' : 'ag-chip ag-chip--muted'}
-                aria-current={active ? 'page' : undefined}
-              >
-                {category.label}
-              </Link>
-            );
-          })}
-        </div>
       </div>
 
       {mostWantedVisible.length > 0 ? (

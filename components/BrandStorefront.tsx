@@ -101,7 +101,6 @@ export function BrandStorefront({
   subtitle,
   productType,
   products,
-  showMostWanted,
   banner,
 }: BrandStorefrontProps) {
   const navItem = allBrandNavItems().find(
@@ -113,6 +112,14 @@ export function BrandStorefront({
     { label: `All ${title}`, productType: null },
   ];
 
+  const featured = useProducts({
+    brand_filter: brand,
+    featured: true,
+    type: productType || undefined,
+    page: 1,
+    page_size: 8,
+    ordering: '-release_date',
+  });
   const showAccessories = productType !== 'AC';
   const accessories = useProducts({
     brand_filter: brand,
@@ -135,7 +142,7 @@ export function BrandStorefront({
     staleTime: 60_000,
   });
 
-  const mostWanted = showMostWanted ? products.slice(0, 8) : [];
+  const featuredProducts = featured.data?.results ?? [];
   const accessoryProducts = accessories.data?.results ?? [];
   const seenGuides = new Set<string>();
   const guideCards: HomeBuyingGuideCardData[] = [];
@@ -182,27 +189,32 @@ export function BrandStorefront({
         </div>
       </div>
 
-      {mostWanted.length > 0 ? (
+      {featuredProducts.length > 0 ? (
         <StorefrontBlock
-          eyebrow="In stock"
-          title={`Shop ${title}`}
-          copy={`The ${title} devices shoppers open first.`}
-          href="#products-grid"
-          linkLabel={`See all ${title}`}
+          eyebrow="Featured"
+          title={`Featured ${title}`}
+          copy={`Chosen ${title} devices. The full list is below.`}
+          href={`/products?brand_filter=${encodeURIComponent(brand)}${productType ? `&type=${encodeURIComponent(productType)}` : ''}&featured=1`}
+          linkLabel="See featured"
         >
           <ProductCarousel
             itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
             showNavigation
             className="brand-storefront__carousel"
           >
-            {mostWanted.map((product) => (
+            {featuredProducts.map((product) => (
               <ProductCard key={product.id} product={product} showRatings />
             ))}
           </ProductCarousel>
         </StorefrontBlock>
       ) : null}
 
-      {banner ? <div className="brand-storefront__banner">{banner}</div> : null}
+      {banner ? (
+        <section className="home-section-panel brand-storefront__campaign">
+          <p className="ag-type-eyebrow text-stock-green">Current offer</p>
+          <div className="brand-storefront__banner">{banner}</div>
+        </section>
+      ) : null}
 
       {guideCards.length > 0 ? (
         <StorefrontBlock

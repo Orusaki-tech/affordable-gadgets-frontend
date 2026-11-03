@@ -2,6 +2,7 @@
 
 import { useProduct, useProductBySlug, useProductUnits } from '@/lib/hooks/useProducts';
 import { usePromotion, useActivePromotionForProduct } from '@/lib/hooks/usePromotions';
+import { seasonalUnitPrice, useHomepageCampaign } from '@/lib/hooks/useHomepageCampaign';
 import {
   getFeaturedOverridePrice,
   getPromotionPriceForUnit,
@@ -354,6 +355,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
   const { data: units, isLoading: unitsLoading } = useProductUnits(product?.id || 0);
   const { data: accessories } = useProductAccessories(product?.id || 0);
   const { promotion: autoPromotion } = useActivePromotionForProduct(product, preferredPromotionIdSafe);
+  const { data: seasonalCampaign } = useHomepageCampaign();
   const { data: urlPromotion } = usePromotion(preferredPromotionIdSafe ?? 0);
   const promotion = useMemo(() => {
     if (urlPromotion && promotionAppliesToProduct(urlPromotion, product)) {
@@ -1107,7 +1109,48 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       (activeOriginalPrice === null || activePromoPrice < activeOriginalPrice),
   );
 
+  const seasonalDeal = useMemo(() => {
+    if (!product || typeof product.id !== 'number' || !seasonalCampaign) return null;
+    const row = seasonalCampaign.products.find((item) => item.id === product.id);
+    const promo = typeof row?.promo_price === 'number' ? row.promo_price : null;
+    const compare =
+      typeof row?.min_price === 'number'
+        ? row.min_price
+        : typeof product.min_price === 'number'
+          ? product.min_price
+          : null;
+    if (promo == null || compare == null || promo >= compare) return null;
+    const savedPercent = Math.round(((compare - promo) / compare) * 100);
+    return {
+      title: seasonalCampaign.title?.trim() || 'Black November',
+      price: promo,
+      compare,
+      savedPercent,
+    };
+  }, [product, seasonalCampaign]);
+
   const activePriceDisplay = useMemo(() => {
+    if (seasonalDeal) {
+      if (activeOriginalPrice !== null) {
+        const current = seasonalUnitPrice(
+          activeOriginalPrice,
+          seasonalDeal.price,
+          seasonalDeal.compare,
+        );
+        if (current != null) {
+          return {
+            currentPrice: current,
+            originalPrice: activeOriginalPrice,
+            hasPromotion: true,
+          };
+        }
+      }
+      return {
+        currentPrice: seasonalDeal.price,
+        originalPrice: seasonalDeal.compare,
+        hasPromotion: true,
+      };
+    }
     if (activeOriginalPrice !== null) {
       return resolvePromotionDisplayPrice(promotion, product, activeOriginalPrice, {
         applyPromotion: usePromotionPrice && isEligibleForPromotion,
@@ -1131,6 +1174,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     usePromotionPrice,
     isEligibleForPromotion,
     featuredOverridePrice,
+    seasonalDeal,
   ]);
 
   const checkoutPrice = useMemo(() => {
@@ -1152,8 +1196,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     const hasStock = Number(product.available_units_count ?? 0) > 0;
     const showWhatsAppForVariant = hasUnitOptions && Boolean(selectedUnitData);
     if (showWhatsAppForVariant && selectedUnitData) {
-      const effectivePrice =
-        canChoosePromotionPrice && usePromotionPrice && checkoutPrice !== null
+      const effectivePrice = seasonalDeal && activePriceDisplay
+        ? activePriceDisplay.currentPrice
+        : canChoosePromotionPrice && usePromotionPrice && checkoutPrice !== null
           ? checkoutPrice
           : null;
       return buildWhatsAppUnitInquiryMessage(
@@ -1163,8 +1208,9 @@ export function ProductDetail({ slug }: ProductDetailProps) {
       );
     }
     if (selectedVariant) {
-      const effectivePrice =
-        canChoosePromotionPrice && usePromotionPrice && checkoutPrice !== null
+      const effectivePrice = seasonalDeal && activePriceDisplay
+        ? activePriceDisplay.currentPrice
+        : canChoosePromotionPrice && usePromotionPrice && checkoutPrice !== null
           ? checkoutPrice
           : null;
       return buildWhatsAppVariantInquiryMessage(product, selectedVariant, effectivePrice ?? undefined);
@@ -1178,6 +1224,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
     canChoosePromotionPrice,
     usePromotionPrice,
     checkoutPrice,
+    seasonalDeal,
+    activePriceDisplay,
   ]);
 
   const promoBannerDetails = useMemo(() => {
@@ -1464,7 +1512,30 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             </div>
 
             {/* Promotion Banner */}
-            {isEligibleForPromotion && promotion && (
+            {seasonalDeal ? (
+              <div className="product-detail__promo product-detail__promo--seasonal">
+                <div className="product-detail__promo-notch product-detail__promo-notch--left" aria-hidden />
+                <div className="product-detail__promo-row">
+                  <span className="product-detail__promo-icon" aria-hidden>
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M10.4 2.785a1.25 1.25 0 0 1 .883.366l8.693 8.693a1.25 1.25 0 0 1 0 1.767l-6.365 6.365a1.25 1.25 0 0 1-1.767 0L3.15 11.283A1.25 1.25 0 0 1 2.785 10.4V4.035l.007-.128a1.25 1.25 0 0 1 1.243-1.122H10.4m-2.9 3.2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3" />
+                    </svg>
+                  </span>
+                  <div className="product-detail__promo-body">
+                    <h3 className="product-detail__promo-title">{seasonalDeal.title}</h3>
+                    <p className="product-detail__promo-copy">
+                      {formatPrice(seasonalDeal.price)}
+                      {' · was '}
+                      {formatPrice(seasonalDeal.compare)}
+                    </p>
+                  </div>
+                  {seasonalDeal.savedPercent > 0 ? (
+                    <span className="product-detail__promo-cta">−{seasonalDeal.savedPercent}%</span>
+                  ) : null}
+                </div>
+                <div className="product-detail__promo-notch product-detail__promo-notch--right" aria-hidden />
+              </div>
+            ) : isEligibleForPromotion && promotion && (
               <div className="product-detail__promo">
                 <div className="product-detail__promo-notch product-detail__promo-notch--left" aria-hidden />
                 <div className="product-detail__promo-row">
@@ -1563,7 +1634,7 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   Nairobi CBD Best Price Guaranteed
                 </p>
               ) : null}
-              {canChoosePromotionPrice && activePromoPrice !== null && (
+              {!seasonalDeal && canChoosePromotionPrice && activePromoPrice !== null && (
                 <div
                   className="product-detail__price-options"
                   role="radiogroup"
@@ -1605,7 +1676,8 @@ export function ProductDetail({ slug }: ProductDetailProps) {
                   </button>
                 </div>
               )}
-              {!canChoosePromotionPrice &&
+              {!seasonalDeal &&
+                !canChoosePromotionPrice &&
                 isEligibleForPromotion &&
                 activeOriginalPrice === null &&
                 product.min_price !== null &&
@@ -2109,9 +2181,12 @@ export function ProductDetail({ slug }: ProductDetailProps) {
               {filteredUnits.length > 0 ? (
                 <div ref={unitsCarouselRef} className="product-detail__units-list">
                   {filteredUnits.map((unit) => {
-                    const unitPromotionPrice = isEligibleForPromotion && promotion && unit.selling_price
-                      ? calculatePromotionPrice(Number(unit.selling_price))
-                      : null;
+                    const unitListPrice = unit.selling_price != null ? Number(unit.selling_price) : null;
+                    const unitPromotionPrice = seasonalDeal && unitListPrice != null
+                      ? seasonalUnitPrice(unitListPrice, seasonalDeal.price, seasonalDeal.compare)
+                      : isEligibleForPromotion && promotion && unitListPrice != null
+                        ? calculatePromotionPrice(unitListPrice)
+                        : null;
 
                     return <UnitCard
                       key={unit.id}

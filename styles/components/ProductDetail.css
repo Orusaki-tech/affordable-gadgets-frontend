@@ -457,6 +457,31 @@
   right: -0.4375rem;
 }
 
+.product-detail__promo--seasonal {
+  background: #121212;
+  border-color: rgba(159, 232, 85, 0.45);
+  box-shadow: none;
+}
+
+.product-detail__promo--seasonal .product-detail__promo-icon {
+  background: var(--promo-lime, #9fe855);
+  color: #121212;
+}
+
+.product-detail__promo--seasonal .product-detail__promo-title {
+  color: var(--promo-lime, #9fe855);
+}
+
+.product-detail__promo--seasonal .product-detail__promo-copy {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.product-detail__promo--seasonal .product-detail__promo-cta {
+  background: var(--promo-lime, #9fe855);
+  color: #121212;
+  border-color: transparent;
+}
+
 .product-detail__price {
   display: flex;
   flex-direction: column;

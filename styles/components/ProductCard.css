@@ -555,6 +555,26 @@
   min-height: 0;
 }
 
+.product-card__featured-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.product-card__promo-price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0.15rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--primary, #030304);
+}
+
+.product-card__promo-price .product-card__msrp {
+  font-size: 0.6875rem;
+}
+
 .product-card--featured.product-card--peek .product-card__footer-bar {
   display: none;
 }

@@ -63,6 +63,10 @@ interface ProductCardProps {
    * Delete looked like “remove from section” but permanently deleted the product).
    */
   studioAllowDelete?: boolean;
+  /** Campaign-only photo. Falls back to the catalog image when omitted. */
+  promoImage?: string | null;
+  /** Campaign-only price. Falls back to the catalog price when omitted. */
+  promoPrice?: number | null;
 }
 
 function RatingStars({ rating, count }: { rating: number | null; count: number }) {
@@ -104,6 +108,8 @@ export function ProductCard({
   showSwatches = true,
   showShippingBadges = true,
   studioAllowDelete = true,
+  promoImage = null,
+  promoPrice = null,
 }: ProductCardProps) {
   const studioEdit = useStudioEditOptional();
   const studioChrome = studioEdit ? (
@@ -610,7 +616,9 @@ export function ProductCard({
     compareAtDisplay !== null;
 
   const placeholderImage = getPlaceholderProductImage(product.product_name);
-  const primaryImage = product.primary_image || placeholderImage;
+  const primaryImage = promoImage || product.primary_image || placeholderImage;
+  const catalogPrice = typeof product.min_price === 'number' ? product.min_price : null;
+  const showPromoCompare = typeof promoPrice === 'number' && catalogPrice !== null && catalogPrice > promoPrice;
   const productTypeLabels: Record<string, string> = {
     PH: 'Phone',
     LT: 'Laptop',
@@ -735,12 +743,22 @@ export function ProductCard({
         {/* Footer: default = bar (name + cart icon); hover = full overlay with storage, RAM, price range, reviews, cart icon */}
         <div className="product-card__footer product-card__footer--featured">
           <div className="product-card__footer-bar">
-            <p
-              ref={featuredNameRef}
-              className="product-card__name product-card__name--featured"
-            >
-              {product.product_name}
-            </p>
+            <div className="product-card__featured-copy">
+              <p
+                ref={featuredNameRef}
+                className="product-card__name product-card__name--featured"
+              >
+                {product.product_name}
+              </p>
+              {typeof promoPrice === 'number' ? (
+                <p className="product-card__promo-price">
+                  <span>{formatPrice(promoPrice)}</span>
+                  {showPromoCompare ? (
+                    <span className="product-card__msrp">{formatPrice(catalogPrice)}</span>
+                  ) : null}
+                </p>
+              ) : null}
+            </div>
             {!isOutOfStock && (
               <button
                 type="button"
@@ -1202,7 +1220,18 @@ export function ProductCard({
 
         {/* Price — always reflects current variant filters (color / storage / RAM) */}
         <div className={`product-card__price-block ${isMinimal ? 'product-card__price-block--minimal' : 'product-card__price-block--standard'}`}>
-          {variantPrice !== null ? (
+          {typeof promoPrice === 'number' ? (
+            <div className="product-card__price-row">
+              <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
+                {formatPrice(promoPrice)}
+              </p>
+              {showPromoCompare ? (
+                <p className={`product-card__msrp ${isMinimal ? 'product-card__msrp--compact' : ''}`}>
+                  {formatPrice(catalogPrice)}
+                </p>
+              ) : null}
+            </div>
+          ) : variantPrice !== null ? (
             <p className={`product-card__price ${isMinimal ? 'product-card__price--compact' : ''}`}>
               {formatPrice(variantPrice)}
             </p>

@@ -6,10 +6,15 @@ import { apiBaseUrl } from '@/lib/api/openapi';
 
 export type HomepageCampaignAnimation = 'none' | 'title_shimmer';
 
+export type SeasonalCampaignProduct = PublicProduct & {
+  promo_image_url?: string | null;
+  promo_price?: number | null;
+};
+
 export type PublicHomepageCampaign = {
   title: string;
   animation: HomepageCampaignAnimation;
-  products: PublicProduct[];
+  products: SeasonalCampaignProduct[];
 };
 
 export async function fetchHomepageCampaign(): Promise<PublicHomepageCampaign> {

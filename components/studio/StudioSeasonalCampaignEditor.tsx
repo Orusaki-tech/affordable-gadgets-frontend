@@ -17,6 +17,35 @@ type StudioSeasonalCampaignEditorProps = {
   onSaved?: () => void | Promise<void>;
 };
 
+type CampaignDraft = {
+  id: number;
+  product_name: string;
+  primary_image: string | null;
+  promo_image_url: string | null;
+  previewUrl: string | null;
+  priceInput: string;
+  file: File | null;
+  clearImage: boolean;
+};
+
+function toDraft(product: StudioHomepageCampaignProduct): CampaignDraft {
+  return {
+    id: product.id,
+    product_name: product.product_name || `Product #${product.id}`,
+    primary_image: product.primary_image || null,
+    promo_image_url: product.promo_image_url || null,
+    previewUrl: null,
+    priceInput: product.promo_price != null ? String(product.promo_price) : '',
+    file: null,
+    clearImage: false,
+  };
+}
+
+function draftPreview(item: CampaignDraft): string | null {
+  if (item.clearImage && !item.previewUrl) return item.primary_image;
+  return item.previewUrl || item.promo_image_url || item.primary_image;
+}
+
 function toDatetimeLocal(value?: string | null): string {
   if (!value) return '';
   const date = new Date(value);
@@ -45,7 +74,7 @@ export function StudioSeasonalCampaignEditor({
   const [isActive, setIsActive] = useState(true);
   const [startsAt, setStartsAt] = useState('');
   const [endsAt, setEndsAt] = useState('');
-  const [selected, setSelected] = useState<StudioHomepageCampaignProduct[]>([]);
+  const [selected, setSelected] = useState<CampaignDraft[]>([]);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<StudioProduct[]>([]);
   const [searching, setSearching] = useState(false);
@@ -66,11 +95,7 @@ export function StudioSeasonalCampaignEditor({
         setSelected(
           (campaign.products ?? [])
             .filter((product) => typeof product.id === 'number')
-            .map((product) => ({
-              id: product.id,
-              product_name: product.product_name || `Product #${product.id}`,
-              primary_image: product.primary_image || null,
-            }))
+            .map(toDraft)
         );
       } catch (err) {
         if (!cancelled) {
@@ -132,11 +157,11 @@ export function StudioSeasonalCampaignEditor({
     }
     setSelected((current) => [
       ...current,
-      {
+      toDraft({
         id: product.id,
         product_name: product.product_name || `Product #${product.id}`,
         primary_image: studioProductImageUrl(product),
-      },
+      }),
     ]);
   };
 
@@ -157,16 +182,19 @@ export function StudioSeasonalCampaignEditor({
         is_active: isActive,
         starts_at: fromDatetimeLocal(startsAt),
         ends_at: fromDatetimeLocal(endsAt),
-        product_ids: selected.map((product) => product.id),
+        products: selected.map((product) => ({
+          product_id: product.id,
+          promo_price: product.priceInput.trim() || null,
+        })),
+        images: selected
+          .filter((product) => product.file)
+          .map((product) => ({ productId: product.id, file: product.file as File })),
+        clearImageIds: selected
+          .filter((product) => product.clearImage && !product.file)
+          .map((product) => product.id),
       });
       setTitle(saved.title);
-      setSelected(
-        (saved.products ?? []).map((product) => ({
-          id: product.id,
-          product_name: product.product_name || `Product #${product.id}`,
-          primary_image: product.primary_image || null,
-        }))
-      );
+      setSelected((saved.products ?? []).map(toDraft));
       setMsg('Campaign saved. The homepage updates for shoppers when it is on and has products.');
       await onSaved?.();
     } catch (err) {
@@ -186,8 +214,9 @@ export function StudioSeasonalCampaignEditor({
         <h2 className="studio-editor__title">Seasonal campaign</h2>
         {roleHint ? <p className="studio-editor__hint">{roleHint}</p> : null}
         <p className="studio-editor__hint">
-          This heading and product order appear above Special Offers. Turn it off, or leave it
-          empty, and shoppers will not see the row. Featured tags are unchanged.
+          This heading and product order appear above Special Offers. Each card can use its own
+          promo image and price. Leave those blank to keep the catalog photo and price. Turn the
+          campaign off, or leave it empty, and shoppers will not see the row.
         </p>
       </div>
 
@@ -260,40 +289,110 @@ export function StudioSeasonalCampaignEditor({
           <p className="studio-images__empty">No products yet. Search the catalog below and add some.</p>
         ) : (
           <ul className="studio-featured-picker__list">
-            {selected.map((product, index) => (
-              <li key={product.id} className="studio-featured-picker__row">
-                {product.primary_image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={product.primary_image} alt="" className="studio-featured-picker__thumb" />
-                ) : (
-                  <span className="studio-featured-picker__thumb studio-featured-picker__thumb--empty" />
-                )}
-                <span className="studio-featured-picker__name">{product.product_name}</span>
-                <button
-                  type="button"
-                  className="studio-btn--ghost studio-btn--compact"
-                  disabled={index === 0}
-                  onClick={() => move(index, -1)}
-                >
-                  Up
-                </button>
-                <button
-                  type="button"
-                  className="studio-btn--ghost studio-btn--compact"
-                  disabled={index === selected.length - 1}
-                  onClick={() => move(index, 1)}
-                >
-                  Down
-                </button>
-                <button
-                  type="button"
-                  className="studio-btn--ghost"
-                  onClick={() => setSelected((current) => current.filter((item) => item.id !== product.id))}
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
+            {selected.map((product, index) => {
+              const preview = draftPreview(product);
+              const hasPromoImage = Boolean(
+                (product.promo_image_url || product.previewUrl) && !product.clearImage
+              );
+              return (
+                <li key={product.id} className="studio-campaign-item">
+                  <div className="studio-campaign-item__head">
+                    {preview ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={preview} alt="" className="studio-featured-picker__thumb" />
+                    ) : (
+                      <span className="studio-featured-picker__thumb studio-featured-picker__thumb--empty" />
+                    )}
+                    <span className="studio-featured-picker__name">{product.product_name}</span>
+                    <button
+                      type="button"
+                      className="studio-btn--ghost studio-btn--compact"
+                      disabled={index === 0}
+                      onClick={() => move(index, -1)}
+                    >
+                      Up
+                    </button>
+                    <button
+                      type="button"
+                      className="studio-btn--ghost studio-btn--compact"
+                      disabled={index === selected.length - 1}
+                      onClick={() => move(index, 1)}
+                    >
+                      Down
+                    </button>
+                    <button
+                      type="button"
+                      className="studio-btn--ghost"
+                      onClick={() =>
+                        setSelected((current) => current.filter((item) => item.id !== product.id))
+                      }
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <label className="studio-field">
+                    <span>Promo price (KSh)</span>
+                    <input
+                      className="studio-input"
+                      inputMode="decimal"
+                      value={product.priceInput}
+                      placeholder="Catalog price"
+                      onChange={(event) =>
+                        setSelected((current) =>
+                          current.map((item) =>
+                            item.id === product.id
+                              ? { ...item, priceInput: event.target.value }
+                              : item
+                          )
+                        )
+                      }
+                    />
+                  </label>
+                  <label className="studio-field">
+                    <span>Promo image</span>
+                    <input
+                      className="studio-input"
+                      type="file"
+                      accept="image/*"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0] ?? null;
+                        setSelected((current) =>
+                          current.map((item) => {
+                            if (item.id !== product.id) return item;
+                            if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+                            return {
+                              ...item,
+                              file,
+                              clearImage: false,
+                              previewUrl: file ? URL.createObjectURL(file) : null,
+                            };
+                          })
+                        );
+                      }}
+                    />
+                  </label>
+                  {hasPromoImage ? (
+                    <button
+                      type="button"
+                      className="studio-btn--ghost studio-btn--compact"
+                      onClick={() =>
+                        setSelected((current) =>
+                          current.map((item) => {
+                            if (item.id !== product.id) return item;
+                            if (item.previewUrl) URL.revokeObjectURL(item.previewUrl);
+                            return { ...item, file: null, previewUrl: null, clearImage: true };
+                          })
+                        )
+                      }
+                    >
+                      Use catalog photo
+                    </button>
+                  ) : (
+                    <p className="studio-editor__hint">Leave empty to use the catalog photo.</p>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

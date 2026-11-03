@@ -1,11 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ProductCard } from '@/components/ProductCard';
-import { ProductCarousel } from '@/components/ProductCarousel';
+import Link from 'next/link';
+import { CloudinaryImage } from '@/components/CloudinaryImage';
 import { StudioBlockChrome } from '@/components/studio/StudioBlockChrome';
 import { useStudioEditOptional } from '@/components/studio/StudioEditHost';
-import { useHomepageCampaign } from '@/lib/hooks/useHomepageCampaign';
+import {
+  useHomepageCampaign,
+  type SeasonalCampaignProduct,
+} from '@/lib/hooks/useHomepageCampaign';
+import { formatPrice } from '@/lib/utils/format';
+import { getPlaceholderProductImage } from '@/lib/utils/placeholders';
+import { getProductHref } from '@/lib/utils/productRoutes';
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -21,6 +27,45 @@ function usePrefersReducedMotion() {
   return reduced;
 }
 
+function cardPrice(product: SeasonalCampaignProduct) {
+  const promo = typeof product.promo_price === 'number' ? product.promo_price : null;
+  const catalog = typeof product.min_price === 'number' ? product.min_price : null;
+  return {
+    price: promo ?? catalog,
+    compare: promo != null && catalog != null && catalog > promo ? catalog : null,
+  };
+}
+
+function SeasonalCard({ product }: { product: SeasonalCampaignProduct }) {
+  const image =
+    product.promo_image_url || product.primary_image || getPlaceholderProductImage(product.product_name);
+  const { price, compare } = cardPrice(product);
+
+  return (
+    <Link href={getProductHref(product)} className="home-seasonal__card">
+      <div className="home-seasonal__media">
+        <CloudinaryImage
+          src={image}
+          alt={product.product_name}
+          preset="productThumb"
+          sizes="(max-width: 640px) 50vw, 25vw"
+          className="home-seasonal__image"
+          fill
+        />
+      </div>
+      <div className="home-seasonal__body">
+        <p className="home-seasonal__name">{product.product_name}</p>
+        <p className="home-seasonal__price">
+          {price != null ? <span>{formatPrice(price)}</span> : <span>Price on request</span>}
+          {compare != null ? (
+            <span className="home-seasonal__compare">{formatPrice(compare)}</span>
+          ) : null}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
 /** Seasonal product row above Special Offers. Hidden for shoppers when empty or off. */
 export function HomeSeasonalCampaign() {
   const studioEdit = useStudioEditOptional();
@@ -29,7 +74,7 @@ export function HomeSeasonalCampaign() {
   const { data, isLoading } = useHomepageCampaign();
   const products = data?.products ?? [];
   const title = data?.title?.trim() || 'Black November';
-  const shimmer = data?.animation === 'title_shimmer';
+  const shimmer = data?.animation === 'title_shimmer' && !reducedMotion;
 
   if (!canEdit && (isLoading || products.length === 0)) {
     return null;
@@ -38,21 +83,21 @@ export function HomeSeasonalCampaign() {
   const section = (
     <section
       id="seasonal-campaign"
-      className="home-redesign__featured home-redesign__seasonal ag-section ag-section--tight scroll-mt-28"
+      className="home-redesign__seasonal ag-section ag-section--tight scroll-mt-28"
     >
-      <div className="mb-6">
+      <div className="home-seasonal__header">
         <h2
           className={
             shimmer
-              ? 'ag-type-h2 home-seasonal__title home-seasonal__title--shimmer'
-              : 'ag-type-h2 home-seasonal__title'
+              ? 'home-seasonal__title home-seasonal__title--shimmer'
+              : 'home-seasonal__title'
           }
         >
           {title}
         </h2>
         {canEdit ? (
-          <p className="mt-1 text-xs font-semibold text-primary">
-            Seasonal campaign · {studioEdit?.capabilities.editableSummary}
+          <p className="home-seasonal__studio-note">
+            Seasonal campaign · {products.length} on the shop
           </p>
         ) : null}
       </div>
@@ -60,23 +105,11 @@ export function HomeSeasonalCampaign() {
       {isLoading ? (
         <p className="ag-type-body text-secondary">Loading campaign…</p>
       ) : products.length > 0 ? (
-        <ProductCarousel
-          itemsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
-          showNavigation
-          showPagination={false}
-          autoPlay={!reducedMotion && products.length > 1}
-          autoPlayInterval={6000}
-          pauseOffscreen
-        >
+        <div className="home-seasonal__grid">
           {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              variant="featured"
-              studioAllowDelete={false}
-            />
+            <SeasonalCard key={product.id} product={product} />
           ))}
-        </ProductCarousel>
+        </div>
       ) : (
         <p className="ag-type-body text-secondary">
           This row is hidden on the shop until you add products and turn the campaign on.

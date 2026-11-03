@@ -1478,6 +1478,8 @@ export type StudioHomepageCampaignProduct = {
   id: number;
   product_name: string;
   primary_image?: string | null;
+  promo_image_url?: string | null;
+  promo_price?: number | null;
 };
 
 export type StudioHomepageCampaign = {
@@ -1499,11 +1501,27 @@ export async function patchStudioHomepageCampaign(data: {
   is_active: boolean;
   starts_at: string | null;
   ends_at: string | null;
-  product_ids: number[];
+  products: Array<{ product_id: number; promo_price: string | null }>;
+  images?: Array<{ productId: number; file: File }>;
+  clearImageIds?: number[];
 }): Promise<StudioHomepageCampaign> {
+  const form = new FormData();
+  form.set('title', data.title);
+  form.set('animation', data.animation);
+  form.set('is_active', data.is_active ? 'true' : 'false');
+  form.set('starts_at', data.starts_at ?? '');
+  form.set('ends_at', data.ends_at ?? '');
+  form.set('products', JSON.stringify(data.products));
+  for (const productId of data.clearImageIds ?? []) {
+    form.append('clear_promo_image', String(productId));
+  }
+  for (const image of data.images ?? []) {
+    form.append(`promo_image_${image.productId}`, image.file);
+  }
   return studioFetchJson<StudioHomepageCampaign>('/homepage-campaign/', {
     method: 'PATCH',
-    body: JSON.stringify(data),
+    body: form,
+    multipart: true,
   });
 }
 

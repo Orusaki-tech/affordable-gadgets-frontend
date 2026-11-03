@@ -470,6 +470,22 @@
   background: #fff;
 }
 
+.studio-campaign-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.65rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-hairline, #e8e8ed);
+  background: #fff;
+}
+
+.studio-campaign-item__head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
 .studio-featured-picker__thumb {
   width: 2.5rem;
   height: 2.5rem;

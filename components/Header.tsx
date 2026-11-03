@@ -77,6 +77,10 @@ function HeaderContent() {
   const [isMounted, setIsMounted] = useState(false);
   const [megaMenuTop, setMegaMenuTop] = useState(0);
   const megaCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrollIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pointerScrollingRef = useRef(false);
+  const openMegaMenuRef = useRef<string | null>(null);
+  openMegaMenuRef.current = openMegaMenu;
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
   const closeMegaMenu = useCallback(() => {
@@ -88,12 +92,42 @@ function HeaderContent() {
     setMoreHoverBrand(null);
   }, []);
 
+  // The brand row opens on hover. A sticky header slides under a still pointer
+  // while the page scrolls, and that hover opens the full-screen menu. Ignore
+  // hover-open until scrolling has settled, and close the menu if it is up.
+  useEffect(() => {
+    const onScroll = () => {
+      pointerScrollingRef.current = true;
+      if (openMegaMenuRef.current) closeMegaMenu();
+      if (scrollIdleTimerRef.current) clearTimeout(scrollIdleTimerRef.current);
+      scrollIdleTimerRef.current = setTimeout(() => {
+        pointerScrollingRef.current = false;
+        scrollIdleTimerRef.current = null;
+      }, 180);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (scrollIdleTimerRef.current) clearTimeout(scrollIdleTimerRef.current);
+    };
+  }, [closeMegaMenu]);
+
   const cancelMegaMenuClose = useCallback(() => {
     if (megaCloseTimerRef.current) {
       clearTimeout(megaCloseTimerRef.current);
       megaCloseTimerRef.current = null;
     }
   }, []);
+
+  const openMegaFromHover = useCallback(
+    (menuKey: string, moreBrand: string | null = null) => {
+      if (pointerScrollingRef.current) return;
+      cancelMegaMenuClose();
+      setMoreHoverBrand(moreBrand);
+      setOpenMegaMenu(menuKey);
+    },
+    [cancelMegaMenuClose]
+  );
 
   const scheduleMegaMenuClose = useCallback(() => {
     cancelMegaMenuClose();
@@ -166,16 +200,21 @@ function HeaderContent() {
     };
   }, [openMegaMenu, closeMegaMenu]);
 
-  const megaMenuPrefetchEntries = useMemo(
-    () =>
-      [...PRIMARY_BRAND_NAV, ...MORE_BRAND_NAV].flatMap((brand) =>
-        brand.categories.map((cat) => ({
-          brandFilter: brand.brandFilter,
-          productType: cat.productType,
-        }))
-      ),
-    []
-  );
+  const megaMenuPrefetchEntries = useMemo(() => {
+    if (!openMegaMenu) return [];
+    const brands =
+      openMegaMenu === MEGA_MENU_MORE_KEY
+        ? MORE_BRAND_NAV.filter(
+            (brand) => !moreHoverBrand || brand.brandFilter === moreHoverBrand
+          )
+        : PRIMARY_BRAND_NAV.filter((brand) => brand.brandFilter === openMegaMenu);
+    return brands.flatMap((brand) =>
+      brand.categories.map((cat) => ({
+        brandFilter: brand.brandFilter,
+        productType: cat.productType,
+      }))
+    );
+  }, [openMegaMenu, moreHoverBrand]);
   usePrefetchNavMegaProducts(megaMenuPrefetchEntries);
 
   const activeMegaBrand = useMemo(
@@ -379,11 +418,7 @@ function HeaderContent() {
                 search={currentSearch}
                 isMegaOpen={openMegaMenu === brand.brandFilter}
                 suppressUrlActive={isAnyMegaOpen}
-                onMegaOpen={() => {
-                  cancelMegaMenuClose();
-                  setMoreHoverBrand(null);
-                  setOpenMegaMenu(brand.brandFilter);
-                }}
+                onMegaOpen={() => openMegaFromHover(brand.brandFilter)}
                 onNavigate={closeMegaMenu}
               />
             ))}
@@ -400,11 +435,9 @@ function HeaderContent() {
               brands={MORE_BRAND_NAV}
               variant="desktop"
               isMegaOpen={openMegaMenu === MEGA_MENU_MORE_KEY}
-              onMegaOpen={() => {
-                cancelMegaMenuClose();
-                setMoreHoverBrand(MORE_BRAND_NAV[0]?.brandFilter ?? null);
-                setOpenMegaMenu(MEGA_MENU_MORE_KEY);
-              }}
+              onMegaOpen={() =>
+                openMegaFromHover(MEGA_MENU_MORE_KEY, MORE_BRAND_NAV[0]?.brandFilter ?? null)
+              }
               onNavigate={closeMegaMenu}
             />
 

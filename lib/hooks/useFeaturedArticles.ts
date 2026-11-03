@@ -15,7 +15,7 @@ export type PaginatedFeaturedArticles = {
   results: PublicArticleCard[];
 };
 
-/** Client fetch — no-store + cache-bust so Studio tag changes show immediately. */
+/** Client fetch for the homepage buying-guides strip. Studio refetches this query after a save. */
 export async function fetchFeaturedArticlesLive(): Promise<PaginatedFeaturedArticles> {
   OpenAPI.BASE = apiBaseUrl;
   const base = OpenAPI.BASE.replace(/\/+$/, '');
@@ -26,11 +26,10 @@ export async function fetchFeaturedArticlesLive(): Promise<PaginatedFeaturedArti
       ? await OpenAPI.HEADERS({} as never)
       : (OpenAPI.HEADERS ?? {})),
   };
-  const url = `${base}/api/v1/public/articles/?tag=featured&page_size=${FEATURED_ARTICLES_PAGE_SIZE}&page=1&_=${Date.now()}`;
+  const url = `${base}/api/v1/public/articles/?tag=featured&page_size=${FEATURED_ARTICLES_PAGE_SIZE}&page=1`;
   const res = await fetch(url, {
     credentials: 'omit',
     headers,
-    cache: 'no-store',
   });
   if (!res.ok) {
     throw new Error(`Featured articles request failed: ${res.status}`);
@@ -54,7 +53,7 @@ export function useFeaturedArticles() {
   return useQuery<PaginatedFeaturedArticles>({
     queryKey: ['articles', 'featured'],
     queryFn: fetchFeaturedArticlesLive,
-    staleTime: 0,
-    refetchOnWindowFocus: true,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   });
 }

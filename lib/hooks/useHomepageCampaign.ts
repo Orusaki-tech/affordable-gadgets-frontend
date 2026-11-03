@@ -27,10 +27,9 @@ export async function fetchHomepageCampaign(): Promise<PublicHomepageCampaign> {
       ? await OpenAPI.HEADERS({} as never)
       : (OpenAPI.HEADERS ?? {})),
   };
-  const res = await fetch(`${base}/api/v1/public/homepage-campaign/?_=${Date.now()}`, {
+  const res = await fetch(`${base}/api/v1/public/homepage-campaign/`, {
     credentials: 'omit',
     headers,
-    cache: 'no-store',
   });
   if (!res.ok) {
     const text = await res.text();
@@ -39,11 +38,25 @@ export async function fetchHomepageCampaign(): Promise<PublicHomepageCampaign> {
   return res.json();
 }
 
+/** Same ratio the API uses so a higher storage keeps the Black November discount. */
+export function seasonalUnitPrice(
+  listPrice: number,
+  promoPrice: number,
+  anchorPrice: number,
+): number | null {
+  if (!Number.isFinite(listPrice) || !Number.isFinite(promoPrice) || !Number.isFinite(anchorPrice)) {
+    return null;
+  }
+  if (anchorPrice <= 0 || promoPrice < 0 || promoPrice >= anchorPrice) return null;
+  const scaled = Math.round((listPrice * promoPrice * 100) / anchorPrice) / 100;
+  return scaled < listPrice ? scaled : null;
+}
+
 export function useHomepageCampaign() {
   return useQuery<PublicHomepageCampaign>({
     queryKey: ['homepage-campaign'],
     queryFn: fetchHomepageCampaign,
-    staleTime: 0,
-    refetchOnWindowFocus: true,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   });
 }

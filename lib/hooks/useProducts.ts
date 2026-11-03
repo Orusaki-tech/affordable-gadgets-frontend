@@ -51,11 +51,10 @@ export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductLis
       ? await OpenAPI.HEADERS({} as never)
       : (OpenAPI.HEADERS ?? {})),
   };
-  const url = `${base}/api/v1/public/products/?featured=1&page_size=${FEATURED_PRODUCTS_PAGE_SIZE}&page=1&_=${Date.now()}`;
+  const url = `${base}/api/v1/public/products/?featured=1&page_size=${FEATURED_PRODUCTS_PAGE_SIZE}&page=1`;
   const res = await fetch(url, {
     credentials: 'omit',
     headers,
-    cache: 'no-store',
   });
   if (!res.ok) {
     const text = await res.text();
@@ -69,12 +68,13 @@ export async function fetchFeaturedProducts(): Promise<PaginatedPublicProductLis
 }
 
 /** Hook for homepage featured section: Featured-tagged products only. */
-export function useFeaturedProducts() {
+export function useFeaturedProducts(options?: { enabled?: boolean }) {
   return useQuery<PaginatedPublicProductList>({
     queryKey: ['products', 'featured'],
     queryFn: fetchFeaturedProducts,
-    staleTime: 0,
-    refetchOnWindowFocus: true,
+    enabled: options?.enabled ?? true,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   });
 }
 

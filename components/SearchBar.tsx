@@ -12,9 +12,11 @@ export function SearchBar() {
   const searchRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
+  const trimmedQuery = searchQuery.trim();
   const { data } = useProducts({
-    search: searchQuery,
+    search: trimmedQuery,
     page_size: 5,
+    enabled: trimmedQuery.length >= 2,
   });
 
   const suggestions = data?.results || [];

@@ -28,7 +28,7 @@ interface ProductGridProps {
 export function ProductGrid({ pageSize = 12, showPagination = true, cardOptions, featuredOnly = false }: ProductGridProps = {}) {
   const [page, setPage] = useState(1);
   const productsQuery = useProducts({ page, page_size: pageSize, enabled: !featuredOnly });
-  const featuredQuery = useFeaturedProducts();
+  const featuredQuery = useFeaturedProducts({ enabled: featuredOnly });
   const { data, isLoading, error } = featuredOnly ? featuredQuery : productsQuery;
 
   if (isLoading) {

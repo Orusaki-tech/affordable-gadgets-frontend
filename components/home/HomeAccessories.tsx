@@ -62,7 +62,7 @@ function pickAccessoryProducts(
 export function HomeAccessories() {
   const { data, isLoading, isError } = useProducts({
     type: 'AC',
-    page_size: 48,
+    page_size: 24,
     page: 1,
   });
 

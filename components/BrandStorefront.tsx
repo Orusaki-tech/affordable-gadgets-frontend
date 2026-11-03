@@ -96,7 +96,7 @@ function StorefrontBlock({
     <section className="brand-storefront__block home-section-panel">
       <div className="brand-storefront__heading">
         <div className="brand-storefront__heading-copy">
-          <p className="ag-type-eyebrow text-stock-green">{eyebrow}</p>
+          <p className="ag-type-eyebrow brand-storefront__kicker">{eyebrow}</p>
           <h3 className="ag-type-h3">{title}</h3>
           {copy ? <p className="ag-type-body">{copy}</p> : null}
         </div>
@@ -216,7 +216,7 @@ export function BrandStorefront({
         }`}
       >
         <div className="brand-storefront__intro">
-          <p className="ag-type-eyebrow text-stock-green">Shop {title}</p>
+          <p className="ag-type-eyebrow brand-storefront__kicker">Shop {title}</p>
           <h2 className="ag-type-h2">{title} in Kenya</h2>
           {subtitle ? <p className="ag-type-body brand-storefront__subtitle">{subtitle}</p> : null}
         </div>
@@ -224,7 +224,7 @@ export function BrandStorefront({
         {guideSpotlight.length > 0 || accessorySpotlight.length > 0 ? (
           <div className="brand-storefront__spotlight">
             <div className="brand-storefront__spotlight-head">
-              <p className="ag-type-eyebrow text-stock-green">
+              <p className="ag-type-eyebrow brand-storefront__kicker">
                 {guideSpotlight.length > 0 ? 'From the guides' : `Accessories for ${title}`}
               </p>
               <Link

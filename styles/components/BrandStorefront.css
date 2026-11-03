@@ -38,25 +38,28 @@
   min-width: 0;
 }
 
-.brand-storefront__lead-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
+.brand-storefront__guides {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
   min-width: 0;
 }
 
-@media (min-width: 960px) {
-  .brand-storefront__lead--split {
-    display: grid;
-    grid-template-columns: minmax(15rem, 18.5rem) minmax(0, 1fr);
-    column-gap: 1.5rem;
-    align-items: stretch;
-  }
+.brand-storefront__guides .home-buying-guides__card {
+  height: 100%;
+}
 
-  .brand-storefront__lead--split .brand-storefront__lead-copy {
-    justify-content: space-between;
-    min-height: 100%;
-  }
+.brand-storefront__repair {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+}
+
+.brand-storefront__repair .ag-type-body {
+  max-width: 40rem;
+  margin-top: 0.2rem;
 }
 
 .brand-storefront__subtitle {
@@ -327,8 +330,13 @@
   color: var(--on-surface-variant, #46464a);
 }
 
+@media (max-width: 900px) {
+  .brand-storefront__guides {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
-  .brand-storefront__spotlight-grid,
   .brand-storefront__reviews {
     grid-template-columns: 1fr;
   }

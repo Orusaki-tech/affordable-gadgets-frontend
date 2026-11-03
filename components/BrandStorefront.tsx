@@ -4,14 +4,11 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiService, type PublicArticleCard, type PublicProduct, type Review } from '@/lib/api/generated';
-import { CloudinaryImage } from '@/components/CloudinaryImage';
+import { HomeBuyingGuideCard, type HomeBuyingGuideCardData } from '@/components/home/HomeBuyingGuideCard';
 import { MaterialIcon } from '@/components/MaterialIcon';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductCarousel } from '@/components/ProductCarousel';
 import { formatArticleCategory } from '@/lib/utils/blogCategories';
-import { formatPrice } from '@/lib/utils/format';
-import { getProductHref } from '@/lib/utils/productRoutes';
-import { studioPath } from '@/lib/studio/paths';
 import {
   allBrandNavItems,
   brandCategoryHref,
@@ -41,40 +38,28 @@ function reviewStars(rating: number) {
   return `${'★'.repeat(filled)}${'☆'.repeat(5 - filled)}`;
 }
 
-const SPOTLIGHT_LIMIT = 4;
+function guideMeta(article: PublicArticleCard) {
+  const raw = article.updated_at || article.published_at;
+  if (!raw) return 'Buying guide';
+  const date = new Date(raw);
+  if (Number.isNaN(date.getTime())) return 'Buying guide';
+  return `Updated ${date.toLocaleDateString('en-KE', { month: 'long', year: 'numeric' })}`;
+}
 
-type SpotlightItem = {
-  key: string;
-  href: string;
-  title: string;
-  meta: string;
-  imageUrl: string | null;
-};
-
-function MediaSpotlightCard({ item }: { item: SpotlightItem }) {
-  return (
-    <Link href={item.href} className="brand-media-card">
-      <span className="brand-media-card__copy">
-        <span className="brand-media-card__title">{item.title}</span>
-        <span className="brand-media-card__meta">{item.meta}</span>
-      </span>
-      <span className="brand-media-card__media">
-        {item.imageUrl ? (
-          <CloudinaryImage
-            src={item.imageUrl}
-            alt=""
-            preset="card"
-            fill
-            fit="cover"
-            sizes="120px"
-            className="brand-media-card__image"
-          />
-        ) : (
-          <MaterialIcon name="article" className="brand-media-card__fallback" />
-        )}
-      </span>
-    </Link>
-  );
+function toGuideCard(article: PublicArticleCard, href: string, fallbackTitle: string): HomeBuyingGuideCardData {
+  const name = article.product_name || fallbackTitle;
+  const opening = (article.opening_words || '').trim();
+  return {
+    key: article.slug || href,
+    href,
+    title: article.headline || name,
+    imageUrl: article.thumbnail_image || article.product_primary_image || null,
+    category: formatArticleCategory(article.category),
+    meta: guideMeta(article),
+    excerpt: opening || `What to check before you buy ${name} in Kenya — and what you can skip.`,
+    cta: 'Read guide',
+    articleSlug: article.slug ?? null,
+  };
 }
 
 function StorefrontBlock({
@@ -96,7 +81,7 @@ function StorefrontBlock({
     <section className="brand-storefront__block home-section-panel">
       <div className="brand-storefront__heading">
         <div className="brand-storefront__heading-copy">
-          <p className="ag-type-eyebrow brand-storefront__kicker">{eyebrow}</p>
+          <p className="ag-type-eyebrow text-stock-green">{eyebrow}</p>
           <h3 className="ag-type-h3">{title}</h3>
           {copy ? <p className="ag-type-body">{copy}</p> : null}
         </div>
@@ -128,17 +113,14 @@ export function BrandStorefront({
     { label: `All ${title}`, productType: null },
   ];
 
-  const companionType: ProductTypeFilter = productType === 'AC' ? 'PH' : 'AC';
-  const companionLabel = companionType === 'AC' ? 'Accessories' : 'Phones';
-  const showCompanion = productType !== companionType;
-
-  const companion = useProducts({
+  const showAccessories = productType !== 'AC';
+  const accessories = useProducts({
     brand_filter: brand,
-    type: companionType,
+    type: 'AC',
     page: 1,
     page_size: 8,
     ordering: '-release_date',
-    enabled: showCompanion,
+    enabled: showAccessories,
   });
 
   const guides = useQuery({
@@ -154,47 +136,19 @@ export function BrandStorefront({
   });
 
   const mostWanted = showMostWanted ? products.slice(0, 8) : [];
-  const companionProducts = companion.data?.results ?? [];
+  const accessoryProducts = accessories.data?.results ?? [];
   const seenGuides = new Set<string>();
-  const guideSpotlight: SpotlightItem[] = [];
+  const guideCards: HomeBuyingGuideCardData[] = [];
   for (const article of guides.data?.results ?? []) {
     const href = articleHref(article);
-    const guideTitle = (article.headline || article.product_name || title).trim();
-    const key = guideTitle.toLowerCase();
-    if (!href || seenGuides.has(key)) continue;
-    seenGuides.add(key);
-    guideSpotlight.push({
-      key: article.slug || href,
-      href: studioPath(href),
-      title: guideTitle,
-      meta: formatArticleCategory(article.category),
-      imageUrl: article.thumbnail_image || article.product_primary_image || null,
-    });
-    if (guideSpotlight.length >= SPOTLIGHT_LIMIT) break;
+    const guideTitle = (article.headline || article.product_name || title).trim().toLowerCase();
+    if (!href || seenGuides.has(guideTitle)) continue;
+    seenGuides.add(guideTitle);
+    guideCards.push(toGuideCard(article, href, title));
+    if (guideCards.length >= 3) break;
   }
-
-  const accessoryPool = productType === 'AC' ? products : companionProducts;
-  const accessorySpotlight: SpotlightItem[] =
-    guideSpotlight.length > 0
-      ? []
-      : accessoryPool.slice(0, SPOTLIGHT_LIMIT).map((product) => ({
-          key: String(product.id ?? product.slug),
-          href: getProductHref(product),
-          title: product.product_name || title,
-          meta: product.min_price != null ? formatPrice(product.min_price) : 'Accessory',
-          imageUrl: product.primary_image || null,
-        }));
-  const spotlightIds = new Set(
-    accessorySpotlight.map((item) => item.key).filter((key) => key && key !== 'undefined')
-  );
-  const mostWantedVisible = mostWanted.filter(
-    (product) => !spotlightIds.has(String(product.id ?? product.slug))
-  );
-  const companionVisible = companionProducts.filter(
-    (product) => !spotlightIds.has(String(product.id ?? product.slug))
-  );
   const catalogNames = new Set(
-    [...products, ...companionProducts].map((product) => (product.product_name || '').toLowerCase())
+    [...products, ...accessoryProducts].map((product) => (product.product_name || '').toLowerCase())
   );
   const brandReviews = ((reviews.data?.results ?? []) as Review[])
     .filter((review) => {
@@ -203,21 +157,11 @@ export function BrandStorefront({
     })
     .slice(0, 4);
 
-  const companionCopy =
-    companionType === 'AC'
-      ? `Chargers, audio, and wearables that belong with ${title}.`
-      : `${title} phones to pair with these accessories.`;
-
   return (
     <section className="brand-storefront" aria-label={`${title} shop`}>
-      <div
-        className={`home-section-panel brand-storefront__lead${
-          guideSpotlight.length > 0 || accessorySpotlight.length > 0 ? ' brand-storefront__lead--split' : ''
-        }`}
-      >
-        <div className="brand-storefront__lead-copy">
+      <div className="home-section-panel brand-storefront__lead">
         <div className="brand-storefront__intro">
-          <p className="ag-type-eyebrow brand-storefront__kicker">Shop {title}</p>
+          <p className="ag-type-eyebrow text-stock-green">Shop {title}</p>
           <h2 className="ag-type-h2">{title} in Kenya</h2>
           {subtitle ? <p className="ag-type-body brand-storefront__subtitle">{subtitle}</p> : null}
         </div>
@@ -236,40 +180,13 @@ export function BrandStorefront({
             );
           })}
         </div>
-        </div>
-
-        {guideSpotlight.length > 0 || accessorySpotlight.length > 0 ? (
-          <div className="brand-storefront__spotlight">
-            <div className="brand-storefront__spotlight-head">
-              <p className="ag-type-eyebrow brand-storefront__kicker">
-                {guideSpotlight.length > 0 ? 'From the guides' : `Accessories for ${title}`}
-              </p>
-              <Link
-                href={
-                  guideSpotlight.length > 0
-                    ? `/articles?brand=${encodeURIComponent(brand)}`
-                    : brandCategoryHref(brand, 'AC')
-                }
-                className="brand-storefront__more"
-              >
-                {guideSpotlight.length > 0 ? 'All guides' : 'See all'}
-                <MaterialIcon name="chevron_right" className="text-[1.125rem]" />
-              </Link>
-            </div>
-            <div className="brand-storefront__spotlight-grid">
-              {(guideSpotlight.length > 0 ? guideSpotlight : accessorySpotlight).map((item) => (
-                <MediaSpotlightCard key={item.key} item={item} />
-              ))}
-            </div>
-          </div>
-        ) : null}
       </div>
 
-      {mostWantedVisible.length > 0 ? (
+      {mostWanted.length > 0 ? (
         <StorefrontBlock
-          eyebrow="Most wanted"
-          title="Shop our most wanted"
-          copy=""
+          eyebrow="In stock"
+          title={`Shop ${title}`}
+          copy={`The ${title} devices shoppers open first.`}
           href="#products-grid"
           linkLabel={`See all ${title}`}
         >
@@ -278,7 +195,7 @@ export function BrandStorefront({
             showNavigation
             className="brand-storefront__carousel"
           >
-            {mostWantedVisible.map((product) => (
+            {mostWanted.map((product) => (
               <ProductCard key={product.id} product={product} showRatings />
             ))}
           </ProductCarousel>
@@ -287,12 +204,28 @@ export function BrandStorefront({
 
       {banner ? <div className="brand-storefront__banner">{banner}</div> : null}
 
-      {showCompanion && companionVisible.length > 0 ? (
+      {guideCards.length > 0 ? (
+        <StorefrontBlock
+          eyebrow="Before you buy"
+          title={`${title} guides`}
+          copy={`What to check before you pay for ${title}.`}
+          href={`/articles?brand=${encodeURIComponent(brand)}`}
+          linkLabel="All guides"
+        >
+          <div className="brand-storefront__guides">
+            {guideCards.map((guide) => (
+              <HomeBuyingGuideCard key={guide.key} guide={guide} />
+            ))}
+          </div>
+        </StorefrontBlock>
+      ) : null}
+
+      {showAccessories && accessoryProducts.length > 0 ? (
         <StorefrontBlock
           eyebrow="Goes with it"
-          title={`${companionLabel} for ${title}`}
-          copy={companionCopy}
-          href={brandCategoryHref(brand, companionType)}
+          title={`Accessories for ${title}`}
+          copy={`Chargers, audio, and wearables that belong with ${title}.`}
+          href={brandCategoryHref(brand, 'AC')}
           linkLabel="See all"
         >
           <ProductCarousel
@@ -300,12 +233,27 @@ export function BrandStorefront({
             showNavigation
             className="brand-storefront__carousel"
           >
-            {companionVisible.map((product) => (
+            {accessoryProducts.map((product) => (
               <ProductCard key={product.id} product={product} showRatings />
             ))}
           </ProductCarousel>
         </StorefrontBlock>
       ) : null}
+
+      <section className="brand-storefront__repair home-section-panel">
+        <div>
+          <p className="ag-type-eyebrow text-stock-green">Repair</p>
+          <p className="ag-type-body">
+            {title.toLowerCase() === 'apple'
+              ? 'Screen or battery for an iPhone. Battery prices are listed; other jobs are quoted after a look.'
+              : `Screen or battery for a ${title} device. We quote the job after a look.`}
+          </p>
+        </div>
+        <Link href="/repair" className="brand-storefront__more">
+          Book a repair
+          <MaterialIcon name="arrow_forward" className="text-[1.125rem]" />
+        </Link>
+      </section>
 
       {brandReviews.length > 0 ? (
         <StorefrontBlock

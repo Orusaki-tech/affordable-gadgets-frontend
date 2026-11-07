@@ -199,6 +199,11 @@
   filter: none;
 }
 
+.studio-icon-btn:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
 .studio-shell__edit-hint {
   margin: 0;
   padding: 0.45rem var(--section-x, 1rem);

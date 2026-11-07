@@ -25,6 +25,7 @@ export function StudioProductChrome({
   const canDelete = Boolean(
     allowDelete && studioEdit?.capabilities.canDeleteProduct
   );
+  const deleting = studioEdit?.deletingProductId === product.id;
   if (!studioEdit || (!canEditProduct && !canDelete)) return null;
 
   return (
@@ -51,8 +52,10 @@ export function StudioProductChrome({
         <button
           type="button"
           className="studio-icon-btn studio-icon-btn--danger"
-          title="Remove this product from the storefront"
-          aria-label={`Delete ${product.product_name}`}
+          title={deleting ? 'Deleting this product' : 'Remove this product from the storefront'}
+          aria-label={deleting ? `Deleting ${product.product_name}` : `Delete ${product.product_name}`}
+          aria-busy={deleting}
+          disabled={deleting || studioEdit.deletingProductId != null}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -62,6 +65,7 @@ export function StudioProductChrome({
           <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden fill="currentColor">
             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
           </svg>
+          <span>{deleting ? 'Deleting' : 'Delete'}</span>
         </button>
       )}
     </div>

@@ -329,6 +329,27 @@ export async function deleteStudioProduct(id: number): Promise<void> {
   await studioDelete(`/products/${id}/`);
 }
 
+/** Drop the Next.js page cache for the shop routes that still render this product. */
+export async function revalidateStudioCatalog(slug?: string | null): Promise<void> {
+  const token = getStudioToken();
+  if (!token || typeof window === 'undefined') return;
+  const safeSlug = slug && !slug.includes('/') && !slug.includes('..') ? slug : undefined;
+  try {
+    await fetch('/api/studio/revalidate-catalog', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(safeSlug ? { slug: safeSlug } : {}),
+      cache: 'no-store',
+    });
+  } catch {
+    // The API cache bump still hides the product on the next client fetch.
+  }
+}
+
 async function studioDelete(path: string): Promise<void> {
   const res = await studioFetch(path, { method: 'DELETE' });
   if (!res.ok && res.status !== 204) {

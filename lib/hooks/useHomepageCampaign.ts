@@ -29,6 +29,7 @@ export async function fetchHomepageCampaign(): Promise<PublicHomepageCampaign> {
   };
   const res = await fetch(`${base}/api/v1/public/homepage-campaign/`, {
     credentials: 'omit',
+    cache: 'no-store',
     headers,
   });
   if (!res.ok) {

@@ -12,7 +12,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, type QueryClient } from '@tanstack/react-query';
 import {
   StudioEditDrawer,
   type StudioEditResource,
@@ -21,6 +21,7 @@ import { useStudioAuthOptional } from '@/components/studio/StudioAuthContext';
 import {
   deleteStudioProduct,
   releaseStudioProductDeleteBlockers,
+  revalidateStudioCatalog,
   findStudioArticleBySlug,
   patchStudioProduct,
   retrieveStudioArticle,
@@ -34,7 +35,50 @@ import {
   studioPromotionHasLocation,
 } from '@/lib/studio/api';
 import type { StudioCapabilities } from '@/lib/studio/permissions';
+import { isStudioWindowPath, prefixStudioPath } from '@/lib/studio/paths';
 import type { PublicProduct } from '@/lib/api/generated';
+
+type ProductListPage = { results?: Array<{ id?: number }> };
+
+function dropDeletedProductFromCache(
+  queryClient: QueryClient,
+  productId: number,
+  slug?: string | null
+) {
+  queryClient.setQueriesData({ queryKey: ['products'] }, (current: unknown) => {
+    if (!current || typeof current !== 'object') return current;
+    const data = current as ProductListPage & { pages?: ProductListPage[] };
+    if (Array.isArray(data.pages)) {
+      return {
+        ...data,
+        pages: data.pages.map((page) => ({
+          ...page,
+          results: page.results?.filter((row) => row.id !== productId),
+        })),
+      };
+    }
+    if (Array.isArray(data.results)) {
+      return {
+        ...data,
+        results: data.results.filter((row) => row.id !== productId),
+      };
+    }
+    return current;
+  });
+  queryClient.setQueryData(['homepage-campaign'], (current: unknown) => {
+    if (!current || typeof current !== 'object' || !('products' in current)) return current;
+    const campaign = current as { products?: Array<{ id?: number }> };
+    if (!Array.isArray(campaign.products)) return current;
+    return {
+      ...campaign,
+      products: campaign.products.filter((row) => row.id !== productId),
+    };
+  });
+  queryClient.removeQueries({ queryKey: ['product', productId] });
+  if (slug) {
+    queryClient.removeQueries({ queryKey: ['product', 'slug', slug] });
+  }
+}
 
 type StudioEditHostValue = {
   capabilities: StudioCapabilities;
@@ -45,7 +89,10 @@ type StudioEditHostValue = {
   openEditProduct: (
     product: Pick<PublicProduct, 'id' | 'product_name'> | number
   ) => Promise<void>;
-  deleteProduct: (product: Pick<PublicProduct, 'id' | 'product_name'>) => Promise<void>;
+  deleteProduct: (
+    product: Pick<PublicProduct, 'id' | 'product_name' | 'slug'>
+  ) => Promise<void>;
+  deletingProductId: number | null;
   openEditArticle: (ref: { id?: number | null; slug?: string | null }) => Promise<void>;
   openCreateArticle: () => void;
   openEditPromotion: (id: number) => Promise<void>;
@@ -143,11 +190,14 @@ function StudioEditQueryBridge({
 export function StudioEditHost({ children }: { children: ReactNode }) {
   const studio = useStudioAuthOptional();
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [resource, setResource] = useState<StudioEditResource | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refreshOnClose, setRefreshOnClose] = useState(false);
+  const [deletingProductId, setDeletingProductId] = useState<number | null>(null);
+  const deleteLock = useRef(false);
 
   const capabilities = studio?.capabilities;
   const isAuthenticated = Boolean(studio?.isAuthenticated);
@@ -199,39 +249,66 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
   );
 
   const deleteProduct = useCallback(
-    async (product: Pick<PublicProduct, 'id' | 'product_name'>) => {
-      if (!product.id || !capabilities?.canDeleteProduct) return;
+    async (product: Pick<PublicProduct, 'id' | 'product_name' | 'slug'>) => {
+      if (!product.id || !capabilities?.canDeleteProduct || deleteLock.current) return;
+      deleteLock.current = true;
       const ok = window.confirm(
         `Remove “${product.product_name}” from the storefront? It will be deleted if possible, or unpublished if it still has inventory.`
       );
-      if (!ok) return;
+      if (!ok) {
+        deleteLock.current = false;
+        return;
+      }
       setError(null);
+      setDeletingProductId(product.id);
       try {
         try {
           await deleteStudioProduct(product.id);
         } catch (err) {
+          const status = err instanceof StudioApiError ? err.status : 0;
           const message =
             err instanceof StudioApiError
               ? err.message
               : err instanceof Error
                 ? err.message
                 : '';
-          const blockedByInventory =
-            /available inventory/i.test(message) &&
-            !/ProductArticle|protected foreign key/i.test(message);
-          if (blockedByInventory) {
-            // Hard delete blocked (stock still attached) — unpublish so it leaves the shop.
-            await patchStudioProduct(product.id, { is_published: false });
+          if (status === 404) {
+            // A slow first attempt can time out after the row is already gone.
           } else {
-            // Buying guides use PROTECT, so the API refuses the delete until they are
-            // unlinked. Keep the guides as standalone articles and retry.
-            const released = await releaseStudioProductDeleteBlockers(product.id);
-            if (!released) throw err;
-            await deleteStudioProduct(product.id);
+            const blockedByInventory =
+              /available inventory/i.test(message) &&
+              !/ProductArticle|protected foreign key/i.test(message);
+            if (blockedByInventory) {
+              // Hard delete blocked (stock still attached) — unpublish so it leaves the shop.
+              await patchStudioProduct(product.id, { is_published: false });
+            } else if (status >= 500) {
+              throw err;
+            } else {
+              // Buying guides use PROTECT, so an older API refuses the delete until they are
+              // unlinked. Keep the guides as standalone articles and retry once.
+              const released = await releaseStudioProductDeleteBlockers(product.id);
+              if (!released) throw err;
+              try {
+                await deleteStudioProduct(product.id);
+              } catch (retryErr) {
+                if (!(retryErr instanceof StudioApiError) || retryErr.status !== 404) {
+                  throw retryErr;
+                }
+              }
+            }
           }
         }
-        await queryClient.invalidateQueries();
-        window.location.reload();
+        dropDeletedProductFromCache(queryClient, product.id, product.slug);
+        void queryClient.invalidateQueries({ queryKey: ['products'] });
+        void queryClient.invalidateQueries({ queryKey: ['homepage-campaign'] });
+        void queryClient.invalidateQueries({ queryKey: ['bundles'] });
+        void revalidateStudioCatalog(product.slug);
+        if (product.slug && typeof window !== 'undefined') {
+          const bare = window.location.pathname.replace(/^\/studio(?=\/|$)/, '') || '/';
+          if (bare === `/products/${product.slug}` || bare.startsWith(`/products/${product.slug}/`)) {
+            router.replace(isStudioWindowPath() ? prefixStudioPath('/products') : '/products');
+          }
+        }
       } catch (err) {
         setError(
           err instanceof StudioApiError
@@ -240,9 +317,12 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
               ? err.message
               : 'Delete failed'
         );
+      } finally {
+        deleteLock.current = false;
+        setDeletingProductId(null);
       }
     },
-    [capabilities?.canDeleteProduct, queryClient]
+    [capabilities?.canDeleteProduct, queryClient, router]
   );
 
   const openEditArticle = useCallback(
@@ -763,6 +843,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
       openCreateProduct,
       openEditProduct,
       deleteProduct,
+      deletingProductId,
       openEditArticle,
       openCreateArticle,
       openEditPromotion,
@@ -794,6 +875,7 @@ export function StudioEditHost({ children }: { children: ReactNode }) {
     openCreateProduct,
     openEditProduct,
     deleteProduct,
+    deletingProductId,
     openEditArticle,
     openCreateArticle,
     openEditPromotion,
